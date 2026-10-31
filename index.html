@@ -734,7 +734,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.63.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.64.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -3670,18 +3670,20 @@ function nextItem(){
   showItem();
 }
 /* 到时间了：不偷偷接着练，停下来让你自己选 */
-function showTimeUp(){
+function showTimeUp(){ RUN._tuAt = Date.now(); if (typeof GAME !== "undefined" && GAME.idleStop) GAME.idleStop();   /* 停在这一页的时间不算练习时间 */
   const el = stageEl(); if (!el){ showItem(); return; }
   if (RUN.stage && RUN.stage.leave) RUN.stage.leave(); RUN.stage = null; TTS.cancel();
   const later = RUN.items.slice(RUN.i), retries = later.filter(x => x.retry).length, mins = Math.round(RUN.limitMs / 60000);
   el.innerHTML = `<div class="card"><h3>${mins} 分钟到了</h3><p class="muted small" style="margin-top:6px">后面还有 ${later.length} 题${retries ? `，其中 ${retries} 题是刚才没说出来、要再练一次的` : ""}。剩下的不会丢，会留到下次。</p>
     ${retries ? `<button class="btn primary block" style="margin-top:12px" data-act="tu-finish">把没说出来的 ${retries} 题练完再结束</button>` : ""}
     <button class="btn block${retries ? "" : " primary"}" style="margin-top:8px" data-act="tu-end">现在结束</button>
-    <button class="btn block ghost" style="margin-top:8px" data-act="tu-more">再练 5 分钟</button></div>`;
+    <button class="btn block ghost" style="margin-top:8px" data-act="tu-more">再练 5 分钟</button>
+     <button class="btn block ghost" style="margin-top:8px" data-act="tu-all">不限时，练完剩下的 ${later.length} 题</button></div>`;
 }
 ACT["tu-finish"] = () => { const later = RUN.items.slice(RUN.i); RUN.rest = later.filter(x => !x.retry); RUN.items = RUN.items.slice(0, RUN.i).concat(later.filter(x => x.retry)); showItem(); };
 ACT["tu-end"] = () => { RUN.rest = RUN.items.slice(RUN.i).filter(x => !x.retry); RUN.items = RUN.items.slice(0, RUN.i); showItem(); };
-ACT["tu-more"] = () => { RUN.limitMs += 5 * 60000; RUN.timeUp = false; showItem(); };
+ACT["tu-more"] = () => { if (RUN._tuAt){ RUN.t0 += Date.now() - RUN._tuAt; RUN._tuAt = 0; } RUN.limitMs = Math.max(RUN.limitMs, Date.now() - RUN.t0) + 5 * 60000; RUN.timeUp = false; showItem(); };
+ACT["tu-all"] = () => { RUN._tuAt = 0; RUN.limitMs = 0; RUN.timeUp = false; showItem(); };   /* 不限时：把这一轮剩下的都练完 */
 /* 切到别的 app 的时间不算进练习时间 */
 document.addEventListener("visibilitychange", () => { if (document.hidden){ RUN._hid = Date.now(); } else if (RUN._hid){ if (RUN.t0) RUN.t0 += Date.now() - RUN._hid; RUN._hid = 0; } });
 ACT["run-rest"] = () => { if (!RUN.rest || !RUN.rest.length) return; RUN.items = RUN.rest; RUN.rest = []; RUN.i = 0; RUN.limitMs = 0; RUN.timeUp = false; showItem(); };
@@ -3767,7 +3769,8 @@ class CardStage {
   onShow(){ if (this.hiddenAt){ if (this.t0) this.t0 += performance.now() - this.hiddenAt; this.hiddenAt = 0; } }
   target(){ return this.isE ? this.card.steps[this.step] : this.card; }
   leave(){ this.alive = false; clearInterval(this.clock); SR.abort(); if (WL.active){ WL.active = false; if (WL.stopFn) WL.stopFn(); Rec.cancel(); } if (this.recOn){ Rec.cancel(); this.recOn = false; } if (this.recUrl){ URL.revokeObjectURL(this.recUrl); this.recUrl = null; } }
-  show(){ if (this.freeUse === undefined){ const pc = S.cards[this.card.id]; this.freeUse = this.card.t === "w" && !!pc && (pc.box || 0) >= 2 && !this.retry && Math.random() < 0.4; } if (this.recUrl){ URL.revokeObjectURL(this.recUrl); this.recUrl = null; } this.phase = "prompt"; this.said = ""; this.cmp = null; this.ms = 0; this.tries = 0; this.firstCmp = null; this.mean = null; this.flags = []; this.mine = false; this.misrec = false; this.render(); }
+  show(){ if (RUN.game && typeof GAME !== "undefined" && GAME.idleArm) try { GAME.idleArm(this); } catch (e) {}   /* 游戏里迟迟不开口：对手出手 */
+    if (this.freeUse === undefined){ const pc = S.cards[this.card.id]; this.freeUse = this.card.t === "w" && !!pc && (pc.box || 0) >= 2 && !this.retry && Math.random() < 0.4; } if (this.recUrl){ URL.revokeObjectURL(this.recUrl); this.recUrl = null; } this.phase = "prompt"; this.said = ""; this.cmp = null; this.ms = 0; this.tries = 0; this.firstCmp = null; this.mean = null; this.flags = []; this.mine = false; this.misrec = false; this.render(); }
   chips(){ const c = this.card; return `<div class="kind"><span class="chip k">${TYPE_LABEL[c.t]}</span>${c.t === "w" ? "" : `<span class="chip">${esc((TAGS[c.tag]||TAGS.other).label)}</span>`}${c.reg ? `<span class="chip reg-${c.reg}">${({casual:"朋友之间", neutral:"通用", formal:"正式", listen:"听懂就行"})[c.reg] || ""}</span>` : ""}${this.retry ? '<span class="chip">再来一次</span>' : ""}${c.custom ? '<span class="chip">我导入的</span>' : ""}</div>`; }
   promptHTML(){
     const c = this.card;
@@ -3859,6 +3862,7 @@ class CardStage {
   }
   elapsed(){ return this.t0 ? performance.now() - this.t0 : 0; }
   async mic(){
+    if (typeof GAME !== "undefined" && GAME.idleStop) GAME.idleStop();   /* 开口了 */
     const useW = whisperOn();
     if (this.live){ if (Date.now() - (this.liveT || 0) > 600){ if (useW) whisperStop(); else SR.stop(); } return; }
     this.liveT = Date.now();
@@ -3973,9 +3977,9 @@ class CardStage {
       const sg = this.suggest();
       h += `<div class="rate">
         <button class="again ${sg==="again"?"sug":""}" data-act="c-rate" data-v="again">没说出来</button>
-        <button class="hard ${sg==="hard"?"sug":""}" data-act="c-rate" data-v="hard">有卡顿</button>
+        <button class="hard ${sg==="hard"?"sug":""}" data-act="c-rate" data-v="hard">有卡顿/有错误</button>
         <button class="good ${sg==="good"?"sug":""}" data-act="c-rate" data-v="good">秒出</button></div>
-        <p class="small muted rate-hint">秒出：说对了，没卡。有卡顿：说出来了，但慢了或者有个小错。没说出来：说不出来，或者大部分不对。</p>`;
+        <p class="small muted rate-hint">秒出：说对了，没卡。有卡顿/有错误：说出来了，但慢了、卡了，或者有错。没说出来：说不出来，或者大部分不对。</p>`;
     }
     return h + "</div>";
   }
@@ -4112,7 +4116,7 @@ function diffHTML(ops){
   }).join(" ");
 }
 ACT["c-mic"] = () => RUN.stage && RUN.stage.mic && RUN.stage.mic();
-ACT["c-check"] = () => { const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; const v = ($("#typed")||{}).value || ""; if (!v.trim()){ toast("先说出来，或在输入框里输入"); return; } SR.abort(); s.finish(v.trim()); };
+ACT["c-check"] = () => { if (typeof GAME !== "undefined" && GAME.idleStop) GAME.idleStop(); const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; const v = ($("#typed")||{}).value || ""; if (!v.trim()){ toast("先说出来，或在输入框里输入"); return; } SR.abort(); s.finish(v.trim()); };
 ACT["c-reveal"] = () => { const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; SR.abort(); const v = ($("#typed")||{}).value || ""; s.finish(v.trim()); };
 ACT["c-speak"] = () => { const s = RUN.stage; s && TTS.speak(s.target().en); };
 ACT["c-rate"] = el => { const s = RUN.stage; if (s instanceof CardStage && s.phase === "reveal") s.rate(el.dataset.v); };
@@ -5891,7 +5895,7 @@ VIEWS.about = {
       <div class="panel" style="margin-top:14px"><ul class="issues">
         <li><b>先说，再看答案。</b>从记忆里把句子说出来，比看十遍记得牢。所以几乎每道题都要你开口。</li>
         <li><b>灯灭就开口。</b>用时从灯灭算到你说完。用时越短，越接近脱口而出；某句刷新最快纪录时会变成紫色。</li>
-        <li><b>三个按钮决定下次什么时候再见。</b>没说出来：这一轮再来一次，明天再练；有卡顿：明天或过几天；秒出：隔得更久。每说对一次，下次就隔得更久；忘了就重新从明天开始。会的越来越少出现，不会的很快回来。</li>
+        <li><b>三个按钮决定下次什么时候再见。</b>没说出来：这一轮再来一次，明天再练；有卡顿/有错误：明天或过几天；秒出：隔得更久。每说对一次，下次就隔得更久；忘了就重新从明天开始。会的越来越少出现，不会的很快回来。</li>
         <li><b>说错了先自己改。</b>差一点时，app 先只给提示，让你再说一次，再给答案。自己改出来的记得更牢。</li>
         <li><b>复习听力时听后复述。</b>新句子先选意思；复习时不看文字整句说出来，练的是把连读的声音听成一个个词。</li>
         <li><b>题库可以选。</b>首页“练哪个题库”可以只练通用、日常生活，或者你导入的题库，比如某家公司的面试准备。来电模拟也能选用哪套面试题。</li>
@@ -6287,7 +6291,7 @@ VIEWS.today = {
     const n = Object.keys(last).length;
     return `<div class="wrap">${backBtn()}<h2>今天练过的</h2><p class="muted small" style="margin:6px 0 4px">${n ? `今天练了 ${n} 句。“没说出来”的那些，明天还会再考你；有空可以先听一遍、跟着说一遍。` : "今天还没练。"}</p>${n ? `<div style="text-align:right"><button class="btn sm ghost" data-act="hist-clear">清空今天的记录</button></div>` : ""}
       ${(() => { const off = ((+S.settings.dayStart) || 0) * 3600e3; const cs = (S.calls || []).filter(c => c.segs && dstr(new Date(c.ts - off)) === today()); return cs.length ? `<div class="sec-title">今天的模拟面试</div><div class="list">${cs.map(c => `<div class="li" style="gap:8px"><button class="linkrow grow" data-act="nav" data-v="callrev" data-id="${c.id}"><b>${esc(modName(c.mode))}</b><span>${esc(fmtWhen(c.ts))}，点开复盘</span></button><button class="btn sm ghost" data-act="call-del" data-id="${c.id}" aria-label="删除">删</button></div>`).join("")}</div>` : ""; })()}
-      ${sec("没说出来，明天还会再来", groups.again)}${sec("有卡顿", groups.hard)}${sec("秒出", groups.good)}
+      ${sec("没说出来，明天还会再来", groups.again)}${sec("有卡顿/有错误", groups.hard)}${sec("秒出", groups.good)}
       ${mis.length ? `<div class="sec-title">常被识别错的词</div><div class="panel">${mis.map(([w, k]) => `<span class="chip" style="margin:4px 6px 4px 0"><span class="w" data-act="word" data-w="${esc(w)}">${esc(w)}</span>　${k} 次</span>`).join("")}<p class="small muted" style="margin-top:8px">点词听读音，再用慢速跟读几遍。</p></div>` : ""}</div>`;
   }
 };
@@ -10106,7 +10110,7 @@ const BT = (() => {
     /* 迪迦那一套（第十四节）：起手式几乎站直，r 0.97 */
     tiga:   {name:"迪迦型", light:"jumpChop", heavy:"flyKick", skill:"zepellion", hover:false, r:0.97, cm:180},
     /* 红奈（第二十五节）：起手式 ÷ 站直 0.86，身高 187，巨大化 49 米 */
-    nexus:  {name:"红奈型", light:"bigPunch", heavy:"sideKick", skill:"overRay", hover:false, r:0.86, cm:187, giantM:49}
+    nexus:  {name:"红奈型", light:"bigPunch", heavy:"sideKick", skill:"overRay", hover:false, r:0.93, cm:187, giantM:49}   /* v1.64.0：0.86 是实际的起手式 ÷ 站直，但红奈起手压得很低，看起来比别人小一圈；按用户的感觉放大 195/180（巨大化同样乘这个比例） */
   };
   const tplOf = id => TEMPLATES[MS_ALIAS[id] || id] ? (MS_ALIAS[id] || id) : null;
   /* 这套组合正好是哪个模板；对不上就是“自定义” */
@@ -10478,7 +10482,8 @@ const BT = (() => {
       f.poseImgs[f.active].img.hidden = true; f.poseImgs[target].img.hidden = false; f.active = target;
     }
     const hasPose = (f, name) => !!(f.poseImgs && f.poseImgs[name]);
-    function pose(f, name, dur, easing){ if (f.rig) return poseTo(f.rig, POSES[name], dur, easing); showPose(f, POSE_FOR[name] || "idle"); return Promise.resolve(); }
+    function pose(f, name, dur, easing){ if (f.classList && f.classList.contains("still") && name !== "kneel" && name !== "lose") return Promise.resolve();   /* 已经倒下：只能跪倒 */
+      if (f.rig) return poseTo(f.rig, POSES[name], dur, easing); showPose(f, POSE_FOR[name] || "idle"); return Promise.resolve(); }
     /* 角色：poses 为空就用原创小人 */
     A.setChar = (poses, meta) => {
       A.dropCode(); A.clear(); ghost.monster = null; ghost.classList.remove("monster", "rigmon", "imgmon"); ghost.style.height = "";
@@ -10541,11 +10546,12 @@ const BT = (() => {
       poseTo(r, POSES.idle, 0); A.shields = 0; paintShields(); requestAnimationFrame(placeFighters);
     };
     /* 回放用：把已经倒下的对手先扶起来 */
-    A.revive = () => { if (A.cm){ A.cm.idle(); return; } ghost.getAnimations().forEach(a => a.cancel()); faceOf(ghost).getAnimations().forEach(a => a.cancel()); ghost.style.opacity = ""; ghost.classList.remove("still"); if (ghost.rig) poseTo(ghost.rig, POSES.idle, 0); };
+    A.revive = () => { if (A.cm){ A.cmDown = false; A.cm.idle(); return; } ghost.getAnimations().forEach(a => a.cancel()); faceOf(ghost).getAnimations().forEach(a => a.cancel()); ghost.style.opacity = ""; ghost.classList.remove("still"); if (ghost.rig) poseTo(ghost.rig, POSES.idle, 0); };
     A.enemyIn = async () => { if (reduced()) return; await run(ghost, [{transform:"translateX(-40%)", opacity:0}, {transform:"none", opacity:1}], {duration:420, easing:"ease-out"}); };
     /* 打倒怪物：闪一下、倒下、淡出 */
     A.knockout = async () => {
-      if (A.cm){ const d = box(CODE_PROXY); burst(d.x + d.w / 2, d.y + d.h / 2, Math.min(220, d.w * 1.2)); shake(7); await A.cm.play("lose"); return; }
+      /* 怪物被打倒：取消 0.3 秒后“再完整受击一次”的定时器，记下已经倒下（以前定时器照样执行：怪物爬起来挨一下，又回到起手式） */
+      if (A.cm){ clearTimeout(A._cmFinal); A.cmDown = true; ghost.classList.add("still"); const d = box(CODE_PROXY); burst(d.x + d.w / 2, d.y + d.h / 2, Math.min(220, d.w * 1.2)); shake(7); await A.cm.play("lose"); return; }
       const d = box(bodyOf(ghost)); burst(d.x + d.w / 2, d.y + d.h / 2, Math.min(220, d.w * 1.4)); shake(7);
       for (let i = 0; i < 6; i++){ const s = document.createElement("div"); s.className = "bt-spark"; s.style.left = d.x + d.w * (0.2 + Math.random() * 0.6) + "px"; s.style.top = d.y + d.h * (0.1 + Math.random() * 0.6) + "px"; fx.appendChild(s); removeAfter(s.animate([{transform:"scale(0)", opacity:0}, {transform:"scale(1.2) rotate(45deg)", opacity:1, offset:0.4}, {transform:"scale(.2) rotate(90deg)", opacity:0}], {duration:600, delay:i * 50, easing:"ease-out", fill:"both"}), s); }
       /* 跪倒、变灰，留在原地（以前是倒下淡出，看起来像直接消失了） */
@@ -10604,6 +10610,9 @@ const BT = (() => {
         onShake: k => shake(4 * k),
         lite: !!L.lite, z: 2
       });
+      A.cmDown = false;
+      /* 倒下以后：除了“倒下”“胜利”，别的动作一律不执行（挨打的定时器、收招时的回到起手式都拉不起来） */
+      { const raw = A.cm, play0 = raw.play.bind(raw), idle0 = raw.idle.bind(raw); raw.play = k => (A.cmDown && k !== "lose" && k !== "win" ? Promise.resolve() : play0(k)); raw.idle = () => (A.cmDown ? undefined : idle0()); }
       try { A.cm.idle(); } catch (e) {}   /* 一出场就摆起手式，不先站直 */
       A.lightKey = null; requestAnimationFrame(() => relight(true));
     };
@@ -11239,7 +11248,7 @@ const BT = (() => {
         face.animate([{filter:"drop-shadow(0 0 18px rgba(90, 200, 255, .95))"}, {filter:"drop-shadow(0 0 22px rgba(170, 235, 255, 1))"}], {duration:430});
         await wait(430); if (token !== A.token) return;
       }
-      if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }
+      if (cl && cl.fizzle){ await fizzleOut(att, def, dir); return; } if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }
       pose(att, "fire"); await wait(30);
       const o = handPoint(att), SW = stage.clientWidth;
       const h0 = Math.max(12, size * 0.075), h1 = Math.max(46, size * 0.46), EXT = 190, OUT = 280, t0 = performance.now(); let HOLD = cl ? 1e9 : 1700;
@@ -11347,7 +11356,7 @@ const BT = (() => {
       const b0 = box(bodyOf(att)); motes(b0.x + b0.w * (dir < 0 ? 0.25 : 0.75), b0.y + b0.h * 0.78, 14, 650, "orange");
       await run(face, [{filter:"drop-shadow(0 0 0 transparent)"}, {filter:"drop-shadow(0 0 14px rgba(255, 150, 40, .95))", offset:0.5}, {filter:"drop-shadow(0 0 20px rgba(255, 170, 60, 1))"}], {duration:650, easing:"ease-in-out"});
       if (token !== A.token) return;
-      if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }
+      if (cl && cl.fizzle){ await fizzleOut(att, def, dir); return; } if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }
       pose(att, "rise", 120); await wait(30);
       const b1 = box(bodyOf(att)); arcSwoosh(b1.x + b1.w * (dir < 0 ? 0.22 : 0.78), b1.y + b1.h * 0.42, b1.h * 0.95, "rise", "rgba(255, 150, 40, .95)", dir); shake(5);
       face.animate([{filter:"drop-shadow(0 0 16px rgba(255, 150, 40, .9))"}, {filter:"drop-shadow(0 0 0 transparent)"}], {duration:700});
@@ -11511,7 +11520,7 @@ const BT = (() => {
       zepRays(b.x + b.w * 0.5, b.y + b.h * 0.29, b.h, 1000, b.y + b.h * 0.215, b.w * 2.6);
       await run(face, [{filter:"drop-shadow(0 0 0 transparent)"}, {filter:"drop-shadow(0 0 20px rgba(235, 235, 255, 1))"}], {duration:1000, easing:"ease-in-out"});
       if (token !== A.token) return;
-      if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }
+      if (cl && cl.fizzle){ await fizzleOut(att, def, dir); return; } if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }
       pose(att, "fire"); await wait(40);
       const o = handPoint(att), size = box(bodyOf(att)).h;
       holdGlow(face, "drop-shadow(0 0 16px rgba(255, 255, 255, .95))");
@@ -11557,6 +11566,37 @@ const BT = (() => {
       push.cancel(); if (!def.classList.contains("still")) pose(def, "idle", 260);
       fadeHeld(800); await pose(att, "idle", 300);
     }
+    /* ---------- 大招没说出来（v1.64.0）：前摇照常，摆出发射的姿势时不出光，发射的位置打出一团短路火花，人物被反噬（受击一次），回到起手式，不扣血 ---------- */
+    async function fizzleOut(att, def, dir){
+      const token = A.token, slow = window.__fzSlow || 1; pose(att, "fire"); await wait(150); if (token !== A.token) return;   /* __fzSlow 只给测试截图用 */
+      const seg = beamSeg(att, "skill"); const o = seg ? {x:seg.x, y:(seg.yTop + seg.yBot) / 2} : handPoint(att), size = box(bodyOf(att)).h, t0 = performance.now(), sparks = [], smoke = [];
+      try { window.__fzSpark = {t:t0, x:o.x, y:o.y}; } catch (e) {}   /* 测试用：短路开始的时间和位置 */
+      for (let i = 0; i < 26; i++){ const a = Math.random() * Math.PI * 2, v = 0.14 + Math.random() * 0.4; sparks.push({vx:Math.cos(a) * v, vy:Math.sin(a) * v - 0.14, life:500 + Math.random() * 600, r:1.6 + Math.random() * 2.2}); }
+      for (let i = 0; i < 4; i++) smoke.push({dx:(Math.random() - 0.5) * size * 0.06, r:size * (0.05 + Math.random() * 0.04), d:Math.random() * 200});
+      glowTop.add((ctx, now) => {
+        if (token !== A.token) return false; const t = (now - t0) / slow; if (t > 1250) return false;
+        ctx.save();
+        for (const m of smoke){ const k = Math.max(0, (t - m.d) / 1000); if (k <= 0 || k >= 1) continue;   /* 一小团往上飘的黑烟 */
+          ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 0.28 * (1 - k) * Math.min(1, k * 5); ctx.fillStyle = "#3A3A40"; ctx.beginPath(); ctx.arc(o.x + m.dx * (1 + k), o.y - size * 0.12 * k, m.r * (0.6 + k), 0, Math.PI * 2); ctx.fill(); }
+        ctx.globalCompositeOperation = "lighter"; ctx.globalAlpha = 1;
+        if (t < 200) blit(ctx, "white", o.x, o.y, size * 0.2 * (1 - t / 200) + 10, 1 - t / 200);   /* 一下白闪 */
+        if (t < 200) blit(ctx, "blue", o.x, o.y, size * 0.28 * (1 - t / 200) + 14, 0.6 * (1 - t / 200));
+        if (t < 620 && Math.floor(t / 60) % 2 === 0){   /* 噼啪的电弧，闪几下 */
+          for (let i = 0; i < 7; i++){ const a = Math.random() * Math.PI * 2, L0 = size * (0.07 + Math.random() * 0.1), pts = jag(o.x, o.y, o.x + Math.cos(a) * L0, o.y + Math.sin(a) * L0, L0 * 0.32, 6);
+            const path = () => { ctx.beginPath(); pts.forEach(([px, py], k) => (k ? ctx.lineTo(px, py) : ctx.moveTo(px, py))); };
+            ctx.lineCap = "round"; ctx.strokeStyle = "rgba(120,180,255,.6)"; ctx.lineWidth = 5; path(); ctx.stroke(); ctx.strokeStyle = "rgba(190,225,255,.95)"; ctx.lineWidth = 2.4; path(); ctx.stroke(); ctx.strokeStyle = "#FFFFFF"; ctx.lineWidth = 1.1; path(); ctx.stroke(); }
+        }
+        for (const s2 of sparks){ if (t > s2.life) continue; const k = t / s2.life, px = o.x + s2.vx * t, py = o.y + s2.vy * t + 0.0008 * t * t;   /* 往外溅、往下掉的火星，带一点拖尾 */
+          ctx.globalAlpha = 1 - k; ctx.strokeStyle = k < 0.35 ? "#FFF6C8" : "#FFA030"; ctx.lineWidth = s2.r; ctx.lineCap = "round";
+          ctx.beginPath(); ctx.moveTo(px - s2.vx * 22, py - (s2.vy + 0.0016 * t) * 22); ctx.lineTo(px, py); ctx.stroke(); }
+        ctx.restore(); return true;
+      });
+      shake(6); await wait(260 * slow); if (token !== A.token) return;
+      fadeHeld(300); pose(att, "recoil", 90);
+      await run(att, [{transform:"none"}, {transform:`translateX(${-dir * 18}px)`}, {transform:"none"}], {duration:460 * slow, easing:"ease-out"});
+      if (token !== A.token) return; await wait(200 * slow); await pose(att, "idle", 300);
+    }
+    A.fizzle = () => A.move("skill", 0, {fizzle:true});
     /* ---------- 红奈：层叠风暴（第二十五到三十节） ---------- */
     /* 手臂能量的位置：每条手臂“手肘 x、y，拳头 x、y”，按姿势图宽高的比例（第二十九节在姿势图特写上逐点核对过） */
     const ARM_SEGS = {nexus:{skillWind:[[0.295, 0.31, 0.333, 0.157], [0.612, 0.322, 0.53, 0.151]], skillMid:[[0.365, 0.163, 0.32, 0.062], [0.627, 0.16, 0.614, 0.027]], skill:[[0.284, 0.31, 0.312, 0.125]]}};
@@ -11631,7 +11671,7 @@ const BT = (() => {
       armEnergy(att, "skillMid", 950, 1);
       await run(face, [{filter:fil(att, "drop-shadow(0 0 5px rgba(120, 190, 255, .4))")}, {filter:fil(att, "drop-shadow(0 0 9px rgba(150, 210, 255, .55))")}], {duration:900, easing:"ease-in-out"});
       if (token !== A.token) return;
-      if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }
+      if (cl && cl.fizzle){ await fizzleOut(att, def, dir); return; } if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }
       pose(att, "fire"); await wait(40);
       const o = handPoint(att), size = box(bodyOf(att)).h;
       holdGlow(face, fil(att, "drop-shadow(0 0 8px rgba(160, 210, 255, .55))"));
@@ -11760,7 +11800,7 @@ const BT = (() => {
       const c0 = handPoint(att); motes(c0.x, c0.y, 14, 700);
       await run(face, [{filter:"drop-shadow(0 0 0 transparent)"}, {filter:"drop-shadow(0 0 16px rgba(150, 224, 238, .95))", offset:0.4}, {filter:"drop-shadow(0 0 20px rgba(150, 224, 238, 1))"}], {duration:700, easing:"ease-in-out"});
       if (token !== A.token) return;
-      const cl = opt.cl; if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }   /* 对波：前摇做完，等对方也准备好，一起出手 */
+      const cl = opt.cl; if (cl && cl.fizzle){ await fizzleOut(att, def, dir); return; } if (cl){ cl.ready(); await cl.go; if (token !== A.token) return; }   /* 对波：前摇做完，等对方也准备好，一起出手 */
       pose(att, "fire"); await wait(30);
       const o = handPoint(att); let xEnd = dir < 0 ? -120 : SW + 120; const span = Math.max(1, Math.abs(o.x - xEnd)), xEnd0 = xEnd;
       let HOLD = cl ? 1e9 : 1600; const t0 = performance.now(), h0 = size * 0.03 * (opt.wide || 1), h1 = size * 0.085 * (opt.wide || 1), rings = [], streaks = [];
@@ -12054,17 +12094,17 @@ const BT = (() => {
         effect:(x, y, d) => { slash(x, y, dir); burst(x, y, Math.min(150, d.w)); }}, o || {}))),
       flyKick: (att, def, dir, dmg, o) => (att.rig ? MOVES.kick(att, def, dir, dmg, o) : leapStrike(att, def, dir, dmg, Object.assign({crouchMs:240, air:"kick", hit:"kick", hitPose:"heavy", flyMs:320, arc:0.2, strikeAt:1, deep:0.36, at:0.2, slide:90, slideK:2, slideMin:120, skidMs:340, slideEase:"cubic-bezier(.5, 1, .89, 1)", ring:true, land:"kickWind", hold:110, big:true,
         effect:(x, y, d) => { punchFx(x, y, d, dir); burst(x, y, Math.min(210, d.w * 1.35)); }}, o || {}))),
-      zepellion: (att, def, dir, total) => (att.rig ? specialWide(att, def, dir, total, RIG_BEAM) : zepellion(att, def, dir, total)),
+      zepellion: (att, def, dir, total, o) => (att.rig ? specialWide(att, def, dir, total, Object.assign({}, RIG_BEAM, o && o.fizzle ? {cl:o} : {})) : zepellion(att, def, dir, total, o && o.fizzle ? o : null)),
       /* 红奈：背身蓄力 300ms 再冲出去出拳，打在胸口高度 */
       bigPunch: (att, def, dir, dmg, o) => (att.rig ? MOVES.punch(att, def, dir, dmg, o) : melee(att, def, dir, dmg, Object.assign({wind:"leap", windMs:300, hit:"punch", dashMs:140, hy:0.28, hold:200, big:true,
         effect:(x, y, d) => { punchFx(x, y, d, dir); burst(x, y, Math.min(170, d.w * 1.1)); }}, o))),
       /* 红奈：提膝冲过去、靠近了才踢出（lateHit 0.72），脚踢进胸口 */
       sideKick: (att, def, dir, dmg, o) => (att.rig ? MOVES.kick(att, def, dir, dmg, o) : melee(att, def, dir, dmg, Object.assign({wind:"kickWind", windMs:160, hit:"kick", dashMs:180, lateHit:0.72, hy:0.3, hold:170, big:true,
         effect:(x, y, d) => { punchFx(x, y, d, dir); burst(x, y, Math.min(190, d.w * 1.25)); shockRing(x, y, d.h * 0.18); }}, o))),
-      overRay: (att, def, dir, total) => (att.rig ? specialWide(att, def, dir, total, RIG_BEAM) : overRay(att, def, dir, total)),
+      overRay: (att, def, dir, total, o) => (att.rig ? specialWide(att, def, dir, total, Object.assign({}, RIG_BEAM, o && o.fizzle ? {cl:o} : {})) : overRay(att, def, dir, total, o && o.fizzle ? o : null)),
       /* 大光线：初代、百慕拉的新画法；原创小人用 RIG_BEAM（第十五、十七节） */
-      wideBeam: (att, def, dir, total) => specialWide(att, def, dir, total, att.rig ? RIG_BEAM : {}),
-      crescent: (att, def, dir, total) => crescentGlow(att, def, dir, total),
+      wideBeam: (att, def, dir, total, o) => specialWide(att, def, dir, total, Object.assign({}, att.rig ? RIG_BEAM : {}, o && o.fizzle ? {cl:o} : {})),
+      crescent: (att, def, dir, total, o) => crescentGlow(att, def, dir, total, o && o.fizzle ? o : null),
       /* 火焰踢：蓄力时小腿到脚着火，跟着腿走；命中时两道弧光（橙色、金黄）加一团火焰爆开，170ms 后火灭 */
       fireKick: async (att, def, dir, dmg, o) => {
         let flame = null;
@@ -12074,7 +12114,7 @@ const BT = (() => {
             effect:(x, y, d) => { fireBurst(x, y, Math.min(230, d.w * 1.5)); if (flame) setTimeout(() => flame.stop(), 170); }}, o));
         } finally { if (flame) flame.stop(); }
       },
-      stormBeam: (att, def, dir, total) => stormBeam(att, def, dir, total)
+      stormBeam: (att, def, dir, total, o) => stormBeam(att, def, dir, total, o && o.fizzle ? o : null)
     };
     /* 你出招：kind = light（轻击）/ heavy（重击）/ skill（技能），按这个角色的招式 */
     A.move = async (kind, dmg, o) => {
@@ -12112,7 +12152,7 @@ const BT = (() => {
       else loser.animate([{transform:"none"}, {transform:`translateY(6%) rotate(${fallDeg}deg)`}], {duration:560, easing:"ease-in", fill:"forwards"});
       l.animate([{filter:fil(loser, "grayscale(0)")}, {filter:fil(loser, loseFilter(loser))}], {duration:1400, delay:650, easing:"ease-in-out", fill:"both"});   /* 先摆出倒下的姿势、不变色，停一下再慢慢变灰 */
       if (youWon) A.setHP(0);
-      if (A.cm){ if (youWon) A.cm.play("lose"); else A.cm.play("win"); }
+      if (A.cm){ if (youWon){ clearTimeout(A._cmFinal); A.cmDown = true; A.cm.play("lose"); } else A.cm.play("win"); }
       await wait(220);
       if (winner === you) sparkles(you);
       pose(winner, "win", 300);
@@ -12521,7 +12561,7 @@ const GAME = {
     GAME.next(true);
     if (r && r.hp != null && GAME.st.enemy){ GAME.st.enemy.hp = r.hp; A.setHP(r.hp, true, GAME.st.enemy.max); }
     GAME.score(); GAME.meter();
-    if (!L.gameTip){ const g = document.querySelector(".g-top"); if (g) g.insertAdjacentHTML("beforeend", `<div class="panel g-tip"><b>怎么打</b><p class="small" style="margin-top:4px">说完一句，你的角色就出招：完全对、基本对、意思对（换了个说法）都出重击，完全对、而且看到就能开口、正常语速一口气说完（十个词的句子大约 7 秒），还有暴击；只要开口说了，至少也能擦伤对手；一个字没说，对手加一层护盾，还会反击你：小兵打得轻，首领打得最重。重练时说对就能打碎护盾。被识别错了，就点“我说对了，是识别错了”，和识别对了完全一样。每次第一次就说对，攒一格能量；攒满 5 格，下一张是大招卡，说对了就放大招，没说出来能量降到 3 格。没看清，点“回放”。</p><button class="btn sm" data-act="g-tip-ok" style="margin-top:6px">知道了</button></div>`); }
+    if (!L.gameTip){ const g = document.querySelector(".g-top"); if (g) g.insertAdjacentHTML("beforeend", `<div class="panel g-tip"><b>怎么打</b><p class="small" style="margin-top:4px">说完一句，你的角色就出招：完全对、基本对、意思对（换了个说法）都出重击，完全对、而且看到就能开口、正常语速一口气说完（十个词的句子大约 7 秒），还有暴击；只要开口说了，至少也能擦伤对手；一个字没说，对手加一层护盾，还会反击你：小兵打得轻，首领打得最重。重练时说对就能打碎护盾。被识别错了，就点“我说对了，是识别错了”，和识别对了完全一样。每次第一次就说对，攒一格能量；攒满 5 格，下一张是大招卡，说对了就放大招。没看清，点“回放”。</p><button class="btn sm" data-act="g-tip-ok" style="margin-top:6px">知道了</button></div>`); }
   },
   score(){ const st = GAME.st; if (!st) return; const day = batDayRec(); st.A.setScore(`今天 ${st.todayBefore + st.sessionDmg}${day.hp ? ` / 昨天 ${day.hp}` : " 点"}`); },
   /* 连击、能量（5 格满了，下一张就是大招卡）、第几只 */
@@ -12640,7 +12680,7 @@ const GAME = {
         GAME.say(`大招！-${dmg}`); st.last.push({kind:"special", dmg, label:`大招！-${dmg}`});
         await A.special(dmg); await GAME.afterHit(); return;
       }
-      st.energy = 3; GAME.meter(); GAME.say("大招卡没说出来：能量降到 3 格，再说对 2 次又能放。正确说法看下面"); return;
+      st.energy = 3; GAME.meter(); GAME.say("大招没放出来，正确说法看下面"); try { await A.fizzle(); } catch (e) {} return;
     }
     const LBL = {exact:"完全对", close:"基本对", meaning:"意思对了，换了个说法", sound:"听起来很接近", graze:"开口了，擦伤"};
     for (const ev of plan.events){
@@ -12669,6 +12709,25 @@ const GAME = {
     GAME.meter();
   },
   /* 对手反击：只有主动放弃（一个字没说）才会。伤害按对手的档位分（小兵最低、首领最高），再按出的招加成 */
+  /* 迟迟不开口（v1.64.0）：卡片出现 12 秒还没开口 → 轻击；再 8 秒 → 重击；之后每 10 秒轻击，一张卡最多 3 下。长句子多给时间（超过 8 个词每个词 +0.5 秒，最多 20 秒）。
+     按麦克风、打字作答、离开页面、切到后台都停。伤害和“对手反击”一样按对手的档位 */
+  idleArm(stage){
+    GAME.idleStop(); const st = GAME.st; if (!st || !stage || !stage.card) return;
+    const words = String(stage.card.en || "").split(/\s+/).filter(Boolean).length, t1 = Math.min(20, 12 + Math.max(0, words - 8) * 0.5) * 1000;
+    let n = 0; const gen = GAME._idleGen = (GAME._idleGen || 0) + 1;   /* 每次开始、停止都换一个编号：正在出手时按了麦克风，打完也不会再安排下一次 */
+    const tick = delay => { delay *= GAME.idleScale || 1; GAME._idleT = setTimeout(async () => {   /* idleScale 只给测试用 */
+      if (gen !== GAME._idleGen || !GAME.st || typeof RUN === "undefined" || RUN.stage !== stage || (stage.phase !== "prompt" && stage.phase !== "retry") || stage.live || document.hidden) return;
+      n++; await GAME.idleHit(n); if (gen === GAME._idleGen && n < 3 && GAME.st && RUN.stage === stage) tick(n === 1 ? 8000 : 10000); }, delay); };
+    tick(t1);
+  },
+  idleStop(){ clearTimeout(GAME._idleT); GAME._idleT = 0; GAME._idleGen = (GAME._idleGen || 0) + 1; },
+  async idleHit(n){
+    const st = GAME.st; if (!st || GAME._idleBusy) return; GAME._idleBusy = true;
+    try { const kind = n === 2 ? "heavy" : "light", dmg = counterDmg(st.enemy, kind); st.php = Math.max(0, (st.php || 0) - dmg);
+      try { st.A.setYouHP(st.php, 100); } catch (e) {} await st.A.enemyMove(kind, dmg);
+      GAME.say(`太久没开口：对手出手了，你 -${dmg}（还剩 ${st.php}）`); if (st.php <= 0) await GAME.fail();
+    } finally { GAME._idleBusy = false; }
+  },
   async counter(){
     const st = GAME.st; if (!st) return; const A = st.A, e = st.enemy;
     st.giveups++;
@@ -12682,6 +12741,7 @@ const GAME = {
   },
   /* 血扣光：这一局失败。停下来，让用户选 */
   async fail(){
+    GAME.idleStop();   /* 弹出“继续还是结束”时不再计时（不然一边选一边挨打） */
     const st = GAME.st; if (!st) return; const A = st.A;
     GAME.say("血扣光了：这一局失败");
     await A.finish(false);
@@ -13654,13 +13714,25 @@ const ERR_DEFS = {
   B7:{n:"动词形式、情态动词叠用", tip:"情态动词不能叠用：might can → could"}, B8:{n:"单复数", tip:"两个以上的东西加 -s"},
   B9:{n:"冠词", tip:"元音开头用 an：an interview"}, B10:{n:"介词", tip:"年份、季节前面用 in：in 2024、in the summer"},
   B11:{n:"中式搭配", tip:"换成现成的地道说法（看聊天语块）"}, B12:{n:"-ed / -ing 形容词", tip:"事物让人觉得怎样用 -ing：exciting、tiring"},
-  B13:{n:"双重最高级", tip:"most 和 -est 二选一"}, C1:{n:"小写 i", tip:"I 永远大写"}, C2:{n:"缺撇号", tip:"I'm、it's、that's、don't"},
+  B13:{n:"双重最高级", tip:"most 和 -est 二选一"}, B14:{n:"语序", tip:"频率词放在动词前，enough 放在形容词后，时间词放在句首或句末，间接问句不倒装"}, B15:{n:"being 用多了", tip:"说状态、地点直接用 be：I'm here、I'm busy；being 只在“正在被…”“这会儿表现得…”或者当名词用时出现"}, C1:{n:"小写 i", tip:"I 永远大写"}, C2:{n:"缺撇号", tip:"I'm、it's、that's、don't"},
   C3:{n:"拼写", tip:"拼写错误"}, C4:{n:"逗号连句", tip:"两个完整的句子之间用句号，或者用 and / but / so 连起来"},
   E1:{n:"话题跳跃、顺序", tip:"先回答对方的问题 → 再回应 → 再说自己的新话题 → 最后留一个问题"}, E2:{n:"一句话太长", tip:"一句只讲一件事，拆成两句"},
   D3:{n:"语气和分寸", tip:"一封信问一两个问题就够"}
 };
 /* 自动检查：只标不改。每条规则对应一个错误代码 */
 const RW_RULES = [
+  /* v1.64.0 B14 语序：中文母语者最常出、又能准确判断的几种 */
+  {c:"B14", re:/\b(?:I|you|we|they|he|she)\s+very\s+(?:like|love|want|enjoy|hate|appreciate|need|miss)\b/gi, tip:"very 不能直接放在动词前：I really like it / I like it very much"},
+  {c:"B14", re:/\blike\s+very\s+much\s+(?:the|this|that|these|those|my|your|his|her|our|their|to|playing|going|watching)\b/gi, tip:"very much 放在最后：I like the movie very much"},
+  {c:"B14", re:/\b(?:I|you|we|they)\s+(?:go|eat|drink|play|work|study|watch|read|cook|run|swim|travel|call|walk|drive|get|take)\s+(?:always|usually|never)\b/gi, tip:"always、usually、never 放在动词前面：I always go …"},
+  {c:"B14", re:/(?:^|[.!?]\s+)(?:always|never)\s+(?:I|we|you|they|he|she)\s+/gi, tip:"always、never 放在主语后面：I always … / I never …（usually、sometimes 可以放句首）"},
+  {c:"B14", re:/\benough\s+(?:big|good|fast|strong|tall|old|long|high|cheap|close|early|warm|cold|easy|hard|smart|large|small|quick|safe|clear)\b/gi, tip:"enough 放在形容词后面：big enough、good enough"},
+  {c:"B14", re:/\b(?:I|we|he|she|they)\s+(?:yesterday|today|tomorrow|last night|last week)\s+(?:went|go|had|did|was|were|will|am|is|are|have|met|saw|bought|got)\b/gi, tip:"时间词放在句首或句末：Yesterday I went … / I went … yesterday"},
+  {c:"B14", re:/\b(?:know|tell me|wonder|not sure|remember|understand)\s+(?:where|what|when|why|how)\s+(?:is|are|was|were|does|do|did|can|will)\s+(?:the|my|your|his|her|this|that|he|she|they|you|we|it)\b/gi, tip:"间接问句不倒装：Do you know where the station is? / I'm not sure what it is"},
+  {c:"B14", re:/\b(?:I|you|we|they|he|she)\s+also\s+(?:am|is|are|was|were)\b/gi, tip:"also 放在 be 动词后面：I'm also … / I was also …"},
+  /* v1.64.0 B15 being 用多了：说状态、地点直接用 be */
+  {c:"B15", re:/\b(?:first|second|third|last|only)\s+time\s+being\s+(?:here|there|in|at)\b/gi, tip:"这里不用 being：It's my first time here / my first time coming here"},
+  {c:"B15", re:/\b(?:I'm|I am|we're|we are|he's|he is|she's|she is|they're|they are)\s+being\s+(?:here|there|home|busy|ready|tired|nervous|excited|hungry|sick|happy|sad|late|early|free)\b/gi, tip:"说状态直接 I'm busy / I'm here；be being + 形容词只用来说“这会儿表现得…”（You're being rude）"},
   {c:"A3", re:/\bthose days\b/gi, skip:/back in those days|in those days/i},
   {c:"B2", re:/\balthough\b[^.!?]*?\bbut\b/gi},
   {c:"B1", re:/(?<!\b(?:is|was|isn't|wasn't|make|makes|made|find|finds|found|keep|keeps|kept|get|got|think|thought|feel|felt|consider)\s)\bit\s+(?:cool|hard|good|nice|great|fun|easy|amazing|awesome|interesting|crazy|true|ok|okay|fine|my first|a really)\b/gi},
@@ -14019,9 +14091,18 @@ function pronMakeRound(u, total){
   for (let r = 0; r < per; r++) for (const s of sets) out.push(s);
   const w = sets.map(s => 1 + Math.min(3, (st.miss || {})[s.join("/")] || 0));
   while (out.length < total){ let x = Math.random() * w.reduce((a, c) => a + c, 0), k = 0; while (x > w[k]) { x -= w[k]; k++; } out.push(sets[Math.min(k, sets.length - 1)]); }
-  for (let i = out.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; }
-  for (let i = 1; i < out.length; i++) if (out[i] === out[i - 1]){ const j = out.findIndex((s, k) => k > i && s !== out[i] && s !== out[i - 1]); if (j > 0) [out[i], out[j]] = [out[j], out[i]]; }
-  return out.slice(0, total).map(set => { const key = set.join("/"), n = used[key] = (used[key] || 0) + 1;
+  /* 一道一道地排（v1.64.0）：每次从剩下的里挑一个和上一道不同的，剩得最多的优先（不然最后只剩同一组）；实在只剩同一组，就插到前面两边都不同的位置。
+     以前是先打乱、再往后找来换，换过来可能又造成新的连着重复，偶尔会有同一组连着两道 */
+  const pool = new Map(); for (const x of out) pool.set(x, (pool.get(x) || 0) + 1);
+  const seq = [];
+  while (seq.length < out.length){
+    const last = seq[seq.length - 1], cands = [...pool.entries()].filter(([x, n]) => n > 0 && x !== last);
+    if (!cands.length){ const [x] = [...pool.entries()].find(([, n]) => n > 0); pool.set(x, pool.get(x) - 1);
+      const k = seq.findIndex((y, i) => y !== x && (i === 0 || seq[i - 1] !== x)); if (k < 0) seq.push(x); else seq.splice(k, 0, x); continue; }
+    const max = Math.max(...cands.map(([, n]) => n)), top = cands.filter(([, n]) => n >= max - 1);
+    const [x] = top[Math.floor(Math.random() * top.length)]; seq.push(x); pool.set(x, pool.get(x) - 1);
+  }
+  return seq.slice(0, total).map(set => { const key = set.join("/"), n = used[key] = (used[key] || 0) + 1;
     if (u.accent){ const gb = n % 2 === 0 ? Math.random() < 0.5 : n % 2 === 1 && Math.random() < 0.5; return {set, word:set[0], ans: gb ? "英式" : "美式", opts:["美式", "英式"], gb}; }
     const ans = set[(n - 1 + Math.floor(Math.random() * set.length)) % set.length]; return {set, word:ans, ans, opts:set.slice()}; });
 }
@@ -14315,7 +14396,7 @@ ACT["rw-new"] = () => { RW.text = ""; RW.letter = ""; RW.first = null; RW.firstI
 ACT["rw-del"] = async el => { if (!await sheet("删除这一条记录？", "", "删除", true)) return; S.replies = (S.replies || []).filter((x, i) => i !== +el.dataset.k); save(); UI.render(); };
 
 /* 日常练习用的语法检查：只用不容易误判的几类；参考说法自己也会被同一条规则标出来的不算 */
-const RW_SPEAK = new Set(["B1", "B2", "B3", "B4", "B5", "B7", "B8", "B10", "B11", "B13", "A3", "A5", "A2"]);
+const RW_SPEAK = new Set(["B1", "B2", "B3", "B4", "B5", "B7", "B8", "B10", "B11", "B13", "B14", "B15", "A3", "A5", "A2"]);
 function rwSpeakFlags(said, ref){
   try { const refC = new Set(rwCheck(String(ref || ""), "", false).map(x => x.c)); const seen = new Set();
     const top = typeof errTop === "function" ? errTop(13) : [], rank = c => { const i = top.indexOf(c); return i < 0 ? 99 : i; };
