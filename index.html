@@ -734,7 +734,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.62.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.63.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -10325,68 +10325,35 @@ const BT = (() => {
     for (let dy = -R; dy <= R; dy++) for (let dx = -R; dx <= R; dx++){ if (!dx && !dy) continue; const v = sc(dx, dy) - pen * (dx * dx + dy * dy); if (v > best.v) best = {dx, dy, v}; }
     return best.v > base * 1.08 ? {dx:best.dx, dy:best.dy} : {dx:0, dy:0};
   }
-  /* 眼睛的范围用你自己的图找全（v1.62.2）：发光部位.json 里有些姿势的眼睛遮罩画得不完整或者放错了地方（迪迦重击、胜利只盖了眼睛的一部分；
-     初代技能、胜利只有几个像素，胜利的还不在眼缝上）。从遮罩里又亮、颜色又接近这个部位颜色的像素出发（一个都没有就在附近找最近的一块），
-     往外把挨着的、同样又亮又是这个颜色的像素都算进来——整只眼睛就都包括了；头盔的银色没这么亮、颜色也不一样，不会算进来。范围太大或太小就退回原来的遮罩 */
-  function eyeRegion(img, w, h, mask, px, py, mw, mh, color){
-    let data = ALIGN_PX.get(img); if (!data){ const c = canvasOf(w, h), g = c.getContext("2d"); g.drawImage(img, 0, 0); data = g.getImageData(0, 0, w, h).data; ALIGN_PX.set(img, data); }
-    const [cr, cg, cb] = /^#[0-9a-f]{6}$/i.test(color || "") ? hexRGB(color) : [255, 250, 230];
-    const ok = (X, Y) => { if (X < 0 || Y < 0 || X >= w || Y >= h) return false; const i = (Y * w + X) * 4; if (data[i + 3] < 90) return false;
-      const r = data[i], g = data[i + 1], b = data[i + 2], lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255, sim = 1 - Math.min(1, Math.hypot(r - cr, g - cg, b - cb) / 255);
-      return lum >= 0.84 && sim >= 0.8; };
-    const W = Math.max(1, Math.round(mw)), H = Math.max(1, Math.round(mh)), mc = canvasOf(W, H), mg = mc.getContext("2d"); mg.drawImage(mask, 0, 0, W, H); const md = mg.getImageData(0, 0, W, H).data;
-    const R = Math.round(Math.max(W, H, h * 0.03) * 1.6), cx0 = Math.round(px + W / 2), cy0 = Math.round(py + H / 2);
-    const bx0 = Math.max(0, cx0 - R), by0 = Math.max(0, cy0 - R), bx1 = Math.min(w - 1, cx0 + R), by1 = Math.min(h - 1, cy0 + R);
-    let seeds = []; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (md[(y * W + x) * 4 + 3] > 100){ const X = Math.round(px + x), Y = Math.round(py + y); if (ok(X, Y)) seeds.push([X, Y]); }
-    if (!seeds.length){
-      /* 遮罩放错了地方：在附近找“像眼睛的一块”（又亮、颜色对、大小合适），选离原位置最近的那块 */
-      const bw = bx1 - bx0 + 1, vis = new Uint8Array(bw * (by1 - by0 + 1)); let best = null, bd = 1e9;
-      for (let Y = by0; Y <= by1; Y++) for (let X = bx0; X <= bx1; X++){ const k0 = (Y - by0) * bw + (X - bx0); if (vis[k0] || !ok(X, Y)) continue;
-        const st = [[X, Y]], comp = []; vis[k0] = 1;
-        while (st.length){ const [x, y] = st.pop(); comp.push([x, y]); for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++){ const x2 = x + dx, y2 = y + dy; if (x2 < bx0 || y2 < by0 || x2 > bx1 || y2 > by1) continue; const k = (y2 - by0) * bw + (x2 - bx0); if (vis[k]) continue; vis[k] = 1; if (ok(x2, y2)) st.push([x2, y2]); } }
-        if (comp.length < 5 || comp.length > h * 0.25 * Math.max(4, h * 0.012)) continue;
-        const cx = comp.reduce((t, c) => t + c[0], 0) / comp.length, cy = comp.reduce((t, c) => t + c[1], 0) / comp.length, d = (cx - cx0) ** 2 + (cy - cy0) ** 2;
-        if (d < bd){ bd = d; best = comp; } }
-      if (best) seeds = best;
-    }
-    if (!seeds.length) return null;
-    /* 往外长的时候，只接受和眼睛本身（起点像素的平均颜色）很接近的像素：头盔边上的高光也很亮，但颜色和眼睛不一样，不会长过去 */
-    let mr = 0, mgc = 0, mb = 0; for (const [X, Y] of seeds){ const i = (Y * w + X) * 4; mr += data[i]; mgc += data[i + 1]; mb += data[i + 2]; } mr /= seeds.length; mgc /= seeds.length; mb /= seeds.length;
-    const ok2 = (X, Y) => { if (X < 0 || Y < 0 || X >= w || Y >= h) return false; const i = (Y * w + X) * 4; if (data[i + 3] < 90) return false;
-      const r = data[i], g = data[i + 1], b = data[i + 2], lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; return lum >= 0.8 && Math.hypot(r - mr, g - mgc, b - mb) <= 34; };
-    const seen = new Uint8Array((bx1 - bx0 + 1) * (by1 - by0 + 1)), key = (X, Y) => (Y - by0) * (bx1 - bx0 + 1) + (X - bx0), q = [];
-    for (const [X, Y] of seeds) if (X >= bx0 && X <= bx1 && Y >= by0 && Y <= by1 && !seen[key(X, Y)]){ seen[key(X, Y)] = 1; q.push([X, Y]); }
-    let n = 0, x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1; const pts = [];
-    while (q.length){ const [X, Y] = q.pop(); n++; pts.push([X, Y]); if (X < x0) x0 = X; if (Y < y0) y0 = Y; if (X > x1) x1 = X; if (Y > y1) y1 = Y;
-      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++){ const X2 = X + dx, Y2 = Y + dy; if (X2 < bx0 || Y2 < by0 || X2 > bx1 || Y2 > by1) continue; const k = key(X2, Y2); if (seen[k]) continue; seen[k] = 1; if (ok2(X2, Y2)) q.push([X2, Y2]); } }
-    const boxA = (bx1 - bx0 + 1) * (by1 - by0 + 1); if (n < 4 || n > boxA * 0.45) return null;
-    /* 剪掉细长的尾巴（沿着头盔高光长出去的一条）：边缘剥掉一层 → 只留和眼睛连着的那块 → 再在原范围里补回两圈 */
-    { const inR = new Set(pts.map(([X, Y]) => X + "," + Y)), has = (X, Y) => inR.has(X + "," + Y);
-      const core = pts.filter(([X, Y]) => has(X - 1, Y) && has(X + 1, Y) && has(X, Y - 1) && has(X, Y + 1));
-      if (core.length >= 4){
-        const cs = new Set(core.map(([X, Y]) => X + "," + Y)), sk = new Set(seeds.map(([X, Y]) => X + "," + Y));
-        let start = core.find(([X, Y]) => sk.has(X + "," + Y)) || core.reduce((a2, c) => ((c[0] - cx0) ** 2 + (c[1] - cy0) ** 2 < (a2[0] - cx0) ** 2 + (a2[1] - cy0) ** 2 ? c : a2), core[0]);
-        const keep = new Set([start[0] + "," + start[1]]), st = [start];
-        while (st.length){ const [x, y] = st.pop(); for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++){ const kk = (x + dx) + "," + (y + dy); if (cs.has(kk) && !keep.has(kk)){ keep.add(kk); st.push([x + dx, y + dy]); } } }
-        let cur = keep; for (let it = 0; it < 2; it++){ const nx = new Set(cur); for (const kk of cur){ const [x, y] = kk.split(",").map(Number); for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++){ const k2 = (x + dx) + "," + (y + dy); if (inR.has(k2)) nx.add(k2); } } cur = nx; }
-        pts.length = 0; x0 = 1e9; y0 = 1e9; x1 = -1; y1 = -1; for (const kk of cur){ const [X, Y] = kk.split(",").map(Number); pts.push([X, Y]); if (X < x0) x0 = X; if (Y < y0) y0 = Y; if (X > x1) x1 = X; if (Y > y1) y1 = Y; }
-        n = pts.length; } }
-    /* 边上多一圈像素，眼睛的边缘也亮 */
-    const pad = 1, cw = x1 - x0 + 1 + pad * 2, ch = y1 - y0 + 1 + pad * 2, out = canvasOf(cw, ch), og = out.getContext("2d"), id = og.createImageData(cw, ch);
-    for (const [X, Y] of pts) for (let dy = -pad; dy <= pad; dy++) for (let dx = -pad; dx <= pad; dx++){ const xx = X - x0 + pad + dx, yy = Y - y0 + pad + dy; if (xx < 0 || yy < 0 || xx >= cw || yy >= ch) continue; const j = (yy * cw + xx) * 4; const a = dx || dy ? 140 : 255; if (id.data[j + 3] < a){ id.data[j] = id.data[j + 1] = id.data[j + 2] = 255; id.data[j + 3] = a; } }
-    og.putImageData(id, 0, 0); return {cv:out, x:x0 - pad, y:y0 - pad, w:cw, h:ch, n};
-  }
-  try { window.__glowAlign = glowAlign; window.__eyeRegion = eyeRegion; setTimeout(() => { try { window.__bakePose = bakePose; } catch (e) {} }, 0); } catch (e) {}   /* 测试用 */
-  async function addGlow(g, img, p, w, h, gk){
+  try { window.__glowAlign = glowAlign; setTimeout(() => { try { window.__bakePose = bakePose; } catch (e) {} }, 0); } catch (e) {}   /* 测试用 */
+  /* 遮罩里不透明的像素有多少（算光晕大小用） */
+  const AREA = new WeakMap();
+  function maskArea(m){ if (AREA.has(m)) return AREA.get(m); const c = canvasOf(m.width, m.height), g = c.getContext("2d"); g.drawImage(m, 0, 0); const d = g.getImageData(0, 0, m.width, m.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 60) n++; AREA.set(m, n || 1); return n || 1; }
+  async function addGlow(g, img, p, w, h, gk, night){
     gk = gk || 1;   /* 迪迦的灯是别人的 0.55 倍（GLOW_K） */
     let m0 = await loadImg(p.png); const s = p.s || 1; let m = {width:m0.width * s, height:m0.height * s}; let px = p.x * s, py = p.y * s;
-    if (p.kind === "eye"){ try { const r = eyeRegion(img, w, h, m0, px, py, m.width, m.height, p.color); if (r){ m0 = r.cv; px = r.x; py = r.y; m = {width:r.w, height:r.h}; } } catch (e) {} }   /* 眼睛：用你的图把范围找全 */
-    else if (p.align){ try { const o = glowAlign(img, w, h, m0, px, py, m.width, m.height, p.color); px += o.dx; py += o.dy; } catch (e) {} }
+    /* 眼睛直接用发光部位.json 里的遮罩（v1.62.5）：v1.62.2 的“自动找眼睛范围”对青蓝色的眼睛会认错（百慕拉、泽塔只亮一只眼、只有眼球亮），
+       对迪迦技能第二步会沿头盔高光漏出去；数据已经修好了，照参考实现直接用。只有姿势图大小和数据对不上、要缩放时才对齐一下 */
+    if (p.align){ try { const o = glowAlign(img, w, h, m0, px, py, m.width, m.height, p.color); px += o.dx; py += o.dy; } catch (e) {} }
     const put = (gg) => gg.drawImage(m0, px, py, m.width, m.height);
     const t = canvasOf(w, h), tg = t.getContext("2d");
     tg.drawImage(img, 0, 0); tg.globalCompositeOperation = "destination-in"; put(tg);
     g.globalCompositeOperation = "source-over"; g.drawImage(t, 0, 0);
     const eye = p.kind === "eye";
+    if (p.kind === "eye" || p.kind === "visor"){
+      /* v1.63.0：用户按发光轮廓亲手画的范围（发光部位_改.json）。范围以内是光本身：提亮 + 灯的颜色，不推成一块纯白，保留原来的颜色和细节；
+         范围外面是周围被照亮：贴着轮廓的很短、很淡的光晕（眼睛约 25px 宽时只有 1–4px），夜晚稍强。以前的宽光晕（尺寸 ×0.42）铺到头盔上，不用了 */
+      const nb = night ? 1.25 : 1;
+      g.globalCompositeOperation = "lighter"; g.globalAlpha = 0.3 * gk; g.drawImage(t, 0, 0);
+      const fill = canvasOf(w, h), fc = fill.getContext("2d"); put(fc); fc.globalCompositeOperation = "source-in"; fc.fillStyle = p.color || "#FFFFFF"; fc.fillRect(0, 0, w, h);
+      g.globalAlpha = 0.24 * gk; g.drawImage(fill, 0, 0);
+      /* 光晕的大小按这块灯的面积算（等面积圆的直径），不按外框：百慕拉两只眼睛画成一块，外框很宽，按外框光晕就被放大了 */
+      const sz = Math.min(Math.max(m.width, m.height), 2 * Math.sqrt(maskArea(m0) * s * s / Math.PI));
+      g.filter = `blur(${Math.max(1, sz * 0.05).toFixed(1)}px)`; g.globalAlpha = 0.4 * gk * nb; g.drawImage(fill, 0, 0);
+      g.filter = `blur(${Math.max(2.2, sz * 0.13).toFixed(1)}px)`; g.globalAlpha = 0.14 * gk * nb; g.drawImage(fill, 0, 0);
+      g.filter = "none"; g.globalCompositeOperation = "source-over"; g.globalAlpha = 1;
+      return;
+    }
     g.globalCompositeOperation = "lighter"; g.globalAlpha = (eye ? 0.38 : 0.26) * gk; g.drawImage(t, 0, 0); g.globalAlpha = 1;
     if (p.fill){
       /* 只给红奈（GLOW_FILL）：部位用自己的颜色从里面填亮（眼睛 0.34、能量灯 0.3），再加一层轻微模糊——眼睛发暖白，能量灯发青蓝 */
@@ -10398,9 +10365,10 @@ const BT = (() => {
     }
     const halo = canvasOf(w, h), hg = halo.getContext("2d");
     put(hg); hg.globalCompositeOperation = "source-in"; hg.fillStyle = p.color; hg.fillRect(0, 0, w, h);
-    const sz = Math.max(m.width, m.height); g.globalCompositeOperation = "lighter";
-    g.filter = `blur(${(sz * 0.12 + 1).toFixed(1)}px)`; g.globalAlpha = (eye ? 0.62 : 0.52) * gk; g.drawImage(halo, 0, 0);
-    g.filter = `blur(${(sz * 0.42 + 2.5).toFixed(1)}px)`; g.globalAlpha = (eye ? 0.24 : 0.22) * gk; g.drawImage(halo, 0, 0);
+    /* 胸口的灯、“其它”：光晕比眼睛大一些，但比以前收短（宽的那层从尺寸 ×0.42 收到 ×0.3），夜晚稍强 */
+    const sz = Math.min(Math.max(m.width, m.height), 2 * Math.sqrt(maskArea(m0) * s * s / Math.PI)), nb2 = night ? 1.2 : 1; g.globalCompositeOperation = "lighter";
+    g.filter = `blur(${(sz * 0.1 + 1).toFixed(1)}px)`; g.globalAlpha = 0.5 * gk * nb2; g.drawImage(halo, 0, 0);
+    g.filter = `blur(${(sz * 0.3 + 2).toFixed(1)}px)`; g.globalAlpha = 0.2 * gk * nb2; g.drawImage(halo, 0, 0);
     g.filter = "none"; g.globalAlpha = 1;
   }
   /* 赛文的玻璃护目镜：上缘白色反光、下缘琥珀色加深、两道斜向高光、一个十字小闪光点。只反光，不发光 */
@@ -10438,7 +10406,8 @@ const BT = (() => {
       g.globalCompositeOperation = "lighter"; g.globalAlpha = L.ra; g.filter = `blur(${(d * 0.45).toFixed(1)}px)`; g.drawImage(r, 0, 0); g.filter = "none"; g.globalAlpha = 1;
       g.globalCompositeOperation = "destination-in"; g.drawImage(img, 0, 0);
     } else g.drawImage(img, 0, 0);
-    for (const p of parts || []){ if (p.kind === "visor") await addGlass(g, p, w, h); else await addGlow(g, img, p, w, h, p.gk || 1); }
+    const night = !!(L && L.bri < 0.9);   /* 夜晚类的场景光照（bri 0.82–0.88）：光晕稍强 */
+    for (const p of parts || []){ if (p.kind === "visor") await addGlass(g, p, w, h); else await addGlow(g, img, p, w, h, p.gk || 1, night); }
     g.globalCompositeOperation = "source-over";
     const blob = await new Promise(res => c.toBlob(res, "image/png")); return URL.createObjectURL(blob);
   }
@@ -12219,8 +12188,8 @@ const BT = (() => {
         /* 大小差得多：长宽比例差不到 5% 就按这个姿势自己的大小缩放（以前整个跳过，眼睛就不亮了），位置靠下面的自动对齐 */
         const ar = (q.w / q.h) / (e.w / e.h); if (Math.abs(ar - 1) > 0.05) return null; s = q.h / e.h;
       }
-      const gk = GLOW_K[f.glowName] || 1, gfill = !!GLOW_FILL[f.glowName];
-      return e.parts.map(p => Object.assign({}, p, {s, gk, fill:gfill, align:true}));
+      const gk = GLOW_K[f.glowName] || 1, gfill = !!GLOW_FILL[f.glowName], scaled = !(Math.abs(e.w * (f.glowScale || 1) - q.w) <= 2 && Math.abs(e.h * (f.glowScale || 1) - q.h) <= 2);
+      return e.parts.map(p => Object.assign({}, p, {s, gk, fill:gfill, align:scaled}));   /* 大小一致就不挪 */
     }
     function rigLight(L){
       const m = root.querySelector(`#${rigFid} feColorMatrix`); if (!m) return "";
@@ -12879,7 +12848,10 @@ function batPreviewMode(){
 }
 function batPreviewApply(){
   if (!BAT_PREV) return; const m = batPreviewMode(), rec = BAT_CHAR;
-  BAT_PREV.setOpt({giant:m.giant, place:m.place}); BAT_PREV.setChar(rec ? BT.rebuild(rec) : null, BT.metaOf(rec, m.giant)); BAT_PREV.setNames("昨天的你", "你"); BAT_PREV.setScore("");
+  BAT_PREV.setOpt({giant:m.giant, place:m.place});
+  /* 预览的时间：按现在的时间（默认）、白天、夜晚——只影响这里的预览，练习和游戏照旧按现在的时间 */
+  const pt = L.btPrevTime || "auto"; if (BAT_PREV.setNight) BAT_PREV.setNight(pt === "night" ? true : pt === "day" ? false : (hr => hr < 6 || hr >= 18)(new Date().getHours()));
+  BAT_PREV.setChar(rec ? BT.rebuild(rec) : null, BT.metaOf(rec, m.giant)); BAT_PREV.setNames("昨天的你", "你"); BAT_PREV.setScore("");
 }
 function batTplHTML(rec){
   const lo = rec ? BT.loadoutOf(rec) : BT.rigLoadout(), tpl = BT.tplMatch(lo);
@@ -12991,8 +12963,12 @@ ACT["bt-tab"] = el => {
 /* 地点：每局随机（默认），或者固定一个。普通大小和巨人各一个选项（能巨大化才显示巨人的） */
 function batPlaceHTML(rec){
   const pm = L.placeMode || {}; const row = (k, label) => `<label class="fld"><span>${label}</span><select data-chg="bt-place" data-k="${k}"><option value="random" ${(pm[k] || "random") === "random" ? "selected" : ""}>每局随机</option>${BT.PLACES[k].map(([id, n]) => `<option value="${id}" ${pm[k] === id ? "selected" : ""}>${n}</option>`).join("")}</select></label>`;
-  return row("human", "地点（普通大小）") + (rec && rec.giantM ? row("giant", "地点（巨大化）") : "");
+  const pt = L.btPrevTime || "auto";
+  return row("human", "地点（普通大小）") + (rec && rec.giantM ? row("giant", "地点（巨大化）") : "") +
+    `<label class="fld"><span>预览的时间</span><select data-chg="bt-prevtime">${[["auto", "按现在的时间"], ["day", "白天"], ["night", "夜晚"]].map(([v, n]) => `<option value="${v}" ${pt === v ? "selected" : ""}>${n}</option>`).join("")}</select></label>
+    <p class="small muted" style="margin-top:2px">只影响这里的预览，练习和游戏照旧按现在的时间</p>`;
 }
+CHG["bt-prevtime"] = el => { L.btPrevTime = el.value; saveLocal(); batPreviewApply(); };
 CHG["bt-place"] = el => {
   L.placeMode = Object.assign({}, L.placeMode || {}, {[el.dataset.k]: el.value}); saveLocal();
   L.btPrevPlace = {giant: el.dataset.k === "giant", place: el.value === "random" ? BT.PLACES[el.dataset.k][0][0] : el.value}; saveLocal(); batPreviewApply();
