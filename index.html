@@ -734,7 +734,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.65.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.65.1"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -10097,7 +10097,7 @@ const BT = (() => {
   const MS_ALIAS = {shodai:"brawler", seven:"blade", bemular:"beam", fighter:"brawler", sword:"blade"};
   /* 每个位置能选的招。以后有新特效，就在对应的位置加一招，不再加整套招式 */
   /* 数据角色（角色设计工具做的）：锚点和招式数据，照 角色配置.json 原样（第三十四到四十二节） */
-  const TOOL_DATA = {Mebius:{"anchors":{"右手掌侧":{"type":"segment","width":0.4,"poses":{"skill":[[0.1649,0.1379],[0.1649,0.2308]]}},"前手":{"type":"point","poses":{"skillWind":[[0.05,0.21]],"skillMid":[[0.33,0.05]]}},"后手":{"type":"point","poses":{"skillWind":[[0.93,0.205]],"skillMid":[[0.62,0.045]]}}},"moves":{"light":{"type":"melee","wind":"lightWind","windMs":320,"strike":"light","dashMs":150,"hy":0.3,"hold":200,"big":false,"hitFx":{"spark":true,"burst":1.1,"ring":false,"shake":0,"dx":0,"dy":0,"small":{"on":false,"n":12,"size":1,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":false,"size":1,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":1,"bright":1}},"lateHit":0,"reach":10},"skill":{"stages":[{"pose":"skillWind","ms":1000,"layers":[{"kind":"flare","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":2.3,"rays":10,"spin":1,"sparks":3,"at":0,"alpha":0.35,"bright":0.5}],"pause":0},{"pose":"skillMid","ms":1700,"bodyGlow":{"color":"#ffe59e","r":8,"alpha":0.55},"layers":[{"kind":"flare","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":1,"rays":8,"spin":1,"sparks":4,"at":0,"alpha":0.6,"bright":0.35},{"kind":"infinity","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":1.6,"end":0.2,"trails":7,"speed":1.5,"width":3,"dy":-0.03,"bloom":0.55,"at":0,"alpha":0.55,"bright":0.45}],"pause":300},{"pose":"skill","ms":1600,"layers":[{"kind":"needles","anchor":"右手掌侧","color":"#FFC36A","core":"#FFFDF4","width":1.7,"rate":15,"length":0.3,"speed":1,"halo":0.1,"flash":1,"at":0,"spread":1,"alpha":1,"bright":1}],"hit":{"ticks":8,"delay":220,"push":30,"shake":8,"hy":0.4,"color":"#FFC060","dx":0,"size":1,"bodySparks":true,"small":{"on":false,"n":12,"size":1,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":true,"size":0.65,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":-10,"alpha":0.75,"bright":0.7,"every":3}},"pause":0}]},"heavy":{"type":"melee","wind":"heavyWind","windMs":230,"strike":"heavy","dashMs":220,"lateHit":0.72,"hy":0.3,"hold":190,"big":true,"hitFx":{"spark":true,"burst":1.25,"ring":true,"shake":0,"dx":0,"dy":0,"small":{"on":true,"n":12,"size":0.3,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":false,"size":1,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":1,"bright":1}},"reach":15}}}};
+  const TOOL_DATA = {Mebius:{"anchors":{"右手掌侧":{"type":"segment","width":0.4,"poses":{"skill":[[0.1649,0.1379],[0.1649,0.2308]]}},"前手":{"type":"point","poses":{"skillWind":[[0.05,0.21]],"skillMid":[[0.33,0.05]]}},"后手":{"type":"point","poses":{"skillWind":[[0.93,0.205]],"skillMid":[[0.62,0.045]]}}},"moves":{"light":{"type":"melee","wind":"lightWind","windMs":320,"strike":"light","dashMs":150,"hy":0.3,"hold":200,"big":false,"hitFx":{"spark":true,"burst":1.1,"ring":false,"shake":0,"dx":0,"dy":0,"small":{"on":false,"n":12,"size":1,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":false,"size":1,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":1,"bright":1}},"lateHit":0,"reach":10},"skill":{"stages":[{"pose":"skillWind","ms":1000,"layers":[{"kind":"flare","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":2.3,"rays":10,"spin":1,"sparks":3,"at":0,"alpha":0.35,"bright":0.5}],"pause":0},{"pose":"skillMid","ms":1700,"bodyGlow":{"color":"#ffe59e","r":8,"alpha":0.55},"layers":[{"kind":"flare","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":1,"rays":8,"spin":1,"sparks":4,"at":0,"alpha":0.6,"bright":0.35},{"kind":"infinity","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":1.6,"end":0.2,"trails":7,"speed":1.5,"width":3,"dy":-0.03,"bloom":0.55,"at":0,"alpha":0.55,"bright":0.45}],"pause":300},{"pose":"skill","ms":1600,"layers":[{"kind":"needles","anchor":"右手掌侧","color":"#FFC36A","core":"#FFFDF4","width":1.7,"rate":20,"length":0.3,"speed":1,"halo":0.1,"flash":1,"at":0,"spread":1,"alpha":1,"bright":1}],"hit":{"ticks":8,"delay":220,"push":30,"shake":8,"hy":0.4,"color":"#FFC060","dx":0,"size":1,"bodySparks":true,"small":{"on":false,"n":12,"size":1,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":true,"size":0.65,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":-10,"alpha":0.75,"bright":0.7,"every":3}},"pause":0}]},"heavy":{"type":"melee","wind":"heavyWind","windMs":230,"strike":"heavy","dashMs":220,"lateHit":0.72,"hy":0.3,"hold":190,"big":true,"hitFx":{"spark":true,"burst":1.25,"ring":true,"shake":0,"dx":0,"dy":0,"small":{"on":true,"n":12,"size":0.3,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":false,"size":1,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":1,"bright":1}},"reach":15}}}};
   const MOVE_LIST = {
     light:[["punch", "出拳"], ["thrust", "突刺"], ["laserThin", "细光线"], ["jumpChop", "跳劈手刀"], ["bigPunch", "蓄力重拳"], ["Mebius.light", "顶心肘"]],
     heavy:[["kick", "侧踢"], ["fireKick", "火焰踢"], ["kesa", "斩击"], ["laserThick", "粗光线"], ["flyKick", "飞踢"], ["sideKick", "垫步侧踢"], ["Mebius.heavy", "回旋踢"]],
@@ -11928,10 +11928,6 @@ const BT = (() => {
           blit(ctx, "white", f.x, f.y, sz * 0.2, 1); blit(ctx, "blue", f.x, f.y, sz * 0.34, 0.55); },
         rig(ctx, f, t, now, S){ PAINT.wideBeam(ctx, f, t, now, S, {wide:1.8, cyan:true, rings:true}); },
         /* 层叠风暴（红奈）：渐隐的蓝色雾带，里面密集的细白光条往前流，小臂处一个小白光点 */
-        /* 梦比姆射线（梦比优斯）：渐隐的金色光带 + 流动的细光针 */
-        "Mebius.skill"(ctx, f, t, now, S){ const b0 = sz * 0.03, b1 = b0 * 1.3; ctx.globalCompositeOperation = "lighter";
-          tqSoft(ctx, f, t, b0 * 2.2, b1 * 2.2, lgr(ctx, f, t, [[0, "rgba(255,195,106,.45)"], [1, "rgba(255,170,60,.25)"]]), 1, 10); ctx.globalAlpha = 1;
-          flowLines(ctx, f, t, S, now, 10, b1, 2.4, "#FFFDF4", sz * 0.22); blit(ctx, "white", f.x, f.y, sz * 0.1, 0.55); },
         overRay(ctx, f, t, now, S){ const b0 = sz * 0.032, b1 = b0 * 1.7; ctx.globalCompositeOperation = "lighter";
           tqSoft(ctx, f, t, b0 * 2.4, b1 * 2.6, lgr(ctx, f, t, [[0, "rgba(80,160,255,.42)"], [1, "rgba(60,130,255,.22)"]]), 1, 10); ctx.globalAlpha = 1;
           flowLines(ctx, f, t, S, now, 8, b1, 2.2, "#FFFFFF", sz * 0.2); blit(ctx, "white", f.x, f.y, sz * 0.1, 0.5); },
@@ -11967,7 +11963,9 @@ const BT = (() => {
         overRay: (a, d, dr, c) => (a.rig ? specialWide(a, d, dr, 0, Object.assign({}, RIG_BEAM, {cl:c})) : overRay(a, d, dr, 0, c)),
         stormBeam: (a, d, dr, c) => stormBeam(a, d, dr, 0, c),
         crescent: (a, d, dr, c) => crescentGlow(a, d, dr, 0, c)
-      };
+      };      /* 数据角色（梦比优斯等）对波时走自己的技能：前摇特效照常，发射时是自己的光线，截在碰撞点上 */
+      for (const id in TOOL_DATA) ORIG[id + ".skill"] = (a, d, dr, c) => (a.rig ? specialWide(a, d, dr, 0, Object.assign({}, RIG_BEAM, {cl:c})) : toolPlayer(id).toolMove(a, d, dr, 0, "skill", c));
+
       const CX = {x:0, y:0}; let goRes, got = 0; const go = new Promise(r => { goRes = r; });
       const arrive = () => { got++; if (got >= 2){ const a = yh(), b = fh(); CX.x = (a.x + b.x) / 2; CX.y = (a.y + b.y) / 2; goRes(); } };
       const mkCl = () => { const c = {_off:false, endAt:0, go, end: () => CX, live: () => !c._off, ready: arrive}; c.done = new Promise(r => { c.finish = () => { if (c._off) return; c._off = true; c.endAt = performance.now(); r(); }; }); return c; };
@@ -12101,7 +12099,11 @@ const BT = (() => {
     function makeToolPlayer(TOOL){
       let MIR = false;
       const Wst = () => stage.clientWidth;
-      const wrapG = G => ({add(fn){ const m = MIR, W = Wst(); return G.add(m ? (c, now) => { c.translate(W, 0); c.scale(-1, 1); return fn(c, now); } : fn); }});
+      let CLASH = null;   /* 对波时：{cl, dir, stop}——发射这一步的特效截在碰撞点上（一方赢了光线推过去就不截），对波结束就停 */
+      const wrapG = G => ({add(fn){ const m = MIR, W = Wst(), C = CLASH;
+        return G.add((c, now) => { if (C && C.stop.on) return false; c.save();
+          if (C && !C.cl.free){ const e = C.cl.end().x; c.beginPath(); if (C.dir < 0) c.rect(e - 4, -1e4, W + 2e4, 3e4); else c.rect(-1e4, -1e4, e + 4 + 1e4, 3e4); c.clip(); }
+          if (m){ c.translate(W, 0); c.scale(-1, 1); } const r = fn(c, now); c.restore(); return r; }); }});
       const glow = wrapG(GLOW0), glowTop = wrapG(GLOWTOP0);
       const bx = el => { const b = box(el); return MIR ? Object.assign({}, b, {x:Wst() - b.x - b.w}) : b; };
   // ===================== 角色设计工具：数据驱动的“自定义角色” =====================
@@ -12451,17 +12453,20 @@ const BT = (() => {
   }
   function toolLayer(A, D, dir, L, poseName, prevPose, ms) {
     const fn = LAYERS[L.kind]; if (!fn) return;
+    const mA = MIR; MIR = dir > 0; try {
     const names = (L.anchor ? [L.anchor] : []).concat(L.more || []);
     const all = names.length ? names.map((n) => anc(A, n, poseName)).filter(Boolean) : [anc(A, null, poseName)].filter(Boolean);
     if (!all.length) return;
-    const start = () => withLook(L, () => fn(A, D, L, all[0], Math.max(60, (L.ms || ms) - (L.at || 0)), all, poseName, prevPose));
-    if (L.at) setTimeout(() => { const m0 = MIR; MIR = dir > 0; try { start(); } finally { MIR = m0; } }, L.at); else start();
+    const C0 = CLASH;
+    const start = () => { const m0 = MIR, c0 = CLASH; MIR = dir > 0; CLASH = C0; try { withLook(L, () => fn(A, D, L, all[0], Math.max(60, (L.ms || ms) - (L.at || 0)), all, poseName, prevPose)); } finally { MIR = m0; CLASH = c0; } };
+    if (L.at) setTimeout(start, L.at); else start();
+    } finally { MIR = mA; }
   }
   // damage dealt over a stage: bursts and sparks on the opponent, numbers, pushed back
   async function toolHits(A, D, dir, dmg, h, ms, token) {
     await wait(h.delay || 200);
     if (token !== ARENA_TOKEN()) return;
-    const d = bx(bodyOf(D)), hx = d.x + d.w * (0.55 - (h.dx || 0) / 100), hy = d.y + d.h * (h.hy || 0.4);
+    const mH = MIR; MIR = dir > 0; const d = bx(bodyOf(D)), hx = d.x + d.w * (0.55 - (h.dx || 0) / 100), hy = d.y + d.h * (h.hy || 0.4); MIR = mH;
     pose(D, 'recoil', 90); shake(h.shake == null ? 8 : h.shake);
     const left = Math.max(200, ms - (h.delay || 200)), push = D.animate([{ transform: 'none' }, { transform: `translateX(${(h.push == null ? 30 : h.push) * dir}px)` }], { duration: left, easing: 'ease-out', fill: 'forwards' });
     const parts = split(dmg || 40, Math.max(1, h.ticks || 8));
@@ -12471,8 +12476,10 @@ const BT = (() => {
       if (h.size !== 0) burst(px, py, Math.min(260, d.w * 1.2 * (h.size || 1)), h.color);
       if (k % 3 === 0 && h.bodySparks !== false && !(D === ghost && ARENA.cm)) sparksOn(D, "skill", {x:px, y:py});
       const sm = fxSmall(h), bg = fxBig(h);
+      const mK = MIR; MIR = dir > 0;
       if (sm) withLook(sm, () => sparkSpray(px - ((sm.dx || 0) / 100) * d.w, py + ((sm.dy || 0) / 100) * d.h, sm.n || 6, sm.size, sm.color || h.color, -1, d.h * 0.5));
       if (bg && (k === 0 || (bg.every > 0 && k % bg.every === 0))) withLook(bg, () => blastFx(hx - ((bg.dx || 0) / 100) * d.w, hy + ((bg.dy || 0) / 100) * d.h, d.h * 0.32 * (bg.size || 1), bg));
+      MIR = mK;
       damageNumber(hx - 10 + (Math.random() - 0.5) * 30, hy - 34, parts[k]);
       if (D === ghost) ARENA.lastSpecial = (ARENA.lastSpecial || 0) + parts[k]; dealt(D, parts[k]);
       await wait(left / parts.length);
@@ -12486,6 +12493,14 @@ const BT = (() => {
       for (const st of (m.stages || [])) {
         if (token !== ARENA_TOKEN()) return;
         if (st.hit && cl && cl.fizzle){ await fizzleOut(A, D, dir); return; }   /* 大招没说出来：发射这一步改成短路 */
+        if (st.hit && cl){
+          cl.ready(); await cl.go; if (token !== ARENA_TOKEN()) return;
+          pose(A, REV[st.pose] || 'fire'); await wait(st.settle == null ? 120 : st.settle);
+          if (st.bodyGlow) holdGlow(face, fil(A, `drop-shadow(0 0 ${st.bodyGlow.r || 8}px ${hexA(st.bodyGlow.color || '#A0D2FF', st.bodyGlow.alpha == null ? 0.55 : st.bodyGlow.alpha)})`));
+          const stop = {on:false}, c0 = CLASH; CLASH = {cl, dir, stop};
+          try { for (const L of (st.layers || [])) toolLayer(A, D, dir, L, st.pose, prev, 600000); } finally { CLASH = c0; }
+          await cl.done; stop.on = true; fadeHeld(800); return;
+        }
         pose(A, REV[st.pose] || 'fire'); await wait(st.settle == null ? 120 : st.settle);
         const ms = st.ms || 800;
         if (st.bodyGlow) holdGlow(face, fil(A, `drop-shadow(0 0 ${st.bodyGlow.r || 8}px ${hexA(st.bodyGlow.color || '#A0D2FF', st.bodyGlow.alpha == null ? 0.55 : st.bodyGlow.alpha)})`));
