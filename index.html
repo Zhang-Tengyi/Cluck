@@ -735,7 +735,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.66.5"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.66.6"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -1719,7 +1719,9 @@ function dnum(s){ const [y,m,dd] = String(s).split("-").map(Number); return Math
 function nstr(n){ const d = new Date(n*86400000); return d.getUTCFullYear()+"-"+pad(d.getUTCMonth()+1)+"-"+pad(d.getUTCDate()); }
 
 /* ---------- 工具 ---------- */
-function splitAlts(s){ return String(s||"").split(/\s*\/\/\s*/).map(x=>x.trim()).filter(Boolean); }
+/* 一行里用 // 隔开的几种说法。连两个字母都不到的丢掉（以前有导入码把一整句拆成了单个字母：显示成竖着的 J、u、s、t，判断时识别只听出一个 a 也可能被当成说对） */
+const altOk = x => (String(x || "").match(/[A-Za-z]/g) || []).length >= 2;
+function splitAlts(s){ return String(s||"").split(/\s*\/\/\s*/).map(x=>x.trim()).filter(x => x && altOk(x)); }
 function shuffle(a, rnd){ rnd = rnd || Math.random; a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function hash(s){ let h=2166136261>>>0; for (let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h.toString(36); }
 
@@ -1741,7 +1743,9 @@ function buildCatalog(C, custom, myAlts){
   /* 其他正确说法：内置补充 + 你自己点“我的说法也对”加的 */
   const extra = C.ALT_EXTRA || {}; myAlts = myAlts || {};
   for (const c of cards){
-    const add = splitAlts(extra[c.id] || "").concat(myAlts[c.id] || []);
+    if (c.alt && c.alt.length) c.alt = c.alt.filter(altOk);   /* 已经存进来的单个字母也清掉 */
+    if (c.t === "e" && c.steps) for (const st of c.steps) if (st.alt && st.alt.length) st.alt = st.alt.filter(altOk);
+    const add = splitAlts(extra[c.id] || "").concat((myAlts[c.id] || []).filter(altOk));
     if (!add.length) continue;
     const seen = new Set([c.en].concat(c.alt || []).map(x => tokens(x).join(" ")));
     const fresh = add.filter(x => { const k = tokens(x).join(" "); if (!k || seen.has(k)) return false; seen.add(k); return true; });
@@ -1933,6 +1937,9 @@ function compareSaid0(target, alts, said){
   }
   best.exact = best.score === 1;
   best.level = best.exact ? "exact" : best.score >= 0.8 ? "close" : "off";
+  /* 记下参考说法里原本是所有格 's 的词（比较时撇号去掉了，master's 和 masters 一样） */
+  const poss = new Set((String(best.text || "").match(/\b[a-z]+['’]s\b/gi) || []).map(w => w.toLowerCase().replace(/['’]s$/, "s")));
+  if (poss.size) for (const o of best.ops || []) if (o.op === "sub" && poss.has(o.a)) o.poss = true;
   best.notes = feedbackNotes(best.ops);
   /* 没对上，但听起来和正确说法很像：很可能是识别听错了 */
   /* 差别里有语法上的（-s、-ed、be 动词这些），就是真的错，不算“识别听错了” */
@@ -1948,12 +1955,14 @@ function compareSaid0(target, alts, said){
 }
 const SOUND_OK = 0.7;
 const GRAM_SUB = new Set(["s", "past", "be", "perf"]);
-const GRAM_NOTE = new Set(["be", "tense", "to"]);
+const GRAM_NOTE = new Set(["be", "tense", "to", "poss"]);
 const G_THIRD = new Set(["he","she","it","this","that","who","everyone","everybody","someone","somebody","nobody"]);
 const G_PL = new Set(["two","three","four","five","six","seven","eight","nine","ten","twenty","many","some","all","these","those","few","several","of","both","lots","kinds","types","sorts"]);
 const G_NOS = new Set(["i","you","we","they"]);
-function sRule(a, b, pv, pv2){
+function sRule(a, b, pv, pv2, poss){
   const need = a === b + "s" || a === b + "es" || (a.endsWith("ies") && b === a.slice(0, -3) + "y");
+  /* 参考说法里这个词原本是所有格 's（master's）：比较时撇号去掉了，看起来像复数，其实是“……的” */
+  if (need && poss) return {k:"poss", hint:`这里是所有格 ${b}'s（“……的”）`, msg:`这里是所有格：${b}'s（“……的”，'s 和复数的 s 读音一样，要读出来）`};
   if (/^(usually|always|often|sometimes|never|really|also|just|still|only|already|even|rarely|normally|actually|typically)$/.test(pv || "") && pv2){ pv = pv2; pv2 = ""; }
   const singSubj = /^(my|his|her|the|this|that|our|their|your)$/.test(pv2 || "") && !G_PL.has(pv) && !/s$/.test(pv || "");
   if (need){
@@ -1978,7 +1987,7 @@ function feedbackNotes(ops){
       const pa = prevA, pa2 = prevA2; prevA2 = prevA; prevA = o.a;
       const k = classifySub(o.a, o.b);
       if (k === "past"){ const r = pastRule(o.a, o.b, pa, pa2); notes.push({k:r.k, msg:r.msg}); }
-      else if (k === "s"){ const r = sRule(o.a, o.b, pa, pa2); notes.push({k:r.k, msg:r.msg}); }
+      else if (k === "s"){ const r = sRule(o.a, o.b, pa, pa2, o.poss); notes.push({k:r.k, msg:r.msg}); }
       else if (k === "be") notes.push({k:"be", msg:`be 动词用 ${o.a}，不是 ${o.b}`});
       else if (k === "perf") notes.push({k:"tense", msg:`完成时用 have（I've），不是 ${o.b}`});
       else if (k === "pron") notes.push({k:"pron", msg:`听起来像 ${o.b}，目标是 ${o.a}，可能是发音`});
@@ -2183,7 +2192,7 @@ function hintNotes(ops){
     if (o.op === "eq"){ prev2 = prev; prev = o.b; continue; }
     if (o.op === "sub"){
       const k = classifySub(o.a, o.b);
-      out.push(k === "past" ? pastRule(o.a, o.b, prev, prev2).hint : k === "s" ? sRule(o.a, o.b, prev, prev2).hint : k === "be" ? `be 动词 ${o.b} 用得不对` :
+      out.push(k === "past" ? pastRule(o.a, o.b, prev, prev2).hint : k === "s" ? sRule(o.a, o.b, prev, prev2, o.poss).hint : k === "be" ? `be 动词 ${o.b} 用得不对` :
         k === "perf" ? `这里要用完成时 have，不是 ${o.b}` : k === "pron" ? `${o.b} 可能没说清楚，注意发音` : `${o.b} 这个词不对`);
       prev = o.b;
     } else if (o.op === "del"){
@@ -3635,7 +3644,7 @@ VIEWS.free = {
 };
 let FREE_OPTS = [];
 ACT["free-go"] = el => { const o = freeOpts().find(x => x[0] === el.dataset.v); if (!o) return; const f = o[2]; const dp = deckPred(curDeck());
-  startSession("free", {filter: c => dp(c) && f(c), fillAhead:true, newLimit: ["due","hard"].includes(el.dataset.v) ? 0 : Math.max(S.settings.newPerDay, 15), newUsed:0}, o[1]); };
+  startSession("free", {filter: c => dp(c) && f(c), fillAhead:true, /* v1.66.6：自由练习也守每天的新题上限（以前每轮重新给最多 15 道，多开几轮一天的新题就没有上限） */ newLimit: ["due","hard"].includes(el.dataset.v) ? 0 : S.settings.newPerDay, newUsed:newUsedToday()}, o[1]); };
 ACT["listen-go"] = () => startSession("listen", {}, "听力快练");
 
 /* ---------- 练习流程 ---------- */
@@ -5922,6 +5931,8 @@ const ABOUT_QA = [
   ["说错以后的补练是什么？说对了还要补练吗？", "没说出来的句子会先听正确的、跟着说，这一轮隔几题再考一次（最多 3 次），剩下的交给明天。说对了不用补练：同一轮里马上多说几遍，好处很快就消失，隔开复习更有效。"],
   ["提示会影响练习效果吗？", "会有一点：提示越多，回忆越省力，记得也就没那么牢。所以最好先自己试着说，真的卡住了再看提示；提示也会随着你说对逐渐撤掉（完整的词 → 开头字母 → 不给）。"],
   ["练完一句下面的语法提示是怎么来的？", "按一组常见错误规则检查你说的句子（比如时态、复数、语序、being 用多了），只用那些不容易误判的规则，所以没提示不代表一定没错；拿不准就存起来问 AI。"],
+  ["标点、撇号会影响判断吗？", "不会。比较前会先去掉标点；you're 和 you are 都算对，master's 和 masters 读音一样也算对。但如果你说成了 master（少了 's），会提示“这里是所有格：master's（……的）”。"],
+  ["每天最多几道新题是固定的吗？练得多要不要自动加？", "固定的：不管今天练几轮（包括自由练习），新题加起来不超过设置里的数。不自动加，因为每张新卡之后一个月里大约还要复习 5 次（2、4、7、15、30 天），新题一多，几天后复习就会堆起来、正确率下降；今天多练几轮，主要是把已经学过的练得更熟。要不要调，看两件事：最近复习大多第一遍就能说对、每天的复习也练得完，可以从 12 调到 20；复习常常做不完或者老是忘，就调回 6。"],
   ["题库怎么选？", "首页“练哪个题库”可以只练通用、日常生活，或者你导入的题库（比如某家公司的面试准备），可以多选，按组折叠。"]]],
  ["游戏和对战", [
   ["游戏模式怎么玩？", "每张卡说对就打出伤害：一口气说完还有暴击；只要开口说了，至少也能擦伤对手。每次第一次就说对攒一格能量，攒满 5 格，下一张是大招卡，说对了就放大招。"],
