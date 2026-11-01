@@ -713,6 +713,7 @@ details.pl-day>summary{list-style:none;cursor:pointer}details.pl-day>summary::-w
 .bt-glowfx{z-index:1}.bt-glowfx.bt-glowtop{z-index:2}
 .chip.reg-casual{background:#FEF3C7;color:#92400E}.chip.reg-formal{background:#E0E7FF;color:#3730A3}.chip.reg-listen{background:#FEE2E2;color:#991B1B}.chip.reg-neutral{background:#E5E7EB;color:#374151}
 .plan-bar{height:4px;border-radius:4px;background:var(--line,#E5E7EB);margin-top:6px;overflow:hidden}.plan-bar>i{display:block;height:100%;background:#2F9E5B;border-radius:4px}
+.about-cat summary{cursor:pointer}.about-qa{border-top:1px solid var(--line,#E5E7EB);padding:6px 2px}.about-qa summary{cursor:pointer;font-size:14px}.about-qa[open] summary{font-weight:600}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -734,7 +735,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.65.1"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.66.5"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -1754,10 +1755,11 @@ function buildCatalog(C, custom, myAlts){
 /* ---------- 间隔重复（分盒法） ---------- */
 const INTERVALS = [0,1,2,4,7,15,30,60,120];
 const MASTERED_BOX = 5;
-function srsRate(p, r, tn){
+function srsRate(p, r, tn, err){
   p = p ? Object.assign({}, p) : {box:0,due:tn,n:0,ok:0,lapses:0};
   if (r === "again"){ p.box = 1; p.due = tn+1; p.lapses = (p.lapses||0)+1; }
-  else if (r === "hard"){ p.box = Math.max(1,p.box); p.due = tn + Math.max(1, Math.ceil(INTERVALS[p.box]/2)); }
+  /* 有卡顿/有错误：只是慢 → 停在这一档、间隔减半；有错误（看了提示才对、或者最后一遍还有错）→ 退一档、取那一档间隔的一半（v1.66.3） */
+  else if (r === "hard"){ p.box = err ? Math.max(1, p.box - 1) : Math.max(1, p.box); p.due = tn + Math.max(1, Math.ceil(INTERVALS[p.box]/2)); }
   else { p.box = p.box===0 ? 2 : Math.min(8, p.box+1); p.due = tn + INTERVALS[p.box]; }
   p.n = (p.n||0)+1; if (r !== "again") p.ok = (p.ok||0)+1; p.last = tn;
   return p;
@@ -2727,7 +2729,7 @@ function deckGroupOf(x){
   if (/实验室|lab|工作|职场/i.test(n)) return "工作";
   return "其他";
 }
-/* 参考回答：导入的（Claude 给的）优先，没有就用自带的 */
+/* 参考回答：导入的（AI 给的）优先，没有就用自带的 */
 function refFor(q){ if (!q) return ""; return ((S.refAns || {})[q.id] || (CONTENT.REF || {})[q.id] || "").trim(); }
 function ans(qid){ return S.answers[qid] || (S.answers[qid] = {text:"", keys:[], practiced:0}); }
 function applyTheme(){ const t = S.settings.theme; if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); else document.documentElement.removeAttribute("data-theme"); }
@@ -2750,7 +2752,7 @@ function rateCard(card, r, ms, opts){
   let pb = false;
   if (!opts.retry){
     if (!S.cards[card.id]){ if (S.newToday.d !== today()) S.newToday = {d:today(), n:0}; S.newToday.n++; }
-    S.cards[card.id] = K.srsRate(S.cards[card.id], r, tn);
+    S.cards[card.id] = K.srsRate(S.cards[card.id], r, tn, !!opts.err);
     const day = dayRec(); day.cards++; if (r !== "again") day.ok++;
     const tg = S.tags[today()] || (S.tags[today()] = {}); const t = tg[card.tag] || (tg[card.tag] = [0,0]); t[0]++; if (r !== "again") t[1]++;
     if (ms && r !== "again" && ms < 60000){
@@ -3315,12 +3317,12 @@ ${text.slice(0, 6000)}
 没有错误时 issues 为空数组。issues 最多 8 个，按重要程度排序。`;
   },
   async review(kind, text, extra, out){
-    if (!this.fn || this.off){ toast("这个版本用不了 AI 批改，可以复制给 Claude"); return; }
+    if (!this.fn || this.off){ toast("这个版本用不了 AI 批改，可以复制给 AI"); return; }
     text = String(text||"").trim();
     if (text.length < 8){ toast("先写几句英文"); return; }
     if (this.ctl) try { this.ctl.abort(); } catch (e) {}
     const ctl = this.ctl = new AbortController();
-    out.innerHTML = `<div class="panel ai-out"><p class="muted">Claude 正在看，通常 10–40 秒……</p><button class="btn sm" data-act="ai-stop">停止</button></div>`;
+    out.innerHTML = `<div class="panel ai-out"><p class="muted">AI 正在看，通常 10–40 秒……</p><button class="btn sm" data-act="ai-stop">停止</button></div>`;
     try {
       const res = await this.fn.json(this.prompt(kind, text, extra), {modelTier:"default", signal:ctl.signal});
       if (!out.isConnected) return;
@@ -3331,7 +3333,7 @@ ${text.slice(0, 6000)}
       if (code === "cancelled"){ out.innerHTML = ""; return; }
       if (["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"].includes(code)){
         this.off = true; document.documentElement.classList.remove("has-ai");
-        out.innerHTML = `<div class="panel small">AI 批改没有开启。可以点“复制给 Claude”，粘贴到和 Claude 的对话里。</div>`; return;
+        out.innerHTML = `<div class="panel small">AI 批改没有开启。可以点“复制给 AI”，粘贴到和 AI 的对话里。</div>`; return;
       }
       const msg = code === "rate_limited" ? "用得太频繁了，过一会儿再试" : code === "invalid_json" ? "这次结果没读出来，再点一次试试" : "这次没成功，检查网络后再试";
       out.innerHTML = `<div class="panel small">${msg}</div>`;
@@ -3383,7 +3385,7 @@ async function copyText(text){
 }
 async function sendToClaude(text){
   const ok = await copyText(text);
-  if (ok){ toast("已复制。打开 Claude 里这个项目的对话，粘贴发送"); return; }
+  if (ok){ toast("已复制。打开 AI 里这个项目的对话，粘贴发送"); return; }
   if (navigator.share && !IN_FRAME){ try { await navigator.share({text}); return; } catch (e) { if (e && e.name === "AbortError") return; } }
   toast("复制没成功，长按文字手动复制");
 }
@@ -3570,7 +3572,7 @@ VIEWS.home = {
       <div class="mods">
         ${mod("chunks","chat","常用语块","聊天、写邮件现成的说法")}${mod("pron","ear","发音","听辨、第一印象、重音")}${mod("read","book","阅读","边听边读，挑有用的词和短语")}${wordsTile()}${mod("tips","chat","说话技巧","重音、语调、断句、连读")}${mod("grammar","pen","语法要点","时态、-s、-ed、语序")}
       </div>
-      <p class="small muted" style="margin:12px 2px 0">有 Claude 给的导入码？<button class="linkbtn small" data-act="nav" data-v="import">导入新内容</button></p>
+      <p class="small muted" style="margin:12px 2px 0">有 AI 给的导入码？<button class="linkbtn small" data-act="nav" data-v="import">导入新内容</button></p>
       <p class="tip">${esc(tipOfDay())}</p>
     </div>`;
   }
@@ -3762,6 +3764,11 @@ function stubCue(card){
 }
 function stubCueHTML(card){ const st = stubCue(card); if (!st || st.lv <= 0) return "";
   return `<p class="small stub-cue" style="margin-top:8px">注意用上：${st.cue.map(w => `<b class="en">${esc(st.lv >= 2 ? w : w[0] + "…")}</b>`).join("、")}</p>`; }
+/* 删掉刚刚记下的这一次“没说好”（只删这一句；整张卡的记录不清空） */
+function dropThisMiss(st){
+  if (!st || !st.card || !st.missAdded || !S.lastMiss) return; const id = st.card.id, list = [].concat(S.lastMiss[id] || []), k = list.indexOf(st.missAdded);
+  if (k >= 0){ list.splice(k, 1); if (list.length) S.lastMiss[id] = list; else delete S.lastMiss[id]; } st.missAdded = null;
+}
 class CardStage {
   constructor(card, retry){ this.card = card; this.retry = !!retry; this.step = 0; this.phase = "prompt"; this.drill = 0; this.alive = true; this.tries = 0; }
   get isE(){ return this.card.t === "e"; }
@@ -3833,7 +3840,7 @@ class CardStage {
         <div class="dots">${steps.map((_, i) => `<i class="${i < this.drill ? "on" : ""}"></i>`).join("")}</div>
         ${SR.usable() && this.drill < n ? `<button class="mic" data-act="c-drill-mic" aria-label="说一遍">${ICON.mic}</button><div class="heard" id="heard">说一遍，说对了自动打勾</div>` : ""}
         ${this.drill < n ? `<button class="btn block" data-act="c-drill-tick">我说了一遍</button>` : `<button class="btn primary block big" data-act="c-drill-done">继续，这一轮还会再考你</button>`}
-        ${this.leech ? `<button class="btn ghost block" style="margin-top:6px" data-act="c-leech-claude">总记不住？让 Claude 换个好记的说法</button>` : ""}
+        ${this.leech ? `<button class="btn ghost block" style="margin-top:6px" data-act="c-leech-claude">总记不住？让 AI 换个好记的说法</button>` : ""}
       </div>`;
       if (this.drill < n && cur.play && canAutoSpeak() && this.drillPlayed !== this.drill){ this.drillPlayed = this.drill; setTimeout(() => { if (this.alive && this.phase === "drill") sayTxt(cur.text, cur.play === "slow"); }, 250); }
     }
@@ -3909,7 +3916,7 @@ class CardStage {
     if (cmp){ if (cmp.exact){ Snd.good(); vib(15); } else if (this.mean && !this.flags.length){ Snd.good(); } else if (cmp.level === "off"){ Snd.bad(); vib([30,40,30]); } }
     if (this.firstMean == null && this.phase === "retry") this.firstMean = !!this.mean;
     /* 记下这张卡这次没说好的说法：下次补练时，先练没说好的那一块 */
-    try { if (cmp && !cmp.exact && this.said){ S.lastMiss = S.lastMiss || {}; S.lastMiss[this.card.id] = [this.said].concat([].concat(S.lastMiss[this.card.id] || [])).slice(0, 2); const ks = Object.keys(S.lastMiss); if (ks.length > 300) delete S.lastMiss[ks[0]]; } else if (cmp && cmp.exact && S.lastMiss) delete S.lastMiss[this.card.id]; } catch (e) {}
+    try { if (cmp && !cmp.exact && this.said && !(this.mean && !this.flags.length)){ S.lastMiss = S.lastMiss || {}; this.missAdded = this.said;   /* 意思对、语法也没问题的换说法不是错误，不记 */ S.lastMiss[this.card.id] = [this.said].concat([].concat(S.lastMiss[this.card.id] || [])).slice(0, 2); const ks = Object.keys(S.lastMiss); if (ks.length > 300) delete S.lastMiss[ks[0]]; } else if (cmp && cmp.exact && S.lastMiss) delete S.lastMiss[this.card.id]; } catch (e) {}
     this.phase = "reveal"; this.render();
   }
   retryHTML(){
@@ -3944,11 +3951,11 @@ class CardStage {
       if (this.mine && cmp.exact) h += `<p class="small muted" style="margin:-6px 0 10px">你的说法记下了，以后这样说也算对。</p>${this._mineUndo ? `<div class="opt-links"><button class="linklike" data-act="c-mine-undo">点错了？撤销，重新选</button></div>` : ""}`;
       else if (this.tries && cmp.exact) h += `<p class="small muted" style="margin:-6px 0 10px">按提示自己改对了。改过一次的句子会早一点再出现。</p>`;
       const mineRow = !this.said ? "" : this._mineUndo ? `<div class="opt-links"><button class="linklike" data-act="c-mine-undo">撤销“我确定这样也对”，重新选</button></div>`
-        : `<button class="btn block misrec-btn" data-act="c-misrec">我说对了，是识别错了</button><div class="row-gap" style="margin:8px 0 2px"><button class="btn sm" data-act="c-ask">拿不准，存起来问 Claude</button></div>${["r","t","f"].includes(c.t) ? `<div class="opt-links"><button class="linklike" data-act="c-mine">我确定这样也对</button></div>` : ""}`;
+        : `<button class="btn block misrec-btn" data-act="c-misrec">我说对了，是识别错了</button><div class="row-gap" style="margin:8px 0 2px"><button class="btn sm" data-act="c-ask">拿不准，存起来问 AI</button></div>${["r","t","f"].includes(c.t) ? `<div class="opt-links"><button class="linklike" data-act="c-mine">我确定这样也对</button></div>` : ""}`;
       if (meaning){
         const fl = this.flags.filter(f => !gcMsgs.has(f.msg));
         if (fl.length) h += `<ul class="fb">${fl.slice(0, 4).map(f => `<li>${esc(f.msg)}</li>`).join("")}</ul>`;
-        else if (!gcMsgs.size) h += `<p class="small muted" style="margin:-4px 0 10px">规则没查出问题，你的说法很可能也是对的。拿不准就存起来问 Claude。</p>`;
+        else if (!gcMsgs.size) h += `<p class="small muted" style="margin:-4px 0 10px">规则没查出问题，你的说法很可能也是对的。拿不准就存起来问 AI。</p>`;
         h += `<details style="margin-bottom:10px"><summary class="small">看逐词对比</summary><div class="diff" style="margin-top:8px">${diffHTML(cmp.ops)}</div></details>` + mineRow;
       } else if (!cmp.exact){
         h += `<div class="diff">${diffHTML(cmp.ops)}</div>`;
@@ -3984,19 +3991,25 @@ class CardStage {
     return h + "</div>";
   }
   rate(r){
-    const res = rateCard(this.card, r, this.tries ? 0 : this.ms, {retry:this.retry, said:this.said});
+    /* v1.66.3：看了提示才说对（第一遍错了、不是识别错）不是自己独立想起来的：最多按“有卡顿/有错误”记 */
+    /* v1.66.4：只在第一遍明显说错时才限制（不是“差一点”：只差一两个词很可能是手机听漏了 the、a 这种小词，不然这种句子每次都被要求重说、永远升不了档） */
+    const firstClear = !!(this.tries && !this.misrec && this.firstCmp && this.firstCmp.level !== "close");
+    if ((r === "good" || r === "easy") && firstClear){ r = "hard"; toast("第一遍说错、看了提示才说对：这次按“有卡顿/有错误”记"); }
+    const okNow = this.misrec || (this.cmp && (this.cmp.exact || this.cmp.level === "close")) || (this.mean && !(this.flags || []).length);
+    const err = r === "hard" && (firstClear || !okNow || (!this.misrec && (this.flags || []).length > 0));   /* 有错误 vs 只是慢 */
+    const res = rateCard(this.card, r, this.tries ? 0 : this.ms, {retry:this.retry, said:this.said, err});
     RUN.res[r]++; if (this.ms && !this.tries && r !== "again") RUN.res.ms.push(this.ms);
     if (!this.retry && r === "again") RUN.weak[this.card.tag] = (RUN.weak[this.card.tag]||0) + 1;
     if (res.pb){ RUN.res.pb++; Snd.pb(); vib([15,40,15]); const tc = $("#timeChip"); if (tc){ tc.classList.add("pb"); tc.textContent = fmt1(this.ms) + " 秒，最快一次"; } }
     else if (r === "good"){ Snd.good(); vib(15); }
+    if (r === "good" || r === "easy") dropThisMiss(this);   /* v1.66.2：只有“秒出”是你判断自己说对了：只删掉刚记下的这一次（以前真的说错的照样留着）。“有卡顿/有错误”可能真的错了，照常记 */
     const stb = (S.stub || {})[this.card.id];
     if (stb){
       if (r === "again"){ stb.lv = 2; save(); }
       else if (!this.tries){ const shown = stb.lv > 0; stb.lv = Math.max(0, stb.lv - 1);
         if (!shown){ delete S.stub[this.card.id]; if (S.lastMiss) delete S.lastMiss[this.card.id]; }
         save();
-        /* 有提示时说对了：马上再说两遍，把对的说顺 */
-        if (shown){ this.stubDrill = true; this.drillLite = true; this.phase = "drill"; this.drill = 0; this.drillPlayed = -1; this.render(); return; } }
+        /* v1.66.0：说对以后不再强制补练两遍——同一轮里马上多练的好处很快就消失，间隔开复习更有效；提示下次逐级撤掉 */ }
     }
     if (r === "again" && (!this.retry || ((RUN.retries || {})[this.card.id] || 0) < 4)){
       const p = S.cards[this.card.id]; this.leech = !!(p && (p.lapses || 0) >= 3);
@@ -4051,7 +4064,7 @@ ACT.word = el => {
     const b = e.target.closest("[data-x]"); if (e.target === bg || (b && b.dataset.x === "c")){ bg.remove(); return; } if (!b) return;
     if (b.dataset.x === "add" || b.dataset.x === "addck"){ const item = (b.dataset.x === "addck" ? (cb || ck) : w).trim(); S.wantWords = S.wantWords || [];
       if (!S.wantWords.some(x => x.w.toLowerCase() === item.toLowerCase())){ const host = el.closest(".en, .rd-s, .card, .li"); S.wantWords.push({w:item, ctx:host ? host.textContent.replace(/\s+/g, " ").trim().slice(0, 200) : "", ts:Date.now()}); save(); }
-      toast("加好了。联网后在“我的 → 问 Claude”里发给 Claude，换成单词卡"); bg.remove(); return; }
+      toast("加好了。联网后在“我的 → 问 AI”里发给 AI，换成单词卡"); bg.remove(); return; }
     if (b.dataset.x === "cn") TTS.speak(ck, {rate:0.95}); else if (b.dataset.x === "cs") TTS.speak(ck, {rate:0.7});
     else if (b.dataset.x === "dmore"){ const l = bg.querySelector(`.dict-list[data-for="${b.dataset.for}"]`); if (l) l.hidden = !l.hidden; return; }
     else if (b.dataset.x === "dict"){ openDict(b.dataset.for === "cd" ? (cb || ck) : w, b.dataset.v); bg.remove(); return; }
@@ -4142,6 +4155,7 @@ ACT["c-drill-mic"] = async el => {
    再错就再练再考，一轮最多 3 次，剩下的交给明天 */
 ACT["c-drill-done"] = () => {
   const s = RUN.stage; if (!(s instanceof CardStage)) return;
+  if (s.stubDrill){ nextItem(); return; }   /* 说对以后的补练：不再考一次、不算没说出来 */
   RUN.retries = RUN.retries || {}; const done = RUN.retries[s.card.id] || 0;
   if (done < 3){ RUN.items.splice(Math.min(RUN.items.length, RUN.i + (done === 0 ? 3 : 4)), 0, {k:"card", id:s.card.id, retry:true}); RUN.retries[s.card.id] = done + 1; }
   else toast("这句今天先练到这，明天还会再来");
@@ -4167,9 +4181,11 @@ ACT["c-mine"] = async () => {
 ACT["c-ask"] = () => {
   const s = RUN.stage; if (!(s instanceof CardStage) || !s.said) return; const c = s.card; const t = s.target();
   S.pending = S.pending || [];
-  if (!S.pending.some(p => p.cid === c.id && p.said === s.said)) S.pending.push({cid:c.id, zh: c.t === "w" && s.freeUse ? "用“" + c.mean + "”（" + c.word + "）自己说一句" : c.t === "f" ? "改错：" + c.wrong : c.t === "e" ? t.add + "：" + t.hint : (c.zh || ""), ref:t.en, said:s.said, ts:Date.now()});
+  if (!S.pending.some(p => p.cid === c.id && p.said === s.said)) S.pending.push({cid:c.id, zh: c.t === "w" && s.freeUse ? "用“" + c.mean + "”（" + c.word + "）自己说一句" : c.t === "f" ? "改错：" + c.wrong : c.t === "e" ? t.add + "：" + t.hint : (c.zh || ""), ref:t.en, said:s.said, first:(s.firstSaid && K.tokens(s.firstSaid).join(" ") !== K.tokens(s.said).join(" ")) ? s.firstSaid : "", ts:Date.now()});   /* 第一遍和第二遍不一样：两遍都存 */
   if (S.pending.length > 60) S.pending = S.pending.slice(-60);
-  save(); toast(`存好了（共 ${S.pending.length} 句）。联网后在“我的 → 问 Claude”一起发给 Claude`);
+  save(); toast(`存好了（共 ${S.pending.length} 句）。联网后在“我的 → 问 AI”一起发给 AI`);
+  /* v1.66.0：拿不准对不对，就按“有卡顿/有错误”记（下次早点再见），等 AI 确认了再导入“也对”或“改” */
+  if (s.phase === "reveal") setTimeout(() => { if (RUN.stage === s && s.phase === "reveal"){ toast("存好了：这题先按“有卡顿/有错误”记"); s.rate("hard"); } }, 700);
 };
 ACT["c-retry-ok"] = () => {
   const s = RUN.stage; if (!(s instanceof CardStage) || s.phase !== "retry" || !s.firstCmp) return;
@@ -4181,7 +4197,7 @@ ACT["c-misrec"] = () => {
   S.misWords = S.misWords || {}; for (const w of words) S.misWords[w] = (S.misWords[w] || 0) + 1;
   const top = Object.entries(S.misWords).sort((a, b) => b[1] - a[1]).slice(0, 50); S.misWords = Object.fromEntries(top); save();
   s.misrec = true; s.cmp = {exact:true, level:"exact", ops:[], notes:[], score:1, text:s.target().en}; s.mean = null; s.flags = [];
-  if (S.lastMiss && s.card) delete S.lastMiss[s.card.id];   /* 识别错了：那一次不当成“没说好” */
+  dropThisMiss(s);   /* 识别错了：只删掉这一次，以前真的说错的照样留着 */
   s.render(); toast("按你说对算。被识别错的词记下了，可以在“今天练过的”里专门听");
   if (typeof batMisrec === "function") batMisrec(s);
 };
@@ -4430,7 +4446,7 @@ const pick = a => a[Math.floor(Math.random() * a.length)];
 const backBtn = () => `<div class="subhead"><button class="back" data-act="back">${ICON.chev}返回</button></div>`;
 function ruleOut(text, issues, emptyMsg){
   issues = issues.slice(0, 24);
-  if (!issues.length) return `<div class="panel" style="margin-top:12px"><p class="verdict exact" style="margin:0">规则没查出问题</p><p class="small muted" style="margin-top:6px">${esc(emptyMsg || "规则只能查出一部分错误。重要的内容可以再让 Claude 看一遍。")}</p></div>`;
+  if (!issues.length) return `<div class="panel" style="margin-top:12px"><p class="verdict exact" style="margin:0">规则没查出问题</p><p class="small muted" style="margin-top:6px">${esc(emptyMsg || "规则只能查出一部分错误。重要的内容可以再让 AI 看一遍。")}</p></div>`;
   const marks = issues.map((it, i) => ({start:it.start, end:it.end, n:i+1}));
   return `<div class="panel ai-out" style="margin-top:12px"><div class="marked">${markText(text, marks)}</div><ol class="issues">${issues.map(it => `<li><b>${esc(it.tag)}</b>　${esc(it.msg)}</li>`).join("")}</ol></div>`;
 }
@@ -4695,9 +4711,9 @@ function crSummaryHTML(rec){
   return `<div class="panel" id="crSum"><b>${rated < qs.length ? `还有 ${qs.length - rated} 题没打分` : weak.length ? `打完分了：${weak.length} 题要重练` : "打完分了：都还行"}</b>
     <p class="small muted" style="margin-top:4px">每题先听自己的录音，再看参考回答，然后给自己打个分。“没说出来”的题明天会再出现，“较多卡顿”的后天再出现。偶尔卡一下、能接上，就打“还行”。</p>
     ${weak.length ? `<button class="btn primary block" style="margin-top:8px" data-act="cr-redo" data-id="${rec.id}">现在就重练这 ${weak.length} 题</button>` : ""}
-    <button class="btn block" style="margin-top:8px" data-act="cr-claude" data-id="${rec.id}">复制这次模拟，发给 Claude 分析</button>
+    <button class="btn block" style="margin-top:8px" data-act="cr-claude" data-id="${rec.id}">复制这次模拟，发给 AI 分析</button>
     <div style="margin-top:8px">${slashBtn()}</div>
-    <p class="small muted" style="margin-top:4px">先在每题下面点“再说一遍，转成文字”，Claude 才能逐句帮你改；它听不到录音，只能看文字。</p></div>`;
+    <p class="small muted" style="margin-top:4px">先在每题下面点“再说一遍，转成文字”，AI 才能逐句帮你改；它听不到录音，只能看文字。</p></div>`;
 }
 /* 听自己的录音：听这五件事；勾出有问题的，下面直接给对应的练法 */
 const SC_ITEMS = [
@@ -4811,7 +4827,7 @@ ACT["cr-say"] = async el => {
   else { ta.value = pre.trim(); toast("没听到。再试一次，或者用键盘的语音输入"); }
 };
 ACT["say-chunk"] = el => TTS.speak(el.dataset.v, {rate:0.9});
-/* 把整次模拟打包，发给 Claude 逐句分析 */
+/* 把整次模拟打包，发给 AI 逐句分析 */
 ACT["cr-claude"] = async el => {
   const rec = crRec(el.dataset.id); if (!rec) return;
   const lab = Object.fromEntries(SC_ITEMS.map(x => [x.k, x.t]));
@@ -4824,7 +4840,7 @@ ACT["cr-claude"] = async el => {
     lines.push(`题 ${n + 1}（${s.qid}）：${s.say}`, `我说的：${said || "（没转写，只有我自己听出来的问题）"}`, `我自己觉得的问题：${iss || "（没勾）"}`, `参考回答：${refFor(QBY[s.qid]) || "（没有）"}`, "");
   });
   const ok = await copyText(lines.join("\n"));
-  toast(ok ? "复制好了。打开 Claude，粘贴发送就行" : "复制没成功，再点一次试试");
+  toast(ok ? "复制好了。打开 AI，粘贴发送就行" : "复制没成功，再点一次试试");
 };
 async function callDelete(id){
   if (!await sheet("删除这次模拟的记录？", "录音、打分和你写下的话会一起删掉。已经安排好的重练不受影响。", "删除", true)) return false;
@@ -4875,10 +4891,10 @@ function soloAsrHTML(q, at){
   const t = x.text || ""; if (!t.trim()) return `<p class="small muted">没识别出内容。录音太短、太小声都会这样。</p>`;
   const iss = K.checkWriting(t).filter(i => i.tag !== "书写"); const ref = refFor(q); const miss = ref ? chunkMiss(t, ref) : [];
   return `<div class="panel" style="margin:8px 0 0"><b>录音转成的文字</b><div class="en sm asr-text" style="margin-top:6px">${esc(t)}</div>
-    ${iss.length ? `<ul class="fb" style="margin-top:8px">${iss.slice(0, 6).map(i => `<li>${esc(i.msg)}</li>`).join("")}</ul>` : `<p class="small muted" style="margin-top:8px">规则没查出问题。不过规则查不出所有错，拿不准就存起来问 Claude。</p>`}
+    ${iss.length ? `<ul class="fb" style="margin-top:8px">${iss.slice(0, 6).map(i => `<li>${esc(i.msg)}</li>`).join("")}</ul>` : `<p class="small muted" style="margin-top:8px">规则没查出问题。不过规则查不出所有错，拿不准就存起来问 AI。</p>`}
     ${ref ? (miss.length ? `<div class="small" style="margin-top:8px">参考回答里这些固定搭配，你这次没用上（点一下听）：</div><div class="chips" style="margin-top:4px">${miss.map(p => `<button class="chip" data-act="say-chunk" data-v="${esc(p)}">${esc(p)}</button>`).join("")}</div>` : `<p class="small muted" style="margin-top:8px">参考回答里的固定搭配，你都用上了。</p>`) : ""}
     <p class="small muted" style="margin-top:6px">转写工具有时会把口误“修好”，拿不准的地方再听一遍录音。</p>
-    <button class="btn sm" style="margin-top:8px" data-act="solo-ask" data-q="${q.id}">存起来问 Claude</button></div>`;
+    <button class="btn sm" style="margin-top:8px" data-act="solo-ask" data-q="${q.id}">存起来问 AI</button></div>`;
 }
 /* 转写任务的几种类型：转好以后把文字放到对应的地方；另外都存一份到“我的 → 录音转文字”的列表里，随时能找到 */
 function asrKeep(label, text){
@@ -4939,7 +4955,7 @@ ACT["iv-asr"] = async () => {
 ACT["solo-ask"] = el => {
   const q = QBY[el.dataset.q]; const x = q && (S.soloText || {})[q.id]; if (!q || !x || !x.text) return;
   S.pending = S.pending || []; S.pending.push({cid:q.id, zh:"面试回答：" + q.zh, ref:refFor(q) || q.v[0], said:x.text, ts:Date.now()}); save();
-  toast("存好了。联网后在“我的 → 问 Claude”里一起发给 Claude");
+  toast("存好了。联网后在“我的 → 问 AI”里一起发给 AI");
 };
 /* 日记录音转文字 */
 ACT["j-asr"] = async el => {
@@ -4960,12 +4976,12 @@ ACT["cr-check"] = el => {
     const miss = chunkMiss(text, ref);
     gap = miss.length ? `<div class="small" style="margin-top:8px">参考回答里这些固定搭配，你这次没用上（点一下听）：</div><div class="chips" style="margin-top:4px">${miss.map(p => `<button class="chip" data-act="say-chunk" data-v="${esc(p)}">${esc(p)}</button>`).join("")}</div>` : `<p class="small muted" style="margin-top:8px">参考回答里的固定搭配，你都用上了。</p>`;
   }
-  out.innerHTML = `${iss.length ? `<ul class="fb" style="margin-top:8px">${iss.slice(0, 6).map(i => `<li>${esc(i.msg)}</li>`).join("")}</ul>` : `<p class="small muted" style="margin-top:8px">规则没查出问题。不过规则查不出所有错，拿不准就存起来问 Claude。</p>`}${gap}<button class="btn sm" style="margin-top:6px" data-act="cr-ask" data-id="${rec.id}" data-q="${qid}">存起来问 Claude</button>`;
+  out.innerHTML = `${iss.length ? `<ul class="fb" style="margin-top:8px">${iss.slice(0, 6).map(i => `<li>${esc(i.msg)}</li>`).join("")}</ul>` : `<p class="small muted" style="margin-top:8px">规则没查出问题。不过规则查不出所有错，拿不准就存起来问 AI。</p>`}${gap}<button class="btn sm" style="margin-top:6px" data-act="cr-ask" data-id="${rec.id}" data-q="${qid}">存起来问 AI</button>`;
 };
 ACT["cr-ask"] = el => {
   const rec = crRec(el.dataset.id); const q = QBY[el.dataset.q]; const text = rec && (rec.note || {})[el.dataset.q]; if (!q || !text) return;
   S.pending = S.pending || []; S.pending.push({cid:q.id, zh:"面试回答：" + q.zh, ref:refFor(q) || q.v[0], said:text, ts:Date.now()}); save();
-  toast("存好了。联网后在“我的 → 问 Claude”里一起发给 Claude");
+  toast("存好了。联网后在“我的 → 问 AI”里一起发给 AI");
 };
 function ivRunQs(qids, title){
   const items = Array.from(new Set(qids)).filter(id => QBY[id]).map(qid => ({k:"iv", qid})); if (!items.length) return;
@@ -5273,7 +5289,7 @@ VIEWS.journal = {
       <div class="panel"><label class="fld" style="margin-top:0"><span>用键盘语音输入再说一遍，或者打字</span>
         <textarea class="en" id="jText" placeholder="Today I...">${esc(L.jDraft || "")}</textarea></label>
         ${jWordsHTML()}
-        <div class="row-gap" style="margin-top:10px"><button class="btn" data-act="j-check">检查过去式</button><button class="btn has-ai-only" data-act="j-ai">AI 标错</button><button class="btn" data-act="j-copy">复制给 Claude</button></div>
+        <div class="row-gap" style="margin-top:10px"><button class="btn" data-act="j-check">检查过去式</button><button class="btn has-ai-only" data-act="j-ai">AI 标错</button><button class="btn" data-act="j-copy">复制给 AI</button></div>
         <div id="jOut"></div></div>
       <button class="btn primary block" style="margin-top:12px" data-act="j-save">保存今天的日记</button>
       ${recent.length ? `<div class="sec-title">以前的日记</div><div class="list">${recent.map(e => `<div class="li"><div class="grow"><b>${esc(e.date)}</b><span>${esc((e.text || "只有录音").slice(0, 80))}</span>${e.asr ? `<span class="small" style="margin-top:4px">录音转写：${esc(e.asr)}</span>` : ""}</div>${e.rec ? `<div class="row-gap" style="flex:none"><button class="btn sm" data-act="j-play" data-v="${esc(e.rec)}">播放</button><button class="btn sm ghost" data-act="j-restart" data-v="${esc(e.rec)}">从头放</button>${ASR.supported() && !e.asr ? `<button class="btn sm ghost" data-act="j-asr" data-v="${esc(e.id)}">转成文字</button>` : ""}</div>` : ""}</div>`).join("")}</div>` : ""}
@@ -5319,7 +5335,7 @@ VIEWS.write = {
     return `<div class="wrap">${backBtn()}<h2>写作自查</h2>
       <p class="muted small" style="margin:6px 0 14px">把求职邮件、cover letter、感谢信贴进来，按你最常犯的错检查。没网也能用。</p>
       <textarea class="en" id="wText" style="min-height:200px" placeholder="Dear ...">${esc(L.wDraft || "")}</textarea>
-      <div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="w-check">检查</button><button class="btn has-ai-only" data-act="w-ai">AI 标错</button><button class="btn" data-act="w-copy">复制给 Claude</button></div>
+      <div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="w-check">检查</button><button class="btn has-ai-only" data-act="w-ai">AI 标错</button><button class="btn" data-act="w-copy">复制给 AI</button></div>
       <div id="wOut"></div>
       <details class="panel" style="margin-top:14px"><summary>规则查不出来的，发送前自己再过一遍</summary><ul class="issues">
         <li>每句话都有动词吗？形容词前有 is、's 吗？</li><li>这件事是平时、过去、已经，还是正在？时态对吗？</li><li>although、because 有没有和 but、so 一起用？</li>
@@ -5397,7 +5413,7 @@ VIEWS.iv = {
     const cards = IV_MODS.map(m => { const qs = modQs(m.id, pool); return `<div class="panel ivmod${m.id === cur ? " on" : ""}"><div class="row-gap" style="justify-content:space-between;align-items:center"><b>${ICON[m.icon] || ""} ${esc(m.name)}</b><span class="small muted">${qs.length} 题，已写 ${qs.filter(written).length}</span></div>
       <p class="small muted" style="margin:4px 0 10px">${esc(m.sub)}</p><div class="row-gap"><button class="btn primary sm" data-act="mod-go" data-v="${m.id}" ${qs.length ? "" : "disabled"}>模拟一场</button><button class="btn sm" data-act="mod-list" data-v="${m.id}" aria-pressed="${m.id === cur}">${m.id === cur ? "题目在下面" : "看题目"}</button></div></div>`; }).join("");
     const curQs = modQs(cur, pool); const curName = (IV_MODS.find(m => m.id === cur) || {}).name || "";
-    const custom = `<div class="sec-title">${esc(curName)}：${curQs.length} 题</div>${curQs.length ? `<div class="list">${curQs.map(row2).join("")}</div>` : `<p class="small muted">这一类还没有题目。把 Claude 给你的面试题库导入码导进来，这里就有了。</p>`}`;
+    const custom = `<div class="sec-title">${esc(curName)}：${curQs.length} 题</div>${curQs.length ? `<div class="list">${curQs.map(row2).join("")}</div>` : `<p class="small muted">这一类还没有题目。把 AI 给你的面试题库导入码导进来，这里就有了。</p>`}`;
     const core = [], scr = [];
     const nW = all.filter(written).length; const left = ivDaysLeft();
     return `<div class="wrap"><div class="top"><h2 style="font-size:26px">面试准备</h2><span class="muted small">已写 ${nW}/${all.length}</span></div>
@@ -5409,8 +5425,8 @@ VIEWS.iv = {
       ${cards}
       <div class="row-gap" style="margin:4px 0 6px"><button class="btn sm" data-act="nav" data-v="calls">复盘记录（${(S.calls || []).filter(c => c.segs).length}）</button><button class="btn sm" data-act="iv-listen">听面试官怎么问</button><button class="btn sm ghost" data-act="nav" data-v="callsetup">自己挑题数的来电模拟</button></div>
       ${custom}
-      <button class="btn block" style="margin-top:16px" data-act="iv-copyall">把写好的回答一起复制给 Claude</button>
-      <p class="small muted" style="margin-top:10px">Claude 改好后，让它给你导入码，贴进“导入新内容”，回答就会更新到这里。</p></div>`;
+      <button class="btn block" style="margin-top:16px" data-act="iv-copyall">把写好的回答一起复制给 AI</button>
+      <p class="small muted" style="margin-top:10px">AI 改好后，让它给你导入码，贴进“导入新内容”，回答就会更新到这里。</p></div>`;
   }
 };
 ACT["iv-copyall"] = () => {
@@ -5437,7 +5453,7 @@ VIEWS.ivedit = {
           <div class="en sm" style="margin-top:8px;line-height:1.7">${wordsHTML(ref)}</div>
           <div class="row-gap" style="margin-top:10px"><button class="btn primary sm" data-act="nav" data-v="reader" data-q="${q.id}" data-src="ref">跟读参考回答</button>${mine && mine !== ref ? `<button class="btn sm" data-act="ive-useref" data-q="${q.id}">用它替换我的回答</button>` : ""}</div>
           ${mine && mine !== ref ? `<p class="small muted" style="margin-top:8px">你的回答和参考回答不一样：对照着看，把参考回答里更自然的说法放进你的回答。用自己的话说，比背别人的稿子在面试里更自然。</p>` : ""}</div>`
-          : `<div class="panel"><p class="small muted" style="margin:0">这题还没有参考回答。写好你的版本，点“复制给 Claude”，我帮你改成自然的说法，再给你导入码。</p></div>`; })()}
+          : `<div class="panel"><p class="small muted" style="margin:0">这题还没有参考回答。写好你的版本，点“复制给 AI”，我帮你改成自然的说法，再给你导入码。</p></div>`; })()}
       ${(q.follow || []).length ? `<div class="panel"><div class="small muted">面试官可能接着追问</div>${q.follow.map(f => { const fa = (S.followAns || {})[q.id + "|" + f]; return `<div class="say-line" style="margin-top:10px"><div class="en sm">${wordsHTML(f)}</div><div class="say-btns">${sayBtns(f)}</div></div>${fa ? `<details style="margin-top:4px"><summary class="small">参考回答</summary><div class="say-line" style="margin-top:6px"><div class="en sm">${wordsHTML(fa)}</div><div class="say-btns">${sayBtns(fa)}</div></div></details>` : ""}`; }).join("")}</div>` : ""}
       <div class="panel"><div class="note" style="margin-top:0">${esc(q.tip)}</div>
         ${q.tpl ? `<details style="margin-top:8px"><summary>参考结构</summary><div class="en sm" style="margin-top:6px">${esc(q.tpl)}</div><button class="btn sm" style="margin-top:8px" data-act="ive-tpl" data-q="${q.id}">放进回答框</button></details>` : ""}</div>
@@ -5445,7 +5461,7 @@ VIEWS.ivedit = {
       <div class="small muted" id="ansCount" style="margin-top:6px"></div>
       <label class="fld"><span>要点小抄：一行一个，来电模拟里能看</span><textarea id="ansKeys" style="min-height:90px">${esc((a.keys || []).join("\n"))}</textarea></label>
       <div class="row-gap" style="margin-top:12px"><button class="btn primary" data-act="ive-save" data-q="${q.id}">保存</button><button class="btn" data-act="iv-solo" data-q="${q.id}">单题彩排</button><button class="btn" data-act="nav" data-v="reader" data-q="${q.id}" data-src="mine">跟读我的回答</button>
-        <button class="btn has-ai-only" data-act="ive-ai" data-q="${q.id}">AI 标错</button><button class="btn" data-act="ive-copy" data-q="${q.id}">复制给 Claude</button></div>
+        <button class="btn has-ai-only" data-act="ive-ai" data-q="${q.id}">AI 标错</button><button class="btn" data-act="ive-copy" data-q="${q.id}">复制给 AI</button></div>
       <div id="shadowBox" class="panel hide" style="margin-top:12px"></div><div id="iveOut"></div>
       <div class="panel" style="margin-top:14px"><h3>写完自查</h3><ul class="issues"><li>第一句直接回答问题</li><li>讲经历用过去式，多用 I，少用 we</li><li>有一个具体例子或数字</li><li>没有 although…but、because…so</li></ul>
         <button class="btn sm" style="margin-top:8px" data-act="ive-check">按规则查一遍</button></div></div>`;
@@ -5600,7 +5616,7 @@ VIEWS.me = {
         <label class="fld"><span>说英语时用什么识别</span><select data-chg="set" data-key="srEngine" data-rerender="1"><option value="device" ${S.settings.srEngine !== "whisper" ? "selected" : ""}>手机自带的识别：快，但口音重时容易听错</option><option value="whisper" ${S.settings.srEngine === "whisper" ? "selected" : ""} ${ASR.supported() ? "" : "disabled"}>Whisper：更准，说完要等几秒（只在安装版里能用）</option></select></label>
         ${S.settings.srEngine === "whisper" ? `<label class="fld" style="margin-top:0"><span>Whisper 用哪个模型</span><select data-chg="asrmodel" data-rerender="1"><option value="base" ${(L.asrModel || "base") === "base" ? "selected" : ""}>快：base.en（约 80 MB）</option><option value="small" ${L.asrModel === "small" ? "selected" : ""}>准一些：small.en（约 250 MB，慢一两秒）</option></select></label>` : ""}
         ${S.settings.srEngine === "whisper" ? `<p class="small muted" style="margin-top:12px;margin:-4px 0 8px">说完停一下，会自动结束录音。第一次用要下载约 80 MB 的模型（在“存储空间”里管理）。Whisper 偶尔会把很小的口误自动“修好”，所以语法检查可能漏掉个别错误。</p>` : ""}
-        <label class="fld"><span>给 Claude 的自我介绍（可选）</span><textarea rows="3" data-chg="profile" placeholder="比如：机械工程硕士，正在准备美国工程类岗位面试，口语大约 A2–B1">${esc(S.settings.profile || "")}</textarea></label>
+        <label class="fld"><span>给 AI 的自我介绍（可选）</span><textarea rows="3" data-chg="profile" placeholder="比如：机械工程硕士，正在准备美国工程类岗位面试，口语大约 A2–B1">${esc(S.settings.profile || "")}</textarea></label>
         <label class="fld"><span>说话中间停顿</span><select data-chg="srlong"><option value="on" ${L.srLong !== false ? "selected" : ""}>停 2.5 秒才算说完</option><option value="off" ${L.srLong === false ? "selected" : ""}>停一下就结束（手机默认）</option></select></label>
         <label class="fld"><span>停 2 秒自动检查</span><select data-chg="set" data-key="autoCheck">${[["smart","自动判断：语音说完自动查，打字时不查"],["on","一直开"],["off","关掉：每次自己点“检查”"]].map(([v, l]) => `<option value="${v}" ${(s.autoCheck || "smart") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
         <label class="fld"><span>一天从几点开始算</span><select data-chg="set" data-key="dayStart" data-num="1">${[0,2,4,6].map(h => `<option value="${h}" ${(+s.dayStart || 0) === h ? "selected" : ""}>${h ? "凌晨 " + h + " 点" : "半夜 12 点"}</option>`).join("")}</select></label>
@@ -5618,11 +5634,11 @@ VIEWS.me = {
         <p class="small muted" style="margin-top:6px">这台手机现在能用 ${TTS.list("en").length} 个英文声音。想换男声、女声：手机设置里搜“文字转语音”，首选引擎选“Google 语音识别和语音合成”，点它旁边的齿轮 → 安装语音数据 → 英语（美国），列表里有好几个声音，点一下能试听，选一个就行。没有齿轮的话，在手机的应用列表里找到“Google 语音识别和语音合成”（Speech Services by Google），打开它的设置。换完回来点“试听英文”听听。</p>
         ${!TTS.ok ? `<p class="note">这个浏览器不支持朗读。</p>` : !enV.length ? `<p class="note">还没读到语音列表。试听没声音的话，去设备检测看看。</p>` : ""}</div>
       <div class="sec-title">外观</div><div class="panel"><select data-chg="set" data-key="theme" aria-label="外观">${[["auto","跟随系统"],["light","浅色"],["dark","深色"]].map(([k, l]) => `<option value="${k}" ${s.theme === k ? "selected" : ""}>${l}</option>`).join("")}</select></div>
-      <div class="sec-title">内容</div><div class="list">${liRow("import","导入新内容","把 Claude 给的导入码贴进来")}${liRow("custom","我导入的内容", S.custom.length + " 张卡，" + (S.customQ || []).length + " 道面试题")}${liRow("pending","问 Claude", ((S.pending || []).length) + " 句说法，" + ((S.wantWords || []).length) + " 个词，" + ((S.dbAsk || []).length + (S.replyAsk || []).length) + " 条回答和回复")}${liRow("battle","对战角色","练完一轮，和昨天的你打一场；可以导入你自己的角色")}</div>
+      <div class="sec-title">内容</div><div class="list">${liRow("import","导入新内容","把 AI 给的导入码贴进来")}${liRow("custom","我导入的内容", S.custom.length + " 张卡，" + (S.customQ || []).length + " 道面试题")}${liRow("pending","问 AI", ((S.pending || []).length) + " 句说法，" + ((S.wantWords || []).length) + " 个词，" + ((S.dbAsk || []).length + (S.replyAsk || []).length) + " 条回答和回复")}${liRow("battle","对战角色","练完一轮，和昨天的你打一场；可以导入你自己的角色")}</div>
       <div class="sec-title">工具</div><div class="list">${liRow("plan","练习计划", "每天练什么、固定的练习时间" + (S.settings.planWhen ? "（" + esc(S.settings.planWhen) + "）" : ""))}${liRow("asr","录音转文字", BUILD.pwa ? "在手机上识别录音，转好了会提醒你" : "要在安装到手机上的版本里用")}${liRow("device","设备检测","朗读、识别、录音能不能用")}${liRow("install", BUILD.pwa ? "离线安装" : "离线版说明", BUILD.pwa ? "装到桌面，没网也能练" : "这个版本需要联网")}</div>
       <div class="sec-title">数据</div><div class="list">${liRow("backup","备份与恢复","换手机或清浏览器数据前先备份")}${liRow("storage","存储空间","看占了多少、清理旧录音")}</div>
-      <div class="sec-title">关于</div><div class="list">${liRow("about","这个 app 的练法","为什么这样练")}</div>
-      <p class="small muted" style="margin:14px 4px 0">${Cloud.on ? "进度会自动同步到你的 Claude 账号。" : BUILD.pwa ? "进度存在这台手机上，记得偶尔备份。" : "进度存在这个浏览器里。"}${STORAGE_OK ? "" : " 注意：这个浏览器存不了数据，关掉页面进度会丢，请先备份。"}</p>
+      <div class="sec-title">关于</div><div class="list">${liRow("about","关于 脱口app","怎么用、为什么这样练（可以搜）")}</div>
+      <p class="small muted" style="margin:14px 4px 0">${Cloud.on ? "进度会自动同步到你的 claude.ai 账号。" : BUILD.pwa ? "进度存在这台手机上，记得偶尔备份。" : "进度存在这个浏览器里。"}${STORAGE_OK ? "" : " 注意：这个浏览器存不了数据，关掉页面进度会丢，请先备份。"}</p>
       <p class="small muted" style="margin:4px 4px 0">脱口 ${esc(BUILD.version)}${BUILD.pwa ? "，离线版" : ""}</p>
       <button class="btn danger block" style="margin-top:18px" data-act="reset">清空所有进度</button></div>`;
   }
@@ -5639,7 +5655,7 @@ VIEWS.import = {
   tab:"me", noRefresh:true,
   render(){
     return `<div class="wrap">${backBtn()}<h2>导入新内容</h2>
-      <p class="muted small" style="margin:6px 0 14px">把 Claude 给的导入码整段贴进来，或者直接选导入码文件。带“题库”行的内容会单独放进一个题库，首页可以选着练。</p>
+      <p class="muted small" style="margin:6px 0 14px">把 AI 给的导入码整段贴进来，或者直接选导入码文件。带“题库”行的内容会单独放进一个题库，首页可以选着练。</p>
       <label class="btn block" style="margin-bottom:10px">${ICON.imp}从文件导入<input type="file" id="impFile" accept=".txt,.md,text/plain" class="hide"></label>
       <textarea id="impText" style="min-height:160px" placeholder="卡 | 中文 | English | 类型 | 提示"></textarea>
       <button class="btn primary block" style="margin-top:10px" data-act="imp-preview">预览</button><div id="impOut"></div>
@@ -5736,7 +5752,7 @@ VIEWS.custom = {
         <div class="list">${cs.slice().reverse().slice(0, 60).map(c => `<div class="li"><div class="grow"><b class="en" style="font-size:16px">${esc(c.en)}</b><span>${esc(c.t === "f" ? c.wrong : c.zh)}，${esc((TAGS[c.tag]||TAGS.other).label)}</span></div><button class="btn sm" data-act="cu-del" data-v="${esc(c.id)}">删除</button></div>`).join("")}${cs.length > 60 ? `<div class="li"><span class="small muted">还有 ${cs.length - 60} 张没列出来</span></div>` : ""}</div></details>`;
     }).join("");
     return `<div class="wrap">${backBtn()}<h2>我导入的内容</h2>
-      ${names.length ? body : `<p class="muted" style="margin:10px 0 14px">还没有导入过。和 Claude 练完后，让它给你一段导入码。</p><button class="btn primary" data-act="nav" data-v="import">去导入</button>`}</div>`;
+      ${names.length ? body : `<p class="muted" style="margin:10px 0 14px">还没有导入过。和 AI 练完后，让它给你一段导入码。</p><button class="btn primary" data-act="nav" data-v="import">去导入</button>`}</div>`;
   }
 };
 ACT["cu-jump"] = el => { const d = $("#cu-" + el.dataset.i); if (!d) return; d.open = true; d.scrollIntoView({behavior:"smooth", block:"start"}); };
@@ -5806,10 +5822,10 @@ VIEWS.device = {
     const d = L.device || {};
     const st = k => d[k] === "ok" ? `<span class="chip" style="color:var(--green)">能用</span>` : d[k] === "no" ? `<span class="chip" style="color:var(--red)">不能用</span>` : d[k] === "net" ? `<span class="chip" style="color:var(--amber)">要联网</span>` : `<span class="chip">还没测</span>`;
     const head = (t, k) => `<div class="row-gap" style="justify-content:space-between"><h3>${t}</h3>${st(k)}</div>`;
-    const env = IN_FRAME ? "claude.ai 版（在 Claude 的页面里运行）" : isStandalone() ? "离线版，已装到桌面" : IS_WEBVIEW ? "App 里的内置浏览器" : "浏览器里的独立网页";
+    const env = IN_FRAME ? "claude.ai 版（在 claude.ai 的页面里运行）" : isStandalone() ? "离线版，已装到桌面" : IS_WEBVIEW ? "App 里的内置浏览器" : "浏览器里的独立网页";
     return `<div class="wrap">${p.from === "ob" ? "" : backBtn()}<h2>设备检测</h2><p class="muted small" style="margin:6px 0 14px">测一遍，app 会按结果调整练法。</p>
       <div class="panel"><h3>运行环境</h3><p class="small" style="margin-top:6px">${env}</p>
-        ${MIC.blocked ? `<p class="note">这个页面拿不到麦克风：Claude 的页面没有把麦克风交给里面的 app，所以和你手机的权限设置无关。答题请用键盘语音输入；要自动识别和录音，请用离线版（在 Chrome 里打开）。</p><button class="btn sm" style="margin-top:8px" data-act="dv-mic-reset">再试一次麦克风</button>` : ""}
+        ${MIC.blocked ? `<p class="note">这个页面拿不到麦克风：AI 的页面没有把麦克风交给里面的 app，所以和你手机的权限设置无关。答题请用键盘语音输入；要自动识别和录音，请用离线版（在 Chrome 里打开）。</p><button class="btn sm" style="margin-top:8px" data-act="dv-mic-reset">再试一次麦克风</button>` : ""}
         ${d.micErr ? `<p class="small muted" style="margin-top:6px">上次的错误代码：${esc(d.micErr)}</p>` : ""}</div>
       <div class="panel">${head("英文朗读","en")}<p class="small muted">${TTS.ok ? `找到 ${TTS.list("en").length} 个英文语音` : "这个浏览器不支持朗读"}</p>
         <div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="dv-say" data-lang="en">试听</button><button class="btn sm" data-act="dv-mark" data-k="en" data-v="ok">听到了</button><button class="btn sm" data-act="dv-mark" data-k="en" data-v="no">没声音</button></div>
@@ -5883,34 +5899,84 @@ VIEWS.install = {
         <div class="panel"><h3>更新</h3><p class="small" style="margin-top:6px">有新版本时，把新文件传到原来的地方覆盖。app 联网打开时会在后台更新，下次打开就是新版。</p></div></div>`;
     }
     return `<div class="wrap">${backBtn()}<h2>离线版说明</h2>
-      <div class="panel" style="margin-top:14px"><p>你现在用的是 claude.ai 版：打开就能用，进度同步到你的 Claude 账号，有 AI 标错，但需要联网。</p>
-      <p style="margin-top:10px">离线版是同一套程序，要先放到一个免费网站上，再用 Chrome 装到桌面。安装包和步骤在你和 Claude 的对话里。</p>
+      <div class="panel" style="margin-top:14px"><p>你现在用的是 claude.ai 版：打开就能用，进度同步到你的 claude.ai 账号，有 AI 标错，但需要联网。</p>
+      <p style="margin-top:10px">离线版是同一套程序，要先放到一个免费网站上，再用 Chrome 装到桌面。安装包和步骤在你和 AI 的对话里。</p>
       <p style="margin-top:10px">换到离线版之前，先在“备份与恢复”里复制备份，装好后再恢复进去。</p></div></div>`;
   }
 };
+/* ---------- 关于 脱口app（v1.66.0）：按类别的问答，点开看解释，顶上可以搜 ---------- */
+const ABOUT_QA = [
+ ["开始使用", [
+  ["脱口是什么？", "一个练英语口语的 app：看中文，用英文说出来。它按你的记忆安排复习，记得牢的少出现，记不住的很快再来；还有游戏、对话首领战、情景对话、写作、阅读、发音这些练法。"],
+  ["每天怎么用最好？", "首页“现在做”点“开始”，按今天的计划练；没有计划就点“练习”，10 分钟。没精神就点“只做 3 分钟”，保住连续天数。碎片时间用耳机模式，睡前说 1 分钟语音日记。"],
+  ["推荐计划是怎么来的？", "“计划”页点“生成推荐计划”，选目标（面试、Coffee chat、日常聊天、写作）和每天多少分钟，app 按目标排好一周。你改过的项不会被重新生成覆盖。"],
+  ["首页最上面的进度（比如 7/21）是什么？", "这一轮练习安排的总题数（今天该复习的加上新学的），7 是练到第几题。"]]],
+ ["练习卡片", [
+  ["为什么要先说，再看答案？", "从记忆里把句子说出来（回忆练习），比看十遍记得牢。所以几乎每道题都要你开口。"],
+  ["“灯灭就开口”和用时是什么意思？", "用时从灯灭算到你说完。用时越短，越接近脱口而出；某句刷新最快纪录时会变成紫色。"],
+  ["“没说出来”“有卡顿/有错误”“秒出”怎么选？下次什么时候再见？", "没说出来：这一轮隔几题再考一次，明天再练。有卡顿/有错误：只是慢了、卡了（说对了），这次的间隔减半；有错误（看了提示才说对、或者最后还有错）会退一档，更早再见。秒出：又快又对，隔得更久。第一遍明显说错、看了提示才说对的，就算点秒出也按“有卡顿/有错误”记——有提示的回忆不等于自己想起来；第一遍只是差一两个词（常常是手机听漏了小词）不限制，你自己判断。说之前就给的“注意用上……”不算看了提示。每说对一次，下次就隔得更久；忘了就重新从明天开始。"],
+  ["我说对了，是识别错了，怎么办？", "点“我说对了，是识别错了”，和识别对了完全一样。如果你直接点了“秒出”，app 也会当成识别错了，只删掉这一次的记录（以前真的说错的照样留着）；点“有卡顿/有错误”说明可能真的有错，这一次照常记成说错。"],
+  ["拿不准自己说得对不对，三个按钮选哪个？", "点“拿不准，存起来问 AI”就行：存好以后会自动按“有卡顿/有错误”记，下次早点再见，不用你再选。之后在“问 AI”页面复制给 AI，它会告诉你对不对，并给你导入码：对的导入“也对”，以后这样说也算对；错的导入“改”，变成改错卡。"],
+  ["我的说法也对，怎么加进去？", "确定意思对、语法也对，就点“我确定这样也对”，以后这样说也算对。拿不准就点“拿不准，存起来问 AI”。"],
+  ["为什么有时会提示“注意用上……”？", "这是“顽固错句”：最近两次都漏了同样的关键词。说之前先提示正确的词（不显示你的错句，免得再加深印象）；说对一次，下次只给开头字母；再说对，就不给了。研究发现，同一个错误一遍遍说出来会越来越顺嘴，所以对这种句子先让你说对。"],
+  ["说错以后的补练是什么？说对了还要补练吗？", "没说出来的句子会先听正确的、跟着说，这一轮隔几题再考一次（最多 3 次），剩下的交给明天。说对了不用补练：同一轮里马上多说几遍，好处很快就消失，隔开复习更有效。"],
+  ["提示会影响练习效果吗？", "会有一点：提示越多，回忆越省力，记得也就没那么牢。所以最好先自己试着说，真的卡住了再看提示；提示也会随着你说对逐渐撤掉（完整的词 → 开头字母 → 不给）。"],
+  ["练完一句下面的语法提示是怎么来的？", "按一组常见错误规则检查你说的句子（比如时态、复数、语序、being 用多了），只用那些不容易误判的规则，所以没提示不代表一定没错；拿不准就存起来问 AI。"],
+  ["题库怎么选？", "首页“练哪个题库”可以只练通用、日常生活，或者你导入的题库（比如某家公司的面试准备），可以多选，按组折叠。"]]],
+ ["游戏和对战", [
+  ["游戏模式怎么玩？", "每张卡说对就打出伤害：一口气说完还有暴击；只要开口说了，至少也能擦伤对手。每次第一次就说对攒一格能量，攒满 5 格，下一张是大招卡，说对了就放大招。"],
+  ["大招没说出来会怎样？", "人物照常蓄力，发射时短路、被反噬（不扣血），能量降到 3 格，再说对 2 次又能放。"],
+  ["太久没开口会怎样？", "卡片出现 12 秒还没开口，对手轻击你一下；再过 8 秒，重击；之后每 10 秒轻击，一张卡最多 3 下。长句子会多给时间。按麦克风或者打字就停。"],
+  ["对手为什么会反击？", "一个字没说（主动放弃），对手加一层护盾，还会反击你：小兵打得轻，首领打得最重。重练时说对就能打碎护盾。"],
+  ["对话首领战是什么？", "像真的面试或 Coffee chat 一样一问一答：对方提问，你开口回答，按回答到没有、具体不具体、长短、有没有结果这些打分；面试模式里用了朋友之间的说法会提醒你。"],
+  ["对波是什么？", "双方同时放技能，两道光线在中间对撞，你说得越好越能推过去。"],
+  ["怎么用自己的角色？", "“我的 → 对战角色”导入姿势表（绿底，9、10、11 个姿势），在“招式”里选模板（比如迪迦型、红奈型、梦比优斯型），再导入发光部位.json 让眼睛和胸口的灯发光。“地点”里可以选预览的时间（白天、夜晚）看效果。"],
+  ["发光的范围不对怎么办？", "用“发光范围工具”（单独的网页文件）：导入姿势表和发光部位.json，用画笔、橡皮改范围，导出新的发光部位.json，再在“对战角色”里导入。"]]],
+ ["开口说", [
+  ["情景对话怎么判断我说得对不对？", "看你有没有回答到对方的问题、说法对不对、语法有没有问题，不看内容是不是和参考一样。比如点单时点什么都行，参考说法只是例子。"],
+  ["接话练习、想不起词怎么练？", "接话：听一句，先给反应（好消息、坏消息、吃惊……），再追问一句。想不起词：不说出东西的名字，用 It's the thing you use to… / It's like… 把它描述出来。"],
+  ["语音日记、耳机模式是什么？", "语音日记：睡前用英文说 1 分钟今天的事（多用过去式）。耳机模式：走路、坐车时听着练，不用看屏幕。"],
+  ["来电模拟是什么？", "面试官念题、你开口答，屏幕上不显示问题，和电话面试一样。"]]],
+ ["听和写", [
+  ["听力快练练什么？", "听懂面试官、日常的问法：新句子先选意思；复习时不看文字，整句说出来，练的是把连读的声音听成一个个词。"],
+  ["写作怎么检查？", "先写、不改，写完按你的错误清单检查；改过的句子会自动变成改错卡。你写过的都留在“我写过的”里，可以存起来问 AI。"],
+  ["听懂俚语练什么？", "当地人聊天里的俚语和脏话：不是为了说，是为了听懂，分清是在开玩笑、夸奖还是真的生气。每句告诉你有多冲、自己能不能用。"],
+  ["阅读怎么用？", "导入或粘贴一篇文章，一句一句听，点词听读音、加到要学的词，读完用 3 句话复述。"]]],
+ ["学", [
+  ["发音练习练什么？", "听辨容易混的音、第一印象测试、重音和节奏、难词本。"],
+  ["错误档案是什么？", "按错误类型统计你写作、练习里出的错，最常犯的排前面，还附上你写过的例子。"]]],
+ ["计划和时间", [
+  ["昨天的计划没做完，今天要补吗？", "不用硬补。研究发现，漏掉一次对养成习惯没有实质影响，真正伤习惯的是长期不规律。该复习的卡片 app 会自动排进今天，不会丢；其他项先做今天的，有精力再挑一项最重要的补。"],
+  ["“只做 3 分钟”是什么？", "没精神时保底：先选普通练习或游戏，练完 3 分钟，今天剩下的计划标成跳过，算“保底完成”。"],
+  ["时间到了以后怎么选？", "可以结束，也可以“再练 5 分钟”（从点下去的那一刻算），或者“不限时，练完剩下的题”。停在提示页的时间不算练习时间。"]]],
+ ["导入和 AI", [
+  ["导入码是什么？", "一行一条的文字，比如“卡 | 中文 | 英文 | 类型 | 提示”。在“导入”页面粘贴就能变成卡片、正确说法、面试题、文章、俚语等。"],
+  ["怎么让 AI 帮我做导入码？", "把“给AI的说明书.txt”发给任何一个 AI 聊天（它写清了所有导入码的格式），再把你想练的内容、拿不准的说法发给它，它就能给你正确的导入码。"],
+  ["“问 AI”页面有什么？", "拿不准的说法、要学的词、对话首领战的回答、真实对话转写：每一块都能一键复制给 AI，配好了说明。"],
+  ["我录的当地人对话怎么用？", "语音转文字以后，贴进“问 AI”页面的“真实对话转写”，复制给 AI：它会挑出值得学的说法、解释俚语和脏话，并给导入码。"]]],
+ ["数据和设置", [
+  ["我的数据存在哪？会丢吗？", "存在这台设备的浏览器里（claude.ai 版会同步到你的 claude.ai 账号）。清浏览器数据会丢，所以每两周在“我的 → 备份与恢复”备份一次。"],
+  ["Whisper 是什么？", "更准的语音识别，在设置里填 key 后使用；没填就用手机自带的识别。"],
+  ["怎么更新 app？", "把新的 index.html 和 sw.js 传到 GitHub，打开两次，看“我的”页面底部的版本号。"]]]
+];
 VIEWS.about = {
   tab:"me",
   render(){
-    return `<div class="wrap">${backBtn()}<h2>这个 app 的练法</h2>
-      <div class="panel" style="margin-top:14px"><ul class="issues">
-        <li><b>先说，再看答案。</b>从记忆里把句子说出来，比看十遍记得牢。所以几乎每道题都要你开口。</li>
-        <li><b>灯灭就开口。</b>用时从灯灭算到你说完。用时越短，越接近脱口而出；某句刷新最快纪录时会变成紫色。</li>
-        <li><b>三个按钮决定下次什么时候再见。</b>没说出来：这一轮再来一次，明天再练；有卡顿/有错误：明天或过几天；秒出：隔得更久。每说对一次，下次就隔得更久；忘了就重新从明天开始。会的越来越少出现，不会的很快回来。</li>
-        <li><b>说错了先自己改。</b>差一点时，app 先只给提示，让你再说一次，再给答案。自己改出来的记得更牢。</li>
-        <li><b>复习听力时听后复述。</b>新句子先选意思；复习时不看文字整句说出来，练的是把连读的声音听成一个个词。</li>
-        <li><b>题库可以选。</b>首页“练哪个题库”可以只练通用、日常生活，或者你导入的题库，比如某家公司的面试准备。来电模拟也能选用哪套面试题。</li>
-        <li><b>记不住很正常。</b>没说出来的句子，这一轮隔几题会再考你，说对一次就过（最多考 3 次），明天再来；错 3 次以上会换成分块练。先试着回想、想不起来再看答案，这个过程本身就在帮你记。</li>
-        <li><b>说法不止一种。</b>你的说法意思对、语法也对，就点“我确定这样也对”；拿不准就点“存起来问 Claude”，联网后一起确认。</li>
-        <li><b>说错了先听再跟。</b>“跟着说 3 遍”会先放慢速、再放正常速度，最后不听自己说。读不准的单词，点一下就能听读音、查意思。</li>
-        <li><b>说错了，说 3 遍再走。</b>这是你报告里验证过的“改错后巩固法”。时间到了也会先把这些句子练完再结束。</li>
-        <li><b>按弱项出题。</b>每道题都标了错误类型，哪类正确率低就多出哪类。面试前 3 周会多放面试内容。</li>
-        <li><b>内容会长大。</b>和 Claude 练完，让它给你导入码，新句子就进了每天的复习。</li></ul></div>
-      <div class="panel"><h3>推荐用法</h3><ul class="issues">
-        <li>每天：首页点“练习”，10 分钟。没空就选 3 分钟，保住连续天数。</li>
-        <li>面试前：先在“面试”页写好 Q1、Q2、Q6，复制给 Claude 改，再用来电模拟每天打 1 通。</li>
-        <li>碎片时间：戴耳机开耳机模式。</li>
-        <li>睡前：语音日记 1 分钟，用过去式讲今天。</li>
-        <li>回笔友、写邮件：首页“写作”，先写、不改，写完按你的错误清单检查，改过的句子会自动变成改错卡。</li><li>每两周备份一次：我的 → 备份与恢复。</li></ul></div></div>`;
+    return `<div class="wrap">${backBtn()}<h2>关于 脱口app</h2>
+      <input id="aboutQ" type="search" placeholder="搜索：比如 拿不准、大招、补练、导入码" style="width:100%;margin:10px 0 6px" autocomplete="off">
+      <p class="small muted hidden" id="aboutNone">没找到，换个词试试</p>
+      ${ABOUT_QA.map(([cat, items], ci) => `<details class="panel about-cat" ${ci === 0 ? "open" : ""}><summary><b>${esc(cat)}</b> <span class="small muted">${items.length}</span></summary>
+        ${items.map(([q, a]) => `<details class="about-qa" data-t="${esc((cat + " " + q + " " + a).toLowerCase())}"><summary>${esc(q)}</summary><p class="small" style="margin:6px 0 4px">${esc(a)}</p></details>`).join("")}</details>`).join("")}</div>`;
+  },
+  mount(){
+    const box = document.getElementById("aboutQ"); if (!box) return;
+    box.addEventListener("input", () => {
+      const q = box.value.trim().toLowerCase(); let shown = 0;
+      document.querySelectorAll(".about-cat").forEach(cat => { let n = 0;
+        cat.querySelectorAll(".about-qa").forEach(it => { const ok = !q || it.dataset.t.includes(q); it.classList.toggle("hidden", !ok); if (q) it.open = ok; if (ok) n++; });
+        cat.classList.toggle("hidden", !n); if (q) cat.open = n > 0; shown += n; });
+      document.getElementById("aboutNone").classList.toggle("hidden", shown > 0);
+    });
   }
 };
 
@@ -6019,49 +6085,49 @@ ACT["dg-next"] = () => {
 };
 ACT["dg-restart"] = () => { const st = DG.st; if (!st) return; st.i = 0; st.phase = "listen"; st.show = false; dgRender(); setTimeout(() => dgPlay(false), 250); };
 
-/* ---------- 待确认的说法：拿不准的先存着，联网后一起问 Claude ---------- */
+/* ---------- 待确认的说法：拿不准的先存着，联网后一起问 AI ---------- */
 function pendingBanner(){
   const n = (S.pending || []).length; if (!n) return "";
-  return `<div class="banner"><span>有 ${n} 句拿不准的说法，联网后发给 Claude 确认</span><button class="btn sm primary" data-act="nav" data-v="pending">去看看</button></div>`;
+  return `<div class="banner"><span>有 ${n} 句拿不准的说法，联网后发给 AI 确认</span><button class="btn sm primary" data-act="nav" data-v="pending">去看看</button></div>`;
 }
 VIEWS.pending = {
   tab:"me",
   render(){
     const list = S.pending || [];
-    return `<div class="wrap">${backBtn()}<h2>问 Claude</h2>
-      <p class="muted small" style="margin:6px 0 14px">没网或拿不准的时候存在这里。联网后一键复制，发到和 Claude 的对话里。Claude 会逐条告诉你对不对，再给你导入码：说对的会加进答案，以后直接算对；说错的会变成找错卡。</p>
+    return `<div class="wrap">${backBtn()}<h2>问 AI</h2>
+      <p class="muted small" style="margin:6px 0 14px">没网或拿不准的时候存在这里。联网后一键复制，发到和 AI 的对话里。AI 会逐条告诉你对不对，再给你导入码：说对的会加进答案，以后直接算对；说错的会变成找错卡。</p>
       <h3 style="margin-top:4px">拿不准的说法（${list.length}）</h3>
-      ${list.length ? `<div class="list">${list.map((p, i) => `<div class="li"><div class="grow"><b class="en" style="font-size:16px">${esc(p.said)}</b><span>${esc(p.zh)}</span><span class="en" style="font-size:14px">参考：${esc(p.ref)}</span></div><button class="btn sm ghost" data-act="pend-del" data-i="${i}">删除</button></div>`).join("")}</div>
-        <button class="btn primary block big" style="margin-top:14px" data-act="pend-copy">全部复制给 Claude（${list.length} 句）</button>
+      ${list.length ? `<div class="list">${list.map((p, i) => `<div class="li"><div class="grow">${p.first ? `<span class="en" style="font-size:14px">第一遍：${esc(p.first)}</span>` : ""}<b class="en" style="font-size:16px">${p.first ? "第二遍：" : ""}${esc(p.said)}</b><span>${esc(p.zh)}</span><span class="en" style="font-size:14px">参考：${esc(p.ref)}</span></div><button class="btn sm ghost" data-act="pend-del" data-i="${i}">删除</button></div>`).join("")}</div>
+        <button class="btn primary block big" style="margin-top:14px" data-act="pend-copy">全部复制给 AI（${list.length} 句）</button>
         <button class="btn ghost block" style="margin-top:6px" data-act="pend-clear">已经问过了，清空</button>` :
-        `<p class="muted">现在没有拿不准的说法。练习时拿不准自己说得对不对，就点“拿不准，存起来问 Claude”。</p>`}
+        `<p class="muted">现在没有拿不准的说法。练习时拿不准自己说得对不对，就点“拿不准，存起来问 AI”。</p>`}
       <h3 style="margin-top:22px">要学的词（${(S.wantWords || []).length}）</h3>
-      <p class="muted small" style="margin:4px 0 10px">点单词时选“加到要学的词”，就会出现在这里。发给 Claude，换成单词卡：卡片会考你“看中文说英文”，还要你用这个词说一句话。光点开看一眼记不牢，自己想起来、用出来才记得住。</p>
+      <p class="muted small" style="margin:4px 0 10px">点单词时选“加到要学的词”，就会出现在这里。发给 AI，换成单词卡：卡片会考你“看中文说英文”，还要你用这个词说一句话。光点开看一眼记不牢，自己想起来、用出来才记得住。</p>
       ${(S.wantWords || []).length ? `<div class="list">${S.wantWords.map((x, i) => `<div class="li"><div class="grow"><b class="en" style="font-size:16px">${esc(x.w)}</b>${x.ctx ? `<span class="en" style="font-size:13.5px">${esc(x.ctx)}</span>` : ""}</div><button class="btn sm ghost" data-act="ww-del" data-i="${i}">删除</button></div>`).join("")}</div>
-        <button class="btn primary block" style="margin-top:12px" data-act="ww-copy">复制给 Claude，换成单词卡（${S.wantWords.length} 个）</button>
+        <button class="btn primary block" style="margin-top:12px" data-act="ww-copy">复制给 AI，换成单词卡（${S.wantWords.length} 个）</button>
         <button class="btn block ghost" style="margin-top:8px" data-act="ww-clear">已经发过了，清空</button>` : `<p class="muted small">现在没有。</p>`}
       <h3 style="margin-top:22px">对话首领战里的回答（${(S.dbAsk || []).length}）</h3>
-      <p class="muted small" style="margin:4px 0 10px">在对话首领战里点“存起来问 Claude”的回答。发给 Claude：逐条点评，按你自己的内容改一版更地道的说法，再做成说的卡片给你练。</p>
+      <p class="muted small" style="margin:4px 0 10px">在对话首领战里点“存起来问 AI”的回答。发给 AI：逐条点评，按你自己的内容改一版更地道的说法，再做成说的卡片给你练。</p>
       ${(S.dbAsk || []).length ? `<div class="list">${S.dbAsk.map((x, i) => `<div class="li"><div class="grow"><span>${esc(x.who)}问：${esc(x.q)}</span><b class="en" style="font-size:15px">${esc(x.said)}</b></div><button class="btn sm ghost" data-act="dba-del" data-i="${i}">删除</button></div>`).join("")}</div>
-        <button class="btn primary block" style="margin-top:12px" data-act="dba-copy">复制给 Claude：点评、改好、做成卡片（${S.dbAsk.length} 条）</button>
+        <button class="btn primary block" style="margin-top:12px" data-act="dba-copy">复制给 AI：点评、改好、做成卡片（${S.dbAsk.length} 条）</button>
         <button class="btn block ghost" style="margin-top:8px" data-act="dba-clear">已经发过了，清空</button>` : `<p class="muted small">现在没有。</p>`}
       <h3 style="margin-top:22px">写好的回复和邮件（${(S.replyAsk || []).length}）</h3>
-      <p class="muted small" style="margin:4px 0 10px">在“写作”里点“存起来问 Claude”的内容。发给 Claude：按错误代码只标出错误，不直接改写，你自己改。</p>
+      <p class="muted small" style="margin:4px 0 10px">在“写作”里点“存起来问 AI”的内容。发给 AI：按错误代码只标出错误，不直接改写，你自己改。</p>
       ${(S.replyAsk || []).length ? `<div class="list">${S.replyAsk.map(x => `<div class="li"><div class="grow"><b class="en" style="font-size:15px">${esc(x.text.slice(0, 120))}${x.text.length > 120 ? "…" : ""}</b></div></div>`).join("")}</div>
-        <button class="btn primary block" style="margin-top:12px" data-act="rwa-copy">复制给 Claude：只标错误代码（${S.replyAsk.length} 条）</button>
+        <button class="btn primary block" style="margin-top:12px" data-act="rwa-copy">复制给 AI：只标错误代码（${S.replyAsk.length} 条）</button>
         <button class="btn block ghost" style="margin-top:8px" data-act="rwa-clear">已经发过了，清空</button>` : `<p class="muted small">现在没有。</p>`}
-      ${[(S.pending || []).length, (S.wantWords || []).length, (S.dbAsk || []).length].filter(Boolean).length >= 2 ? `<div class="panel" style="margin-top:20px"><b>一起发</b><p class="small muted" style="margin-top:4px">把上面几样一起复制，一次发给 Claude。</p>
-        <button class="btn primary block" style="margin-top:8px" data-act="all-copy">一起复制给 Claude</button><button class="btn block ghost" style="margin-top:8px" data-act="all-clear">两样都发过了，清空</button></div>` : ""}
+      ${[(S.pending || []).length, (S.wantWords || []).length, (S.dbAsk || []).length].filter(Boolean).length >= 2 ? `<div class="panel" style="margin-top:20px"><b>一起发</b><p class="small muted" style="margin-top:4px">把上面几样一起复制，一次发给 AI。</p>
+        <button class="btn primary block" style="margin-top:8px" data-act="all-copy">一起复制给 AI</button><button class="btn block ghost" style="margin-top:8px" data-act="all-clear">两样都发过了，清空</button></div>` : ""}
       <h3 style="margin-top:22px">真实对话转写</h3>
-      <p class="muted small">在当地录下来的聊天，语音转文字以后贴在这里。说话人可能标错、内容有识别错误都没关系，Claude 会按意思看：挑出值得学的说法，解释俚语和脏话（什么意思、是不是开玩笑、有多冲、你能不能用），再给你导入码。</p>
+      <p class="muted small">在当地录下来的聊天，语音转文字以后贴在这里。说话人可能标错、内容有识别错误都没关系，AI 会按意思看：挑出值得学的说法，解释俚语和脏话（什么意思、是不是开玩笑、有多冲、你能不能用），再给你导入码。</p>
       <textarea id="convoText" rows="5" style="width:100%;margin-top:6px" placeholder="把转写贴到这里"></textarea>
-      <button class="btn primary block" style="margin-top:8px" data-act="convo-copy">复制给 Claude：挑说法、解释俚语、做成卡片</button></div>`;
+      <button class="btn primary block" style="margin-top:8px" data-act="convo-copy">复制给 AI：挑说法、解释俚语、做成卡片</button></div>`;
   }
 };
 ACT["ww-del"] = el => { (S.wantWords || []).splice(+el.dataset.i, 1); save(); UI.render(); };
 ACT["ww-copy"] = () => { const t = wwText(); if (t) sendToClaude(t); };
 ACT["pend-del"] = el => { (S.pending || []).splice(+el.dataset.i, 1); save(); UI.render(); };
-ACT["pend-clear"] = async () => { if (!await sheet("清空拿不准的说法？", "建议先把 Claude 给的导入码导进来再清空。", "清空", true)) return; S.pending = []; save(); UI.render(); };
+ACT["pend-clear"] = async () => { if (!await sheet("清空拿不准的说法？", "建议先把 AI 给的导入码导进来再清空。", "清空", true)) return; S.pending = []; save(); UI.render(); };
 CHG.profile = el => { S.settings.profile = el.value.slice(0, 600); save(); };
 CHG.dict = el => { L.dict = el.value; saveLocal(); toast("查词典默认用：" + dictCur().name); };
 CHG.asrmodel = el => { if (L.asrModel !== el.value){ L.asrModel = el.value; L.asrReady = false; saveLocal(); try { ASR.cached = null; ASR.checkCached(); } catch (e) {} toast("换了模型：第一次用要重新下载"); } };
@@ -6087,7 +6153,7 @@ VIEWS.asr = {
   render(){
     const list = (S.asrDocs || []).slice().reverse();
     const row = d => `<div class="panel"><div class="row-gap" style="justify-content:space-between;align-items:center"><b>${esc(d.name)}</b><span class="small muted">${esc(fmtWhen(d.ts))}</span></div>
-      ${d.status === "done" ? `<div class="en asr-text" style="margin-top:8px;font-size:15.5px">${esc(d.text || "（没识别出内容）")}</div><div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="asr-copy" data-id="${d.id}">复制文字</button><button class="btn sm primary" data-act="asr-claude" data-id="${d.id}">发给 Claude 分析</button><button class="btn sm ghost" data-act="asr-del" data-id="${d.id}">删除</button></div>`
+      ${d.status === "done" ? `<div class="en asr-text" style="margin-top:8px;font-size:15.5px">${esc(d.text || "（没识别出内容）")}</div><div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="asr-copy" data-id="${d.id}">复制文字</button><button class="btn sm primary" data-act="asr-claude" data-id="${d.id}">发给 AI 分析</button><button class="btn sm ghost" data-act="asr-del" data-id="${d.id}">删除</button></div>`
         : d.status === "error" ? `<p class="small" style="margin-top:6px">没转成：${esc(d.err || "")}</p><button class="btn sm ghost" data-act="asr-del" data-id="${d.id}">删除</button>`
         : `<p class="small muted" style="margin-top:6px">排队中或正在转写……转好了会提醒你。</p>`}</div>`;
     return `<div class="wrap">${backBtn()}<h2>录音转文字</h2>
@@ -6146,8 +6212,9 @@ ACT["asr-del"] = el => { S.asrDocs = (S.asrDocs || []).filter(x => x.id !== el.d
 CHG.srlong = el => { L.srLong = el.value === "on"; saveLocal(); toast(L.srLong ? "说话中间停一下也不会断了" : "改回手机默认"); };
 function pendText(){
   const list = S.pending || []; if (!list.length) return "";
-  const body = list.map((p, i) => `${i + 1}. 编号 ${p.cid}｜${p.zh}｜参考：${p.ref}｜我说：${p.said}`).join("\n");
-  return `下面是我在脱口里说的句子，参考说法只是其中一种。请逐条判断我的说法对不对：语法、意思、自然不自然，错在哪里。\n最后给我导入码：说对的写“也对 | 编号 | 我的说法”；说错的写“改 | 我的原句 | 正确说法 | 类型 | 提示”。\n\n${body}`;
+  const body = list.map((p, i) => `${i + 1}. 编号 ${p.cid}｜${p.zh}｜参考：${p.ref}｜` + (p.first ? `我第一遍说：${p.first}｜我第二遍说：${p.said}` : `我说：${p.said}`)).join("\n");
+  const two = list.some(p => p.first) ? "有“第一遍、第二遍”的，两遍都要判断，导入码按每一遍分别写。" : "";
+  return `下面是我在脱口里说的句子，参考说法只是其中一种。请逐条判断我的说法对不对：语法、意思、自然不自然，错在哪里。${two}\n最后给我导入码：说对的写“也对 | 编号 | 我的说法”；说错的写“改 | 我的原句 | 正确说法 | 类型 | 提示”。\n\n${body}`;
 }
 function wwText(){
   const list = S.wantWords || []; if (!list.length) return "";
@@ -6156,8 +6223,8 @@ function wwText(){
 }
 ACT["pend-copy"] = () => { const t = pendText(); if (t) sendToClaude(t); };
 ACT["all-copy"] = () => { const parts = [pendText(), wwText(), dbaText()].filter(Boolean); if (parts.length) sendToClaude(parts.join("\n\n————————\n\n")); };
-ACT["all-clear"] = async () => { if (!await sheet("都发过了？", "会清空这一页上的所有东西。确认 Claude 已经收到再清。", "清空", true)) return; S.pending = []; S.wantWords = []; S.dbAsk = []; save(); UI.render(); };
-ACT["ww-clear"] = async () => { if (!await sheet("要学的词都发过了？", "会清空这个列表。确认 Claude 已经收到再清。", "清空", true)) return; S.wantWords = []; save(); UI.render(); };
+ACT["all-clear"] = async () => { if (!await sheet("都发过了？", "会清空这一页上的所有东西。确认 AI 已经收到再清。", "清空", true)) return; S.pending = []; S.wantWords = []; S.dbAsk = []; save(); UI.render(); };
+ACT["ww-clear"] = async () => { if (!await sheet("要学的词都发过了？", "会清空这个列表。确认 AI 已经收到再清。", "清空", true)) return; S.wantWords = []; save(); UI.render(); };
 
 /* ---------- 英文朗读检查：有的手机用中文语音读英文，跟着练会学成中式发音 ---------- */
 function ttsBanner(){
@@ -6339,7 +6406,7 @@ VIEWS.plan = {
       <div class="seg" style="margin-top:10px">${tabs.map(([k, l]) => `<button data-act="pl-tab" data-v="${k}" aria-pressed="${tab === k}">${l}${G[k].length ? `<span class="seg-n">${G[k].length}</span>` : ""}</button>`).join("")}</div>
       <div style="margin-top:12px">${body}</div>
       ${PLAN_FORM || ed ? form : `<button class="btn block" style="margin-top:14px" data-act="pl-open">＋ 加一项</button>`}
-      <div class="panel" style="margin-top:14px"><b>让 Claude 帮你整理</b><p class="small muted" style="margin-top:4px">计划多了、重复了，就复制给 Claude。它会给你一段第一行写着“计划 | 替换”的导入码：导入以后，所有没做完的计划都换成新的，做完的记录留着。</p><button class="btn block" style="margin-top:8px" data-act="pl-claude">复制所有计划给 Claude</button></div>
+      <div class="panel" style="margin-top:14px"><b>让 AI 帮你整理</b><p class="small muted" style="margin-top:4px">计划多了、重复了，就复制给 AI。它会给你一段第一行写着“计划 | 替换”的导入码：导入以后，所有没做完的计划都换成新的，做完的记录留着。</p><button class="btn block" style="margin-top:8px" data-act="pl-claude">复制所有计划给 AI</button></div>
       <p class="small muted" style="margin-top:10px">每一项写成“什么时候 → 做什么”，比只写日期更容易做到。写了具体时间（比如 20:00）的，点“提醒我”可以加到本机日历、Google 日历，或者复制下来放进任何提醒 app。</p>
       <h3 style="margin-top:20px">每天固定的练习时间</h3>
       <p class="muted small" style="margin:6px 0 14px">写成“如果……就……”的计划，比只说“我要每天练”更容易坚持。选一个你每天一定会碰到的时刻。</p>
@@ -6392,7 +6459,7 @@ function boot(){
 }
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 
-/* 对话首领战里存下的回答：发给 Claude 点评、改好、做成说的卡片 */
+/* 对话首领战里存下的回答：发给 AI 点评、改好、做成说的卡片 */
 function dbaText(){
   const L0 = S.dbAsk || []; if (!L0.length) return "";
   return `下面是我在脱口的“对话首领战”里的回答（${L0.some(x => /Coffee|社交|chat/i.test(x.mode + x.who)) ? "面试和 coffee chat" : "面试"}），是语音识别转写的，可能有个别词识别错，不要因为这个扣分。参考回答只是一种说法，我不需要照背。
@@ -6406,7 +6473,7 @@ function dbaText(){
 }
 ACT["dba-del"] = el => { (S.dbAsk || []).splice(+el.dataset.i, 1); save(); UI.render(); };
 ACT["dba-copy"] = () => { const t = dbaText(); if (t) sendToClaude(t); };
-ACT["dba-clear"] = async () => { if (!await sheet("清空对话首领战里的回答？", "建议先把 Claude 给的导入码导进来再清空。", "清空", true)) return; S.dbAsk = []; save(); UI.render(); };
+ACT["dba-clear"] = async () => { if (!await sheet("清空对话首领战里的回答？", "建议先把 AI 给的导入码导进来再清空。", "清空", true)) return; S.dbAsk = []; save(); UI.render(); };
 
 /* 换了一天：app 回到前台、重新获得焦点时马上重画首页（以前要等一分钟，早上打开还显示着昨天的计划） */
 (function(){ let day = today(); const chk = () => { const d = today(); if (d === day) return; day = d; try { if (UI.top().name === "home") UI.render(); } catch (e) {} };
@@ -6416,7 +6483,7 @@ ACT["dba-clear"] = async () => { if (!await sheet("清空对话首领战里的�
 setTimeout(() => { try { if (L.deckRen1) return; let n = 0; for (const c of S.custom || []) if (c.deck === "对话首领战"){ c.deck = "对话"; n++; }
   L.deckRen1 = true; saveLocal(); if (n){ save(); try { rebuildCatalog(); } catch (e) {} if (UI.top().name === "home") UI.render(); } } catch (e) {} }, 1500);
 
-/* 真实对话转写：配好说明，复制给 Claude */
+/* 真实对话转写：配好说明，复制给 AI */
 function convoText(t){ return `下面是我在当地记录的真实日常对话（语音转文字）。说话人的标注可能不准，个别词也可能识别错，请按意思理解，不用管谁说的。我的目的是说得更地道，也要听得懂当地人。
 请：
 1. 挑出值得学的说法，按用途分组（反应和接话、讲故事、留余地、想不起词时救场、说看法、常用固定说法），每个说明什么时候用。
@@ -6429,7 +6496,7 @@ function convoText(t){ return `下面是我在当地记录的真实日常对话�
 对话：
 ${t}`; }
 ACT["convo-copy"] = async () => { const t = (($("#convoText") || {}).value || "").trim(); if (t.length < 20){ toast("先把转写贴进来"); return; }
-  try { await navigator.clipboard.writeText(convoText(t)); toast("复制好了，发到和 Claude 的对话里"); } catch (e) { toast("复制不了：长按输入框全选复制"); } };
+  try { await navigator.clipboard.writeText(convoText(t)); toast("复制好了，发到和 AI 的对话里"); } catch (e) { toast("复制不了：长按输入框全选复制"); } };
 
 /* 情景对话的判断（v1.62.0）：按“功能是否到位”（回答到对方的问题、说法对、听得懂），不按内容是不是和参考一样。
    1. 和参考很接近 → 很地道；2. 骨架一样（虚词顺序对上、内容换成自己的）或者回答到了问题（点单、二选一、名字、几位、是不是、付款、道谢……）→ 这样说也对；
@@ -10097,7 +10164,7 @@ const BT = (() => {
   const MS_ALIAS = {shodai:"brawler", seven:"blade", bemular:"beam", fighter:"brawler", sword:"blade"};
   /* 每个位置能选的招。以后有新特效，就在对应的位置加一招，不再加整套招式 */
   /* 数据角色（角色设计工具做的）：锚点和招式数据，照 角色配置.json 原样（第三十四到四十二节） */
-  const TOOL_DATA = {Mebius:{"anchors":{"右手掌侧":{"type":"segment","width":0.4,"poses":{"skill":[[0.1649,0.1379],[0.1649,0.2308]]}},"前手":{"type":"point","poses":{"skillWind":[[0.05,0.21]],"skillMid":[[0.33,0.05]]}},"后手":{"type":"point","poses":{"skillWind":[[0.93,0.205]],"skillMid":[[0.62,0.045]]}}},"moves":{"light":{"type":"melee","wind":"lightWind","windMs":320,"strike":"light","dashMs":150,"hy":0.3,"hold":200,"big":false,"hitFx":{"spark":true,"burst":1.1,"ring":false,"shake":0,"dx":0,"dy":0,"small":{"on":false,"n":12,"size":1,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":false,"size":1,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":1,"bright":1}},"lateHit":0,"reach":10},"skill":{"stages":[{"pose":"skillWind","ms":1000,"layers":[{"kind":"flare","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":2.3,"rays":10,"spin":1,"sparks":3,"at":0,"alpha":0.35,"bright":0.5}],"pause":0},{"pose":"skillMid","ms":1700,"bodyGlow":{"color":"#ffe59e","r":8,"alpha":0.55},"layers":[{"kind":"flare","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":1,"rays":8,"spin":1,"sparks":4,"at":0,"alpha":0.6,"bright":0.35},{"kind":"infinity","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":1.6,"end":0.2,"trails":7,"speed":1.5,"width":3,"dy":-0.03,"bloom":0.55,"at":0,"alpha":0.55,"bright":0.45}],"pause":300},{"pose":"skill","ms":1600,"layers":[{"kind":"needles","anchor":"右手掌侧","color":"#FFC36A","core":"#FFFDF4","width":1.7,"rate":20,"length":0.3,"speed":1,"halo":0.1,"flash":1,"at":0,"spread":1,"alpha":1,"bright":1}],"hit":{"ticks":8,"delay":220,"push":30,"shake":8,"hy":0.4,"color":"#FFC060","dx":0,"size":1,"bodySparks":true,"small":{"on":false,"n":12,"size":1,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":true,"size":0.65,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":-10,"alpha":0.75,"bright":0.7,"every":3}},"pause":0}]},"heavy":{"type":"melee","wind":"heavyWind","windMs":230,"strike":"heavy","dashMs":220,"lateHit":0.72,"hy":0.3,"hold":190,"big":true,"hitFx":{"spark":true,"burst":1.25,"ring":true,"shake":0,"dx":0,"dy":0,"small":{"on":true,"n":12,"size":0.3,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":false,"size":1,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":1,"bright":1}},"reach":15}}}};
+  const TOOL_DATA = {Mebius:{"anchors":{"右手掌侧":{"type":"segment","width":0.4,"poses":{"skill":[[0.1649,0.1379],[0.1649,0.2308]]}},"前手":{"type":"point","poses":{"skillWind":[[0.05,0.21]],"skillMid":[[0.33,0.05]]}},"后手":{"type":"point","poses":{"skillWind":[[0.93,0.205]],"skillMid":[[0.62,0.045]]}}},"moves":{"light":{"type":"melee","wind":"lightWind","windMs":320,"strike":"light","dashMs":150,"hy":0.3,"hold":200,"big":false,"hitFx":{"spark":true,"burst":1.1,"ring":false,"shake":0,"dx":0,"dy":0,"small":{"on":false,"n":12,"size":1,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":false,"size":1,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":1,"bright":1}},"lateHit":0,"reach":10},"skill":{"stages":[{"pose":"skillWind","ms":1000,"layers":[{"kind":"flare","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":2.3,"rays":10,"spin":1,"sparks":3,"at":0,"alpha":0.35,"bright":0.5}],"pause":0},{"pose":"skillMid","ms":1700,"bodyGlow":{"color":"#ffe59e","r":8,"alpha":0.55},"layers":[{"kind":"flare","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":1,"rays":8,"spin":1,"sparks":4,"at":0,"alpha":0.6,"bright":0.35},{"kind":"infinity","anchor":"前手","more":"后手","color":"#FFB040","core":"#FFF4D2","size":1.6,"end":0.2,"trails":7,"speed":1.5,"width":3,"dy":-0.03,"bloom":0.55,"at":0,"alpha":0.55,"bright":0.45}],"pause":300},{"pose":"skill","ms":1600,"layers":[{"kind":"needles","anchor":"右手掌侧","color":"#FFC36A","core":"#FFFDF4","width":1.7,"rate":20,"length":0.3,"speed":1,"halo":0.1,"flash":1,"at":0,"spread":1,"alpha":1,"bright":1}],"hit":{"ticks":8,"delay":220,"push":30,"shake":8,"hy":0.4,"color":"#FFC060","dx":0,"size":1,"bodySparks":true,"small":{"on":false,"n":12,"size":1,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":true,"size":0.65,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":0.75,"bright":0.7,"every":3}},"pause":0}]},"heavy":{"type":"melee","wind":"heavyWind","windMs":230,"strike":"heavy","dashMs":220,"lateHit":0.72,"hy":0.3,"hold":190,"big":true,"hitFx":{"spark":true,"burst":1.25,"ring":true,"shake":0,"dx":0,"dy":0,"small":{"on":true,"n":12,"size":0.3,"color":"#ffe7a8","dx":0,"dy":0,"alpha":1,"bright":1},"big":{"on":false,"size":1,"streaks":60,"flakes":40,"color":"#ffe9b0","ms":800,"dx":0,"dy":0,"alpha":1,"bright":1}},"reach":15}}}};
   const MOVE_LIST = {
     light:[["punch", "出拳"], ["thrust", "突刺"], ["laserThin", "细光线"], ["jumpChop", "跳劈手刀"], ["bigPunch", "蓄力重拳"], ["Mebius.light", "顶心肘"]],
     heavy:[["kick", "侧踢"], ["fireKick", "火焰踢"], ["kesa", "斩击"], ["laserThick", "粗光线"], ["flyKick", "飞踢"], ["sideKick", "垫步侧踢"], ["Mebius.heavy", "回旋踢"]],
@@ -12101,7 +12168,7 @@ const BT = (() => {
       const Wst = () => stage.clientWidth;
       let CLASH = null;   /* 对波时：{cl, dir, stop}——发射这一步的特效截在碰撞点上（一方赢了光线推过去就不截），对波结束就停 */
       const wrapG = G => ({add(fn){ const m = MIR, W = Wst(), C = CLASH;
-        return G.add((c, now) => { if (C && C.stop.on) return false; c.save();
+        return (C ? GLOW0 : G).add((c, now) => { if (C && C.stop.on) return false; c.save();   /* 对波时画在下面那张：对波中心的光球盖在光线前端 */
           if (C && !C.cl.free){ const e = C.cl.end().x; c.beginPath(); if (C.dir < 0) c.rect(e - 4, -1e4, W + 2e4, 3e4); else c.rect(-1e4, -1e4, e + 4 + 1e4, 3e4); c.clip(); }
           if (m){ c.translate(W, 0); c.scale(-1, 1); } const r = fn(c, now); c.restore(); return r; }); }});
       const glow = wrapG(GLOW0), glowTop = wrapG(GLOWTOP0);
@@ -12466,7 +12533,7 @@ const BT = (() => {
   async function toolHits(A, D, dir, dmg, h, ms, token) {
     await wait(h.delay || 200);
     if (token !== ARENA_TOKEN()) return;
-    const mH = MIR; MIR = dir > 0; const d = bx(bodyOf(D)), hx = d.x + d.w * (0.55 - (h.dx || 0) / 100), hy = d.y + d.h * (h.hy || 0.4); MIR = mH;
+    const mH = MIR; MIR = dir > 0; const d = bx(bodyOf(D)), hx = d.x + d.w * (0.55 - (h.dx || 0) / 100), hy = h._y != null ? Math.min(d.y + d.h * 0.85, Math.max(d.y + d.h * 0.15, h._y)) : d.y + d.h * (h.hy || 0.4); MIR = mH;
     pose(D, 'recoil', 90); shake(h.shake == null ? 8 : h.shake);
     const left = Math.max(200, ms - (h.delay || 200)), push = D.animate([{ transform: 'none' }, { transform: `translateX(${(h.push == null ? 30 : h.push) * dir}px)` }], { duration: left, easing: 'ease-out', fill: 'forwards' });
     const parts = split(dmg || 40, Math.max(1, h.ticks || 8));
@@ -12495,7 +12562,7 @@ const BT = (() => {
         if (st.hit && cl && cl.fizzle){ await fizzleOut(A, D, dir); return; }   /* 大招没说出来：发射这一步改成短路 */
         if (st.hit && cl){
           cl.ready(); await cl.go; if (token !== ARENA_TOKEN()) return;
-          pose(A, REV[st.pose] || 'fire'); await wait(st.settle == null ? 120 : st.settle);
+          pose(A, REV[st.pose] || 'fire');   /* 不再等：光线要在对波中心的光球之前加进去，光球才盖得住光线前端 */
           if (st.bodyGlow) holdGlow(face, fil(A, `drop-shadow(0 0 ${st.bodyGlow.r || 8}px ${hexA(st.bodyGlow.color || '#A0D2FF', st.bodyGlow.alpha == null ? 0.55 : st.bodyGlow.alpha)})`));
           const stop = {on:false}, c0 = CLASH; CLASH = {cl, dir, stop};
           try { for (const L of (st.layers || [])) toolLayer(A, D, dir, L, st.pose, prev, 600000); } finally { CLASH = c0; }
@@ -12505,7 +12572,8 @@ const BT = (() => {
         const ms = st.ms || 800;
         if (st.bodyGlow) holdGlow(face, fil(A, `drop-shadow(0 0 ${st.bodyGlow.r || 8}px ${hexA(st.bodyGlow.color || '#A0D2FF', st.bodyGlow.alpha == null ? 0.55 : st.bodyGlow.alpha)})`));
         for (const L of (st.layers || [])) toolLayer(A, D, dir, L, st.pose, prev, ms);
-        if (st.hit) toolHits(A, D, dir, dmg, st.hit, ms, token);
+        if (st.hit){ const La = (st.layers || []).find(L => L.anchor), Pa = La && anc(A, La.anchor, st.pose);   /* 打中的高度 = 光线真正射过来的高度 */
+          toolHits(A, D, dir, dmg, Object.assign({}, st.hit, Pa ? {_y:mid(Pa)[1]} : {}), ms, token); }
         await wait(ms);
         if (st.pause) await wait(st.pause);   // 光效结束后停一下再换下一个动作
         prev = st.pose;
@@ -13295,21 +13363,23 @@ function batPanel(html){ const p = $("#btPanel"); if (p) p.innerHTML = html; }
 function batSpecialPanel(note){
   const R = BAT_RUN; if (!R) return; const sp = K.battleSpecial(R.card); const pick = R.pick;
   const others = R.order.filter(e => e !== pick).slice(0, 4);
-  const canSay = SR.usable && SR.usable();
+  const canSay = (SR.usable && SR.usable()) || (typeof whisperOn === "function" && whisperOn());
   batPanel(`<div class="panel bt-sp"><b>放大招：用英文说出这一句</b><p class="small muted" style="margin-top:2px">说对了才放得出来，能再打 ${sp} 点。这是今天你说得最吃力的一句，多练一次记得更牢；这一次不算进复习安排。</p>
     <div class="bt-zh">${esc(pick.zh)}</div>
     ${note ? `<p class="small bt-note">${note}</p>` : ""}
-    <div class="row-gap" style="margin-top:8px">${canSay ? `<button class="btn primary" data-act="bt-say" id="btSay">点一下，说出来</button>` : ""}<button class="btn ghost" data-act="bt-nosp">不放大招</button></div>
+    ${canSay ? `<div class="db-mic" style="margin-top:8px"><button class="mic" id="btSay" data-act="bt-say" aria-label="说出来">${ICON.mic}</button><div class="heard" id="btHeard">点一下开始说</div></div>` : ""}
+    <div class="row-gap" style="margin-top:8px"><button class="btn ghost" data-act="bt-nosp">不放大招</button></div>
     ${canSay ? "" : `<div class="row-gap" style="margin-top:8px"><input type="text" id="btType" placeholder="用键盘打出英文" autocomplete="off" style="flex:1"><button class="btn" data-act="bt-type">放大招</button></div>`}
     ${others.length ? `<p class="small muted" style="margin-top:10px">想换一句：</p><div class="chips">${others.map(e => `<button class="chip" data-act="bt-pick" data-v="${esc(e.id)}">${esc(e.zh)}</button>`).join("")}</div>` : ""}</div>`);
 }
 ACT["bt-pick"] = el => { const R = BAT_RUN; if (!R) return; const e = R.order.find(x => x.id === el.dataset.v); if (e){ R.pick = e; R.tries = 0; batSpecialPanel(); } };
 ACT["bt-nosp"] = () => batFinish();
 ACT["bt-say"] = async () => {
-  const R = BAT_RUN; if (!R || R.saying) return; R.saying = true;
-  const btn = $("#btSay"); if (btn){ btn.classList.add("live"); btn.textContent = "在听……"; }
-  const r = await listenAny({btn});
-  R.saying = false; if (!BAT_RUN) return;
+  const R = BAT_RUN; if (!R) return; const btn = $("#btSay"), h = $("#btHeard");
+  if (R.saying){ try { stopAny(); } catch (e) {} return; }   /* 再点一次：说完了 */
+  R.saying = true; micState(btn, "live"); if (h) h.textContent = "在听……";
+  const r = await listenAny({short:true, btn, heard:h});
+  R.saying = false; micState(btn, null); if (!BAT_RUN) return;
   batJudge(r && r.text ? r.text : "", (r && r.alts) || []);
 };
 ACT["bt-type"] = () => { const v = (($("#btType") || {}).value || "").trim(); if (v) batJudge(v, []); };
@@ -13864,7 +13934,7 @@ ACT["db-say"] = async () => {
   const r = await listenAny({manual:true, maxMs:lim, idleMs:600000, btn, heard:h, onInterim: tx => { if (h && tx) h.textContent = tx; }}); if (stopper) clearTimeout(stopper); micState(btn, "");   /* btn：录完以后识别时转圈 */
   dbResolve(((r && r.text) || "").trim(), Math.min(lim, performance.now() - t0) / 1000);
 };
-/* 判分：不看用词和参考回答像不像（不用背稿）。在 claude.ai 里打开时让 Claude 按意思判；离线版按沟通要素判：
+/* 判分：不看用词和参考回答像不像（不用背稿）。在 claude.ai 里打开时让 AI 按意思判；离线版按沟通要素判：
    回答到了问题、讲得具体、说得够多、讲项目讲了结果、Coffee chat 把话题抛回去，再加一项很宽松的“意思和参考回答接近”（只占两成） */
 async function dbJudge(said, q, ref, ask){
   const st = DB.st, qt = st.follow ? st.follow.q : dbText(q), words = String(said || "").trim().split(/\s+/).filter(Boolean).length, base = dbScore(said, ref), cc = st.mode === "cc";
@@ -13959,12 +14029,12 @@ async function dbResolve(said, secs){
   if (st.game){ $("#dbYou").textContent = st.you; $("#dbBoss").textContent = Math.max(0, Math.round(A.hp)); }
   const alive = !st.game || (A.hp > 0 && st.you > 0), more = alive && (st.i + 1 < st.qs.length || (!st.follow && dbFollow(q) && !st.fdone[q.id]));
   if (!st.game) dmg = 0;   /* 对话练习：只看分数，不算伤害 */
-  $("#dbFb").innerHTML = `<div class="card db-fb"><p><b>${st.mode === "432" ? "这一遍" : st.follow ? "这个追问" : "这一题"} ${Math.round(sc.cov * 100)} 分</b>${dmg ? `，伤害 ${dmg}` : ""}${ask ? `；你问了 ${sc.questions} 个问题` : ""}${st.mode === "432" && wpm ? `；每分钟 ${wpm} 个词` : ""}${sc.ai ? `<span class="small muted">（Claude 按意思判的）</span>` : ""}</p>${note ? `<p class="small">${esc(note)}</p>` : ""}${sc.fb ? `<p class="small">${esc(sc.fb)}</p>` : ""}
+  $("#dbFb").innerHTML = `<div class="card db-fb"><p><b>${st.mode === "432" ? "这一遍" : st.follow ? "这个追问" : "这一题"} ${Math.round(sc.cov * 100)} 分</b>${dmg ? `，伤害 ${dmg}` : ""}${ask ? `；你问了 ${sc.questions} 个问题` : ""}${st.mode === "432" && wpm ? `；每分钟 ${wpm} 个词` : ""}${sc.ai ? `<span class="small muted">（AI 按意思判的）</span>` : ""}</p>${note ? `<p class="small">${esc(note)}</p>` : ""}${sc.fb ? `<p class="small">${esc(sc.fb)}</p>` : ""}
     ${(sc.sub || []).length ? `<p class="small muted" style="margin-top:4px">${sc.sub.map(x => `${esc(x.s)} ${x.v}`).join(" · ")}</p>` : ""}
     ${sc.pts.map(p => `<p class="small ${p.ok ? "" : "db-miss"}">${p.ok ? "✓" : "✗"} ${esc(p.s)}${p.tip ? `<span class="muted">：${esc(p.tip)}</span>` : ""}</p>`).join("")}
     ${sc.rewrite ? `<p class="small muted" style="margin-top:6px">你可以这样说：</p><p class="small en">${esc(sc.rewrite)}</p>` : ""}
     ${ref ? `<details style="margin-top:6px"><summary class="small muted">参考回答：一种说法（不用照背）</summary><p class="small en">${esc(ref)}</p></details>` : ""}
-    ${said ? `<button class="btn sm" data-act="db-ask" style="margin-top:8px">存起来问 Claude</button>` : ""}
+    ${said ? `<button class="btn sm" data-act="db-ask" style="margin-top:8px">存起来问 AI</button>` : ""}
     ${st.game && st.anim ? `<button class="btn sm" data-act="db-replay" style="margin-top:8px">回放</button>` : ""}
     <button class="btn primary block" data-act="db-next" style="margin-top:10px">${more ? "继续" : "看结果"}</button></div>`;
   st.busy = false;
@@ -14125,13 +14195,13 @@ ACT["cl-auto"] = async () => { await batClashLoad(); for (let i = 0; i < 3; i++)
 ACT["cl-reset"] = () => batClashLoad();   /* 把双方都放回去（倒下的站起来） */
 CHG["cl-pick"] = () => batClashLoad();
 
-/* 对话首领战：把这一回合的问题和你的回答存进“问 Claude”，回头一起发给 Claude 点评、改好、做成卡片 */
+/* 对话首领战：把这一回合的问题和你的回答存进“问 AI”，回头一起发给 AI 点评、改好、做成卡片 */
 ACT["db-ask"] = el => {
   const st = DB.st; if (!st) return; const r = st.rounds[st.rounds.length - 1]; if (!r || !r.said) return;
   const q = st.qs[st.i]; S.dbAsk = S.dbAsk || [];
   S.dbAsk.push({mode: st.mode === "cc" ? "Coffee chat" : st.mode === "432" ? "4/3/2" : "面试", who: dbWho(st), q: r.q, said: r.said, ref: st.follow ? (st.follow.a || "") : (q ? dbRef(q) : ""), ts: Date.now()});
   if (S.dbAsk.length > 60) S.dbAsk = S.dbAsk.slice(-60); save();
-  if (el){ el.disabled = true; el.textContent = "已存"; } toast(`存好了（共 ${S.dbAsk.length} 条）。在“我的 → 问 Claude”里一起发给 Claude`);
+  if (el){ el.disabled = true; el.textContent = "已存"; } toast(`存好了（共 ${S.dbAsk.length} 条）。在“我的 → 问 AI”里一起发给 AI`);
 };
 
 /* 对波：点麦克风开始说，再点一下结束；录音停的那一刻倒计时就停（识别的时间不算） */
@@ -14165,7 +14235,7 @@ VIEWS.dblog = {
 const ERR_DEFS = {
   A1:{n:"中文结构直译", tip:"先说“主语 + 动词”，别按中文语序一个词一个词翻"}, A2:{n:"时态", tip:"讲过去的事用过去式；最近一直在做的用 I've been …"},
   A3:{n:"those days / these days", tip:"最近是 these days 或 lately；those days 是“那些日子（过去）”"}, A4:{n:"用错词、拼成了别的词", tip:"now / know、you / your、mouth / month 这种拼成了别的真词，意思就跑偏了"},
-  A5:{n:"疑问句结构", tip:"疑问句把 do / does / did / is / are 提前"}, A6:{n:"夹杂中文", tip:"这里缺一个英文说法：查一下，或者存起来问 Claude"},
+  A5:{n:"疑问句结构", tip:"疑问句把 do / does / did / is / are 提前"}, A6:{n:"夹杂中文", tip:"这里缺一个英文说法：查一下，或者存起来问 AI"},
   B1:{n:"漏 be 动词", tip:"形容词、地点前面要有 be：That's cool、It's hard、I'm here"}, B2:{n:"although 和 but 连用", tip:"although 和 but 只留一个"},
   B3:{n:"主谓一致", tip:"主语是 I 时动词不加 -s；he / she / it 后面要加 -s"}, B4:{n:"完成时、进行时的形式", tip:"have 后面用过去分词：haven't played"},
   B5:{n:"用 will 表示习惯", tip:"习惯用一般现在时：I usually go …"}, B6:{n:"过去完成时用多了", tip:"一般过去的事用过去式就够了"},
@@ -14336,7 +14406,7 @@ VIEWS.write = {
         <div class="rw-plan">${mail ? `<input id="rwA" placeholder="目的（为什么写）"><input id="rwR" placeholder="要点"><input id="rwQ" placeholder="下一步（想让对方做什么）">` : `<input id="rwA" placeholder="回答：对方问的（比如问你周末干嘛）"><input id="rwR" placeholder="回应：对方说的事（比如“那太酷了”）"><input id="rwQ" placeholder="提问：你想问对方的">`}</div></div>
       <div class="card"><p class="small muted">直接用英文写，一句只讲一件事，先别改</p><textarea id="rwText" class="en" rows="8" style="width:100%" placeholder="${mail ? "Hi …," : "Hi! …"}">${esc(d.text)}</textarea>
         <details style="margin-top:6px"><summary class="small">${mail ? "邮件常用说法" : "聊天语块"}（点一下插进去）</summary>${rwMovesHTML(mail ? MAIL_MOVES : CHAT_MOVES)}</details>
-        <div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="rw-check">检查</button>${typeof AI !== "undefined" && AI.fn && !AI.off ? `<button class="btn" data-act="rw-ai">让 Claude 只标错误</button>` : ""}<button class="btn" data-act="rw-done">完成</button><button class="btn ghost" data-act="rw-ask">存起来问 Claude</button>${mail ? `<button class="btn ghost" data-act="w-copy">复制给 Claude 改好</button>` : ""}</div></div>
+        <div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="rw-check">检查</button>${typeof AI !== "undefined" && AI.fn && !AI.off ? `<button class="btn" data-act="rw-ai">让 AI 只标错误</button>` : ""}<button class="btn" data-act="rw-done">完成</button><button class="btn ghost" data-act="rw-ask">存起来问 AI</button>${mail ? `<button class="btn ghost" data-act="w-copy">复制给 AI 改好</button>` : ""}</div></div>
       ${RW.doneLast ? `<div class="card" style="margin-top:10px;border-color:#2F9E5B"><b>存好了 ✓</b><p class="en" style="white-space:pre-wrap;margin-top:6px;font-size:15px">${esc(RW.doneLast.text)}</p>
         <div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="rw-copy" data-k="last">复制</button><button class="btn sm primary" data-act="rw-new">写下一封</button></div></div>` : ""}
       <div id="rwRes"></div>
@@ -14349,7 +14419,7 @@ VIEWS.write = {
           ${x.letter ? `<p class="small muted" style="margin-top:6px">对方：${esc(x.letter)}</p>` : ""}<p class="en" style="white-space:pre-wrap;margin-top:6px;font-size:15px">${esc(x.final || "")}</p>
           ${x.first && x.first !== x.final ? `<p class="small muted" style="margin-top:4px">初稿：${esc(x.first)}</p>` : ""}
           ${(x.issues || []).length ? `<p class="small" style="margin-top:6px">第一次检查查出：${x.issues.map(z => `<b>${esc(z.c)}</b> “${esc(z.s)}”`).join("、")}</p>` : `<p class="small muted" style="margin-top:6px">自动检查没查出错（它只查常见的几类，不代表没有错）</p>`}
-          <div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="rw-copy" data-k="${i}">复制</button><button class="btn sm ghost" data-act="rw-ask-h" data-k="${i}">存起来问 Claude</button><button class="btn sm ghost" data-act="rw-del" data-k="${i}">删除</button></div></details>`; }).join("")}` : ""}</div>`;
+          <div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="rw-copy" data-k="${i}">复制</button><button class="btn sm ghost" data-act="rw-ask-h" data-k="${i}">存起来问 AI</button><button class="btn sm ghost" data-act="rw-del" data-k="${i}">删除</button></div></details>`; }).join("")}` : ""}</div>`;
   },
   mount(){ const l = $("#rwLetter"), t = $("#rwText"); if (l) l.addEventListener("input", () => { RW.letter = l.value; }); if (t) t.addEventListener("input", () => { RW.text = t.value; }); }
 };
@@ -14377,7 +14447,7 @@ ACT["rw-check"] = () => {
 };
 ACT["rw-ai"] = async () => {
   const text = (($("#rwText") || {}).value || "").trim(); if (!text || !(typeof AI !== "undefined" && AI.fn)) return; RW.text = text;
-  $("#rwRes").innerHTML = `<p class="small muted">Claude 在看……</p>`;
+  $("#rwRes").innerHTML = `<p class="small muted">AI 在看……</p>`;
   try {
     const mail = wMode() === "mail";
     const j = await AI.fn.json(`你是英语老师。下面是一位中文母语者写的${mail ? "求职相关的英文邮件（求职邮件、cover letter 或感谢信）" : "给笔友的回复"}。请只标出错误，不要改写、不要给出改好的句子。
@@ -14387,8 +14457,8 @@ ACT["rw-ai"] = async () => {
 只回复一个 JSON：{"issues":[{"c":"错误代码","s":"他原文里出错的那几个词（原样摘出来）","tip":"一句中文提示：错在哪，不要直接给答案"}]}，最多 8 条，${mail ? "正式邮件里大小写、撇号、标点（C 类）也要标" : "聊天里不影响意思的小错（C 类）可以不标"}。`, {modelTier:"default"});
     const issues = ((j && j.issues) || []).filter(x => x && x.c && x.s).map(x => ({c:String(x.c).toUpperCase(), s:String(x.s), tip:String(x.tip || "")}));
     if (RW.first === null){ RW.first = text; RW.firstIssues = issues.concat(rwCheck(text, RW.letter)); }
-    RW.issues = issues; rwShow(issues, "Claude 标的（只标不改）：");
-  } catch (e) { toast("Claude 现在用不了，先用自动检查"); ACT["rw-check"](); }
+    RW.issues = issues; rwShow(issues, "AI 标的（只标不改）：");
+  } catch (e) { toast("AI 现在用不了，先用自动检查"); ACT["rw-check"](); }
 };
 /* 完成：改过的句子自动变成改错卡（过几天在复习里凭记忆再写一遍）；第一次检查查出来的错误记进错误档案 */
 ACT["rw-done"] = () => {
@@ -14426,7 +14496,7 @@ VIEWS.errlog = {
 };
 VIEWS.errlog.mount = () => { if (typeof planAutoDone === "function") planAutoDone("errlog"); };
 ACT["err-toggle"] = el => { const st = errState(), c = el.dataset.c; st[c] = st[c] || {seed:0, hits:[]}; st[c].off = !st[c].off; save(); UI.render(); };
-/* 问 Claude：写好的回复（请它只标错误代码，不改写） */
+/* 问 AI：写好的回复（请它只标错误代码，不改写） */
 function rwaText(){
   const L0 = S.replyAsk || []; if (!L0.length) return "";
   return `下面是我写给笔友的回复。请按错误代码只标出错误，不要直接改写，也不要给出改好的句子，让我自己改。每条写：错误代码、我原文里出错的那几个词、一句中文提示。聊天里不影响意思的小错（C 类）可以不标。
@@ -14434,9 +14504,9 @@ function rwaText(){
 
 ` + L0.map((x, i) => x.mode === "mail" ? `${i + 1}. （求职邮件）${x.letter ? "对方的邮件：" + x.letter + "\n" : ""}我写的邮件：${x.text}` : `${i + 1}. 对方来信：${x.letter || "（没贴）"}\n我的回复：${x.text}`).join("\n\n");
 }
-ACT["rw-ask"] = () => { const text = (($("#rwText") || {}).value || "").trim(); if (!text){ toast("先写几句"); return; } S.replyAsk = (S.replyAsk || []).concat({mode:wMode(), letter:RW.letter, text, ts:Date.now()}).slice(-20); save(); toast(`存好了（共 ${S.replyAsk.length} 条）。在“我的 → 问 Claude”里一起发`); };
+ACT["rw-ask"] = () => { const text = (($("#rwText") || {}).value || "").trim(); if (!text){ toast("先写几句"); return; } S.replyAsk = (S.replyAsk || []).concat({mode:wMode(), letter:RW.letter, text, ts:Date.now()}).slice(-20); save(); toast(`存好了（共 ${S.replyAsk.length} 条）。在“我的 → 问 AI”里一起发`); };
 ACT["rwa-copy"] = () => { const t = rwaText(); if (t) sendToClaude(t); };
-ACT["rwa-clear"] = async () => { if (!await sheet("清空写好的回复？", "确认 Claude 已经收到再清。", "清空", true)) return; S.replyAsk = []; save(); UI.render(); };
+ACT["rwa-clear"] = async () => { if (!await sheet("清空写好的回复？", "确认 AI 已经收到再清。", "清空", true)) return; S.replyAsk = []; save(); UI.render(); };
 
 VIEWS.chunks = {
   tab:"home",
@@ -14721,7 +14791,7 @@ VIEWS.pron.leave = () => { pronStopAll(); try { Rec.cancel(); } catch (e) {} PR.
 })();
 
 /* ===================== 阅读（v1.59.0）：首页“学” → 阅读 =====================
-   来源：自己贴进来的文章（去哪找见 READ_SITES）、Claude 写的文章（导入码“文章|标题|正文”，或者在 claude.ai 里直接写）。
+   来源：自己贴进来的文章（去哪找见 READ_SITES）、AI 写的文章（导入码“文章|标题|正文”，或者在 claude.ai 里直接写）。
    边听边读（点一句读一句，或者从头连着听，读到哪句哪句高亮）；“没练过的词”= app 里练过的卡片、题目里都没出现过的词（不一定是生词）；
    你在练的语块划线（K.findChunks + CHUNK_LEX）；点词 → 加进“想学的词和短语”；读完用 3 句话复述。 */
 const READ_SITES = [
@@ -14769,7 +14839,7 @@ VIEWS.read = {
         <p class="small muted" style="margin-top:8px">挑读着不费劲的：一段里不认识的词最好不超过一两个（大约认识 95%–98% 的词）。大部分时候读这种；偶尔读一篇难一点的，只精读一两段。话题挑你感兴趣、面试和 coffee chat 用得上的。</p></details>
       <div class="card" style="margin-top:10px"><b>贴一篇进来</b><input id="rdTitle" placeholder="标题（可以不填）" style="width:100%;margin-top:8px"><textarea id="rdText" rows="6" style="width:100%;margin-top:6px" placeholder="把文章粘贴到这里"></textarea>
         <button class="btn primary" data-act="rd-add" style="margin-top:8px">开始读</button></div>
-      ${ai ? `<div class="card" style="margin-top:10px"><b>让 Claude 写一篇</b><input id="rdTopic" placeholder="话题，比如：高尔夫球杆怎么设计" style="width:100%;margin-top:8px"><button class="btn" data-act="rd-ai" style="margin-top:8px">写一篇</button></div>` : ""}
+      ${ai ? `<div class="card" style="margin-top:10px"><b>让 AI 写一篇</b><input id="rdTopic" placeholder="话题，比如：高尔夫球杆怎么设计" style="width:100%;margin-top:8px"><button class="btn" data-act="rd-ai" style="margin-top:8px">写一篇</button></div>` : ""}
       ${L0.length ? `<div class="sec-title">我的文章</div><div class="list">${L0.slice().reverse().map(x => `<div class="li"><div class="grow"><b>${esc(x.title || x.text.slice(0, 40))}</b><span>${rdWords(x.text).length} 个词${x.done ? " · 读过 ✓" : ""}</span></div><button class="btn sm" data-act="rd-open" data-id="${x.id}">读</button><button class="btn sm ghost" data-act="rd-edit" data-id="${x.id}">改</button><button class="btn sm ghost" data-act="rd-del" data-id="${x.id}">删</button></div>`).join("")}</div>` : ""}</div>`;
   },
   leave(){ rdStopAll(); RDG.cur = null; RDG.sel = null; RDG.retell = null; RDG.edit = null; }
@@ -14841,15 +14911,15 @@ ACT["rd-done"] = () => { const A = rdState().find(x => x.id === RDG.cur); if (A)
 /* claude.ai 里：按你的水平写一篇（认识 95%–98% 的词），把你在练的语块放进去几个 */
 ACT["rd-ai"] = async () => { const topic = (($("#rdTopic") || {}).value || "").trim(); if (!topic){ toast("写一个话题"); return; } if (!(typeof AI !== "undefined" && AI.fn)) return;
   const chunks = (CONTENT.CHUNKS || []).slice(0, 200).map(c => c[0]).sort(() => Math.random() - 0.5).slice(0, 6);
-  toast("Claude 在写……");
+  toast("AI 在写……");
   try { const j = await AI.fn.json(`给一位英语中级（大约 B2）的中文母语者写一篇短文，话题：${topic}。要求：250 到 350 个英文单词；读者能认识文中 95% 以上的词，少用生僻词；句子不要太长；自然地用上其中 3 个以上的语块：${chunks.join("; ")}。只回复一个 JSON：{"title":"英文标题","text":"正文，段落之间空一格"}`, {modelTier:"default"});
     if (!j || !j.text) throw new Error("empty"); const id = "rd" + Date.now().toString(36); rdState().push({id, title:String(j.title || topic), text:String(j.text), ts:Date.now(), done:false, ai:true}); S.reads = rdState().slice(-30); save(); RDG.cur = id; UI.render();
-  } catch (e) { toast("Claude 现在写不了，先贴一篇进来"); } };
+  } catch (e) { toast("AI 现在写不了，先贴一篇进来"); } };
 
 /* 写作：复制、写下一封、删除一条记录 */
 async function copyText(t){ try { await navigator.clipboard.writeText(t); toast("复制好了"); } catch (e) { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); toast("复制好了"); } catch (e2) { toast("复制不了，长按文字自己复制"); } ta.remove(); } }
 ACT["rw-copy"] = el => { const k = el.dataset.k, t = k === "last" ? (RW.doneLast && RW.doneLast.text) : ((S.replies || [])[+k] || {}).final; if (t) copyText(t); };
-ACT["rw-ask-h"] = el => { const x = (S.replies || [])[+el.dataset.k]; if (!x) return; S.replyAsk = (S.replyAsk || []).concat({mode:x.mode, letter:x.letter || "", text:x.final, ts:Date.now()}).slice(-20); save(); toast(`存好了（共 ${S.replyAsk.length} 条）。在“我的 → 问 Claude”里一起发`); };
+ACT["rw-ask-h"] = el => { const x = (S.replies || [])[+el.dataset.k]; if (!x) return; S.replyAsk = (S.replyAsk || []).concat({mode:x.mode, letter:x.letter || "", text:x.final, ts:Date.now()}).slice(-20); save(); toast(`存好了（共 ${S.replyAsk.length} 条）。在“我的 → 问 AI”里一起发`); };
 ACT["rw-new"] = () => { RW.text = ""; RW.letter = ""; RW.first = null; RW.firstIssues = null; RW.issues = null; RW.doneLast = null; UI.render(); };
 ACT["rw-del"] = async el => { if (!await sheet("删除这一条记录？", "", "删除", true)) return; S.replies = (S.replies || []).filter((x, i) => i !== +el.dataset.k); save(); UI.render(); };
 
@@ -14872,14 +14942,31 @@ setTimeout(() => { try { const VER = "1.59.5"; if (!S || L.rwVer === VER) return
    依据：母语者的话里一半以上是固定说法；学习者普遍少用表示“我在听”的小词和反应，而这些会影响别人感受到的流利度。
    接话：听一句，先给对的反应（好消息、坏消息、吃惊、好笑、邀请、分享看法），再追问一句。
    想不起词：给一样东西，不说它的名字，用 It's the thing you use to… / It's like… 描述出来（卡住时最常用的救场办法）。 */
+/* v1.66.5：反应的说法（对话研究里的“接话词”）：really、wow、no way、that's amazing、interesting 这类表示“我在听、有兴趣”的反应哪一类都能用；
+   真正用错的只有好坏颜色反了（坏消息回 That's awesome，好消息回 Sorry to hear that）。以前每类一张死清单、类和类之间互相挑错，52 句地道反应错判 18 句 */
+const RX_POS = "congrats|congratulations|that'?s (?:awesome|great|amazing|huge|so good|so cool|fantastic|wonderful|excellent|brilliant|great news|exciting|incredible)|how exciting|nice|awesome|amazing|fantastic|wonderful|excellent|well done|good job|nice job|good for you|(?:i'?m )?(?:so )?(?:happy|proud) (?:for|of) you|you deserve it|well deserved|let'?s go|sweet|i'?m (?:so )?jealous|so cool";
+const RX_NEG = "oh no|that'?s (?:brutal|rough|terrible|awful|annoying|the worst|tough|too bad|a shame|unfortunate|a bummer|so sad|sad)|that sucks|that stinks|sorry to hear(?: that)?|i'?m (?:so )?sorry|what a (?:shame|bummer|pain)|bummer|ugh|oh man|yikes|poor (?:you|thing)|too bad";
+const RX_RECEIPT = "wow|really|seriously|no way|for real|are you serious|you'?re kidding|no kidding|wait,? what|that'?s (?:wild|crazy|insane|nuts|incredible|unbelievable|amazing|interesting|cool)|incredible|unbelievable|interesting|oh (?:wow|nice|cool|really|interesting)|oh my (?:god|gosh)";
+const RX_FUN = "ha(?:ha)+|lol|that'?s (?:hilarious|so funny|funny)|hilarious|i love (?:that|it)|i'?m dead|cracks me up|so funny";
+const RX_AGREE = "same(?: here)?|exactly|totally|true|fair(?: enough)?|me too|i feel you|i know,? right|that'?s (?:cool|interesting|fair)|i agree|good point|definitely|for sure|absolutely";
+const RX_ACCEPT = "i'?m in|count me in|i'?m down|sounds (?:good|fun|great|like a plan)|that sounds (?:great|fun|good)|i'?d love (?:to|that)|for sure|definitely|absolutely|why not|let'?s do it|sure|yeah,? let'?s|i'?d be (?:happy|glad) to|i can'?t make it|maybe next time|rain check|(?:i'?d love to|sorry),? but";
+const rxw = src => new RegExp("\\b(?:" + src + ")\\b", "i");
 const REACT_CAT = {
-  good:{n:"好消息", re:/\b(congrats|congratulations|that'?s (awesome|great|amazing|huge|so good|so cool)|nice|let'?s go|good for you|i'?m (so )?jealous|so happy for you|well deserved|amazing|awesome|so cool)\b/i, ex:"That's awesome! / Congrats! / Let's go!"},
-  bad:{n:"坏消息", re:/\b(oh no|that'?s (brutal|rough|terrible|awful|annoying|the worst|tough)|that sucks|i'?m (so )?sorry|ugh|oh man|bummer)\b/i, ex:"Oh no, that's brutal. / That sucks. / I'm sorry."},
-  surprise:{n:"让人吃惊", re:/\b(no way|really|seriously|are you serious|for real|that'?s (wild|crazy|insane|nuts)|wow)\b/i, ex:"No way! / Seriously? / That's wild."},
-  funny:{n:"好笑的事", re:/\b(haha+|lol|that'?s (hilarious|so funny|amazing|great)|i love that|i'?m dead|no way)\b/i, ex:"That's hilarious! / Haha, no way."},
-  invite:{n:"邀请、提议", re:/\b(i'?m in|count me in|i'?m down|sounds (good|fun|great)|i'?d love (to|that)|for sure|definitely|let'?s do it|sure)\b/i, ex:"I'm in! / Sounds good. / For sure!"},
-  share:{n:"分享看法", re:/\b(same|exactly|totally|true|fair|me too|i feel you|i know,? right|oh nice|that'?s (cool|interesting|fair)|i agree|good point)\b/i, ex:"Same. / Oh nice. / Fair."}
+  good:{n:"好消息", re:rxw(RX_POS + "|" + RX_RECEIPT), ex:"That's awesome! / Congrats! / Good for you!"},
+  bad:{n:"坏消息", re:rxw(RX_NEG + "|really|seriously|no way|oh my (?:god|gosh)"), ex:"Oh no, that's brutal. / Sorry to hear that."},
+  surprise:{n:"让人吃惊", re:rxw(RX_RECEIPT), ex:"No way! / Seriously? / That's wild."},
+  funny:{n:"好笑的事", re:rxw(RX_FUN + "|" + RX_RECEIPT), ex:"That's hilarious! / Haha, no way."},
+  invite:{n:"邀请、提议", re:rxw(RX_ACCEPT), ex:"I'm in! / Sounds good. / For sure!"},
+  share:{n:"分享看法", re:rxw(RX_AGREE + "|" + RX_RECEIPT + "|" + RX_POS), ex:"Same. / Oh nice. / Really? Which one?"}
 };
+const RE_POS = rxw(RX_POS), RE_NEG = rxw(RX_NEG);
+/* 好坏颜色反了：坏消息回了好消息的话；好消息、好笑的事、分享回了安慰的话（邀请里的 sorry, but 是委婉拒绝，不算） */
+function reactMismatch(cat, s){
+  const pos = RE_POS.test(s), neg = RE_NEG.test(s) && !(cat === "invite" && /\b(?:sorry,? but|sorry,? i can'?t)\b/i.test(s));
+  if (cat === "bad" && pos && !neg) return "good";
+  if (["good", "funny", "share", "invite"].includes(cat) && neg && !pos) return "bad";
+  return null;
+}
 const REACT_ITEMS = [
   ["good", "I just got a job offer!", "我刚拿到工作 offer 了！", "Congrats! That's huge. What's the company?"],
   ["good", "We won the game last night.", "我们昨晚赢了比赛。", "Nice! What was the score?"],
@@ -14934,7 +15021,9 @@ const CIRCUM_ITEMS = [
   ["砂纸", "sandpaper", ["rough", "smooth", "surface", "sand"], "It's rough paper you use to make a surface smooth."],
   ["垫圈", "washer", ["bolt", "ring", "flat", "metal", "screw"], "It's a small flat metal ring you put under a bolt."]
 ];
-const CIRCUM_STRAT = /\b(it'?s (a|an|the|like|kind of|sort of|this|that)|(a|the) (thing|tool|device|machine|stuff)|you use (it )?(to|for)|it'?s used (to|for)|what'?s it called|kind of like|something (you|that)|the thing (that|you)|for (making|doing|cutting|opening|holding))\b/i;
+/* v1.66.5：绕着说的几大类都认：说用途（it's for / it helps / you use it）、打比方（looks like / similar to / kind of like）、外形和材料（it's round / made of / it has）、
+   在哪能找到（you can find it in）、人怎么用它（people wear it / you kick it）、属于什么（a person who / a place where）。以前只认用途那几种，20 句地道的绕着说漏判 9 句 */
+const CIRCUM_STRAT = /\b(it'?s (a|an|the|like|kind of|sort of|this|that|for|what|basically|used|made|round|square|long|short|small|tiny|big|huge|flat|soft|hard|sharp|heavy|light|thin|thick|usually)|(a|the) (thing|tool|device|machine|stuff|person|place|animal)|you use (it )?(to|for)|it'?s used (to|for)|what'?s it called|kind of like|sort of like|something (you|that|people)|the thing (that|you)|for (making|doing|cutting|opening|holding|keeping|measuring|cleaning|carrying)|(it )?looks like|similar to|the opposite of|made (of|from)|it has (a|an|two|four|many|lots)|you can find (it|them)|you find (it|them)|it helps|it lets you|people (use|wear|put|carry|eat|drink|keep) (it|them)|you (wear|put|carry|kick|hold|eat|drink|plug|open|close|fill|push|throw) (it|them|this)|(a|an) (person|place|animal) (who|that|where)|what you (use|put|wear))\b/i;
 const RT = {tab:"react", run:null};
 const rtState = () => { S.react = S.react || {n:0, ok:0, cats:{}, circ:{n:0, ok:0}}; return S.react; };
 const rtSay = t => (typeof pronSay === "function" ? pronSay(t, {rate:0.95}) : TTS.speak(t, {rate:0.95, raw:true}));
@@ -14992,9 +15081,7 @@ function rtJudge(said){
   if (R.kind === "circ"){ const [, word, keys] = it, low = s.toLowerCase();
     const strat = CIRCUM_STRAT.test(s), key = keys.some(k => new RegExp("\\b" + k + "s?\\b", "i").test(low)), ok = !!s && strat && key;
     R.fb = {said:s, strat, key}; R.res.push({ok}); st.circ.n++; if (ok) st.circ.ok++; save(); UI.render(); return; }
-  const cat = it[0], react = REACT_CAT[cat].re.test(s);
-  /* 用错了类：比如坏消息回了 That's awesome（surprise、funny 共用的 no way 不算错） */
-  const wrong = !react ? Object.keys(REACT_CAT).find(k => k !== cat && REACT_CAT[k].re.test(s) && !(["surprise", "funny", "bad"].includes(k) && /\bno way\b/i.test(s))) : null;
+  const cat = it[0], wrong = reactMismatch(cat, s), react = REACT_CAT[cat].re.test(s) && !wrong;   /* 只有好坏颜色反了才算用错 */
   const q = rtHasQ(s), ok = react && q;
   R.fb = {said:s, react, wrong, q}; R.res.push({ok}); st.n++; if (ok) st.ok++; st.cats[cat] = (st.cats[cat] || []).concat(ok).slice(-20); save(); UI.render();
 }
