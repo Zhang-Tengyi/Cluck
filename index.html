@@ -714,6 +714,8 @@ details.pl-day>summary{list-style:none;cursor:pointer}details.pl-day>summary::-w
 .chip.reg-casual{background:#FEF3C7;color:#92400E}.chip.reg-formal{background:#E0E7FF;color:#3730A3}.chip.reg-listen{background:#FEE2E2;color:#991B1B}.chip.reg-neutral{background:#E5E7EB;color:#374151}
 .plan-bar{height:4px;border-radius:4px;background:var(--line,#E5E7EB);margin-top:6px;overflow:hidden}.plan-bar>i{display:block;height:100%;background:#2F9E5B;border-radius:4px}
 .about-cat summary{cursor:pointer}.about-qa{border-top:1px solid var(--line,#E5E7EB);padding:6px 2px}.about-qa summary{cursor:pointer;font-size:14px}.about-qa[open] summary{font-weight:600}
+.ipa{font-family:"Charis SIL","Doulos SIL","Noto Sans","Segoe UI","DejaVu Sans",Arial,sans-serif;letter-spacing:.02em;font-size:18px}.ipa-line{min-height:22px}
+.ipa-ex svg{width:22px;height:22px;flex:none;color:var(--mute,#6B7280)}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -735,7 +737,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.66.6"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.67.1"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -4066,7 +4068,7 @@ ACT.word = el => {
   /* 这个搭配是不是已经在单词卡里了 */
   const wcCk = !!(ck && CAT.cards.some(x => x.t === "w" && String(x.word || "").toLowerCase() === String(cb || ck).toLowerCase()));
   bg.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${ck ? `<div class="ck-box"><div class="small muted">这个词在固定搭配里，整体记、整体说更自然</div><div class="en" style="font-size:24px;margin-top:4px">${esc(ck)}</div>${cz ? `<div style="margin-top:2px">${esc(cz)}</div>` : ""}
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px"><button class="btn" data-x="cn">${ICON.speak}整体读</button><button class="btn" data-x="cs">慢速</button></div><div class="small muted dict-h">词典：</div><div class="dict-grid">${DICTS.map(d => `<button class="btn sm" data-x="dict" data-for="cd" data-v="${d.id}">${d.name}</button>`).join("")}</div>${wcCk ? "" : `<button class="btn sm" data-x="addck" style="margin-top:8px">把这个搭配加到要学的词</button>`}</div><div class="small muted" style="margin-top:14px">单独这个词</div>` : ""}<div class="en" style="font-size:30px">${esc(w)}</div>${wc && wc.mean ? `<div style="margin-top:2px">${esc(wc.mean)}</div>` : ""}
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px"><button class="btn" data-x="cn">${ICON.speak}整体读</button><button class="btn" data-x="cs">慢速</button></div><div class="small muted dict-h">词典：</div><div class="dict-grid">${DICTS.map(d => `<button class="btn sm" data-x="dict" data-for="cd" data-v="${d.id}">${d.name}</button>`).join("")}</div>${wcCk ? "" : `<button class="btn sm" data-x="addck" style="margin-top:8px">把这个搭配加到要学的词</button>`}</div><div class="small muted" style="margin-top:14px">单独这个词</div>` : ""}<div class="en" style="font-size:30px">${esc(w)}</div><div id="wIpa" class="ipa-line" style="margin:2px 0 4px"></div>${wc && wc.mean ? `<div style="margin-top:2px">${esc(wc.mean)}</div>` : ""}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px"><button class="btn" data-x="n">${ICON.speak}正常读</button><button class="btn" data-x="s">慢速读</button>${wc ? `<button class="btn" disabled style="grid-column:1/-1">已经在你的单词卡里</button>` : `<button class="btn" data-x="add" style="grid-column:1/-1">把这个词加到要学的词</button>`}</div>
     <div class="small muted dict-h">词典：</div><div class="dict-grid">${DICTS.map(d => `<button class="btn sm" data-x="dict" data-for="d" data-v="${d.id}">${d.name}</button>`).join("")}</div></div>`;
   bg.addEventListener("click", e => {
@@ -4084,6 +4086,7 @@ ACT.word = el => {
     else if (b.dataset.x === "d") openDict(w);
   });
   document.body.appendChild(bg);
+  if (typeof ipaFill === "function") ipaFill(w, bg.querySelector("#wIpa"));   /* 美式音标和重音（v1.67.0） */
 };
 /* ---------- 查词典：可以选词典；默认用上次用的那个 ---------- */
 /* 词典按权威顺序排：牛津学习词典（美式、英式）、剑桥、韦氏、柯林斯，再是中文的有道、必应，最后谷歌 */
@@ -5726,7 +5729,7 @@ ACT["imp-apply"] = () => {
   for (const a of r.answers){ const prev = (S.refAns[a.qid] || "").trim(); S.refAns[a.qid] = a.text; const x = ans(a.qid); const mine = (x.text || "").trim();
     if (!mine || mine === prev || x.fromRef){ x.text = a.text; x.fromRef = true; x.updated = Date.now(); } }
   for (const k of r.keys){ const x = ans(k.qid); x.keys = k.keys; }
-  S.plan = S.plan || []; if (r.planReplace) S.plan = S.plan.filter(x => x.done);
+  S.plan = S.plan || []; if (r.planReplace) S.plan = S.plan.filter(x => x.done || x.addon);   /* 单独的计划（学音标）不被替换 */
   for (const x of r.plan){ if (!S.plan.some(y => y.date === x.date && y.text === x.text)) S.plan.push({id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date:x.date, cue:x.cue, text:x.text, act:x.act, done:false, ts:Date.now()}); }
   if ((S.wantWords || []).length){
     /* 导入的单词卡和“要学的词”对上了（一样，或者一个是另一个的一部分，比如 stepped 和 stepped boss），就从列表里去掉 */
@@ -5954,10 +5957,13 @@ const ABOUT_QA = [
   ["听懂俚语练什么？", "当地人聊天里的俚语和脏话：不是为了说，是为了听懂，分清是在开玩笑、夸奖还是真的生气。每句告诉你有多冲、自己能不能用。"],
   ["阅读怎么用？", "导入或粘贴一篇文章，一句一句听，点词听读音、加到要学的词，读完用 3 句话复述。"]]],
  ["学", [
+  ["看到一个词不知道怎么读怎么办？", "点一下这个词：会读给你听，还会显示美式音标和重音在第几个音节（要联网查，查过的存在手机里，没网也能看）。音标里 ˈ 标在重读音节的开头。"],
+  ["要不要学音标？音标入门怎么学？", "值得学，目标是“看到音标能读出来”，不用背规则、不用自己写。英语的拼写和读音对不上（though、through、tough、cough），音标一个符号只对一个音，还能告诉你重音。在“发音 → 音标”里有 10 课，按对中文母语者最要紧的顺序：每课先认音标、听例词，再做听辨（换不同的声音和词、每题告诉对错，这是研究里证据最强的听辨练法），最后看音标读词。学过的会按 1、3、7、14、30、60 天提醒复习。"],
   ["发音练习练什么？", "听辨容易混的音、第一印象测试、重音和节奏、难词本。"],
   ["错误档案是什么？", "按错误类型统计你写作、练习里出的错，最常犯的排前面，还附上你写过的例子。"]]],
  ["计划和时间", [
   ["昨天的计划没做完，今天要补吗？", "不用硬补。研究发现，漏掉一次对养成习惯没有实质影响，真正伤习惯的是长期不规律。该复习的卡片 app 会自动排进今天，不会丢；其他项先做今天的，有精力再挑一项最重要的补。"],
+  ["“学音标”这个单独的计划怎么用？", "在“计划”页点“＋ 学音标（单独的计划）”，选每天、隔一天或者一周三次，再选什么时候做。它和推荐计划分开：重新生成推荐计划、清除推荐计划、导入计划时选“替换”都不会动它；改它、关掉它也不会动别的计划，关掉时只删还没做的“学音标”。内容跟着你的进度：10 课没学完就写“学第几课”（有到期的复习顺便复习）；学完以后只在有复习的日子出现。点它直接打开“发音 → 音标”，学完一课或者复习完自动打勾。"],
   ["“只做 3 分钟”是什么？", "没精神时保底：先选普通练习或游戏，练完 3 分钟，今天剩下的计划标成跳过，算“保底完成”。"],
   ["时间到了以后怎么选？", "可以结束，也可以“再练 5 分钟”（从点下去的那一刻算），或者“不限时，练完剩下的题”。停在提示页的时间不算练习时间。"]]],
  ["导入和 AI", [
@@ -6412,7 +6418,7 @@ VIEWS.plan = {
       <div class="row-gap" style="margin-top:8px"><button class="btn sm primary" data-act="iv-due-go">现在练</button><button class="btn sm ghost" data-act="iv-due-later">明天再说</button></div></div>` + body;
     const nGen = (S.plan || []).filter(x => x.gen && !x.done).length, grouped = ["next", "late", "done"].includes(tab) && body.includes("pl-day");
     return `<div class="wrap">${backBtn()}<h2>我的计划</h2>
-      <div class="row-gap" style="margin-top:6px"><button class="btn sm primary" data-act="pl-open-top">＋ 添加一项</button><button class="btn sm" data-act="pl-gen">生成推荐计划</button>${nGen ? `<button class="btn sm ghost" data-act="pl-gen-clear">清除推荐计划（${nGen}）</button>` : ""}</div>
+      <div class="row-gap" style="margin-top:6px"><button class="btn sm primary" data-act="pl-open-top">＋ 添加一项</button><button class="btn sm" data-act="pl-gen">生成推荐计划</button>${typeof ipaPlanBtn === "function" ? ipaPlanBtn() : ""}${nGen ? `<button class="btn sm ghost" data-act="pl-gen-clear">清除推荐计划（${nGen}）</button>` : ""}</div>
       ${grouped ? `<div class="row-gap" style="margin-top:8px"><button class="linkbtn small" data-act="pl-fold-all" data-v="open">全部展开</button><button class="linkbtn small" data-act="pl-fold-all" data-v="close">全部收起</button></div>` : ""}
       <div class="seg" style="margin-top:10px">${tabs.map(([k, l]) => `<button data-act="pl-tab" data-v="${k}" aria-pressed="${tab === k}">${l}${G[k].length ? `<span class="seg-n">${G[k].length}</span>` : ""}</button>`).join("")}</div>
       <div style="margin-top:12px">${body}</div>
@@ -13759,6 +13765,49 @@ ACT["bt-del"] = async () => {
   };
 })();
 
+
+/* ---------- 单独的计划：学音标（v1.67.1）。和推荐计划分开：标 addon:"ipa"、不带 gen，所以重新生成、清除推荐计划都不动它；
+   打开以后按选的频率排接下来 14 天，每次打开 app 往后续；关掉只删还没做的“学音标”。内容跟着进度变：10 课没学完 → 学第 N 课（有到期的顺便复习）；学完以后只在有复习的日子排 ---------- */
+const IPA_FREQ = {daily:"每天", alt:"隔一天", mwf:"一周三次（一、三、五）"};
+function ipaPlanAddDays(t, k){ const [y, m, d] = String(t).split("-").map(Number); const x = new Date(y, m - 1, d + k); return ymd(x); }
+function ipaNextLesson(){ const st = ipaState(); return IPA_LESSONS.findIndex(l => !st.L[l.id]); }
+function ipaPlanDay(d, A){
+  const dn = dnum(d), wd = new Date(d + "T12:00:00").getDay();
+  const ok = A.freq === "alt" ? ((dn - dnum(A.start || today())) % 2 + 2) % 2 === 0 : A.freq === "mwf" ? [1, 3, 5].includes(wd) : true;
+  if (!ok) return false;
+  if (ipaNextLesson() >= 0) return true;   /* 还有没学的课 */
+  const st = ipaState(); return IPA_LESSONS.some(l => st.L[l.id] && st.L[l.id].due <= dn);   /* 都学完了：只在有到期复习的日子 */
+}
+function ipaPlanText(){
+  const i = ipaNextLesson(), due = ipaDue().length;
+  if (i >= 0) return `音标：学第 ${i + 1} 课「${IPA_LESSONS[i].name}」（约 5 分钟）${due ? `，再复习 ${due} 课` : ""}`;
+  return due ? `音标：复习 ${due} 课（约 2 分钟）` : "音标：今天没有到期的复习";
+}
+function planAddonsSync(){
+  const A = S.planAddons && S.planAddons.ipa; if (!A || !A.on) return false;
+  const t = today(); let ch = false; S.plan = S.plan || [];
+  const want = new Set(); for (let k = 0; k < 14; k++){ const d = ipaPlanAddDays(t, k); if (ipaPlanDay(d, A)) want.add(d); }
+  const n0 = S.plan.length; S.plan = S.plan.filter(x => !(x.addon === "ipa" && !x.done && x.date >= t && !want.has(x.date))); if (S.plan.length !== n0) ch = true;
+  for (const d of want) if (!S.plan.some(x => x.addon === "ipa" && x.date === d)){ S.plan.push({id:"ipa-" + d, date:d, cue:A.cue, text:"音标：学一课或复习（约 5 分钟）", act:"ipa", addon:"ipa"}); ch = true; }
+  for (const x of S.plan) if (x.addon === "ipa" && !x.done && x.date >= t){ if (x.cue !== A.cue){ x.cue = A.cue; ch = true; } if (x.date === t){ const tx = ipaPlanText(); if (x.text !== tx){ x.text = tx; ch = true; } } }
+  if (ch) save(); return ch;
+}
+function ipaPlanBtn(){ const A = S.planAddons && S.planAddons.ipa; return `<button class="btn sm" data-act="pl-ipa">${A && A.on ? "学音标 ✓（单独的计划）" : "＋ 学音标（单独的计划）"}</button>`; }
+ACT["pl-ipa"] = async () => {
+  S.planAddons = S.planAddons || {}; const A = S.planAddons.ipa;
+  const note = `<p class="small muted">它和推荐计划分开：重新生成推荐计划、清除推荐计划都不会动它；加上或关掉它，也不会动别的计划。</p>`;
+  if (A && A.on){
+    const c = await choose("学音标（单独的计划）", `<p class="small">现在：${IPA_FREQ[A.freq] || "每天"}，${esc(A.cue)}。</p>${note}`, [["edit", "改频率或时间"], ["off", "关掉（删掉还没做的）"]]); if (!c) return;
+    if (c === "off"){ A.on = false; S.plan = (S.plan || []).filter(x => !(x.addon === "ipa" && !x.done)); save(); toast("关掉了：没做的“学音标”删了，别的计划没动"); UI.render(); return; }
+  }
+  const f = await choose("学音标：多久一次？", `<p class="small muted">每次约 5 分钟：先学新的一课，有到期的复习就顺便复习。10 课学完以后，只在有复习的日子提醒。</p>${note}`, [["daily", "每天"], ["alt", "隔一天"], ["mwf", "一周三次（一、三、五）"]]); if (!f) return;
+  const cue = await choose("什么时候做？", "", [["早上", "早上"], ["午休", "午休"], ["晚上", "晚上"], ["睡前", "睡前"]]); if (!cue) return;
+  S.planAddons.ipa = {on:true, freq:f, cue, start:today()}; planAddonsSync(); save(); toast("加上了：接下来两周的“学音标”"); UI.render();
+};
+/* 点计划里的“学音标”：打开 发音 → 音标；学完一课或复习完自动打勾 */
+(function(){ if (typeof PLAN_ACTS !== "undefined" && !PLAN_ACTS.some(x => x[0] === "ipa")) PLAN_ACTS.push(["ipa", "学音标"]);
+  const f = ACT["plan-go"]; ACT["plan-go"] = el => { const a = (el.dataset && el.dataset.v) || ""; if (a === "ipa"){ PR.tab = "ipa"; IPAC.v = null; return UI.nav("pron"); } return f(el); };
+  const r0 = UI.render; UI.render = function(){ try { planAddonsSync(); } catch (e) {} return r0.apply(this, arguments); }; })();
 /* ===================== 通用推荐计划：选目标和每天的时间，排出接下来 14 天 ===================== */
 (function(){
   if (typeof PLAN_ACTS !== "undefined") PLAN_ACTS.push(["dboss:iv", "对话首领战（面试官）"], ["dboss:cc", "对话首领战（Coffee chat）"]);
@@ -14594,15 +14643,161 @@ const pronToks = s => String(s || "").toLowerCase().replace(/[’]/g, "'").repla
 const pronContent = s => [...new Set(pronToks(s).filter(w => w.length > 2 && !PRON_STOP.has(w)))];
 function pronAcc(id){ const u = pronState().units[id] || {t:[]}; const r = (u.t || []).slice(-20); return {n:(u.n || 0), acc: r.length ? r.filter(Boolean).length / r.length : 0, last:r.length, ok:(u.n || 0) >= 40 && r.length >= 20 && r.filter(Boolean).length / r.length >= 0.9}; }
 function pronOpeners(){ const mine = (S.custom || []).filter(c => c.deck === "面试开场白" && c.en).map(c => [c.en, c.zh || ""]); return mine.length ? mine : PRON_OPENERS; }
-const PR = {tab:"listen", run:null, ft:null, st:null};
+/* ===================== 音标（v1.67.0）：点单词看美式音标和重音；Arpabet（CMU 美式发音词典）→ 音标，重音符号标在音节开头 ===================== */
+const ARPA_V = {AA:"ɑ", AE:"æ", AH:"ʌ", AO:"ɔ", AW:"aʊ", AY:"aɪ", EH:"ɛ", ER:"ɝ", EY:"eɪ", IH:"ɪ", IY:"i", OW:"oʊ", OY:"ɔɪ", UH:"ʊ", UW:"u"};
+const ARPA_C = {B:"b", CH:"tʃ", D:"d", DH:"ð", F:"f", G:"ɡ", HH:"h", JH:"dʒ", K:"k", L:"l", M:"m", N:"n", NG:"ŋ", P:"p", R:"r", S:"s", SH:"ʃ", T:"t", TH:"θ", V:"v", W:"w", Y:"j", Z:"z", ZH:"ʒ"};
+const IPA_ON2 = new Set(["pl","pr","bl","br","tr","dr","kl","kr","ɡl","ɡr","fl","fr","θr","ʃr","sp","st","sk","sm","sn","sl","sw","tw","dw","kw","ɡw","pj","bj","kj","ɡj","fj","vj","mj","hj","sf","θw"]);
+const IPA_ON3 = new Set(["spl","spr","str","skr","skw","skj","spj"]);
+function arpaToIpa(pron){
+  const ph = String(pron || "").trim().split(/\s+/).filter(Boolean).map(t => { const m = t.match(/^([A-Z]+)([012])?$/); if (!m) return null; const b = m[1], st = m[2];
+    if (ARPA_V[b]) return {v:true, s:st === "1" ? 1 : st === "2" ? 2 : 0, t:(b === "AH" && st === "0") ? "ə" : (b === "ER" && st === "0") ? "ɚ" : ARPA_V[b]};
+    return ARPA_C[b] ? {v:false, t:ARPA_C[b]} : null; }).filter(Boolean);
+  if (!ph.length) return null;
+  const vi = ph.map((p, i) => p.v ? i : -1).filter(i => i >= 0), out = ph.map(p => p.t); let prim = 0;
+  if (vi.length > 1){
+    const marks = []; let prev = -1;
+    vi.forEach((i, n) => { const p = ph[i];
+      if (p.s){ const cons = ph.slice(prev + 1, i).map(x => x.t); let k = 0;   /* 音节开头：前面的辅音里，能放在音节开头的最长那一串 */
+        for (let L = Math.min(3, cons.length); L >= 1; L--){ const on = cons.slice(cons.length - L).join(""); if ((L === 1 && on !== "ŋ") || (L === 2 && IPA_ON2.has(on)) || (L === 3 && IPA_ON3.has(on))){ k = L; break; } }
+        marks.push([i - k, p.s === 1 ? "ˈ" : "ˌ"]); if (p.s === 1 && !prim) prim = n + 1; }
+      prev = i; });
+    for (const [pos, m] of marks.sort((a, b) => b[0] - a[0])) out.splice(pos, 0, m);
+  }
+  return {ipa:out.join(""), n:vi.length, st:prim};
+}
+/* 查音标：Datamuse（用的是 CMU 美式发音词典，免费、不用 key）；查过的存在手机里，没网也能看 */
+async function ipaLookup(w){
+  w = String(w || "").toLowerCase().replace(/[’]/g, "'").replace(/[^a-z'-]/g, ""); if (!w) return null;
+  S.ipa = S.ipa || {}; if (S.ipa[w]) return S.ipa[w];
+  try {
+    const ctl = typeof AbortController !== "undefined" ? new AbortController() : null, tm = setTimeout(() => { try { ctl && ctl.abort(); } catch (e) {} }, 6000);
+    const r = await fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(w)}&qe=sp&md=r&max=1`, ctl ? {signal:ctl.signal} : {}); clearTimeout(tm);
+    const j = await r.json(), e = (j || []).find(x => String(x.word || "").toLowerCase() === w) || (j || [])[0], tag = e && (e.tags || []).find(x => /^pron:/.test(x));
+    const res = tag ? arpaToIpa(tag.slice(5)) : null; if (!res) return null;
+    const ks = Object.keys(S.ipa); if (ks.length >= 3000) delete S.ipa[ks[0]];
+    S.ipa[w] = res; save(); return res;
+  } catch (e) { return null; }
+}
+const IPA_ORD = ["", "第一个", "第二个", "第三个", "第四个", "第五个", "第六个"];
+function ipaLineHTML(r){ if (!r) return ""; return `<span class="ipa">/${esc(r.ipa)}/</span>${r.n > 1 && r.st ? `<span class="small muted">　${r.n} 个音节，重音在${IPA_ORD[r.st] || "第 " + r.st + " 个"}</span>` : ""}`; }
+async function ipaFill(w, el){ if (!el) return; const c = (S.ipa || {})[String(w).toLowerCase()]; if (c){ el.innerHTML = ipaLineHTML(c); return; }
+  el.innerHTML = `<span class="small muted">查音标……</span>`; const r = await ipaLookup(w); if (!el.isConnected) return;
+  el.innerHTML = r ? ipaLineHTML(r) : `<span class="small muted">查不到音标（要联网）。可以点“读”听读音</span>`; }
+/* ---------- 音标入门：10 课，按对中文母语者最要紧的排。每课：认音标 → 听辨（换不同的声音、不同的词、每题告诉对错：研究里证据最强的听辨训练）→ 看音标读词。学过的按 1、3、7、14、30、60 天复习 ---------- */
+const IPA_LESSONS = [
+ {id:"L1", name:"重音 ˈ 和弱读 ə", sym:"ˈ　ˌ　ə", tip:"ˈ 标在重读音节的开头：那个音节读得更长、更响、调更高；ˌ 是次重音。ə 是英语里最常见的音：不重读的元音大多弱成这个又轻又短的“呃”，嘴巴放松、不用力。很多词读错，其实是重音放错了。",
+  ex:[["about","əˈbaʊt"],["banana","bəˈnænə"],["today","təˈdeɪ"],["problem","ˈprɑbləm"],["computer","kəmˈpjutɚ"]],
+  pairs:[[["comfortable","ˈkʌmftɚbəl"],[null,"kəmˈfɔrtəbəl"]],[["vegetable","ˈvɛdʒtəbəl"],[null,"ˌvɛdʒəˈteɪbəl"]],[["Wednesday","ˈwɛnzdeɪ"],[null,"ˈwɛdnəzdeɪ"]],[["recipe","ˈrɛsəpi"],[null,"rɪˈsaɪp"]],
+   [["hotel","hoʊˈtɛl"],[null,"ˈhoʊtɛl"]],[["develop","dɪˈvɛləp"],[null,"ˈdɛvələp"]],[["engineer","ˌɛndʒəˈnɪr"],[null,"ˈɛndʒənɪr"]],[["computer","kəmˈpjutɚ"],[null,"ˈkɑmpjutɚ"]]]},
+ {id:"L2", name:"i 和 ɪ（sheep / ship）", sym:"i　ɪ", tip:"i（sheep）：嘴角往两边拉，舌头抬高，音长一点。ɪ（ship）：嘴巴放松、稍微张开，又短又松，不是“衣”。有的词典把 i 写成 iː。",
+  pairs:[[["sheep","ʃip"],["ship","ʃɪp"]],[["seat","sit"],["sit","sɪt"]],[["leave","liv"],["live","lɪv"]],[["feel","fil"],["fill","fɪl"]],[["beat","bit"],["bit","bɪt"]],[["heel","hil"],["hill","hɪl"]],[["reach","ritʃ"],["rich","rɪtʃ"]],[["peak","pik"],["pick","pɪk"]]]},
+ {id:"L3", name:"æ 和 ɛ（bad / bed）", sym:"æ　ɛ", tip:"æ（bad）：嘴巴张大，下巴往下，舌头压低往前，像拉长的“哎啊”。ɛ（bed）：嘴巴张一半，像短的“诶”。中文里没有 æ，最容易读成 ɛ。",
+  pairs:[[["bad","bæd"],["bed","bɛd"]],[["man","mæn"],["men","mɛn"]],[["sad","sæd"],["said","sɛd"]],[["had","hæd"],["head","hɛd"]],[["pan","pæn"],["pen","pɛn"]],[["bat","bæt"],["bet","bɛt"]],[["sat","sæt"],["set","sɛt"]],[["laughed","læft"],["left","lɛft"]]]},
+ {id:"L4", name:"ʌ 和 ɑ（cut / cot）", sym:"ʌ　ɑ", tip:"ʌ（cut）：嘴巴半张、放松，短促的“啊”，舌头在中间。ɑ（hot，美式）：嘴巴张大，舌头往后往下，长一点的“啊”。美式的 hot、not、job 都是 ɑ，不是“奥”。",
+  pairs:[[["cut","kʌt"],["cot","kɑt"]],[["luck","lʌk"],["lock","lɑk"]],[["duck","dʌk"],["dock","dɑk"]],[["hut","hʌt"],["hot","hɑt"]],[["cup","kʌp"],["cop","kɑp"]],[["nut","nʌt"],["not","nɑt"]],[["shut","ʃʌt"],["shot","ʃɑt"]]]},
+ {id:"L5", name:"ʊ 和 u（full / fool）", sym:"ʊ　u", tip:"u（fool）：嘴唇圆、往前噘，舌头后部抬高，音长。ʊ（full）：嘴唇只微微圆，放松，又短又松。有的词典把 u 写成 uː。",
+  pairs:[[["full","fʊl"],["fool","ful"]],[["pull","pʊl"],["pool","pul"]],[["look","lʊk"],["Luke","luk"]],[["soot","sʊt"],["suit","sut"]],[["stood","stʊd"],["stewed","stud"]]]},
+ {id:"L6", name:"双元音 eɪ、oʊ（pain / pen）", sym:"eɪ　oʊ　ɛ　ɔ", tip:"eɪ（day）、oʊ（go）是滑动的音：从前一个滑到后一个，嘴型要变。常见的错是把 eɪ 读成短的 ɛ（pain 读成 pen），把 oʊ 读成“欧”。ɔ（law，美式）：嘴巴张开、嘴唇稍圆。",
+  pairs:[[["pain","peɪn"],["pen","pɛn"]],[["late","leɪt"],["let","lɛt"]],[["wait","weɪt"],["wet","wɛt"]],[["date","deɪt"],["debt","dɛt"]],[["coat","koʊt"],["caught","kɔt"]],[["boat","boʊt"],["bought","bɔt"]],[["low","loʊ"],["law","lɔ"]]]},
+ {id:"L7", name:"r 化元音 ɝ、ɚ（work / walk）", sym:"ɝ　ɚ　ɔr　ɑr", tip:"ɝ（bird）、ɚ（teacher 的 er）：舌头卷起或往后缩，整个音都带着 r，美式里一定要卷。和 ɔr（born）、ɑr（farm）分开：ɝ 嘴巴不张大。",
+  pairs:[[["word","wɝd"],["ward","wɔrd"]],[["work","wɝk"],["walk","wɔk"]],[["burn","bɝn"],["born","bɔrn"]],[["shirt","ʃɝt"],["short","ʃɔrt"]],[["firm","fɝm"],["farm","fɑrm"]],[["heard","hɝd"],["hard","hɑrd"]]]},
+ {id:"L8", name:"θ 和 ð（think / this）", sym:"θ　ð", tip:"θ（think）、ð（this）：舌尖轻轻放在上下牙之间往外送气；θ 不振动声带，ð 振动。最常见的错是读成 s、z 或者 t、d。",
+  pairs:[[["think","θɪŋk"],["sink","sɪŋk"]],[["three","θri"],["tree","tri"]],[["thank","θæŋk"],["tank","tæŋk"]],[["path","pæθ"],["pass","pæs"]],[["mouth","maʊθ"],["mouse","maʊs"]],[["they","ðeɪ"],["day","deɪ"]],[["then","ðɛn"],["den","dɛn"]],[["breathe","brið"],["breeze","briz"]]]},
+ {id:"L9", name:"v、w、f（vest / west）", sym:"v　w　f", tip:"v：上牙轻轻碰下嘴唇，声带振动。w：嘴唇圆起来，不碰牙。f：和 v 一样碰嘴唇，但不振动。中文母语者常把 v 读成 w。",
+  pairs:[[["vest","vɛst"],["west","wɛst"]],[["vine","vaɪn"],["wine","waɪn"]],[["very","ˈvɛri"],["wary","ˈwɛri"]],[["vet","vɛt"],["wet","wɛt"]],[["veil","veɪl"],["whale","weɪl"]],[["van","væn"],["fan","fæn"]],[["vast","væst"],["fast","fæst"]]]},
+ {id:"L10", name:"词尾 n / ŋ 和清浊（thin / thing）", sym:"n　ŋ　词尾辅音", tip:"n：舌尖顶住上牙后面。ŋ（sing）：舌头后部抬起，舌尖不动，后面不要加 g。词尾的辅音要读出来、不要吞，也不要加“呃”（bag 不是 bag-uh）；词尾清浊要分清：bag / back、prize / price。",
+  pairs:[[["sin","sɪn"],["sing","sɪŋ"]],[["ban","bæn"],["bang","bæŋ"]],[["thin","θɪn"],["thing","θɪŋ"]],[["win","wɪn"],["wing","wɪŋ"]],[["ran","ræn"],["rang","ræŋ"]],[["bag","bæɡ"],["back","bæk"]],[["leave","liv"],["leaf","lif"]],[["prize","praɪz"],["price","praɪs"]]]}
+];
+const IPA_IV = [1, 3, 7, 14, 30, 60];
+const IPAC = {v:null};
+function ipaState(){ S.ipaCourse = S.ipaCourse || {L:{}}; return S.ipaCourse; }
+function ipaDue(){ const st = ipaState(), tn = dnum(today()); return IPA_LESSONS.filter(l => st.L[l.id] && st.L[l.id].due <= tn); }
+/* 不同的声音：先美式，再其他口音；一题换一个 */
+function ipaVoices(){ const vs = (TTS.voices || []).filter(v => TTS.norm(v.lang).startsWith("en")); return vs.sort((a, b) => (TTS.norm(b.lang) === "en-us") - (TTS.norm(a.lang) === "en-us")); }
+function ipaSay(w, vi, rate){ const vs = ipaVoices(); try { TTS.speak(w, Object.assign({rate:rate || 0.85}, vs.length ? {voice:vs[(vi || 0) % vs.length]} : {})); } catch (e) {} }
+function ipaTrials(lessons, n){
+  const pool = []; for (const l of lessons) for (const p of l.pairs) pool.push([l, p]);
+  const out = []; let last = null;
+  for (let k = 0; k < n && pool.length; k++){ let x, g = 0; do { x = pool[Math.floor(Math.random() * pool.length)]; g++; } while (pool.length > 1 && x === last && g < 10); last = x;
+    const p = x[1], pick = p[1][0] ? Math.floor(Math.random() * 2) : 0, order = Math.random() < 0.5 ? [0, 1] : [1, 0];
+    out.push({lid:x[0].id, p, pick, order, voice:Math.floor(Math.random() * 9), ans:null}); }
+  return out;
+}
+function ipaReadItems(l){ const ws = []; for (const p of l.pairs) for (const m of p) if (m[0]) ws.push(m); for (const e of (l.ex || [])) ws.push(e); return ws.sort(() => Math.random() - 0.5).slice(0, 3).map(m => ({w:m[0], ipa:m[1], heard:"", ok:null})); }
+function ipaListHTML(){
+  const st = ipaState(), tn = dnum(today()), due = ipaDue(), done = IPA_LESSONS.filter(l => st.L[l.id]).length;
+  return `<div class="card"><h3>音标入门</h3><p class="small muted" style="margin:4px 0 8px">美式音标，按对中文母语者最要紧的顺序。目标是看到音标能读出来，不用背规则、不用自己写。每课约 5 分钟：认音标 → 听辨（换不同的声音和词，每题告诉你对错）→ 看音标读词。点任何英文单词也能看它的音标。</p>
+    <p class="small">学了 ${done}/${IPA_LESSONS.length} 课${due.length ? `，今天要复习 ${due.length} 课` : ""}</p>
+    ${due.length ? `<button class="btn primary block" data-act="ipa-review" style="margin:8px 0">复习今天的（${due.length} 课，10 题）</button>` : ""}
+    <div class="list">${IPA_LESSONS.map((l, i) => { const s = st.L[l.id]; const tag = !s ? "没学" : s.due <= tn ? "今天复习" : `下次复习 ${new Date((s.due) * 86400000).toISOString().slice(5, 10)}`;
+      return `<button class="li" data-act="ipa-open" data-v="${l.id}" style="text-align:left"><div class="grow"><b>${i + 1}. ${esc(l.name)}</b><span class="small muted">${esc(l.sym)}</span></div><span class="small ${s && s.due <= tn ? "" : "muted"}">${tag}</span></button>`; }).join("")}</div></div>`;
+}
+function ipaTrialHTML(V){
+  const t = V.qs[V.i], A = t.p[t.pick], opts = t.order.map(k => t.p[k]);
+  const head = `<p class="small muted">${V.kind === "review" ? "复习" : esc(IPA_LESSONS.find(l => l.id === V.lid).name)} · 听辨 ${V.i + 1}/${V.qs.length}</p><p class="small" style="margin:4px 0 10px">听一遍，选你听到的那个音标。</p>`;
+  if (t.ans == null) return `${head}<button class="btn block" data-act="ipa-play">▶ 再听一遍</button><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">${opts.map((m, k) => `<button class="btn big" data-act="ipa-pick" data-k="${k}" style="font-size:22px">/${esc(m[1])}/</button>`).join("")}</div>`;
+  const ok = t.ans === t.order.indexOf(t.pick);
+  return `${head}<div class="panel" style="background:${ok ? "var(--green-soft)" : "var(--red-soft)"};border-color:transparent"><b>${ok ? "对了" : "不对"}</b>：你听到的是 <span class="ipa">/${esc(A[1])}/</span>${A[0] ? `（${esc(A[0])}）` : ""}</div>
+    <div class="row-gap" style="margin-top:10px">${t.p.filter(m => m[0]).map(m => `<button class="btn sm" data-act="ipa-say" data-w="${esc(m[0])}">${ICON.speak} ${esc(m[0])} /${esc(m[1])}/</button>`).join("")}</div>
+    ${t.p[1][0] ? "" : `<p class="small muted" style="margin-top:6px">另一个 /${esc(t.p[1][1])}/ 是常见的错误读法</p>`}
+    <button class="btn primary block" data-act="ipa-next" style="margin-top:12px">${V.i + 1 >= V.qs.length ? "看结果" : "下一题"}</button>`;
+}
+function ipaViewHTML(){
+  const V = IPAC.v; if (!V) return ipaListHTML();
+  const back = `<button class="linkbtn small" data-act="ipa-back">← 音标目录</button>`;
+  if (V.step === "learn"){ const l = IPA_LESSONS.find(x => x.id === V.lid), ex = l.ex || l.pairs.flat().filter(m => m[0]);
+    return `<div class="card">${back}<h3 style="margin-top:6px">${esc(l.name)}</h3><div class="ipa" style="font-size:28px;margin:6px 0">${esc(l.sym)}</div><p class="small">${esc(l.tip)}</p>
+      <div class="list" style="margin-top:10px">${ex.slice(0, 10).map(m => `<button class="li ipa-ex" data-act="ipa-say" data-w="${esc(m[0])}" style="text-align:left"><div class="grow"><b class="en">${esc(m[0])}</b><span class="ipa">/${esc(m[1])}/</span></div>${ICON.speak}</button>`).join("")}</div>
+      <p class="small muted" style="margin-top:8px">每个都点开听，跟着读一遍。</p><button class="btn primary block" data-act="ipa-quiz" style="margin-top:10px">开始听辨（10 题）</button></div>`; }
+  if (V.step === "quiz") return `<div class="card">${back}${ipaTrialHTML(V)}</div>`;
+  if (V.step === "read"){ const it = V.read[V.ri];
+    return `<div class="card">${back}<p class="small muted">看音标读词 ${V.ri + 1}/${V.read.length}：不看拼写，照音标读出来</p><div class="ipa" style="font-size:34px;text-align:center;margin:14px 0">/${esc(it.ipa)}/</div>
+      ${it.ok == null && !it.shown ? `<div class="db-mic"><button class="mic" id="ipaMic" data-act="ipa-mic" aria-label="读出来">${ICON.mic}</button><div class="heard" id="ipaHeard">${esc(it.heard || "点一下开始读")}</div></div><button class="linkbtn small" data-act="ipa-show" style="margin-top:6px">读不出来，看答案</button>` : ""}
+      ${it.shown && it.ok == null ? `<div class="panel" style="margin-top:8px">是 <b class="en">${esc(it.w)}</b>${it.heard ? `　<span class="small muted">（识别听到：${esc(it.heard)}）</span>` : ""}<div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="ipa-say" data-w="${esc(it.w)}">${ICON.speak} 听</button></div><p class="small" style="margin-top:8px">${it.hit ? "识别也听到了这个词。" : "识别有时会听错单个词，你自己判断："}</p><div class="row-gap"><button class="btn ${it.hit ? "primary" : ""}" data-act="ipa-self" data-v="1">读对了</button><button class="btn" data-act="ipa-self" data-v="0">没读对</button></div></div>` : ""}
+      ${it.ok != null ? `<div class="panel" style="margin-top:8px">${it.ok ? "读对了 ✓" : "下次注意"}：<b class="en">${esc(it.w)}</b> /${esc(it.ipa)}/<button class="btn primary block" data-act="ipa-rnext" style="margin-top:10px">${V.ri + 1 >= V.read.length ? "完成这一课" : "下一个"}</button></div>` : ""}</div>`; }
+  if (V.step === "done"){ const ok = V.qs.filter(t => t.ans === t.order.indexOf(t.pick)).length, pct = Math.round(ok / V.qs.length * 100);
+    const rd = V.read ? V.read.filter(x => x.ok).length : 0;
+    return `<div class="card">${back}<h3>${V.kind === "review" ? "复习完了" : "这一课完成"}</h3><p>听辨 ${ok}/${V.qs.length}（${pct}%）${V.read ? `；看音标读词 ${rd}/${V.read.length}` : ""}</p>
+      <p class="small muted" style="margin-top:6px">${V.note || ""}</p><div class="row-gap" style="margin-top:10px">${V.kind === "lesson" ? `<button class="btn" data-act="ipa-open" data-v="${V.lid}">再学一遍</button>` : ""}<button class="btn primary" data-act="ipa-back">回目录</button></div></div>`; }
+  return ipaListHTML();
+}
+function ipaFinish(){
+  const V = IPAC.v, st = ipaState(), tn = dnum(today()), byL = {};
+  for (const t of V.qs){ (byL[t.lid] = byL[t.lid] || [0, 0])[1]++; if (t.ans === t.order.indexOf(t.pick)) byL[t.lid][0]++; }
+  const notes = [];
+  for (const [id, [ok, n]] of Object.entries(byL)){ const acc = ok / n, s = st.L[id];
+    if (V.kind === "lesson"){ if (acc >= 0.8){ st.L[id] = {box:0, due:tn + IPA_IV[0], done:today()}; notes.push("听辨过了 80%：明天复习一次，之后越隔越久。"); } else notes.push("听辨不到 80%：再学一遍这一课，先把例词多听几遍。"); }
+    else if (s){ if (acc >= 0.8){ s.box = Math.min(IPA_IV.length - 1, (s.box || 0) + 1); s.due = tn + IPA_IV[s.box]; } else { s.box = 0; s.due = tn + 1; notes.push(`${IPA_LESSONS.find(l => l.id === id).name}：这次没过 80%，明天再复习`); } }
+  }
+  V.note = notes.join(" "); V.step = "done"; save(); if (typeof planAutoDone === "function") try { planAutoDone("ipa"); planAutoDone("pron"); } catch (e) {}
+}
+ACT["ipa-open"] = el => { const l = IPA_LESSONS.find(x => x.id === el.dataset.v); if (!l) return; IPAC.v = {kind:"lesson", lid:l.id, step:"learn"}; UI.render(); };
+ACT["ipa-back"] = () => { IPAC.v = null; UI.render(); };
+ACT["ipa-say"] = el => ipaSay(el.dataset.w, 0, 0.85);
+ACT["ipa-quiz"] = () => { const V = IPAC.v; V.qs = ipaTrials([IPA_LESSONS.find(l => l.id === V.lid)], 10); V.i = 0; V.step = "quiz"; UI.render(); setTimeout(() => ACT["ipa-play"](), 250); };
+ACT["ipa-review"] = () => { const due = ipaDue(); if (!due.length) return; IPAC.v = {kind:"review", step:"quiz", qs:ipaTrials(due, 10), i:0}; UI.render(); setTimeout(() => ACT["ipa-play"](), 250); };
+ACT["ipa-play"] = () => { const V = IPAC.v; if (!V || V.step !== "quiz") return; const t = V.qs[V.i]; ipaSay(t.p[t.pick][0], t.voice, 0.85); };
+ACT["ipa-pick"] = el => { const V = IPAC.v; if (!V) return; const t = V.qs[V.i]; if (t.ans != null) return; t.ans = +el.dataset.k; const ok = t.ans === t.order.indexOf(t.pick); try { ok ? Snd.good() : Snd.bad(); } catch (e) {} UI.render(); };
+ACT["ipa-next"] = () => { const V = IPAC.v; if (!V) return; V.i++; if (V.i < V.qs.length){ UI.render(); setTimeout(() => ACT["ipa-play"](), 200); return; }
+  if (V.kind === "lesson"){ V.read = ipaReadItems(IPA_LESSONS.find(l => l.id === V.lid)); V.ri = 0; V.step = "read"; UI.render(); } else { ipaFinish(); UI.render(); } };
+ACT["ipa-mic"] = async () => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; const btn = $("#ipaMic"), h = $("#ipaHeard");
+  if (IPAC.listening){ try { stopAny(); } catch (e) {} return; }
+  IPAC.listening = true; micState(btn, "live"); if (h) h.textContent = "在听……";
+  const r = await listenAny({short:true, btn, heard:h}); IPAC.listening = false; micState(btn, null);
+  it.heard = ((r && r.text) || "").trim(); it.hit = !!it.heard && K.hasWord(it.heard, it.w); it.shown = true; UI.render(); };
+ACT["ipa-show"] = () => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; it.shown = true; it.hit = false; UI.render(); };
+ACT["ipa-self"] = el => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; it.ok = el.dataset.v === "1"; ipaSay(it.w, 0, 0.85); UI.render(); };
+ACT["ipa-rnext"] = () => { const V = IPAC.v; if (!V) return; V.ri++; if (V.ri < V.read.length){ UI.render(); return; } ipaFinish(); UI.render(); };
+
+const PR = {tab:"ipa", run:null, ft:null, st:null};
 const PRON_HARD_UNIT = {id:"_hard", name:"难词", tip:"仔细听两个词的区别", sets:[]};
 const pronUnit = id => PRON_UNITS.find(x => x.id === id) || (id === "_hard" ? PRON_HARD_UNIT : null);
 VIEWS.pron = {
   tab:"home",
   render(){
-    const p = pronState(), tabs = [["listen", "听辨"], ["first", "第一印象"], ["stress", "重音和节奏"], ["hard", "难词本"]];
+    const p = pronState(), tabs = [["ipa", "音标"], ["listen", "听辨"], ["first", "第一印象"], ["stress", "重音和节奏"], ["hard", "难词本"]];
     const head = `<div class="wrap">${backBtn()}<h2>发音</h2><div class="seg" role="group" style="margin:6px 0 10px">${tabs.map(([k, t]) => `<button data-act="pr-tab" data-v="${k}" aria-pressed="${PR.tab === k}">${t}</button>`).join("")}</div>`;
-    return head + (PR.tab === "listen" ? pronListenHTML() : PR.tab === "first" ? pronFirstHTML() : PR.tab === "stress" ? pronStressHTML() : pronHardHTML()) + `</div>`;
+    return head + (PR.tab === "ipa" ? ipaViewHTML() : PR.tab === "listen" ? pronListenHTML() : PR.tab === "first" ? pronFirstHTML() : PR.tab === "stress" ? pronStressHTML() : pronHardHTML()) + `</div>`;
   }
 };
 ACT["pr-tab"] = el => { PR.tab = el.dataset.v; PR.run = null; PR.ft = null; PR.st = null; UI.render(); };
