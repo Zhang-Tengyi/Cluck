@@ -737,7 +737,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.67.1"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.67.2"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2825,8 +2825,14 @@ const TTS = {
       let busy = false; try { busy = speechSynthesis.speaking || speechSynthesis.pending; } catch (e) {}
       if (busy) this.cancel();
       pauseAllAudio();
+      /* v1.67.2：语音列表还没加载完时先等一下（最多 1.2 秒），不然没有具体的语音，手机会用系统默认的（中文）语音读英文 */
+      if (!this.voices.length){ try { this.voices = speechSynthesis.getVoices() || []; } catch (e) {} }
+      if (!this.voices.length && !o.voice && !o._waited){ const t0 = Date.now(); const again = () => { try { this.voices = speechSynthesis.getVoices() || []; } catch (e) {}
+          if (this.voices.length || Date.now() - t0 > 1200) this.speak(text, Object.assign({}, o, {_waited:true})).then(res); else setTimeout(again, 100); }; again(); return; }
       const u = new SpeechSynthesisUtterance(lang === "zh" ? text : (o && o.raw ? text : K.speakEN(text)));
-      const v = o.voice || this.voice(lang);
+      let v = o.voice || this.voice(lang);
+      if (v){ const cur = this.voices.find(x => x.name === v.name && x.lang === v.lang); if (cur) v = cur; }   /* 列表重新加载过：换成现在的那个 */
+      if (v && lang !== "zh" && !this.norm(v.lang).startsWith("en")) v = this.voice("en");   /* 英文绝不用非英文的语音 */
       u.lang = lang === "zh" ? "zh-CN" : "en-US";
       if (v){ try { u.voice = v; u.lang = v.lang; } catch (e) {} }
       u.rate = Math.max(0.5, Math.min(1.6, (o.rate || 1) * (lang === "en" ? (L.rate || 0.95) : 1)));
@@ -5958,12 +5964,12 @@ const ABOUT_QA = [
   ["阅读怎么用？", "导入或粘贴一篇文章，一句一句听，点词听读音、加到要学的词，读完用 3 句话复述。"]]],
  ["学", [
   ["看到一个词不知道怎么读怎么办？", "点一下这个词：会读给你听，还会显示美式音标和重音在第几个音节（要联网查，查过的存在手机里，没网也能看）。音标里 ˈ 标在重读音节的开头。"],
-  ["要不要学音标？音标入门怎么学？", "值得学，目标是“看到音标能读出来”，不用背规则、不用自己写。英语的拼写和读音对不上（though、through、tough、cough），音标一个符号只对一个音，还能告诉你重音。在“发音 → 音标”里有 10 课，按对中文母语者最要紧的顺序：每课先认音标、听例词，再做听辨（换不同的声音和词、每题告诉对错，这是研究里证据最强的听辨练法），最后看音标读词。学过的会按 1、3、7、14、30、60 天提醒复习。"],
+  ["要不要学音标？音标入门怎么学？", "值得学，目标是“看到音标能读出来”，不用背规则、不用自己写。英语的拼写和读音对不上（though、through、tough、cough），音标一个符号只对一个音，还能告诉你重音。在“发音 → 音标”里有 15 课：先 5 课认符号（每个符号配一个熟悉的词，比如 æ = cat 里的 a，先把符号和声音对上），再 1 课重音，最后 9 课练中文母语者最容易混的音（换不同的美式声音和词、每题告诉对错，这是研究里证据最强的听辨练法）；每课最后看音标读词。每天一课，每课约 5 分钟。学过的会按 1、3、7、14、30、60 天提醒复习。"],
   ["发音练习练什么？", "听辨容易混的音、第一印象测试、重音和节奏、难词本。"],
   ["错误档案是什么？", "按错误类型统计你写作、练习里出的错，最常犯的排前面，还附上你写过的例子。"]]],
  ["计划和时间", [
   ["昨天的计划没做完，今天要补吗？", "不用硬补。研究发现，漏掉一次对养成习惯没有实质影响，真正伤习惯的是长期不规律。该复习的卡片 app 会自动排进今天，不会丢；其他项先做今天的，有精力再挑一项最重要的补。"],
-  ["“学音标”这个单独的计划怎么用？", "在“计划”页点“＋ 学音标（单独的计划）”，选每天、隔一天或者一周三次，再选什么时候做。它和推荐计划分开：重新生成推荐计划、清除推荐计划、导入计划时选“替换”都不会动它；改它、关掉它也不会动别的计划，关掉时只删还没做的“学音标”。内容跟着你的进度：10 课没学完就写“学第几课”（有到期的复习顺便复习）；学完以后只在有复习的日子出现。点它直接打开“发音 → 音标”，学完一课或者复习完自动打勾。"],
+  ["“学音标”这个单独的计划怎么用？", "在“计划”页点“＋ 学音标（单独的计划）”，选每天、隔一天或者一周三次，再选什么时候做。它和推荐计划分开：重新生成推荐计划、清除推荐计划、导入计划时选“替换”都不会动它；改它、关掉它也不会动别的计划，关掉时只删还没做的“学音标”。内容跟着你的进度：没学完就写“学第几课”（有到期的复习顺便复习）；学完以后只在有复习的日子出现。点它直接打开“发音 → 音标”，学完一课或者复习完自动打勾。"],
   ["“只做 3 分钟”是什么？", "没精神时保底：先选普通练习或游戏，练完 3 分钟，今天剩下的计划标成跳过，算“保底完成”。"],
   ["时间到了以后怎么选？", "可以结束，也可以“再练 5 分钟”（从点下去的那一刻算），或者“不限时，练完剩下的题”。停在提示页的时间不算练习时间。"]]],
  ["导入和 AI", [
@@ -13800,7 +13806,7 @@ ACT["pl-ipa"] = async () => {
     const c = await choose("学音标（单独的计划）", `<p class="small">现在：${IPA_FREQ[A.freq] || "每天"}，${esc(A.cue)}。</p>${note}`, [["edit", "改频率或时间"], ["off", "关掉（删掉还没做的）"]]); if (!c) return;
     if (c === "off"){ A.on = false; S.plan = (S.plan || []).filter(x => !(x.addon === "ipa" && !x.done)); save(); toast("关掉了：没做的“学音标”删了，别的计划没动"); UI.render(); return; }
   }
-  const f = await choose("学音标：多久一次？", `<p class="small muted">每次约 5 分钟：先学新的一课，有到期的复习就顺便复习。10 课学完以后，只在有复习的日子提醒。</p>${note}`, [["daily", "每天"], ["alt", "隔一天"], ["mwf", "一周三次（一、三、五）"]]); if (!f) return;
+  const f = await choose("学音标：多久一次？", `<p class="small muted">每次约 5 分钟：先学新的一课，有到期的复习就顺便复习。全部学完以后，只在有复习的日子提醒。</p>${note}`, [["daily", "每天"], ["alt", "隔一天"], ["mwf", "一周三次（一、三、五）"]]); if (!f) return;
   const cue = await choose("什么时候做？", "", [["早上", "早上"], ["午休", "午休"], ["晚上", "晚上"], ["睡前", "睡前"]]); if (!cue) return;
   S.planAddons.ipa = {on:true, freq:f, cue, start:today()}; planAddonsSync(); save(); toast("加上了：接下来两周的“学音标”"); UI.render();
 };
@@ -14685,68 +14691,112 @@ async function ipaFill(w, el){ if (!el) return; const c = (S.ipa || {})[String(w
   el.innerHTML = r ? ipaLineHTML(r) : `<span class="small muted">查不到音标（要联网）。可以点“读”听读音</span>`; }
 /* ---------- 音标入门：10 课，按对中文母语者最要紧的排。每课：认音标 → 听辨（换不同的声音、不同的词、每题告诉对错：研究里证据最强的听辨训练）→ 看音标读词。学过的按 1、3、7、14、30、60 天复习 ---------- */
 const IPA_LESSONS = [
- {id:"L1", name:"重音 ˈ 和弱读 ə", sym:"ˈ　ˌ　ə", tip:"ˈ 标在重读音节的开头：那个音节读得更长、更响、调更高；ˌ 是次重音。ə 是英语里最常见的音：不重读的元音大多弱成这个又轻又短的“呃”，嘴巴放松、不用力。很多词读错，其实是重音放错了。",
+ {id:"L1", name:"重音 ˈ 和弱读 ə", sym:"ˈ 重音（about /əˈbaʊt/）　ə 弱读", tip:"ˈ 标在重读音节的开头：那个音节读得更长、更响、调更高；ˌ 是次重音。ə 是英语里最常见的音：不重读的元音大多弱成这个又轻又短的“呃”，嘴巴放松、不用力。很多词读错，其实是重音放错了。",
   ex:[["about","əˈbaʊt"],["banana","bəˈnænə"],["today","təˈdeɪ"],["problem","ˈprɑbləm"],["computer","kəmˈpjutɚ"]],
   pairs:[[["comfortable","ˈkʌmftɚbəl"],[null,"kəmˈfɔrtəbəl"]],[["vegetable","ˈvɛdʒtəbəl"],[null,"ˌvɛdʒəˈteɪbəl"]],[["Wednesday","ˈwɛnzdeɪ"],[null,"ˈwɛdnəzdeɪ"]],[["recipe","ˈrɛsəpi"],[null,"rɪˈsaɪp"]],
    [["hotel","hoʊˈtɛl"],[null,"ˈhoʊtɛl"]],[["develop","dɪˈvɛləp"],[null,"ˈdɛvələp"]],[["engineer","ˌɛndʒəˈnɪr"],[null,"ˈɛndʒənɪr"]],[["computer","kəmˈpjutɚ"],[null,"ˈkɑmpjutɚ"]]]},
- {id:"L2", name:"i 和 ɪ（sheep / ship）", sym:"i　ɪ", tip:"i（sheep）：嘴角往两边拉，舌头抬高，音长一点。ɪ（ship）：嘴巴放松、稍微张开，又短又松，不是“衣”。有的词典把 i 写成 iː。",
+ {id:"L2", name:"i 和 ɪ（sheep / ship）", sym:"i（see）　ɪ（sit）", tip:"i（sheep）：嘴角往两边拉，舌头抬高，音长一点。ɪ（ship）：嘴巴放松、稍微张开，又短又松，不是“衣”。有的词典把 i 写成 iː。",
   pairs:[[["sheep","ʃip"],["ship","ʃɪp"]],[["seat","sit"],["sit","sɪt"]],[["leave","liv"],["live","lɪv"]],[["feel","fil"],["fill","fɪl"]],[["beat","bit"],["bit","bɪt"]],[["heel","hil"],["hill","hɪl"]],[["reach","ritʃ"],["rich","rɪtʃ"]],[["peak","pik"],["pick","pɪk"]]]},
- {id:"L3", name:"æ 和 ɛ（bad / bed）", sym:"æ　ɛ", tip:"æ（bad）：嘴巴张大，下巴往下，舌头压低往前，像拉长的“哎啊”。ɛ（bed）：嘴巴张一半，像短的“诶”。中文里没有 æ，最容易读成 ɛ。",
+ {id:"L3", name:"æ 和 ɛ（bad / bed）", sym:"æ（cat）　ɛ（bed）", tip:"æ（bad）：嘴巴张大，下巴往下，舌头压低往前，像拉长的“哎啊”。ɛ（bed）：嘴巴张一半，像短的“诶”。中文里没有 æ，最容易读成 ɛ。",
   pairs:[[["bad","bæd"],["bed","bɛd"]],[["man","mæn"],["men","mɛn"]],[["sad","sæd"],["said","sɛd"]],[["had","hæd"],["head","hɛd"]],[["pan","pæn"],["pen","pɛn"]],[["bat","bæt"],["bet","bɛt"]],[["sat","sæt"],["set","sɛt"]],[["laughed","læft"],["left","lɛft"]]]},
- {id:"L4", name:"ʌ 和 ɑ（cut / cot）", sym:"ʌ　ɑ", tip:"ʌ（cut）：嘴巴半张、放松，短促的“啊”，舌头在中间。ɑ（hot，美式）：嘴巴张大，舌头往后往下，长一点的“啊”。美式的 hot、not、job 都是 ɑ，不是“奥”。",
+ {id:"L4", name:"ʌ 和 ɑ（cut / cot）", sym:"ʌ（cup）　ɑ（hot）", tip:"ʌ（cut）：嘴巴半张、放松，短促的“啊”，舌头在中间。ɑ（hot，美式）：嘴巴张大，舌头往后往下，长一点的“啊”。美式的 hot、not、job 都是 ɑ，不是“奥”。",
   pairs:[[["cut","kʌt"],["cot","kɑt"]],[["luck","lʌk"],["lock","lɑk"]],[["duck","dʌk"],["dock","dɑk"]],[["hut","hʌt"],["hot","hɑt"]],[["cup","kʌp"],["cop","kɑp"]],[["nut","nʌt"],["not","nɑt"]],[["shut","ʃʌt"],["shot","ʃɑt"]]]},
- {id:"L5", name:"ʊ 和 u（full / fool）", sym:"ʊ　u", tip:"u（fool）：嘴唇圆、往前噘，舌头后部抬高，音长。ʊ（full）：嘴唇只微微圆，放松，又短又松。有的词典把 u 写成 uː。",
+ {id:"L5", name:"ʊ 和 u（full / fool）", sym:"ʊ（book）　u（food）", tip:"u（fool）：嘴唇圆、往前噘，舌头后部抬高，音长。ʊ（full）：嘴唇只微微圆，放松，又短又松。有的词典把 u 写成 uː。",
   pairs:[[["full","fʊl"],["fool","ful"]],[["pull","pʊl"],["pool","pul"]],[["look","lʊk"],["Luke","luk"]],[["soot","sʊt"],["suit","sut"]],[["stood","stʊd"],["stewed","stud"]]]},
- {id:"L6", name:"双元音 eɪ、oʊ（pain / pen）", sym:"eɪ　oʊ　ɛ　ɔ", tip:"eɪ（day）、oʊ（go）是滑动的音：从前一个滑到后一个，嘴型要变。常见的错是把 eɪ 读成短的 ɛ（pain 读成 pen），把 oʊ 读成“欧”。ɔ（law，美式）：嘴巴张开、嘴唇稍圆。",
+ {id:"L6", name:"双元音 eɪ、oʊ（pain / pen）", sym:"eɪ（day）　oʊ（go）　ɛ（bed）　ɔ（law）", tip:"eɪ（day）、oʊ（go）是滑动的音：从前一个滑到后一个，嘴型要变。常见的错是把 eɪ 读成短的 ɛ（pain 读成 pen），把 oʊ 读成“欧”。ɔ（law，美式）：嘴巴张开、嘴唇稍圆。",
   pairs:[[["pain","peɪn"],["pen","pɛn"]],[["late","leɪt"],["let","lɛt"]],[["wait","weɪt"],["wet","wɛt"]],[["date","deɪt"],["debt","dɛt"]],[["coat","koʊt"],["caught","kɔt"]],[["boat","boʊt"],["bought","bɔt"]],[["low","loʊ"],["law","lɔ"]]]},
- {id:"L7", name:"r 化元音 ɝ、ɚ（work / walk）", sym:"ɝ　ɚ　ɔr　ɑr", tip:"ɝ（bird）、ɚ（teacher 的 er）：舌头卷起或往后缩，整个音都带着 r，美式里一定要卷。和 ɔr（born）、ɑr（farm）分开：ɝ 嘴巴不张大。",
+ {id:"L7", name:"r 化元音 ɝ、ɚ（work / walk）", sym:"ɝ（bird）　ɚ（teacher）　ɔr（born）　ɑr（car）", tip:"ɝ（bird）、ɚ（teacher 的 er）：舌头卷起或往后缩，整个音都带着 r，美式里一定要卷。和 ɔr（born）、ɑr（farm）分开：ɝ 嘴巴不张大。",
   pairs:[[["word","wɝd"],["ward","wɔrd"]],[["work","wɝk"],["walk","wɔk"]],[["burn","bɝn"],["born","bɔrn"]],[["shirt","ʃɝt"],["short","ʃɔrt"]],[["firm","fɝm"],["farm","fɑrm"]],[["heard","hɝd"],["hard","hɑrd"]]]},
- {id:"L8", name:"θ 和 ð（think / this）", sym:"θ　ð", tip:"θ（think）、ð（this）：舌尖轻轻放在上下牙之间往外送气；θ 不振动声带，ð 振动。最常见的错是读成 s、z 或者 t、d。",
+ {id:"L8", name:"θ 和 ð（think / this）", sym:"θ（think）　ð（this）", tip:"θ（think）、ð（this）：舌尖轻轻放在上下牙之间往外送气；θ 不振动声带，ð 振动。最常见的错是读成 s、z 或者 t、d。",
   pairs:[[["think","θɪŋk"],["sink","sɪŋk"]],[["three","θri"],["tree","tri"]],[["thank","θæŋk"],["tank","tæŋk"]],[["path","pæθ"],["pass","pæs"]],[["mouth","maʊθ"],["mouse","maʊs"]],[["they","ðeɪ"],["day","deɪ"]],[["then","ðɛn"],["den","dɛn"]],[["breathe","brið"],["breeze","briz"]]]},
- {id:"L9", name:"v、w、f（vest / west）", sym:"v　w　f", tip:"v：上牙轻轻碰下嘴唇，声带振动。w：嘴唇圆起来，不碰牙。f：和 v 一样碰嘴唇，但不振动。中文母语者常把 v 读成 w。",
+ {id:"L9", name:"v、w、f（vest / west）", sym:"v（van）　w（we）　f（fan）", tip:"v：上牙轻轻碰下嘴唇，声带振动。w：嘴唇圆起来，不碰牙。f：和 v 一样碰嘴唇，但不振动。中文母语者常把 v 读成 w。",
   pairs:[[["vest","vɛst"],["west","wɛst"]],[["vine","vaɪn"],["wine","waɪn"]],[["very","ˈvɛri"],["wary","ˈwɛri"]],[["vet","vɛt"],["wet","wɛt"]],[["veil","veɪl"],["whale","weɪl"]],[["van","væn"],["fan","fæn"]],[["vast","væst"],["fast","fæst"]]]},
- {id:"L10", name:"词尾 n / ŋ 和清浊（thin / thing）", sym:"n　ŋ　词尾辅音", tip:"n：舌尖顶住上牙后面。ŋ（sing）：舌头后部抬起，舌尖不动，后面不要加 g。词尾的辅音要读出来、不要吞，也不要加“呃”（bag 不是 bag-uh）；词尾清浊要分清：bag / back、prize / price。",
+ {id:"L10", name:"词尾 n / ŋ 和清浊（thin / thing）", sym:"n（no）　ŋ（sing）　词尾辅音", tip:"n：舌尖顶住上牙后面。ŋ（sing）：舌头后部抬起，舌尖不动，后面不要加 g。词尾的辅音要读出来、不要吞，也不要加“呃”（bag 不是 bag-uh）；词尾清浊要分清：bag / back、prize / price。",
   pairs:[[["sin","sɪn"],["sing","sɪŋ"]],[["ban","bæn"],["bang","bæŋ"]],[["thin","θɪn"],["thing","θɪŋ"]],[["win","wɪn"],["wing","wɪŋ"]],[["ran","ræn"],["rang","ræŋ"]],[["bag","bæɡ"],["back","bæk"]],[["leave","liv"],["leaf","lif"]],[["prize","praɪz"],["price","praɪs"]]]}
 ];
+
+/* v1.67.2：先认符号——每个符号配一个熟悉的单词（发音教学里常用的“关键词”做法），先把符号和声音对上，再去分辨容易混的音 */
+const IPA_BASICS = [
+ {id:"B1", type:"sym", name:"音标怎么看 + 和字母一样的辅音", sym:"p b t d k ɡ f v s z h m n l r w j",
+  tip:"音标写在两条斜线中间，比如 cat 是 /kæt/：一个符号只代表一个音，不管单词怎么拼。这一课的辅音符号和字母读法一样，几乎不用学；只有 j 要注意：音标里的 j 是 yes 里 y 的音（yes /jɛs/），不是字母 J 的音。元音符号后面几课再学，这一课只看辅音。",
+  syms:[["p","",[["pen","pɛn"],["map","mæp"]]],["b","",[["bed","bɛd"],["cab","kæb"]]],["t","",[["ten","tɛn"],["cat","kæt"]]],["d","",[["day","deɪ"],["red","rɛd"]]],
+   ["k","字母 c、k 都可能是这个音",[["key","ki"],["cat","kæt"]]],["ɡ","永远是 go 里的 g，不读“机”",[["go","ɡoʊ"],["bag","bæɡ"]]],["f","ph 也读 f",[["fan","fæn"],["phone","foʊn"]]],["v","",[["van","væn"],["five","faɪv"]]],
+   ["s","",[["see","si"],["city","ˈsɪti"]]],["z","字母 s 有时读 z",[["zoo","zu"],["is","ɪz"]]],["h","",[["hat","hæt"],["home","hoʊm"]]],["m","",[["man","mæn"],["home","hoʊm"]]],
+   ["n","",[["no","noʊ"],["ten","tɛn"]]],["l","",[["leg","lɛɡ"],["feel","fil"]]],["r","",[["red","rɛd"],["car","kɑr"]]],["w","",[["we","wi"],["one","wʌn"]]],["j","是 yes 里 y 的音",[["yes","jɛs"],["you","ju"]]]]},
+ {id:"B2", type:"sym", name:"长得特别的辅音", sym:"θ ð ʃ ʒ tʃ dʒ ŋ",
+  tip:"这几个符号字母里没有，要单独记，每个配一个词：θ = think，ð = this，ʃ = she，ʒ = vision 中间的音，tʃ = chair，dʒ = job，ŋ = sing 的结尾。",
+  syms:[["θ","舌尖放在上下牙之间送气，声带不振动",[["think","θɪŋk"],["bath","bæθ"]]],["ð","和 θ 一样，但声带振动",[["this","ðɪs"],["mother","ˈmʌðɚ"]]],["ʃ","像“嘘”，嘴唇稍微噘起",[["she","ʃi"],["fish","fɪʃ"]]],
+   ["ʒ","像 ʃ，但声带振动",[["vision","ˈvɪʒən"],["usually","ˈjuʒuəli"]]],["tʃ","像“吃”，嘴唇噘起",[["chair","tʃɛr"],["watch","wɑtʃ"]]],["dʒ","像“知”，更用力、嘴唇噘起",[["job","dʒɑb"],["age","eɪdʒ"]]],["ŋ","后鼻音，像“昂”的尾巴，后面不加 g",[["sing","sɪŋ"],["long","lɔŋ"]]]]},
+ {id:"B3", type:"sym", name:"单元音（一）", sym:"i ɪ ɛ æ ɑ ʌ",
+  tip:"元音是音标里最难的部分，也是拼写最靠不住的地方：同一个字母 a，在 cat、father、about 里读法都不一样。每个符号记住一个词就行。",
+  syms:[["i","长的“衣”，嘴角往两边拉（有的词典写 iː）",[["see","si"],["need","nid"]]],["ɪ","短而松，在“衣”和“诶”之间",[["sit","sɪt"],["big","bɪɡ"]]],["ɛ","短的“诶”",[["bed","bɛd"],["yes","jɛs"]]],
+   ["æ","嘴巴张大的“哎啊”，中文里没有",[["cat","kæt"],["bad","bæd"]]],["ɑ","张大嘴的长“啊”（美式 hot）",[["hot","hɑt"],["father","ˈfɑðɚ"]]],["ʌ","短促、放松的“啊”",[["cup","kʌp"],["love","lʌv"]]]]},
+ {id:"B4", type:"sym", name:"单元音（二）和弱读", sym:"ɔ ʊ u ə ɝ ɚ",
+  tip:"ə 是英语里最常见的音，只出现在不重读的地方；ɝ 和 ɚ 都是卷舌的“儿”，区别是 ɝ 重读、ɚ 不重读。",
+  syms:[["ɔ","嘴张开、嘴唇稍圆（美式 law）",[["law","lɔ"],["talk","tɔk"]]],["ʊ","短而松的“乌”",[["book","bʊk"],["good","ɡʊd"]]],["u","长的“乌”，嘴唇噘圆（有的词典写 uː）",[["food","fud"],["blue","blu"]]],
+   ["ə","最轻最短的“呃”，嘴巴放松",[["about","əˈbaʊt"],["sofa","ˈsoʊfə"]]],["ɝ","重读的卷舌“儿”",[["bird","bɝd"],["work","wɝk"]]],["ɚ","不重读的卷舌“儿”",[["teacher","ˈtitʃɚ"],["water","ˈwɔtɚ"]]]]},
+ {id:"B5", type:"sym", name:"双元音", sym:"eɪ aɪ ɔɪ aʊ oʊ",
+  tip:"双元音从前一个音滑到后一个音，嘴型要跟着变。只读前一半是最常见的错：day 读成短的“诶”，go 读成“哦”。",
+  syms:[["eɪ","“诶—衣”",[["day","deɪ"],["name","neɪm"]]],["aɪ","像“爱”",[["my","maɪ"],["time","taɪm"]]],["ɔɪ","“奥—衣”",[["boy","bɔɪ"],["voice","vɔɪs"]]],
+   ["aʊ","从“啊”滑到“乌”",[["now","naʊ"],["house","haʊs"]]],["oʊ","像“欧”，嘴唇越来越圆",[["go","ɡoʊ"],["phone","foʊn"]]]]}
+];
+IPA_LESSONS.unshift(...IPA_BASICS);   /* 先认符号，再重音，再对比 */
 const IPA_IV = [1, 3, 7, 14, 30, 60];
 const IPAC = {v:null};
 function ipaState(){ S.ipaCourse = S.ipaCourse || {L:{}}; return S.ipaCourse; }
 function ipaDue(){ const st = ipaState(), tn = dnum(today()); return IPA_LESSONS.filter(l => st.L[l.id] && st.L[l.id].due <= tn); }
 /* 不同的声音：先美式，再其他口音；一题换一个 */
-function ipaVoices(){ const vs = (TTS.voices || []).filter(v => TTS.norm(v.lang).startsWith("en")); return vs.sort((a, b) => (TTS.norm(b.lang) === "en-us") - (TTS.norm(a.lang) === "en-us")); }
-function ipaSay(w, vi, rate){ const vs = ipaVoices(); try { TTS.speak(w, Object.assign({rate:rate || 0.85}, vs.length ? {voice:vs[(vi || 0) % vs.length]} : {})); } catch (e) {} }
+/* v1.67.2：只用美式英语的语音（以前所有英文语音都算，会轮到印度英语这些口音）。研究里换的是同一种口音的不同人；只有一个美式语音就一直用它 */
+function ipaVoices(){ return (TTS.voices || []).filter(v => TTS.norm(v.lang) === "en-us"); }
+function ipaSay(w, vi, rate){ const vs = ipaVoices(); try { TTS.speak(w, Object.assign({rate:rate || 0.85}, vs.length > 1 ? {voice:vs[(vi || 0) % vs.length]} : {})); } catch (e) {} }
 function ipaTrials(lessons, n){
-  const pool = []; for (const l of lessons) for (const p of l.pairs) pool.push([l, p]);
+  const pool = [];
+  for (const l of lessons){
+    if (l.type === "sym") for (const s of l.syms) for (const w of s[2]) pool.push({l, sym:s[0], w});
+    else for (const p of l.pairs) pool.push({l, p});
+  }
   const out = []; let last = null;
   for (let k = 0; k < n && pool.length; k++){ let x, g = 0; do { x = pool[Math.floor(Math.random() * pool.length)]; g++; } while (pool.length > 1 && x === last && g < 10); last = x;
-    const p = x[1], pick = p[1][0] ? Math.floor(Math.random() * 2) : 0, order = Math.random() < 0.5 ? [0, 1] : [1, 0];
-    out.push({lid:x[0].id, p, pick, order, voice:Math.floor(Math.random() * 9), ans:null}); }
+    let opts, right, word;
+    if (x.sym){   /* 听音选音标：干扰项把这个符号换成同一课里别的符号 */
+      const others = x.l.syms.map(s => s[0]).filter(s => s !== x.sym).sort(() => Math.random() - 0.5), ds = [];
+      for (const o of others){ const d = x.w[1].replace(x.sym, o); if (d !== x.w[1] && !ds.includes(d)) ds.push(d); if (ds.length >= 2) break; }
+      opts = [{ipa:x.w[1], w:x.w[0]}].concat(ds.map(d => ({ipa:d, w:null}))).sort(() => Math.random() - 0.5); right = opts.findIndex(o => o.w === x.w[0]); word = x.w[0];
+    } else {
+      const p = x.p, pick = p[1][0] ? Math.floor(Math.random() * 2) : 0, order = Math.random() < 0.5 ? [0, 1] : [1, 0];
+      opts = order.map(i => ({ipa:p[i][1], w:p[i][0]})); right = order.indexOf(pick); word = p[pick][0];
+    }
+    out.push({lid:x.l.id, opts, right, word, voice:Math.floor(Math.random() * 9), ans:null}); }
   return out;
 }
-function ipaReadItems(l){ const ws = []; for (const p of l.pairs) for (const m of p) if (m[0]) ws.push(m); for (const e of (l.ex || [])) ws.push(e); return ws.sort(() => Math.random() - 0.5).slice(0, 3).map(m => ({w:m[0], ipa:m[1], heard:"", ok:null})); }
+function ipaReadItems(l){ const ws = []; if (l.type === "sym") for (const s of l.syms) for (const w of s[2]) ws.push(w); else for (const p of l.pairs) for (const m of p) if (m[0]) ws.push(m); for (const e of (l.ex || [])) ws.push(e); return ws.sort(() => Math.random() - 0.5).slice(0, 3).map(m => ({w:m[0], ipa:m[1], heard:"", ok:null})); }
 function ipaListHTML(){
   const st = ipaState(), tn = dnum(today()), due = ipaDue(), done = IPA_LESSONS.filter(l => st.L[l.id]).length;
-  return `<div class="card"><h3>音标入门</h3><p class="small muted" style="margin:4px 0 8px">美式音标，按对中文母语者最要紧的顺序。目标是看到音标能读出来，不用背规则、不用自己写。每课约 5 分钟：认音标 → 听辨（换不同的声音和词，每题告诉你对错）→ 看音标读词。点任何英文单词也能看它的音标。</p>
+  return `<div class="card"><h3>音标入门</h3><p class="small muted" style="margin:4px 0 8px">美式音标。目标是看到音标能读出来，不用背规则、不用自己写。先学 1–5 课认符号（每个符号配一个熟悉的词），再学重音，最后练容易混的音。每天一课，每课约 5 分钟。点任何英文单词也能看它的音标。</p>
     <p class="small">学了 ${done}/${IPA_LESSONS.length} 课${due.length ? `，今天要复习 ${due.length} 课` : ""}</p>
     ${due.length ? `<button class="btn primary block" data-act="ipa-review" style="margin:8px 0">复习今天的（${due.length} 课，10 题）</button>` : ""}
     <div class="list">${IPA_LESSONS.map((l, i) => { const s = st.L[l.id]; const tag = !s ? "没学" : s.due <= tn ? "今天复习" : `下次复习 ${new Date((s.due) * 86400000).toISOString().slice(5, 10)}`;
       return `<button class="li" data-act="ipa-open" data-v="${l.id}" style="text-align:left"><div class="grow"><b>${i + 1}. ${esc(l.name)}</b><span class="small muted">${esc(l.sym)}</span></div><span class="small ${s && s.due <= tn ? "" : "muted"}">${tag}</span></button>`; }).join("")}</div></div>`;
 }
 function ipaTrialHTML(V){
-  const t = V.qs[V.i], A = t.p[t.pick], opts = t.order.map(k => t.p[k]);
-  const head = `<p class="small muted">${V.kind === "review" ? "复习" : esc(IPA_LESSONS.find(l => l.id === V.lid).name)} · 听辨 ${V.i + 1}/${V.qs.length}</p><p class="small" style="margin:4px 0 10px">听一遍，选你听到的那个音标。</p>`;
-  if (t.ans == null) return `${head}<button class="btn block" data-act="ipa-play">▶ 再听一遍</button><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">${opts.map((m, k) => `<button class="btn big" data-act="ipa-pick" data-k="${k}" style="font-size:22px">/${esc(m[1])}/</button>`).join("")}</div>`;
-  const ok = t.ans === t.order.indexOf(t.pick);
-  return `${head}<div class="panel" style="background:${ok ? "var(--green-soft)" : "var(--red-soft)"};border-color:transparent"><b>${ok ? "对了" : "不对"}</b>：你听到的是 <span class="ipa">/${esc(A[1])}/</span>${A[0] ? `（${esc(A[0])}）` : ""}</div>
-    <div class="row-gap" style="margin-top:10px">${t.p.filter(m => m[0]).map(m => `<button class="btn sm" data-act="ipa-say" data-w="${esc(m[0])}">${ICON.speak} ${esc(m[0])} /${esc(m[1])}/</button>`).join("")}</div>
-    ${t.p[1][0] ? "" : `<p class="small muted" style="margin-top:6px">另一个 /${esc(t.p[1][1])}/ 是常见的错误读法</p>`}
+  const t = V.qs[V.i], A = t.opts[t.right];
+  const head = `<p class="small muted">${V.kind === "review" ? "复习" : esc(IPA_LESSONS.find(l => l.id === V.lid).name)} · ${V.i + 1}/${V.qs.length}</p><p class="small" style="margin:4px 0 10px">听一遍，选你听到的那个音标。</p>`;
+  if (t.ans == null) return `${head}<button class="btn block" data-act="ipa-play">▶ 再听一遍</button><div style="display:grid;grid-template-columns:${t.opts.length > 2 ? "1fr" : "1fr 1fr"};gap:10px;margin-top:12px">${t.opts.map((m, k) => `<button class="btn big" data-act="ipa-pick" data-k="${k}" style="font-size:22px">/${esc(m.ipa)}/</button>`).join("")}</div>`;
+  const ok = t.ans === t.right, others = t.opts.filter((m, k) => k !== t.right);
+  return `${head}<div class="panel" style="background:${ok ? "var(--green-soft)" : "var(--red-soft)"};border-color:transparent"><b>${ok ? "对了" : "不对"}</b>：你听到的是 <b class="en">${esc(A.w)}</b> <span class="ipa">/${esc(A.ipa)}/</span></div>
+    <div class="row-gap" style="margin-top:10px">${t.opts.filter(m => m.w).map(m => `<button class="btn sm" data-act="ipa-say" data-w="${esc(m.w)}">${ICON.speak} ${esc(m.w)} /${esc(m.ipa)}/</button>`).join("")}</div>
+    ${others.some(m => !m.w) ? `<p class="small muted" style="margin-top:6px">${others.filter(m => !m.w).map(m => "/" + esc(m.ipa) + "/").join("、")} 不是这个词的读法${t.opts.length > 2 ? "：比一比哪个符号不一样" : "（常见的错误读法）"}</p>` : ""}
     <button class="btn primary block" data-act="ipa-next" style="margin-top:12px">${V.i + 1 >= V.qs.length ? "看结果" : "下一题"}</button>`;
 }
 function ipaViewHTML(){
   const V = IPAC.v; if (!V) return ipaListHTML();
   const back = `<button class="linkbtn small" data-act="ipa-back">← 音标目录</button>`;
+  if (V.step === "learn" && IPA_LESSONS.find(x => x.id === V.lid).type === "sym"){ const l = IPA_LESSONS.find(x => x.id === V.lid);
+    return `<div class="card">${back}<h3 style="margin-top:6px">${esc(l.name)}</h3><p class="small" style="margin-top:6px">${esc(l.tip)}</p>
+      <div class="list" style="margin-top:10px">${l.syms.map(([sy, tip, ws]) => `<div class="li" style="align-items:flex-start"><div class="ipa" style="font-size:30px;min-width:56px;text-align:center">${esc(sy)}</div><div class="grow">${ws.map(([w, ip]) => `<button class="linkbtn ipa-ex" data-act="ipa-say" data-w="${esc(w)}" style="display:flex;align-items:center;gap:6px;text-align:left"><b class="en">${esc(w)}</b><span class="ipa" style="font-size:16px">/${esc(ip)}/</span>${ICON.speak}</button>`).join("")}${tip ? `<span class="small muted">${esc(tip)}</span>` : ""}</div></div>`).join("")}</div>
+      <p class="small muted" style="margin-top:8px">每个词点开听，看着符号跟读一遍。记住“这个符号 = 这个词里的那个音”。</p><button class="btn primary block" data-act="ipa-quiz" style="margin-top:10px">开始练（10 题：听音选音标）</button></div>`; }
   if (V.step === "learn"){ const l = IPA_LESSONS.find(x => x.id === V.lid), ex = l.ex || l.pairs.flat().filter(m => m[0]);
-    return `<div class="card">${back}<h3 style="margin-top:6px">${esc(l.name)}</h3><div class="ipa" style="font-size:28px;margin:6px 0">${esc(l.sym)}</div><p class="small">${esc(l.tip)}</p>
+    return `<div class="card">${back}<h3 style="margin-top:6px">${esc(l.name)}</h3><div class="ipa" style="font-size:18px;margin:6px 0">${esc(l.sym)}</div><p class="small">${esc(l.tip)}</p>
       <div class="list" style="margin-top:10px">${ex.slice(0, 10).map(m => `<button class="li ipa-ex" data-act="ipa-say" data-w="${esc(m[0])}" style="text-align:left"><div class="grow"><b class="en">${esc(m[0])}</b><span class="ipa">/${esc(m[1])}/</span></div>${ICON.speak}</button>`).join("")}</div>
       <p class="small muted" style="margin-top:8px">每个都点开听，跟着读一遍。</p><button class="btn primary block" data-act="ipa-quiz" style="margin-top:10px">开始听辨（10 题）</button></div>`; }
   if (V.step === "quiz") return `<div class="card">${back}${ipaTrialHTML(V)}</div>`;
@@ -14755,7 +14805,7 @@ function ipaViewHTML(){
       ${it.ok == null && !it.shown ? `<div class="db-mic"><button class="mic" id="ipaMic" data-act="ipa-mic" aria-label="读出来">${ICON.mic}</button><div class="heard" id="ipaHeard">${esc(it.heard || "点一下开始读")}</div></div><button class="linkbtn small" data-act="ipa-show" style="margin-top:6px">读不出来，看答案</button>` : ""}
       ${it.shown && it.ok == null ? `<div class="panel" style="margin-top:8px">是 <b class="en">${esc(it.w)}</b>${it.heard ? `　<span class="small muted">（识别听到：${esc(it.heard)}）</span>` : ""}<div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="ipa-say" data-w="${esc(it.w)}">${ICON.speak} 听</button></div><p class="small" style="margin-top:8px">${it.hit ? "识别也听到了这个词。" : "识别有时会听错单个词，你自己判断："}</p><div class="row-gap"><button class="btn ${it.hit ? "primary" : ""}" data-act="ipa-self" data-v="1">读对了</button><button class="btn" data-act="ipa-self" data-v="0">没读对</button></div></div>` : ""}
       ${it.ok != null ? `<div class="panel" style="margin-top:8px">${it.ok ? "读对了 ✓" : "下次注意"}：<b class="en">${esc(it.w)}</b> /${esc(it.ipa)}/<button class="btn primary block" data-act="ipa-rnext" style="margin-top:10px">${V.ri + 1 >= V.read.length ? "完成这一课" : "下一个"}</button></div>` : ""}</div>`; }
-  if (V.step === "done"){ const ok = V.qs.filter(t => t.ans === t.order.indexOf(t.pick)).length, pct = Math.round(ok / V.qs.length * 100);
+  if (V.step === "done"){ const ok = V.qs.filter(t => t.ans === t.right).length, pct = Math.round(ok / V.qs.length * 100);
     const rd = V.read ? V.read.filter(x => x.ok).length : 0;
     return `<div class="card">${back}<h3>${V.kind === "review" ? "复习完了" : "这一课完成"}</h3><p>听辨 ${ok}/${V.qs.length}（${pct}%）${V.read ? `；看音标读词 ${rd}/${V.read.length}` : ""}</p>
       <p class="small muted" style="margin-top:6px">${V.note || ""}</p><div class="row-gap" style="margin-top:10px">${V.kind === "lesson" ? `<button class="btn" data-act="ipa-open" data-v="${V.lid}">再学一遍</button>` : ""}<button class="btn primary" data-act="ipa-back">回目录</button></div></div>`; }
@@ -14763,7 +14813,7 @@ function ipaViewHTML(){
 }
 function ipaFinish(){
   const V = IPAC.v, st = ipaState(), tn = dnum(today()), byL = {};
-  for (const t of V.qs){ (byL[t.lid] = byL[t.lid] || [0, 0])[1]++; if (t.ans === t.order.indexOf(t.pick)) byL[t.lid][0]++; }
+  for (const t of V.qs){ (byL[t.lid] = byL[t.lid] || [0, 0])[1]++; if (t.ans === t.right) byL[t.lid][0]++; }
   const notes = [];
   for (const [id, [ok, n]] of Object.entries(byL)){ const acc = ok / n, s = st.L[id];
     if (V.kind === "lesson"){ if (acc >= 0.8){ st.L[id] = {box:0, due:tn + IPA_IV[0], done:today()}; notes.push("听辨过了 80%：明天复习一次，之后越隔越久。"); } else notes.push("听辨不到 80%：再学一遍这一课，先把例词多听几遍。"); }
@@ -14776,8 +14826,8 @@ ACT["ipa-back"] = () => { IPAC.v = null; UI.render(); };
 ACT["ipa-say"] = el => ipaSay(el.dataset.w, 0, 0.85);
 ACT["ipa-quiz"] = () => { const V = IPAC.v; V.qs = ipaTrials([IPA_LESSONS.find(l => l.id === V.lid)], 10); V.i = 0; V.step = "quiz"; UI.render(); setTimeout(() => ACT["ipa-play"](), 250); };
 ACT["ipa-review"] = () => { const due = ipaDue(); if (!due.length) return; IPAC.v = {kind:"review", step:"quiz", qs:ipaTrials(due, 10), i:0}; UI.render(); setTimeout(() => ACT["ipa-play"](), 250); };
-ACT["ipa-play"] = () => { const V = IPAC.v; if (!V || V.step !== "quiz") return; const t = V.qs[V.i]; ipaSay(t.p[t.pick][0], t.voice, 0.85); };
-ACT["ipa-pick"] = el => { const V = IPAC.v; if (!V) return; const t = V.qs[V.i]; if (t.ans != null) return; t.ans = +el.dataset.k; const ok = t.ans === t.order.indexOf(t.pick); try { ok ? Snd.good() : Snd.bad(); } catch (e) {} UI.render(); };
+ACT["ipa-play"] = () => { const V = IPAC.v; if (!V || V.step !== "quiz") return; const t = V.qs[V.i]; ipaSay(t.word, t.voice, 0.85); };
+ACT["ipa-pick"] = el => { const V = IPAC.v; if (!V) return; const t = V.qs[V.i]; if (t.ans != null) return; t.ans = +el.dataset.k; const ok = t.ans === t.right; try { ok ? Snd.good() : Snd.bad(); } catch (e) {} UI.render(); };
 ACT["ipa-next"] = () => { const V = IPAC.v; if (!V) return; V.i++; if (V.i < V.qs.length){ UI.render(); setTimeout(() => ACT["ipa-play"](), 200); return; }
   if (V.kind === "lesson"){ V.read = ipaReadItems(IPA_LESSONS.find(l => l.id === V.lid)); V.ri = 0; V.step = "read"; UI.render(); } else { ipaFinish(); UI.render(); } };
 ACT["ipa-mic"] = async () => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; const btn = $("#ipaMic"), h = $("#ipaHeard");
