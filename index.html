@@ -737,7 +737,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.68.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.68.2"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -1939,6 +1939,10 @@ function compareSaid0(target, alts, said){
   }
   best.exact = best.score === 1;
   best.level = best.exact ? "exact" : best.score >= 0.8 ? "close" : "off";
+  /* v1.68.1：和参考相比只漏了一两个虚词（a、an、the、to、about、is……），不管句子多短都算“差一点”并指出漏了哪个（I'm not expert 不是换说法） */
+  if (!best.exact && best.ops){ const FW = new Set("a an the to of in on at for about with from by as into is are am was were be been do does did have has had will would can could it that this and or but so my your his her our their its me you him them us".split(" "));
+    const miss = best.ops.filter(o => o.op === "del").map(o => o.a), other = best.ops.filter(o => o.op === "sub" || o.op === "ins");
+    if (!other.length && miss.length && miss.length <= 2 && miss.every(w => FW.has(w))){ best.level = "close"; best.near = true; best.nearN = miss.length; } }
   /* 记下参考说法里原本是所有格 's 的词（比较时撇号去掉了，master's 和 masters 一样） */
   const poss = new Set((String(best.text || "").match(/\b[a-z]+['’]s\b/gi) || []).map(w => w.toLowerCase().replace(/['’]s$/, "s")));
   if (poss.size) for (const o of best.ops || []) if (o.op === "sub" && poss.has(o.a)) o.poss = true;
@@ -3611,7 +3615,7 @@ ACT.start = async el => {
   startSession(S.settings.goal);
 };
 function sessionCtx(extra){
-  return Object.assign({cat:CAT, prog:S.cards, todayN:dnum(today()), newLimit:S.settings.newPerDay, newUsed:newUsedToday(),
+  return Object.assign({cat:CAT, prog:S.cards, todayN:dnum(today()), newLimit: (typeof newPausedToday === "function" && newPausedToday()) ? 0 : S.settings.newPerDay, newUsed:newUsedToday(),
     acc:K.tagAgg(S.tags, today(), 0, 14), mode:interviewMode(), questions:deckQuestions(curDeck()), filter:deckPred(curDeck()), answers:S.answers, ivDue:S.ivDue, today:dnum(today())}, extra || {});
 }
 /* 游戏模式只出“说英语”的卡：每张都能出招。面试长回答、听力题、新单词介绍留在学习模式 */
@@ -3652,7 +3656,7 @@ VIEWS.free = {
 };
 let FREE_OPTS = [];
 ACT["free-go"] = el => { const o = freeOpts().find(x => x[0] === el.dataset.v); if (!o) return; const f = o[2]; const dp = deckPred(curDeck());
-  startSession("free", {filter: c => dp(c) && f(c), fillAhead:true, /* v1.66.6：自由练习也守每天的新题上限（以前每轮重新给最多 15 道，多开几轮一天的新题就没有上限） */ newLimit: ["due","hard"].includes(el.dataset.v) ? 0 : S.settings.newPerDay, newUsed:newUsedToday()}, o[1]); };
+  startSession("free", {filter: c => dp(c) && f(c), fillAhead:true, /* v1.66.6：自由练习也守每天的新题上限（以前每轮重新给最多 15 道，多开几轮一天的新题就没有上限） */ newLimit: ["due","hard"].includes(el.dataset.v) || (typeof newPausedToday === "function" && newPausedToday()) ? 0 : S.settings.newPerDay, newUsed:newUsedToday()}, o[1]); };
 ACT["listen-go"] = () => startSession("listen", {}, "听力快练");
 
 /* ---------- 练习流程 ---------- */
@@ -3834,12 +3838,14 @@ class CardStage {
           if (!this.t0) this.startClock();
           const v = typed.value; const d = v.length - lastLen; if (d >= 4) dict = true; if (d > 0 && d <= 2) small++; lastLen = v.length;
           clearTimeout(tmr);
-          if (autoCheckOK(dict, small) && v.trim().split(/\s+/).length >= 2) tmr = setTimeout(() => { if (this.alive && (this.phase === "prompt" || this.phase === "retry") && typed.value.trim()){ SR.abort(); this.finish(typed.value.trim()); } }, 2200);
+          if (autoCheckOK(dict, small) && v.trim().split(/\s+/).length >= 2) tmr = setTimeout(() => { if (this.alive && (this.phase === "prompt" || this.phase === "retry") && typed.value.trim()){ SR.abort(); this.typed = true; this.finish(typed.value.trim()); } }, 2200);
         });
       }
-      this.t0 = 0;
-      if (this.phase === "retry") this.startClock();
-      else runLights($("#lamps"), 170, 200).then(() => { if (!this.alive || this.phase !== "prompt" || this.t0) return; this.startClock(); });
+      /* v1.68.1：每道题（每一步、每一次重说）只开始计时一次：切换麦克风 / 键盘会重画页面，以前每次都把计时清零、重新亮灯 */
+      const clockKey = this.phase + ":" + (this.step || 0) + ":" + (this.tries || 0);
+      if (this.clockKey !== clockKey){ this.clockKey = clockKey; this.t0 = 0;
+        if (this.phase === "retry") this.startClock();
+        else runLights($("#lamps"), 170, 200).then(() => { if (!this.alive || this.phase !== "prompt" || this.t0) return; this.startClock(); }); }
     } else if (this.phase === "reveal"){
       el.innerHTML = `<div class="card">${this.chips()}${this.revealHTML()}</div>`;
       if (el.querySelector(".ckg") && (L.ckHintN || 0) < 3){ L.ckHintN = (L.ckHintN || 0) + 1; saveLocal(); const h = document.createElement("p"); h.className = "small muted"; h.style.marginTop = "10px"; h.textContent = "黄色底的是固定搭配：点一下，可以整体听、看意思，也能单独听其中一个词。"; el.querySelector(".card").appendChild(h); }
@@ -3848,7 +3854,7 @@ class CardStage {
       const steps = this.drillSteps(); const n = steps.length; const k = Math.min(this.drill, n - 1); const cur = steps[k];
       const p = S.cards[this.card.id]; const lapses = (p && p.lapses) || 0;
       el.innerHTML = `<div class="card"><div class="kind"><span class="chip k">${this.leech ? "分块练" : "跟着说 3 遍"}</span></div>
-        <p class="muted small">${this.leech ? `这句错过 ${lapses} 次了，换个练法：一块一块加长，最后说整句。` : "先听慢速、再听正常速度跟着说，最后不听自己说。"}想不起来就点一下句子，偷看两秒。</p>
+        <p class="muted small">${this.leech ? `错过 ${lapses} 次：一块一块加长，最后说整句。` : "慢速跟说 → 正常速度跟说 → 自己说。"}想不起来点一下句子偷看。</p>
         <p style="margin-top:10px;font-weight:600">${this.drill < n ? `补练 ${this.drill + 1}/${n}：${esc(cur.label)}` : "练完了"}</p>
         <div class="en${this.drill === 0 ? "" : " blur"}" id="drillText" data-act="c-peek" style="margin-top:8px">${esc(L.slashes ? K.thoughtGroups(cur.text).join(" / ") : cur.text)}${cur.rest ? ` <span class="drill-rest">${esc(cur.rest)}</span>` : ""}</div>
         <div class="row-gap" style="margin-top:10px">${sayBtns(cur.text)}${slashBtn()}</div>
@@ -3875,14 +3881,14 @@ class CardStage {
     if (misses.length){ const sets = misses.map(m => new Set(K.tokens(m))); const cov = ch.map(c => { const tk = K.tokens(c); if (!tk.length) return 1; return sets.reduce((a, st) => a + tk.filter(w => st.has(w)).length / tk.length, 0) / sets.length; });
       const w = cov.indexOf(Math.min(...cov)), rest = cov.filter((_, i) => i !== w), second = rest.length ? Math.min(...rest) : 1;
       /* 只有某一块明显比别的差（大部分词没说出来、比第二差的那块差一截）才先练它；不明显就从后往前加 */
-      if (cov[w] < 0.67 && second - cov[w] >= 0.2) return [{text:ch[w], play:"slow", label:"先练这一块（你上次这里没说好）：听慢速，跟着说"}].concat([{text:t, play:"normal", label:"整句：听一遍，跟着说"}, {text:t, play:null, label:"不听了，自己说一遍"}]); }
+      if (cov[w] < 0.67 && second - cov[w] >= 0.2) return [{text:ch[w], play:"slow", label:"先练上次没说好的这块"}].concat([{text:t, play:"normal", label:"整句跟说"}, {text:t, play:null, label:"不听了，自己说一遍"}]); }
     const suf = ch.map((_, i) => ch.slice(ch.length - 1 - i).join(" "));
-    return suf.slice(0, -1).map((x, i) => ({text:x, play:"slow", label: i === 0 ? "先说最后一块：听慢速，跟着说" : `再往前加一块：听慢速，跟着说`})).concat([{text:t, play:"normal", label:"整句：听一遍，跟着说"}, {text:t, play:null, label:"不听了，自己说整句"}]);
+    return suf.slice(0, -1).map((x, i) => ({text:x, play:"slow", label: i === 0 ? "最后一块：慢速跟说" : `再加一块：慢速跟说`})).concat([{text:t, play:"normal", label:"整句跟说"}, {text:t, play:null, label:"自己说整句"}]);
   }
   startClock(){
-    this.t0 = performance.now(); const ck = $("#clock");
+    this.t0 = performance.now(); 
     clearInterval(this.clock);
-    this.clock = setInterval(() => { if (!this.alive || (this.phase !== "prompt" && this.phase !== "retry")){ clearInterval(this.clock); return; } if (ck && ck.isConnected) ck.textContent = fmt1(performance.now() - this.t0); }, 100);
+    this.clock = setInterval(() => { const ck = $("#clock"); if (!this.alive || (this.phase !== "prompt" && this.phase !== "retry")){ clearInterval(this.clock); return; } if (ck && ck.isConnected) ck.textContent = fmt1(performance.now() - this.t0); }, 100);
   }
   elapsed(){ return this.t0 ? performance.now() - this.t0 : 0; }
   async mic(){
@@ -3942,7 +3948,8 @@ class CardStage {
   }
   suggest(){
     /* v1.67.4：建议和打分规则对齐——说对了（包括识别错了、意思对且没有语法问题、第一遍只差一点后说对）就按快慢建议；说出来了但有错 → 有卡顿/有错误；说不出来 → 没说出来 */
-    const bytime = () => { const lim = typeof critMs === "function" ? critMs({en:this.target().en}) : 3500; return this.ms && this.ms <= lim ? "good" : "hard"; };
+    /* 打字（或输入法语音转文字）的用时包含打字、确认，不是开口的快慢：不按用时建议，快不快你自己判断 */
+    const bytime = () => { if (this.typed) return ""; const lim = typeof critMs === "function" ? critMs({en:this.target().en}) : 3500; return this.ms && this.ms <= lim ? "good" : "hard"; };
     if (!this.cmp) return "";
     if (this.misrec) return bytime();   /* 你说对了，是识别错了：按快慢（以前一律建议“有卡顿/有错误”） */
     if (this.cmp.near && !this.cmp.exact) return "hard";   /* 只差一点：建议“有卡顿/有错误” */
@@ -3964,7 +3971,9 @@ class CardStage {
       const gc = this.said && !this.misrec ? gramCheck(this.said, null) : null;
       const gcMsgs = new Set(gc ? gc.must.concat(gc.opt).map(i => i.msg) : []);
       const two = !!(this.tries && this.firstSaid && this.said && K.tokens(this.firstSaid).join(" ") !== K.tokens(this.said).join(" "));   /* v1.67.3：两遍不一样就都显示 */
-      if (two) h += `<p class="small muted" style="margin:-4px 0 4px">第一遍：<span class="en" style="font-size:16px">${esc(this.firstSaid)}</span></p>`;
+      const fl = this.firstCmp ? (this.firstCmp.near || this.firstCmp.level === "close" ? "差一点" : this.firstCmp.level === "exact" ? "完全正确" : "不对") : "";
+      if (this.typed) h += `<p class="small muted" style="margin:-4px 0 6px">打字输入：不按用时判断快慢，按你自己的感觉选</p>`;
+      if (two) h += `<p class="small muted" style="margin:-4px 0 4px">第一遍${fl ? `（${fl}）` : ""}：<span class="en" style="font-size:16px">${esc(this.firstSaid)}</span></p>`;   /* v1.68.1：第一遍也写上判断 */
       if (this.said) h += `<p class="small muted" style="margin:${two ? "0" : "-4px"} 0 10px">${this.misrec ? "识别成了" : two ? "第二遍" : "你说的"}：<span class="en" style="font-size:16px">${gc ? gc.html : esc(this.said)}</span></p>`;
       if (this.altNote) h += `<p class="small" style="margin:-6px 0 10px">手机第一遍听成了：<span class="en">${esc(this.altNote.top)}</span>。候选里有你要说的那句，所以按它判断。${this.altNote.meantW.length ? `第一遍没听准的：${this.altNote.meantW.map((w, i) => `<span class="w" data-act="word" data-w="${esc(w)}">${esc(w)}</span>${this.altNote.heardW[i] ? `（听成了 ${esc(this.altNote.heardW[i])}）` : ""}`).join("、")}。点一下听听，下次这几个词说慢一点、清楚一点。` : ""}</p>`;
       if (gc && (gc.must.length || gc.opt.length)) h += gramBoxHTML(gc);
@@ -3976,7 +3985,7 @@ class CardStage {
       if (meaning){
         const fl = this.flags.filter(f => !gcMsgs.has(f.msg));
         if (fl.length) h += `<ul class="fb">${fl.slice(0, 4).map(f => `<li>${esc(f.msg)}</li>`).join("")}</ul>`;
-        else if (!gcMsgs.size) h += `<p class="small muted" style="margin:-4px 0 10px">规则没查出问题，你的说法很可能也是对的。拿不准就存起来问 AI。</p>`;
+        else if (!gcMsgs.size) h += `<p class="small muted" style="margin:-4px 0 10px">没发现语法问题，这样说应该也对。拿不准就存起来问 AI。</p>`;
         h += `<details style="margin-bottom:10px"><summary class="small">看逐词对比</summary><div class="diff" style="margin-top:8px">${diffHTML(cmp.ops)}</div></details>` + mineRow;
       } else if (!cmp.exact){
         h += `<div class="diff">${diffHTML(cmp.ops)}</div>`;
@@ -4153,7 +4162,7 @@ function diffHTML(ops){
   }).join(" ");
 }
 ACT["c-mic"] = () => RUN.stage && RUN.stage.mic && RUN.stage.mic();
-ACT["c-check"] = () => { if (typeof GAME !== "undefined" && GAME.idleStop) GAME.idleStop(); const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; const v = ($("#typed")||{}).value || ""; if (!v.trim()){ toast("先说出来，或在输入框里输入"); return; } SR.abort(); s.finish(v.trim()); };
+ACT["c-check"] = () => { if (typeof GAME !== "undefined" && GAME.idleStop) GAME.idleStop(); const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; const v = ($("#typed")||{}).value || ""; if (!v.trim()){ toast("先说出来，或在输入框里输入"); return; } SR.abort(); s.typed = true; s.finish(v.trim()); };
 ACT["c-reveal"] = () => { const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; SR.abort(); const v = ($("#typed")||{}).value || ""; s.finish(v.trim()); };
 ACT["c-speak"] = () => { const s = RUN.stage; s && TTS.speak(s.target().en); };
 ACT["c-rate"] = el => { const s = RUN.stage; if (s instanceof CardStage && s.phase === "reveal") s.rate(el.dataset.v); };
@@ -5987,6 +5996,8 @@ const ABOUT_QA = [
  ["计划和时间", [
   ["昨天的计划没做完，今天要补吗？", "不用硬补。研究发现，漏掉一次对养成习惯没有实质影响，真正伤习惯的是长期不规律。该复习的卡片 app 会自动排进今天，不会丢；其他项先做今天的，有精力再挑一项最重要的补。"],
   ["“学音标”这个单独的计划怎么用？", "在“计划”页点“＋ 学音标（单独的计划）”，选每天、隔一天或者一周三次，再选什么时候做。它和推荐计划分开：重新生成推荐计划、清除推荐计划、导入计划时选“替换”都不会动它；改它、关掉它也不会动别的计划，关掉时只删还没做的“学音标”。内容跟着你的进度：没学完就写“学第几课”（有到期的复习顺便复习）；学完以后只在有复习的日子出现。点它直接打开“发音 → 音标”，学完一课或者复习完自动打勾。"],
+  ["为什么有时候今天不学新卡？", "今天到期的复习超过一轮的量（普通练习 16 张、深度练习 30 张）时，app 先暂停新卡，让你把复习清掉。复习没清完又加新卡，欠的复习会越来越多，过期越久越容易忘。计划页可以点“今天照常学新卡”改回来；复习清到一轮以内，新卡自动恢复。"],
+  ["错误专练是什么？", "从你的错误档案里找出最常犯的那一类（比如时态、冠词），直接练这一类的卡，开始时告诉你这一类这周和上周各错了几次。光看错误统计没什么用，针对最常犯的错集中练、再看到它在减少，才有效果。错误档案里每一类旁边也有“练这一类”。计划里的反射训练开始时也可以选“练最弱的一类”。"],
   ["“只做 3 分钟”是什么？", "没精神时保底：先选普通练习或游戏，练完 3 分钟，今天剩下的计划标成跳过，算“保底完成”。"],
   ["时间到了以后怎么选？", "可以结束，也可以“再练 5 分钟”（从点下去的那一刻算），或者“不限时，练完剩下的题”。停在提示页的时间不算练习时间。"]]],
  ["导入和 AI", [
@@ -6441,7 +6452,7 @@ VIEWS.plan = {
       <div class="row-gap" style="margin-top:8px"><button class="btn sm primary" data-act="iv-due-go">现在练</button><button class="btn sm ghost" data-act="iv-due-later">明天再说</button></div></div>` + body;
     const nGen = (S.plan || []).filter(x => x.gen && !x.done).length, grouped = ["next", "late", "done"].includes(tab) && body.includes("pl-day");
     return `<div class="wrap">${backBtn()}<h2>我的计划</h2>
-      <div class="row-gap" style="margin-top:6px"><button class="btn sm primary" data-act="pl-open-top">＋ 添加一项</button><button class="btn sm" data-act="pl-gen">生成推荐计划</button>${typeof ipaPlanBtn === "function" ? ipaPlanBtn() : ""}${nGen ? `<button class="btn sm ghost" data-act="pl-gen-clear">清除推荐计划（${nGen}）</button>` : ""}</div>
+      <div class="row-gap" style="margin-top:6px"><button class="btn sm primary" data-act="pl-open-top">＋ 添加一项</button>${typeof newPausedToday === "function" && newPausedToday() ? `<div class="panel" style="margin:6px 0;width:100%"><span class="small">今天到期的复习有 ${dueTodayN()} 张，比一轮多：先清复习，今天暂停新卡。</span> <button class="btn sm ghost" data-act="new-override">今天照常学新卡</button></div>` : ""}<button class="btn sm" data-act="pl-gen">生成推荐计划</button>${typeof ipaPlanBtn === "function" ? ipaPlanBtn() : ""}${nGen ? `<button class="btn sm ghost" data-act="pl-gen-clear">清除推荐计划（${nGen}）</button>` : ""}</div>
       ${grouped ? `<div class="row-gap" style="margin-top:8px"><button class="linkbtn small" data-act="pl-fold-all" data-v="open">全部展开</button><button class="linkbtn small" data-act="pl-fold-all" data-v="close">全部收起</button></div>` : ""}
       <div class="seg" style="margin-top:10px">${tabs.map(([k, l]) => `<button data-act="pl-tab" data-v="${k}" aria-pressed="${tab === k}">${l}${G[k].length ? `<span class="seg-n">${G[k].length}</span>` : ""}</button>`).join("")}</div>
       <div style="margin-top:12px">${body}</div>
@@ -13096,7 +13107,7 @@ function batRecord(stage){
   const meanFirst = stage.firstMean != null ? stage.firstMean : (!retried && stage.mean);
   /* v1.68.0：意思对、而且没有语法问题的换说法，和练习卡片一样算完全说对（以前只打 8 点，说了正确的英语却因为没照参考说而吃亏）；有语法问题的照旧 8 点 */
   const lvOf = (cmp, meant, fl) => !cmp ? "off" : cmp.exact ? "exact" : meant ? (fl && !fl.length ? "exact" : "meaning") : cmp.near ? "close" : cmp.level;   /* 只差一点：按基本对算 */
-  const e = {id:c.id, zh:c.zh, en:c.en, alt:c.alt || [], lv1: lvOf(first, meanFirst, retried ? null : (stage.flags || [])), lv2: retried ? lvOf(stage.cmp, stage.mean, stage.flags || []) : lv2, ms: stage.ms || 0, tag:c.tag, spoke, sound: !!(first && first.sound), special: !!(it && it.special)};
+  const e = {id:c.id, zh:c.zh, en:c.en, alt:c.alt || [], lv1: lvOf(first, meanFirst, retried ? null : (stage.flags || [])), lv2: retried ? lvOf(stage.cmp, stage.mean, stage.flags || []) : lv2, ms: stage.typed ? 0 : (stage.ms || 0), tag:c.tag, spoke, sound: !!(first && first.sound), special: !!(it && it.special)};
   if (stage.misrec && batMisOk()){ e.mis = true; RUN.batMis = (RUN.batMis || 0) + 1; }
   stage.batEntry = e; RUN.battle.push(e);
   if (RUN.game && GAME.st) GAME.onCard(e);
@@ -13872,7 +13883,45 @@ ACT["pl-ipa"] = async () => {
 /* 点计划里的“学音标”：打开 发音 → 音标；学完一课或复习完自动打勾 */
 (function(){ if (typeof PLAN_ACTS !== "undefined" && !PLAN_ACTS.some(x => x[0] === "ipa")) PLAN_ACTS.push(["ipa", "学音标"]);
   const f = ACT["plan-go"]; ACT["plan-go"] = el => { const a = (el.dataset && el.dataset.v) || ""; if (a === "ipa"){ PR.tab = "ipa"; IPAC.v = null; return UI.nav("pron"); } return f(el); };
-  const r0 = UI.render; UI.render = function(){ try { planAddonsSync(); } catch (e) {} return r0.apply(this, arguments); }; })();
+  const r0 = UI.render; UI.render = function(){ try { planAddonsSync(); planBacklogSync(); } catch (e) {} return r0.apply(this, arguments); }; })();
+/* 今天计划里早上那一项：复习堆积时写明“先清复习，今天不学新卡” */
+function planBacklogSync(){ const t = today(), m = (S.plan || []).find(x => x.gen && x.date === t && !x.done && (x.act === "std" || x.act === "deep")); if (!m || typeof newPausedToday !== "function") return;
+  const base = m.textBase || m.text; if (!m.textBase) m.textBase = base;
+  const tx = newPausedToday() ? `复习到期的卡：今天到期 ${dueTodayN()} 张，比一轮多——先清复习，今天不学新卡` : base; if (m.text !== tx){ m.text = tx; save(); } }
+
+/* ---------- v1.68.2：复习堆积时今天暂停新卡（SRS 的常见做法：复习没清完又加新卡，欠的复习越来越多、过期越久越容易忘）。
+   堆积 = 今天到期的超过一轮的量（今天计划里早上那一项是深度练习就按 30，否则按 16）；“今天照常学新卡”可以改回来 ---------- */
+function dueTodayN(){ const tn = dnum(today()); return CAT.cards.filter(c => c.t !== "l" && S.cards[c.id] && S.cards[c.id].due <= tn).length; }
+function roundSize(){ const m = (S.plan || []).find(x => x.gen && x.date === today() && (x.act === "std" || x.act === "deep")); return (K.SESSION_CFG || SESSION_CFG)[m ? m.act : "std"].core; }
+function newPausedToday(){ if (L.newOverride === today()) return false; return dueTodayN() > roundSize(); }
+ACT["new-override"] = () => { L.newOverride = today(); saveLocal(); toast("今天照常学新卡"); UI.render(); };
+/* ---------- v1.68.2：最弱的一类、错误专练 ---------- */
+const ERR_TAG = {A2:"时态", B4:"时态", B5:"时态", B6:"时态", B1:"be 动词", B15:"be 动词", B3:"主谓一致", B7:"情态动词", B8:"复数", B9:"冠词", B10:"介词", B11:"地道说法", A1:"地道说法", B12:"-ed / -ing", B13:"比较级", B14:"语序", A5:"提问"};
+function tagHasCards(tag){ return CAT.cards.some(c => c.tag === tag && c.t !== "l"); }
+function errTagOf(code){ const lab = ERR_TAG[code]; const tag = lab && typeof TAG_ALIAS !== "undefined" ? TAG_ALIAS[lab] : null; return tag && tagHasCards(tag) ? tag : null; }
+/* 最弱的一类：先看最常犯的错误类型（能对上卡片类型的），没有错误统计时看忘得最多的那类卡 */
+function weakestTag(){
+  for (const code of (typeof errTop === "function" ? errTop(8) : [])){ const t = errTagOf(code); if (t) return {tag:t, why:`最常犯的错误：${ERR_DEFS[code].n}`}; }
+  const sc = {}; for (const c of CAT.cards){ const p = S.cards[c.id]; if (!p || c.t === "l" || !c.tag) continue; sc[c.tag] = (sc[c.tag] || 0) + (p.lapses || 0) + ((p.box || 0) <= 1 ? 1 : 0); }
+  const best = Object.entries(sc).sort((a, b) => b[1] - a[1])[0]; return best && best[1] > 0 ? {tag:best[0], why:"忘得最多的一类卡"} : null;
+}
+function tagLabel(tag){ return ((typeof TAGS !== "undefined" && TAGS[tag]) || {}).label || tag; }
+function errWeekCounts(code){ const e = (errState() || {})[code] || {}, now = Date.now(), wk = 7 * 864e5; let a = 0, b = 0;
+  for (const h of (e.hits || [])){ const t = typeof h === "number" ? h : (h && (h.t || (h.d ? Date.parse(h.d) : 0))) || 0; if (!t) continue; if (now - t <= wk) a++; else if (now - t <= 2 * wk) b++; } return [a, b]; }
+function errDrill(code){
+  const tag = code ? errTagOf(code) : null;
+  if (tag){ const [a, b] = errWeekCounts(code); toast(`错误专练：${ERR_DEFS[code].n}（这周 ${a} 次，上周 ${b} 次）`); return ACT["free-go"]({dataset:{v:"g:" + tag}}); }
+  if (CAT.cards.some(c => c.t === "f")) { toast("错误专练：练你写错过的原句"); return ACT["free-go"]({dataset:{v:"t:f"}}); }
+  return UI.nav("errlog");
+}
+ACT["err-drill"] = el => errDrill(el.dataset.c);
+(function(){ if (typeof PLAN_ACTS !== "undefined"){ if (!PLAN_ACTS.some(x => x[0] === "errdrill")) PLAN_ACTS.push(["errdrill", "错误专练"]); }
+  const f = ACT["plan-go"]; ACT["plan-go"] = async el => { const a = (el.dataset && el.dataset.v) || "";
+    if (a === "errdrill"){ const top = (typeof errTop === "function" ? errTop(8) : []).find(c => errTagOf(c)) || (typeof errTop === "function" ? errTop(1)[0] : null); return errDrill(top); }
+    if (a === "free"){ const w = weakestTag();
+      if (w){ const c = await choose("反射训练", `<p class="small muted">${esc(w.why)}。练最弱的一类最有针对性；想自己挑就选“正常”。</p>`, [["weak", `练最弱的一类：${tagLabel(w.tag)}`], ["normal", "正常（自己挑）"]]); if (!c) return;
+        if (c === "weak") return ACT["free-go"]({dataset:{v:"g:" + w.tag}}); } }
+    return f(el); }; })();
 /* ===================== 通用推荐计划：选目标和每天的时间，排出接下来 14 天 ===================== */
 (function(){
   if (typeof PLAN_ACTS !== "undefined") PLAN_ACTS.push(["dboss:iv", "对话首领战（面试官）"], ["dboss:cc", "对话首领战（Coffee chat）"]);
@@ -13913,12 +13962,12 @@ ACT["pl-gen"] = async () => {
     reply: () => ["晚上", "写作 · 回复消息：回一封笔友的信（没有就用练习信）。先列关键词、直接写，写完点“检查”，改完点“完成”", "write:reply"],
     mail: () => ["晚上", "写作 · 写邮件：写一封跟进或感谢邮件，检查开头称呼和结尾落款", "write:mail"],
     chunks: () => ["午休", "常用语块：练一组（聊天或邮件），整块说出来", "chunks"],
-    err: () => hasErr ? ["周末", "看错误档案：这周哪类错误在减少？最常犯的那类，今天写和说的时候特别注意", "errlog"] : ["晚上", "写作 · 回复消息：写一封回复，写完会自动记进错误档案", "write:reply"],
+    err: () => hasErr ? ["周末", "错误专练：练你最常犯的那一类错误（相关的卡，练完看这一类这周错了几次）", "errdrill"] : ["晚上", "写作 · 回复消息：写一封回复，写完会自动记进错误档案", "write:reply"],
     listen: () => ["午休", "听力快练：听懂别人的问法（5 分钟）", "listen"],
     hands: () => ["路上", "耳机模式：走路、坐车时听着练 10 分钟", "hands"],
     journal: () => ["睡前", "语音日记：用过去式讲今天，1 分钟", "journal"],
     dialogs: () => ["晚上", "情景对话：点餐、闲聊、打电话办事，挑一个", "dialogs"],
-    free: () => ["午休", "反射训练：挑你最弱的一类，看中文马上说英文", "free"],
+    free: () => ["午休", "反射训练：开始时可以选练最弱的一类，看中文马上说英文", "free"],
     words: () => hasWords ? ["午休", "单词：学 2–3 个新词，复习到期的", "words"] : null,
     pron: () => ["午休", "发音：练一组听辨，再测一句第一印象", "pron"],
     read: () => ["晚上", "阅读：读一篇（边听边读），把有用的词和短语加进想学的", "read"],
@@ -14624,7 +14673,7 @@ VIEWS.errlog = {
     const rows = Object.keys(ERR_DEFS).map(c => ({c, e:st[c] || {}, sc:errScore(c)})).filter(x => x.sc > 0 || (x.e.hits || []).length || x.e.seed).sort((a, b) => b.sc - a.sc);
     return `<div class="wrap">${backBtn()}<h2>错误档案</h2><p class="muted small">每一类错误出现了多少次：起点是导入的统计（比如以前的写作分析），之后在“写作”里每写一次，第一次检查查出来的都记进来。排在最前面的 5 类，就是写作时（回复消息、写邮件）自动检查的清单；某一类觉得改掉了，可以移出清单，换下一类进来。</p>
       ${rows.length ? rows.map(x => { const recent = (x.e.hits || []).filter(t => Date.now() - t < 30 * 864e5).length, total = (x.e.seed || 0) + (x.e.hits || []).length, on = top.includes(x.c);
-        return `<div class="card" style="margin-top:8px"><p><b>${x.c} ${esc(ERR_DEFS[x.c].n)}</b>${on ? `<span class="small" style="color:#B42318">　在清单里</span>` : x.e.off ? `<span class="small muted">　已移出清单</span>` : ""}${x.e.pri ? `<span class="small muted">　（导入时标了优先）</span>` : ""}</p>
+        return `<div class="card" style="margin-top:8px"><p><b>${x.c} ${esc(ERR_DEFS[x.c].n)}${typeof errTagOf === "function" && errTagOf(x.c) ? `　<button class="btn sm ghost" data-act="err-drill" data-c="${x.c}">练这一类</button>` : ""}</b>${on ? `<span class="small" style="color:#B42318">　在清单里</span>` : x.e.off ? `<span class="small muted">　已移出清单</span>` : ""}${x.e.pri ? `<span class="small muted">　（导入时标了优先）</span>` : ""}</p>
           <p class="small muted">一共 ${total} 次，最近一个月 ${recent} 次${recent === 0 && (x.e.hits || []).length ? "（这个月没再出现 ✓）" : ""}</p><p class="small">${esc(ERR_DEFS[x.c].tip)}</p>
           ${(() => { const ex = [...new Set((S.replies || []).slice().reverse().flatMap(r => (r.issues || []).filter(z => z.c === x.c).map(z => z.s)))].slice(0, 3); return ex.length ? `<p class="small muted" style="margin-top:4px">你写过：${ex.map(z => "“" + esc(z) + "”").join("、")}</p>` : ""; })()}
           <button class="linkbtn small" data-act="err-toggle" data-c="${x.c}">${x.e.off ? "加回清单" : "我觉得改掉了，移出清单"}</button></div>`; }).join("") : `<p class="muted small" style="margin-top:12px">还没有统计。导入“错误统计”，或者在“写作”里写一次，就会有了。</p>`}</div>`;
