@@ -737,7 +737,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.67.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.68.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2762,7 +2762,7 @@ function rateCard(card, r, ms, opts){
   const tn = dnum(today());
   let pb = false;
   if (!opts.retry){
-    if (!S.cards[card.id]){ if (S.newToday.d !== today()) S.newToday = {d:today(), n:0}; S.newToday.n++; }
+    if (!S.cards[card.id] && card.t !== "l"){ if (S.newToday.d !== today()) S.newToday = {d:today(), n:0}; S.newToday.n++; }   /* v1.67.9：听力卡有自己的数量（组一轮时也不算进新题上限），不占普通练习的新题额度 */
     S.cards[card.id] = K.srsRate(S.cards[card.id], r, tn, !!opts.err);
     const day = dayRec(); day.cards++; if (r !== "again") day.ok++;
     const tg = S.tags[today()] || (S.tags[today()] = {}); const t = tg[card.tag] || (tg[card.tag] = [0,0]); t[0]++; if (r !== "again") t[1]++;
@@ -2771,7 +2771,7 @@ function rateCard(card, r, ms, opts){
       const b = S.best[card.id];
       if (!b || ms < b){ pb = !!b; S.best[card.id] = ms; }
     }
-  } else { dayRec().cards++; }
+  } else { const d = dayRec(); d.cards++; if (r !== "again") d.ok++; }   /* v1.67.4：重考说对了也算“说对一次”（以前只算练了一次，正确率被算低） */
   save();
   return {pb};
 }
@@ -3941,14 +3941,16 @@ class CardStage {
     return `<div class="panel" style="margin-top:14px;background:var(--amber-soft);border-color:transparent"><b>${this.hintMode === "flags" ? "意思对上了，但有几处可能有问题。按提示改一下，再说一次" : "差一点。按提示自己改，再说一次"}</b><ul class="fb" style="margin:6px 0 4px">${this.hints.map(h => `<li>${esc(h)}</li>`).join("")}</ul><p class="small muted">你刚才说的：<span class="en" style="font-size:15px">${esc(this.firstSaid)}</span></p><p class="small muted" style="margin-top:4px">这一步是让你自己改一次的机会，不算错。你其实说对了、是识别听错了，就点下面的按钮。</p><button class="btn block misrec-btn" data-act="c-retry-ok" style="margin-top:8px">我说对了，是识别错了</button></div>`;
   }
   suggest(){
-    if (this.cmp && this.cmp.near && !this.cmp.exact) return "hard";   /* 只差一点：建议“有卡顿” */
+    /* v1.67.4：建议和打分规则对齐——说对了（包括识别错了、意思对且没有语法问题、第一遍只差一点后说对）就按快慢建议；说出来了但有错 → 有卡顿/有错误；说不出来 → 没说出来 */
+    const bytime = () => { const lim = typeof critMs === "function" ? critMs({en:this.target().en}) : 3500; return this.ms && this.ms <= lim ? "good" : "hard"; };
     if (!this.cmp) return "";
-    if (this.misrec) return "hard";
+    if (this.misrec) return bytime();   /* 你说对了，是识别错了：按快慢（以前一律建议“有卡顿/有错误”） */
+    if (this.cmp.near && !this.cmp.exact) return "hard";   /* 只差一点：建议“有卡顿/有错误” */
     if (this.cmp.free) return this.cmp.exact ? "good" : this.cmp.level === "close" ? "hard" : "again";
     if (this.cmp.exact && this.cmp.restart) return "hard";
-    if (this.mean && !this.cmp.exact) return this.flags.length ? "again" : "hard";
-    if (this.tries) return this.cmp.exact ? "hard" : "again";
-    if (this.cmp.exact){ const lim = typeof critMs === "function" ? critMs({en:this.target().en}) : 3500; return this.ms && this.ms <= lim ? "good" : "hard"; }
+    if (this.mean && !this.cmp.exact) return this.flags.length ? "hard" : bytime();   /* 意思对：有语法问题是“说出来了但有错”（以前建议“没说出来”）；没有就和说对一样按快慢 */
+    if (this.tries) return this.cmp.exact ? (this.firstCmp && this.firstCmp.level === "close" ? bytime() : "hard") : "again";   /* 第一遍只差一点（常是手机听漏小词）就按快慢 */
+    if (this.cmp.exact) return bytime();
     return this.cmp.level === "close" ? "hard" : "again";
   }
   revealHTML(){
@@ -3961,7 +3963,9 @@ class CardStage {
       h += `<div class="verdict ${meaning ? (this.flags.length ? "close" : "meaning") : cmp.near ? "close" : cmp.level}">${lab}${this.tries ? "" : timeChip}</div>`;
       const gc = this.said && !this.misrec ? gramCheck(this.said, null) : null;
       const gcMsgs = new Set(gc ? gc.must.concat(gc.opt).map(i => i.msg) : []);
-      if (this.said) h += `<p class="small muted" style="margin:-4px 0 10px">${this.misrec ? "识别成了" : "你说的"}：<span class="en" style="font-size:16px">${gc ? gc.html : esc(this.said)}</span></p>`;
+      const two = !!(this.tries && this.firstSaid && this.said && K.tokens(this.firstSaid).join(" ") !== K.tokens(this.said).join(" "));   /* v1.67.3：两遍不一样就都显示 */
+      if (two) h += `<p class="small muted" style="margin:-4px 0 4px">第一遍：<span class="en" style="font-size:16px">${esc(this.firstSaid)}</span></p>`;
+      if (this.said) h += `<p class="small muted" style="margin:${two ? "0" : "-4px"} 0 10px">${this.misrec ? "识别成了" : two ? "第二遍" : "你说的"}：<span class="en" style="font-size:16px">${gc ? gc.html : esc(this.said)}</span></p>`;
       if (this.altNote) h += `<p class="small" style="margin:-6px 0 10px">手机第一遍听成了：<span class="en">${esc(this.altNote.top)}</span>。候选里有你要说的那句，所以按它判断。${this.altNote.meantW.length ? `第一遍没听准的：${this.altNote.meantW.map((w, i) => `<span class="w" data-act="word" data-w="${esc(w)}">${esc(w)}</span>${this.altNote.heardW[i] ? `（听成了 ${esc(this.altNote.heardW[i])}）` : ""}`).join("、")}。点一下听听，下次这几个词说慢一点、清楚一点。` : ""}</p>`;
       if (gc && (gc.must.length || gc.opt.length)) h += gramBoxHTML(gc);
       if (cmp.restart && !this.misrec) h += `<p class="small muted" style="margin:-6px 0 10px">前面重说的部分没算，按后面那句判断。</p>`;
@@ -4010,7 +4014,7 @@ class CardStage {
   rate(r){
     /* v1.66.3：看了提示才说对（第一遍错了、不是识别错）不是自己独立想起来的：最多按“有卡顿/有错误”记 */
     /* v1.66.4：只在第一遍明显说错时才限制（不是“差一点”：只差一两个词很可能是手机听漏了 the、a 这种小词，不然这种句子每次都被要求重说、永远升不了档） */
-    const firstClear = !!(this.tries && !this.misrec && this.firstCmp && this.firstCmp.level !== "close");
+    const firstClear = !!((this.tries && !this.misrec && this.firstCmp && this.firstCmp.level !== "close") || this.anyHint);   /* anyHint：扩句前面哪一步看了提示 */
     if ((r === "good" || r === "easy") && firstClear){ r = "hard"; toast("第一遍说错、看了提示才说对：这次按“有卡顿/有错误”记"); }
     const okNow = this.misrec || (this.cmp && (this.cmp.exact || this.cmp.level === "close")) || (this.mean && !(this.flags || []).length);
     const err = r === "hard" && (firstClear || !okNow || (!this.misrec && (this.flags || []).length > 0));   /* 有错误 vs 只是慢 */
@@ -4034,6 +4038,8 @@ class CardStage {
       this.drillLite = !!(this.said && String(this.said).trim()) && !!(this.cmp && (this.cmp.level !== "off" || this.cmp.near || this.mean));
       this.phase = "drill"; this.drill = 0; this.drillPlayed = -1; this.render(); return;
     }
+    if (r === "hard" && err && !this.retry){ RUN.retries = RUN.retries || {};
+      if (!RUN.retries[this.card.id]){ RUN.items.splice(Math.min(RUN.items.length, RUN.i + 3), 0, {k:"card", id:this.card.id, retry:true}); RUN.retries[this.card.id] = 1; toast("有错的句子：隔几题再考一次，这次不看提示说对"); } }
     setTimeout(() => { if (this.alive) nextItem(); }, res.pb ? 650 : 120);
   }
 }
@@ -4151,7 +4157,9 @@ ACT["c-check"] = () => { if (typeof GAME !== "undefined" && GAME.idleStop) GAME.
 ACT["c-reveal"] = () => { const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; SR.abort(); const v = ($("#typed")||{}).value || ""; s.finish(v.trim()); };
 ACT["c-speak"] = () => { const s = RUN.stage; s && TTS.speak(s.target().en); };
 ACT["c-rate"] = el => { const s = RUN.stage; if (s instanceof CardStage && s.phase === "reveal") s.rate(el.dataset.v); };
-ACT["c-next-step"] = () => { const s = RUN.stage; if (!(s instanceof CardStage)) return; s.step++; s.show(); };
+ACT["c-next-step"] = () => { const s = RUN.stage; if (!(s instanceof CardStage)) return;
+  if (s.tries && !s.misrec && s.firstCmp && s.firstCmp.level !== "close") s.anyHint = true;   /* v1.67.5：扩句里任何一步看了提示，最后打分时也算（以前每一步都清零） */
+  s.step++; s.show(); };
 ACT["c-peek"] = el => { el.classList.add("peek"); setTimeout(() => el.classList.remove("peek"), 2000); };
 ACT["c-drill-tick"] = () => { const s = RUN.stage; if (!(s instanceof CardStage)) return; s.drill = Math.min(s.drillSteps().length, s.drill + 1); vib(10); s.render(); };
 ACT["c-drill-mic"] = async el => {
@@ -4271,8 +4279,9 @@ class ListenStage {
         }
       } else {
         const cmp = this.cmp; const lv = cmp ? cmp.level : "off";
-        const lab = cmp ? {exact:"一字不差", close:"差一点", off:"漏得比较多"}[lv] : "看一下原句";
-        el.innerHTML = `<div class="card">${head}<div class="verdict ${cmp ? lv : ""}">${lab}</div>${this.firstSaid && this.saidRaw && this.firstSaid !== this.saidRaw ? `<p class="small muted">第一遍：<span class="en" style="font-size:15px">${esc(this.firstSaid)}</span></p><p class="small muted">第二遍：<span class="en" style="font-size:15px">${esc(this.saidRaw)}</span></p>` : this.saidRaw ? `<p class="small muted">你说的：<span class="en" style="font-size:15px">${esc(this.saidRaw)}</span></p>` : ""}
+        const lab = this.misrec ? "按说对了记" : cmp ? {exact:"一字不差", close:"差一点", off:"漏得比较多"}[lv] : "看一下原句";
+        const misBtn = !this.misrec && cmp && lv !== "exact" && this.saidRaw ? `<button class="btn block" data-act="l-misrec" style="margin-top:8px">我说对了，是识别错了</button>` : "";   /* v1.67.5：以前听力复述按识别结果自动打分，没法纠正 */
+        el.innerHTML = `<div class="card">${head}<div class="verdict ${cmp ? lv : ""}">${lab}</div>${misBtn}${this.firstSaid && this.saidRaw && this.firstSaid !== this.saidRaw ? `<p class="small muted">第一遍：<span class="en" style="font-size:15px">${esc(this.firstSaid)}</span></p><p class="small muted">第二遍：<span class="en" style="font-size:15px">${esc(this.saidRaw)}</span></p>` : this.saidRaw ? `<p class="small muted">你说的：<span class="en" style="font-size:15px">${esc(this.saidRaw)}</span></p>` : ""}
           ${cmp && !cmp.exact ? `<div class="diff">${diffHTML(cmp.ops)}</div><p class="small muted">绿色是没听出来（或没说出来）的词。最容易漏的是 did you、want to、I'd 这类读得很轻的小词。</p>` : ""}
           <div class="say-line" style="margin-top:8px"><div class="en">${wordsHTML(c.en)}</div><button class="icon-btn" data-act="l-play" aria-label="朗读">${ICON.speak}</button></div>
           <div class="note">${esc(c.zh)}</div>
@@ -4314,6 +4323,7 @@ class ListenStage {
     this.cmp = said ? K.compareSaid(this.card.en, [], said) : null; this.done = true; this.saidRaw = said || "";
     const lv = this.cmp ? this.cmp.level : "off";
     const r = lv === "exact" ? (this.plays <= 2 && !this.slow ? "good" : "hard") : lv === "close" ? "hard" : "again";
+    this.prevP = S.cards[this.card.id] ? Object.assign({}, S.cards[this.card.id]) : null; this.prevR = r;   /* 识别错了可以撤回重打 */
     rateCard(this.card, r, 0, {said:this.saidRaw}); RUN.res.listenN++; if (lv !== "off") RUN.res.listenOk++;
     if (lv === "exact"){ Snd.good(); vib(15); } else if (lv === "off"){ Snd.bad(); vib([30,40,30]); }
     this.render(); if (canAutoSpeak() && lv !== "exact") TTS.speak(this.card.en);
@@ -4326,6 +4336,13 @@ ACT["l-pick"] = el => RUN.stage instanceof ListenStage && RUN.stage.pick(+el.dat
 ACT["l-next"] = () => nextItem();
 ACT["l-mic"] = () => RUN.stage instanceof ListenStage && RUN.stage.mic();
 ACT["l-check"] = () => { const s = RUN.stage; if (!(s instanceof ListenStage) || s.done) return; const v = (($("#typed")||{}).value || "").trim(); if (!v){ toast("先把听到的说出来"); return; } SR.abort(); s.repeatCheck(v); };
+/* 听力复述：识别错了 → 撤回刚才的打分，按说对了重打（听了一两遍算秒出，多听或慢速算有卡顿） */
+ACT["l-misrec"] = () => { const s = RUN.stage; if (!(s instanceof ListenStage) || !s.done || s.misrec || !s.saidRaw) return;
+  const r = s.plays <= 2 && !s.slow ? "good" : "hard";
+  if (s.prevP) S.cards[s.card.id] = s.prevP; else delete S.cards[s.card.id];
+  S.cards[s.card.id] = K.srsRate(S.cards[s.card.id], r, dnum(today()), false);
+  if (s.prevR === "again"){ dayRec().ok++; RUN.res.listenOk++; }
+  s.misrec = true; s.cmp = Object.assign({}, s.cmp, {level:"exact", exact:true}); save(); s.render(); toast("按说对了记"); };
 ACT["l-giveup"] = () => { const s = RUN.stage; if (!(s instanceof ListenStage) || s.done) return; SR.abort(); s.repeatCheck(""); };
 
 /* 面试一题（练习里、单题彩排共用） */
@@ -5932,7 +5949,7 @@ const ABOUT_QA = [
  ["练习卡片", [
   ["为什么要先说，再看答案？", "从记忆里把句子说出来（回忆练习），比看十遍记得牢。所以几乎每道题都要你开口。"],
   ["“灯灭就开口”和用时是什么意思？", "用时从灯灭算到你说完。用时越短，越接近脱口而出；某句刷新最快纪录时会变成紫色。"],
-  ["“没说出来”“有卡顿/有错误”“秒出”怎么选？下次什么时候再见？", "没说出来：这一轮隔几题再考一次，明天再练。有卡顿/有错误：只是慢了、卡了（说对了），这次的间隔减半；有错误（看了提示才说对、或者最后还有错）会退一档，更早再见。秒出：又快又对，隔得更久。第一遍明显说错、看了提示才说对的，就算点秒出也按“有卡顿/有错误”记——有提示的回忆不等于自己想起来；第一遍只是差一两个词（常常是手机听漏了小词）不限制，你自己判断。说之前就给的“注意用上……”不算看了提示。每说对一次，下次就隔得更久；忘了就重新从明天开始。"],
+  ["“没说出来”“有卡顿/有错误”“秒出”怎么选？下次什么时候再见？", "没说出来：这一轮隔几题再考一次，明天再练。有卡顿/有错误：只是慢了、卡了（说对了），这次的间隔减半；有错误（看了提示才说对、或者最后还有错）会退一档、更早再见，而且这一轮里隔几题再考你一次，这次不给提示（练到自己说对一次，再间隔复习）。秒出：又快又对，隔得更久。第一遍明显说错、看了提示才说对的，就算点秒出也按“有卡顿/有错误”记——有提示的回忆不等于自己想起来；第一遍只是差一两个词（常常是手机听漏了小词）不限制，你自己判断。说之前就给的“注意用上……”不算看了提示。每说对一次，下次就隔得更久；忘了就重新从明天开始。"],
   ["我说对了，是识别错了，怎么办？", "点“我说对了，是识别错了”，和识别对了完全一样。如果你直接点了“秒出”，app 也会当成识别错了，只删掉这一次的记录（以前真的说错的照样留着）；点“有卡顿/有错误”说明可能真的有错，这一次照常记成说错。"],
   ["拿不准自己说得对不对，三个按钮选哪个？", "点“拿不准，存起来问 AI”就行：存好以后会自动按“有卡顿/有错误”记，下次早点再见，不用你再选。之后在“问 AI”页面复制给 AI，它会告诉你对不对，并给你导入码：对的导入“也对”，以后这样说也算对；错的导入“改”，变成改错卡。"],
   ["我的说法也对，怎么加进去？", "确定意思对、语法也对，就点“我确定这样也对”，以后这样说也算对。拿不准就点“拿不准，存起来问 AI”。"],
@@ -5964,7 +5981,7 @@ const ABOUT_QA = [
   ["阅读怎么用？", "导入或粘贴一篇文章，一句一句听，点词听读音、加到要学的词，读完用 3 句话复述。"]]],
  ["学", [
   ["看到一个词不知道怎么读怎么办？", "点一下这个词：会读给你听，还会显示美式音标和重音在第几个音节（要联网查，查过的存在手机里，没网也能看）。音标里 ˈ 标在重读音节的开头。"],
-  ["要不要学音标？音标入门怎么学？", "值得学，目标是“看到音标能读出来”，不用背规则、不用自己写。英语的拼写和读音对不上（though、through、tough、cough），音标一个符号只对一个音，还能告诉你重音。在“发音 → 音标”里有 15 课：先 5 课认符号（每个符号配一个熟悉的词，比如 æ = cat 里的 a，先把符号和声音对上），再 1 课重音，最后 9 课练中文母语者最容易混的音（换不同的美式声音和词、每题告诉对错，这是研究里证据最强的听辨练法）；每课最后看音标读词。每天一课，每课约 5 分钟。学过的会按 1、3、7、14、30、60 天提醒复习。"],
+  ["要不要学音标？音标入门怎么学？", "值得学，目标是“看到音标能读出来”，不用背规则、不用自己写。英语的拼写和读音对不上（though、through、tough、cough），音标一个符号只对一个音，还能告诉你重音。在“发音 → 音标”里有 15 课：先 5 课认符号（每个符号配一个熟悉的词，比如 æ = cat 里的 a，先把符号和声音对上），再 1 课重音，最后 9 课练中文母语者最容易混的音（换不同的美式声音和词、每题告诉对错，这是研究里证据最强的听辨练法）；每课最后看音标读词：读出来并录下来，听自己的录音和标准读音对比，再自己判断（单个词的识别不可靠，不用识别）。每天一课，每课约 5 分钟。学过的会按 1、3、7、14、30、60 天提醒复习。"],
   ["发音练习练什么？", "听辨容易混的音、第一印象测试、重音和节奏、难词本。"],
   ["错误档案是什么？", "按错误类型统计你写作、练习里出的错，最常犯的排前面，还附上你写过的例子。"]]],
  ["计划和时间", [
@@ -6528,23 +6545,58 @@ const DG_FN = new Set("a an the i i'm i'd i'll you we it it's is are was can cou
 function dgSkel(s){ return K.tokens(s).filter(w => DG_FN.has(w)); }
 function dgLcs(a, b){ const m = a.length, n = b.length; if (!m || !n) return 0; const dp = Array.from({length:m + 1}, () => new Array(n + 1).fill(0));
   for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] + 1 : Math.max(dp[i - 1][j], dp[i][j - 1]); return dp[m][n]; }
+/* v1.67.6：按“对方这句话期待你怎么回应”判断（对话研究里的“相邻对”）：先取对方话里真正的那一句问句（前面的寒暄、铺垫跳过），再看你的回答是不是那一类回应。
+   以前只认几种固定问法：54 句地道的自己的说法错判 28 句（问题前面有 Nice. / Great. 就认不出是非问句；开放的问题、陈述句没有规则），问名字时句首的大写 My 也被当成名字 */
+const DG_ACK = /\b(okay|ok|got it|gotcha|makes sense|sounds (good|great)|perfect|great|nice|cool|awesome|good to know|i see|alright|all right|sure|thanks|thank you|appreciate|noted|will do|fair enough|that works|no worries|good)\b/;
+const DG_YES = /\b(yes|yeah|yep|yup|sure|of course|definitely|absolutely|certainly|i do|i am|i can|i will|i'?d love|i'?d like|i would|that'?d be|that would be|sounds good|let'?s do it|why not|please|for sure|totally|i think so|i guess|no problem|will do|i should be)\b/;
+const DG_NO = /\b(no|nope|nah|not really|not right now|i don'?t|i'?m not|i can'?t|i'?m good|we'?re good|i'?m all set|all set|that'?s (it|all)|just browsing|just looking)\b/;
+const DG_REQ = /\b(i'?d like|i would like|i want|i need|i'?m looking for|looking for|i'?m calling|i saw|i was wondering|can i|could i|could we|can we|may i|i'?m interested|i'?ll have|i'?ll take|i'?ll get|let me get|just browsing|just looking|we need|we'?d like)\b/;
+const DG_BACK = /\b(you'?re welcome|no problem|anytime|any time|glad|my pleasure|of course|no worries|sure thing|you too|see you|bye|good luck|have a (good|great|nice)|take care|thanks|thank you|appreciate)\b/;
+const DG_OPIN = /\b(like|love|enjoy|good|great|nice|amazing|awesome|fine|okay|not bad|pretty|really|so far|bad|terrible|hard|easy|fun|interesting|tastes?|feels?|drives?|looks?|smooth|comfortable|delicious|perfect|team|everyone)\b/;
+const DG_DUR = /(\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a few|several|a couple|half)\b.*\b(years?|months?|weeks?|days?|hours?)\b)|\bsince\b|\b(a while|a long time|forever|not long|just started|my whole life|ages)\b/;
+const DG_ADVICE = /\b(try|maybe|you (could|should|might|can)|make sure|i'?d|check|keep|don'?t|focus|work on|it helps|slow down)\b/;
+const dgIsQ = s => /\?\s*$/.test(s.trim()) || /^(what|who|where|when|why|how|which|is|are|do|does|did|can|could|would|will|should|have|has)\b/.test(s.trim().toLowerCase());
 function dgFit(t, said){
-  const q = String(t.say || "").toLowerCase(), s = String(said || "").toLowerCase(), toks = K.tokens(s); if (!toks.length) return {ok:false};
-  const content = toks.filter(w => !DG_FN.has(w) && w.length > 1);
+  const q = String(t.say || "").toLowerCase(), raw = String(said || ""), s = raw.toLowerCase(), toks = K.tokens(s); if (!toks.length) return {ok:false};
+  const content = toks.filter(w => !DG_FN.has(w) && w.length > 1), has = re => re.test(s);
   /* 骨架：参考说法的虚词顺序，大部分都对上了，内容是自己的 */
   for (const r of t.reply){ const rs = dgSkel(r), ss = dgSkel(s); if (rs.length >= 2 && content.length && dgLcs(rs, ss) / rs.length >= 0.7) return {ok:true}; }
-  const has = re => re.test(s);
+  /* 对方真正在问的那一句：有问句取最后一个问句，没有就取最后一句 */
+  const sents = String(t.say || "").split(/(?<=[.!?])\s+/).map(x => x.trim().toLowerCase()).filter(Boolean), qq = (sents.filter(x => /\?/.test(x)).pop() || sents[sents.length - 1] || q).replace(/^(sure|okay|great|alright|perfect|nice|cool|oh|well|so|anyway|and)[.,!]?\s+/, "");
+  const isQ = /\?/.test(q);
   /* 二选一：A or B? → 说了其中一个；“我们有 X、Y 和 Z” → 说了其中一样 */
-  const orm = q.match(/([a-z' ]{2,30}?)\s+or\s+([a-z' ]{2,30}?)\?/); if (orm){ const opt = [orm[1].trim().split(" ").slice(-3).join(" "), orm[2].trim()]; if (opt.some(o => o && s.includes(o.replace(/^(is that |do you want |would you like |)/, "")))) return {ok:true}; }
-  const lst = q.match(/we have ([a-z ,'-]+?)(?:\.|$)/); if (lst && lst[1].split(/,\s*|\s+and\s+|\s+or\s+/).map(x => x.trim()).filter(x => x.length > 2).some(x => s.includes(x))) return {ok:true};
-  if (/what can i get|what would you like|ready to order|what can i do for you|anything (else|to drink)|what('s| is) your order|get you started/.test(q) && (has(/\b(can i (get|have)|could i (get|have)|i'?d like|i'?ll (have|take|get|go with)|let me (get|have)|i want|just (a|an|the|some)|no,? (that'?s|i'?m) (it|good|all))\b/) || (toks.length <= 6 && /please|thanks/.test(s)))) return {ok:true};
-  if (/name/.test(q) && (has(/\b(it'?s|my name is|i'?m|this is|name'?s)\b/) || /\b[A-Z][a-z]+/.test(String(said)))) return {ok:true};
-  if (/how many|party of|how much|what time|when/.test(q) && (has(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|noon|tonight|tomorrow|today|morning|afternoon|evening|o'?clock|am|pm)\b/))) return {ok:true};
-  if (/^(hi|hey|hello)?[,! ]*(how are you|how'?s it going|how are you doing|how'?s your day)/.test(q) && has(/\b(good|great|fine|not bad|pretty good|doing well|okay|alright)\b/)) return {ok:true};
-  if (/total|that'?ll be|that comes to|it'?s \$?\d/.test(q) && has(/\b(card|cash|here you go|tap|apple pay|pay|here it is|sure)\b/)) return {ok:true};
-  if (/^(do|does|did|are|is|was|were|can|could|would|will|have|has|should|any)\b/.test(q.replace(/^(sure|okay|great|alright|perfect)[.,!]\s*/, "")) && has(/\b(yes|yeah|yep|sure|no|nope|not really|of course|definitely|i think so|actually|please|that'?d be great|i'?m good)\b/)) return {ok:true};
-  if (/(enjoy|have a (good|great|nice)|thanks for|thank you|here you go|go ahead|there you go|see you)/.test(q) && has(/\b(thanks|thank you|appreciate|you too|have a (good|great|nice)|bye|see you)\b/)) return {ok:true};
-  if (/^(where|which)\b/.test(q) && content.length) return {ok:true, soft:true};
+  const orm = qq.match(/([a-z' ]{2,30}?)\s+or\s+([a-z' ]{2,30}?)\?/); if (orm){ const w1 = orm[1].trim().split(" "), opt = [w1.slice(-1).join(" "), w1.slice(-2).join(" "), orm[2].trim()]; if (opt.some(o => o && o.length > 1 && s.includes(o))) return {ok:true}; }   /* 二选一：前一个选项取最后一两个词（together or separate → together） */
+  const lst = q.match(/we have ([a-z ,'-]+?)(?:\.|$)/); if (lst && lst[1].split(/,\s*|\s+and\s+|\s+or\s+/).map(x => x.trim().replace(/^(and|or)\s+/, "")).filter(x => x.length > 2).some(x => s.includes(x))) return {ok:true};   /* “whole, oat, and almond”：最后一项去掉 and */
+  /* 点单、问需要什么 */
+  if (/what can i get|what would you like|ready to order|what can i do for you|anything (else|to drink)|what('s| is) your order|get you started|how can i help|what brings you|anything in particular|looking for anything|help you find/.test(q) && (has(DG_REQ) || has(DG_NO) || has(/\b(more minutes|a minute|another minute|the check|just (a|an|the|some))\b/) || (toks.length <= 6 && /please|thanks/.test(s)))) return {ok:true};
+  /* 问名字：it's / I'm / my name is 后面跟名字（句首的大写字母不算名字） */
+  if (/name/.test(q) && (has(/\b(it'?s|my name is|i'?m|this is|name'?s)\s+[a-z]/) || (toks.length <= 5 && /(^|[a-z,.]\s+)[A-Z][a-z]+/.test(raw) && !/^(my|i|it|the|this|that|sure|yes|yeah|no|of)\b/i.test(raw.trim()) ))) return {ok:true};   /* 很短的回答里的大写词才当名字（The weather in Boston 不算） */
+  /* 数量、时间、多久、熟度 */
+  if (/how many|party of|how much|what time|when\b|around \w+\?/.test(qq) && has(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|noon|tonight|tomorrow|today|morning|afternoon|evening|o'?clock|am|pm|works|perfect|sounds good)\b/)) return {ok:true};
+  if (/how long/.test(qq) && has(DG_DUR)) return {ok:true};
+  /* 问具体信息（年份、品牌型号、尺寸、号码、地址、邮箱、日期）：回答里有数字或专有名词 */
+  if (/\b(year|make|model|size|number|address|zip|email|date)\b/.test(qq) && (/\d/.test(raw) || /\s[A-Z][a-z]+/.test(raw))) return {ok:true};
+  if (/cooked|how would you like (it|your)/.test(qq) && has(/\b(rare|medium|well[- ]done|medium[- ]?(rare|well))\b/)) return {ok:true};
+  /* 问感觉、评价 */
+  if (/(how are you|how'?s it going|how are you doing|how'?s your day)/.test(qq) && has(/\b(good|great|fine|not bad|pretty good|doing well|okay|alright)\b/)) return {ok:true};
+  if (/what do you think|how (are|do) you (liking|like)|how'?s everything|how was|how is it|liking it/.test(qq) && has(DG_OPIN) && content.length) return {ok:true};
+  /* 还有没有问题、还有别的吗：提一个问题，或者说没有了 */
+  if (/any questions|anything else|questions so far|before we wrap up/.test(qq) && (dgIsQ(raw) || has(DG_NO) || has(/\b(just one|one question|quick question|the check)\b/))) return {ok:true};
+  /* 要建议 */
+  if (/tips|advice|suggestions|any ideas/.test(qq) && has(DG_ADVICE) && content.length >= 2) return {ok:true};
+  /* 付钱 */
+  if (/total|that'?ll be|that comes to|it'?s \$?\d/.test(q) && has(/\b(card|cash|here you go|tap|apple pay|pay|here it is|sure|here'?s my)\b/)) return {ok:true};
+  /* 是非问句（前面的寒暄跳过；Want to … ? 也是）：肯定、否定、接受、婉拒、提要求；问 “any / anything …” 的直接说内容也算 */
+  if (/^(do|does|did|are|is|was|were|can|could|would|will|have|has|should|any|want to|wanna|you want)\b/.test(qq) && (has(DG_YES) || has(DG_NO) || has(DG_REQ) || (/\b(do you (do|play|like|enjoy|have) anything|any hobbies|anything for fun)\b/.test(qq) && content.length >= 2) || (/^(do you have|have you got)/.test(qq) && has(/\b(here'?s|i have|i'?ve got|i do)\b/)))) return {ok:true};
+  /* 夸你：道谢 */
+  if (/nice shot|smooth swing|you'?ve got a|great job|good job|well done|looks (great|good)|nice (work|job)/.test(q) && has(/\b(thanks|thank you|appreciate|working on|practic)/)) return {ok:true};
+  /* 道谢、告别：回应 */
+  if (/(thanks|thank you|appreciate|helped|see you|have a (good|great|nice)|enjoy|take care|go ahead|here you go|there you go)/.test(q) && has(DG_BACK)) return {ok:true};
+  /* 自我介绍、欢迎：打招呼 */
+  if (/(you must be|i'?m [a-z]+[.!]|nice to meet|welcome)/.test(q) && has(/\b(hi|hey|hello|nice to meet|good to meet|great to meet|that'?s me|thanks|thank you|i'?m [a-z]+)\b/)) return {ok:true};
+  if (/^(where|which)\b/.test(qq) && content.length && isQ) return {ok:true, soft:true};
+  /* 对方说的是陈述句（不是问题）：表示知道了，或者接着问，或者接着对方的话题说 */
+  if (!isQ && (has(DG_ACK) || dgIsQ(raw) || content.some(w => w.length > 3 && q.includes(w)))) return {ok:true, soft:true};
   return {ok:false, why:"好像没回答到对方的问题：先听清对方问的是什么，再看看下面的说法"};
 }
 function dgJudge(t, said){
@@ -13042,8 +13094,9 @@ function batRecord(stage){
   /* 卡片判成“意思对上了”（换了个说法）的，游戏也按意思对算，不当成擦伤 */
   const retried = !!(stage.firstCmp && stage.cmp && stage.cmp !== stage.firstCmp);
   const meanFirst = stage.firstMean != null ? stage.firstMean : (!retried && stage.mean);
-  const lvOf = (cmp, meant) => !cmp ? "off" : cmp.exact ? "exact" : meant ? "meaning" : cmp.near ? "close" : cmp.level;   /* 只差一点：按基本对算 */
-  const e = {id:c.id, zh:c.zh, en:c.en, alt:c.alt || [], lv1: lvOf(first, meanFirst), lv2: retried ? lvOf(stage.cmp, stage.mean) : lv2, ms: stage.ms || 0, tag:c.tag, spoke, sound: !!(first && first.sound), special: !!(it && it.special)};
+  /* v1.68.0：意思对、而且没有语法问题的换说法，和练习卡片一样算完全说对（以前只打 8 点，说了正确的英语却因为没照参考说而吃亏）；有语法问题的照旧 8 点 */
+  const lvOf = (cmp, meant, fl) => !cmp ? "off" : cmp.exact ? "exact" : meant ? (fl && !fl.length ? "exact" : "meaning") : cmp.near ? "close" : cmp.level;   /* 只差一点：按基本对算 */
+  const e = {id:c.id, zh:c.zh, en:c.en, alt:c.alt || [], lv1: lvOf(first, meanFirst, retried ? null : (stage.flags || [])), lv2: retried ? lvOf(stage.cmp, stage.mean, stage.flags || []) : lv2, ms: stage.ms || 0, tag:c.tag, spoke, sound: !!(first && first.sound), special: !!(it && it.special)};
   if (stage.misrec && batMisOk()){ e.mis = true; RUN.batMis = (RUN.batMis || 0) + 1; }
   stage.batEntry = e; RUN.battle.push(e);
   if (RUN.game && GAME.st) GAME.onCard(e);
@@ -13742,6 +13795,12 @@ ACT["bt-del"] = async () => {
     if (c === "new"){ L.resume = null; saveLocal(); return false; }
     return true;
   }
+  /* v1.67.3：首页横条的“接着练”：先问游戏继续还是普通练习继续（同一批卡；上次也是游戏、这次也选游戏才接着打上次那只敌人） */
+  { const rg = ACT["resume-go"]; if (typeof rg === "function") ACT["resume-go"] = async (el, game) => {
+      if (typeof game === "boolean") return rg(el, game);   /* 点击时第二个参数是事件对象，不是“游戏 / 不是游戏” */
+      const r = typeof resumeInfo === "function" ? resumeInfo() : null;
+      const c = await choose("接着练", `<p class="small muted">还剩 ${r ? r.items.length : ""} 题。${r && r.game ? "上次是游戏：选“游戏继续”会接着打上次那只敌人。" : "上次是普通练习。"}</p>`, [["game", "游戏继续"], ["std", "普通练习继续"]]);
+      if (!c) return; return rg(null, c === "game"); }; }
   /* 首页的“练习”“游戏”：先选普通还是对话（data-menu）；选了普通再看有没有没练完的一轮 */
   for (const k of ["start", "start-std", "start-game"]){ if (typeof ACT[k] !== "function") continue; const f = ACT[k]; ACT[k] = async function(el){
     const game = k === "start-game";
@@ -14032,16 +14091,27 @@ ${keys ? "要点：" + keys + "\n" : ""}按真实交流的效果分项打分（�
   const smallTalk = /weekend|lately|up to|plans|holiday|how are you|how's it going|how is it going|how have you been/i.test(qt);
   let relevance = hit >= 2 ? 1 : hit === 1 ? 0.5 : 0;
   if (relevance < 0.8 && smallTalk && words >= 5 && /\b(i|i'm|i've|it was|we|my)\b/i.test(S0)) relevance = 0.8;
+  /* v1.67.7：按问题的类型认回答的方式（不只靠和问题、参考回答共同的关键词：好回答完全可能一个共同的词都没有） */
+  const QCUE = [[/weakness|improve|struggle|challenge for you/i, /\b(sometimes i|i tend to|i'?m not (great|good|the best)|i (struggle|used to)|working on|i'?ve been (practicing|working|trying)|to improve|i (can|could) be)\b/i],
+    [/why (do you want|are you interested|this (company|role|job|position)|us\b|here)/i, /\b(because|i (really )?(admire|love|like|want|enjoy)|i'?m (excited|interested|passionate)|that'?s why|i think i can|fits?|match)\b/i],
+    [/tell me about a time|describe a (time|situation)|give me an example|have you ever/i, /\b(when i|during|last (year|semester|summer|month|week)|in my (internship|project|job|class|team|last)|one time|once|i had to|we had)\b/i],
+    [/(what do you|what'?s your|do you) (like|enjoy|do for fun|hobb)|weekends?|free time/i, /\b(i (usually|often|like|love|enjoy|play|go|try|spend)|most (weekends|saturdays|sundays|days)|on (weekends|saturdays|sundays))\b/i],
+    [/how did you (get|end up|start|become|decide)|what got you|why did you (choose|pick|study)/i, /\b(when i was|as a kid|grew up|i (started|decided|chose|got into|fell in love)|that'?s (why|how)|because)\b/i],
+    [/tell me about yourself|walk me through|introduce yourself|your background/i, /\b(i'?m (a|an)|i (just )?(graduated|finished|studied|work|worked)|my background|currently)\b/i]];
+  if (relevance < 0.8 && words >= 8 && QCUE.some(([qr, ar]) => qr.test(qt) && ar.test(S0))) relevance = 0.8;
   const lenOk = cc ? (words < 12 ? words / 12 : words <= 70 ? 1 : Math.max(0.6, 1 - (words - 70) / 120)) : (words < 25 ? words / 25 : words <= 160 ? 1 : Math.max(0.6, 1 - (words - 160) / 200));
   /* 讲得具体：数字、专有名词（句首的大写和 I 不算）、做过的具体的事 */
   const named = (S0.match(/[^.?!\s]\s+[A-Z][a-zA-Z0-9]+/g) || []).filter(w => !/\sI$/.test(w)).length;
-  const specific = /\d/.test(S0) || named >= 1 || /\b(I|we)('ve| have)?\s+(designed|built|made|tested|worked on|studied|played|watched|went|finished|graduated|developed|created|led|wrote|redesigned|helped|ran|fixed)\b/i.test(S0) ? 1 : 0;
+  /* v1.67.7：具体经历的标志也算（last semester、during my internship、for example、when I was……），做过的事的动词也多认一些 */
+  const specific = /\d/.test(S0) || named >= 1 || /\b(I|we)('ve| have)?\s+(designed|built|made|tested|worked on|studied|played|watched|went|finished|graduated|developed|created|led|wrote|redesigned|helped|ran|fixed|started|used|learned|set up|organized|improved|managed|planned|presented|joined|grew up|chose|decided|moved|found|tried|practiced|took|spent)\b/i.test(S0)
+    || /\b(last (year|semester|summer|month|week)|during my|in my (internship|project|job|class|team)|for example|for instance|one time|when i was|as a kid)\b/i.test(S0) ? 1 : 0;
   /* 把话题抛回去：要真的问对方一个问题（How about you? / Do you…? / What … you …?） */
   const engage = /\b(how|what) about you\b|\band you\?|\b(do|did|have|are|were|would|could|can) you\b[^.?!]*\?|\b(what|how|where|when|why|which)\b[^.?!]*\byou\b[^.?!]*\?/i.test(S0) ? 1 : 0;
   /* 说得通顺：同一个词、短语连着说两遍，口头禅和道歉多（well、like、sorry、um……），都扣 */
   const tl = S0.toLowerCase().replace(/[^a-z0-9' ]+/g, " ").split(/\s+/).filter(Boolean);
   let repeats = 0; for (let k = 0; k + 1 < tl.length; k++){ if (tl[k] === tl[k + 1] && !["very", "really", "so", "that"].includes(tl[k])) repeats++; if (k + 3 < tl.length && tl[k] + " " + tl[k + 1] === tl[k + 2] + " " + tl[k + 3]) repeats++; }
-  const fillers = (S0.match(/\b(well|um+|uh+|like|sorry|you know|i mean)\b/gi) || []).length;
+  /* v1.67.7：like 只有当口头禅用时才算（, like, / like, 开头），well 只有在句首才算——I like to cook、going well 都是正常用法 */
+  const fillers = (S0.match(/\b(um+|uh+|sorry|you know|i mean)\b/gi) || []).length + (S0.match(/(^|[,.!?]\s*)like\s*,|,\s*like\b/gi) || []).length + (S0.match(/(^|[.!?,]\s*)well\b/gi) || []).length;
   const fluent = fillers <= 1 && !repeats ? 1 : fillers <= 2 && repeats <= 1 ? 0.5 : 0;
   const natural = /\b(thanks|thank you|that's great|that sounds|i'd love|i really|actually|honestly|pretty|definitely)\b/i.test(S0) && fluent > 0 ? 1 : fluent;
   const structure = /\b(first|then|after that|so|because|as a result|in the end|finally)\b/i.test(S0) ? 1 : 0.4;
@@ -14052,17 +14122,17 @@ ${keys ? "要点：" + keys + "\n" : ""}按真实交流的效果分项打分（�
     {s:"讲得具体（一个例子或细节）", v:specific, w:0.15, tip:"加一个具体的东西，比如一个项目、一次经历、一个数字"},
     {s:`长短合适（${words} 个词；两到四句最好）`, v:lenOk, w:0.15, tip: words < 8 ? "多说一两句" : "太长了，coffee chat 一次说两到四句就好"},
     {s:"把话题抛回给对方", v:engage, w:0.2, tip:"结尾加一句 How about you? 或者问对方一个具体的问题"},
-    {s:"说得自然、通顺", v:natural, w:0.1, tip: fluent < 1 ? "少一点 well / like / sorry 和重复，想好一句再说" : "可以加 That sounds great / Thanks for asking / Actually 这类口头的说法"},
-    {s:"意思和参考回答接近（不用照背）", v:loose, w:0.15, tip:"看一下参考回答里讲了哪几件事"}
+    {s:"说得自然、通顺", v:natural, w:0.1, tip: fluent < 1 ? "少一点 well / like / sorry 和重复，想好一句再说" : "可以加 That sounds great / Thanks for asking / Actually 这类口头的说法"}
   ] : [
     {s:"回答到了问题", v:relevance, w:0.25, tip:"第一句就直接回答问的是什么"},
     {s:"讲得具体（例子、细节、数字）", v:specific, w:0.2, tip:"讲你具体做了什么（I designed / I tested / I found…），最好带一个数字"},
     {s:`长短合适（${words} 个词）`, v:lenOk, w:0.15, tip: words < 25 ? "讲得太短了，按情境、行动、结果讲完整" : "太长了，挑最重要的两三件事讲"},
     ...(base.needResult ? [{s:"讲了结果", v:base.result ? 1 : 0, w:0.15, tip:"最后一定要讲结果：As a result, …"}] : []),
     {s:"有条理（先、然后、所以……）", v:structure, w:0.1, tip:"用 First / Then / So / As a result 把几件事串起来"},
-    {s:"说得通顺（没有重复、口头禅不多）", v:fluent, w:0.1, tip:"少一点 well / like / sorry 和重复，卡住了就停一下再说"},
-    {s:"意思和参考回答接近（不用照背）", v:loose, w:0.15, tip:"看一下参考回答里讲了哪几件事"}
+    {s:"说得通顺（没有重复、口头禅不多）", v:fluent, w:0.1, tip:"少一点 well / like / sorry 和重复，卡住了就停一下再说"}
   ];
+  /* v1.67.7：“意思和参考回答接近”不再单独扣分（写着“不用照背”却扣 15%，内容不同的好回答最多 85 分）；只用来帮“回答到了问题”：讲到了参考回答里的事，就算回答到了 */
+  if (loose >= 0.5 && crit[0].v < 0.8) crit[0].v = 0.8;
   if (ask && !cc) crit.push({s:"问了对方问题", v:engage, w:0.2, tip:"准备两三个问题：团队、项目、对新人的建议"});
   const tw = crit.reduce((a, c) => a + c.w, 0); res.cov = crit.reduce((a, c) => a + c.w * c.v, 0) / tw;
   if (words < 8) res.cov = Math.min(res.cov, 0.3);   /* 太短：最多 30 分 */
@@ -14336,7 +14406,7 @@ const RW_RULES = [
   {c:"B5", re:/\b(usually|often|sometimes|always)\s+(I|we)\s+will\b|\b(I|we)\s+will\s+usually\b/gi},
   {c:"C1", re:/(^|[\s(“"'])i(?=[\s’',.!?]|$)/g},
   {c:"C2", re:/\b(im|ive|dont|cant|didnt|doesnt|isnt|wasnt|thats|youre|theyre|havent|wont)\b/gi},
-  {c:"B9", re:/\ba\s+(?!uni|use|usu|euro|one\b|u\b)[aeiou]\w*/g},
+  {c:"B9", re:/\ba\s+(?!uni|use|usu|uti|uto|ura|uri|ure|ubi|unanim|eu|ewe|one\b|once|u\b|ufo)[aeiou]\w*/g},   /* v1.67.8：u 读 /juː/ 的（utility、utopia、unanimous……）、eu-、once 前面用 a 是对的 */
   {c:"B10", re:/\bat\s+(?:19|20)\d\d\b|\bat\s+(?:the\s+)?(?:summer|winter|spring|fall|autumn)\b/gi},
   {c:"B13", re:/\bmost\s+\w+est\b/gi},
   {c:"B7", re:/\b(might|may|will|would|could|should|must)\s+(can|could|will|may)\b/gi},
@@ -14802,8 +14872,11 @@ function ipaViewHTML(){
   if (V.step === "quiz") return `<div class="card">${back}${ipaTrialHTML(V)}</div>`;
   if (V.step === "read"){ const it = V.read[V.ri];
     return `<div class="card">${back}<p class="small muted">看音标读词 ${V.ri + 1}/${V.read.length}：不看拼写，照音标读出来</p><div class="ipa" style="font-size:34px;text-align:center;margin:14px 0">/${esc(it.ipa)}/</div>
-      ${it.ok == null && !it.shown ? `<div class="db-mic"><button class="mic" id="ipaMic" data-act="ipa-mic" aria-label="读出来">${ICON.mic}</button><div class="heard" id="ipaHeard">${esc(it.heard || "点一下开始读")}</div></div><button class="linkbtn small" data-act="ipa-show" style="margin-top:6px">读不出来，看答案</button>` : ""}
-      ${it.shown && it.ok == null ? `<div class="panel" style="margin-top:8px">是 <b class="en">${esc(it.w)}</b>${it.heard ? `　<span class="small muted">（识别听到：${esc(it.heard)}）</span>` : ""}<div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="ipa-say" data-w="${esc(it.w)}">${ICON.speak} 听</button></div><p class="small" style="margin-top:8px">${it.hit ? "识别也听到了这个词。" : "识别有时会听错单个词，你自己判断："}</p><div class="row-gap"><button class="btn ${it.hit ? "primary" : ""}" data-act="ipa-self" data-v="1">读对了</button><button class="btn" data-act="ipa-self" data-v="0">没读对</button></div></div>` : ""}
+      ${it.ok == null && !it.shown ? `<p class="small" style="margin:0 0 8px">先看着音标大声读出来，同时录下来；再把你的录音和标准读音对比。</p><div class="db-mic"><button class="mic" id="ipaMic" data-act="ipa-mic" aria-label="录音">${ICON.mic}</button><div class="heard" id="ipaHeard">${IPAC.recOn ? "在录……读完再点一次" : "点一下开始录"}</div></div><button class="linkbtn small" data-act="ipa-show" style="margin-top:6px">不录了，直接看答案</button>` : ""}
+      ${it.shown && it.ok == null ? `<div class="panel" style="margin-top:8px">是 <b class="en">${esc(it.w)}</b>
+        ${it.rec ? `<p class="small" style="margin:8px 0 4px">① 听你的录音</p><audio controls src="${it.rec}" style="width:100%"></audio>` : ""}
+        <p class="small" style="margin:8px 0 4px">${it.rec ? "② " : ""}听标准读音</p><div class="row-gap"><button class="btn sm" data-act="ipa-say" data-w="${esc(it.w)}">${ICON.speak} 原速</button><button class="btn sm" data-act="ipa-slow" data-w="${esc(it.w)}">慢速</button></div>
+        <p class="small" style="margin:10px 0 6px">${it.rec ? "③ 对比一下，" : ""}你读得和标准的一样吗？</p><div class="row-gap"><button class="btn" data-act="ipa-self" data-v="1">读对了</button><button class="btn" data-act="ipa-self" data-v="0">没读对</button></div></div>` : ""}
       ${it.ok != null ? `<div class="panel" style="margin-top:8px">${it.ok ? "读对了 ✓" : "下次注意"}：<b class="en">${esc(it.w)}</b> /${esc(it.ipa)}/<button class="btn primary block" data-act="ipa-rnext" style="margin-top:10px">${V.ri + 1 >= V.read.length ? "完成这一课" : "下一个"}</button></div>` : ""}</div>`; }
   if (V.step === "done"){ const ok = V.qs.filter(t => t.ans === t.right).length, pct = Math.round(ok / V.qs.length * 100);
     const rd = V.read ? V.read.filter(x => x.ok).length : 0;
@@ -14830,13 +14903,14 @@ ACT["ipa-play"] = () => { const V = IPAC.v; if (!V || V.step !== "quiz") return;
 ACT["ipa-pick"] = el => { const V = IPAC.v; if (!V) return; const t = V.qs[V.i]; if (t.ans != null) return; t.ans = +el.dataset.k; const ok = t.ans === t.right; try { ok ? Snd.good() : Snd.bad(); } catch (e) {} UI.render(); };
 ACT["ipa-next"] = () => { const V = IPAC.v; if (!V) return; V.i++; if (V.i < V.qs.length){ UI.render(); setTimeout(() => ACT["ipa-play"](), 200); return; }
   if (V.kind === "lesson"){ V.read = ipaReadItems(IPA_LESSONS.find(l => l.id === V.lid)); V.ri = 0; V.step = "read"; UI.render(); } else { ipaFinish(); UI.render(); } };
-ACT["ipa-mic"] = async () => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; const btn = $("#ipaMic"), h = $("#ipaHeard");
-  if (IPAC.listening){ try { stopAny(); } catch (e) {} return; }
-  IPAC.listening = true; micState(btn, "live"); if (h) h.textContent = "在听……";
-  const r = await listenAny({short:true, btn, heard:h}); IPAC.listening = false; micState(btn, null);
-  it.heard = ((r && r.text) || "").trim(); it.hit = !!it.heard && K.hasWord(it.heard, it.w); it.shown = true; UI.render(); };
-ACT["ipa-show"] = () => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; it.shown = true; it.hit = false; UI.render(); };
-ACT["ipa-self"] = el => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; it.ok = el.dataset.v === "1"; ipaSay(it.w, 0, 0.85); UI.render(); };
+ACT["ipa-mic"] = async () => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return;
+  if (IPAC.recOn){ IPAC.recOn = false; let r = null; try { r = await Rec.stop(); } catch (e) {} if (r && r.blob && r.blob.size){ if (it.rec) URL.revokeObjectURL(it.rec); it.rec = URL.createObjectURL(r.blob); } it.shown = true; UI.render(); return; }
+  let ok = false; if (Rec.ok) try { await Rec.start(null); ok = true; } catch (e) { ok = false; }   /* Rec.start 失败时会抛错，成功时不返回值 */
+  if (!ok){ toast("没法录音（要允许麦克风）：先大声读出来，再看答案对比"); it.shown = true; UI.render(); return; }
+  IPAC.recOn = true; UI.render(); const b = $("#ipaMic"); if (b) micState(b, "live"); };
+ACT["ipa-slow"] = el => ipaSay(el.dataset.w, 0, 0.6);
+ACT["ipa-show"] = () => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; if (IPAC.recOn){ IPAC.recOn = false; try { Rec.cancel(); } catch (e) {} } it.shown = true; UI.render(); };
+ACT["ipa-self"] = el => { const V = IPAC.v, it = V && V.read && V.read[V.ri]; if (!it) return; it.ok = el.dataset.v === "1"; UI.render(); };
 ACT["ipa-rnext"] = () => { const V = IPAC.v; if (!V) return; V.ri++; if (V.ri < V.read.length){ UI.render(); return; } ipaFinish(); UI.render(); };
 
 const PR = {tab:"ipa", run:null, ft:null, st:null};
@@ -15283,7 +15357,14 @@ const CIRCUM_STRAT = /\b(it'?s (a|an|the|like|kind of|sort of|this|that|for|what
 const RT = {tab:"react", run:null};
 const rtState = () => { S.react = S.react || {n:0, ok:0, cats:{}, circ:{n:0, ok:0}}; return S.react; };
 const rtSay = t => (typeof pronSay === "function" ? pronSay(t, {rate:0.95}) : TTS.speak(t, {rate:0.95, raw:true}));
-const rtHasQ = s => /\?|(^|[.!,;]\s*|\b(and|so)\s+)(what|where|when|how|why|who|which|did|do|does|are|is|was|were|have|has|can|could|will|would)\b|\bhow about you\b|\bwhat about you\b/i.test(String(s || ""));
+/* v1.67.9：认追问不靠标点——手机识别出来的文字常常没有问号（what happened），以前 15 句只认出 1 句（带问号的那句）。
+   现在看句子结构：疑问词后面接着内容（that's what I think 这类不算）、助动词放在主语前面（are you、is there）、常用的追问（how about you、then what） */
+const rtHasQ = s => { const t = String(s || "").toLowerCase();
+  if (/\?/.test(t)) return true;
+  if (/\b(how|what) about (you|it|that|him|her|them)\b|\bthen what\b|\bwhat'?s (up|next|the plan)\b/.test(t)) return true;
+  if (/\b(what|where|when|how|why|who|which|whose)\b\s+(?!(i|we|you) (mean|meant|think|thought|said|say)\b)\w+/.test(t) && !/\b(that'?s|this is|is) (what|how|why|where|when)\b/.test(t)) return true;
+  if (/\b(are|is|was|were|do|does|did|have|has|can|could|will|would|should)\s+(you|it|he|she|they|we|there|that|this|your)\b/.test(t)) return true;
+  return false; };
 VIEWS.react = {
   tab:"home",
   render(){
@@ -15425,10 +15506,19 @@ function slPop(t, phrase, k){ const p = $("#slPop"); if (!p || !t) return;
   p.innerHTML = `<div class="card rd-popc"><b class="en">${esc(t)}</b><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="rd-say" data-t="${esc(t)}">▶ 听</button><button class="btn sm primary" data-act="rd-want" data-t="${esc(t)}">收藏进想学的</button>${phrase ? "" : `<button class="btn sm ghost" data-act="sl-from" data-k="${k}">从这里选短语</button>`}</div></div>`; }
 ACT["sl-from"] = el => { SL.sel = +el.dataset.k; UI.render(); toast("再点短语的最后一个词"); };
 function slMakeOpts(it, all){ const others = all.filter(x => x.zh !== it.zh).sort(() => Math.random() - 0.5).slice(0, 2).map(x => x.zh); return [it.zh].concat(others).sort(() => Math.random() - 0.5); }
-ACT["sl-go"] = () => { const all = slItems(), items = all.slice().sort(() => Math.random() - 0.5).slice(0, 8); SL.run = {items, all, i:0, res:[], picked:null, opts:slMakeOpts(items[0], all)}; UI.render(); setTimeout(() => ACT["sl-play"](), 250); };
+/* v1.67.9：每一句俚语单独记（以前只记总数、每轮随机 8 句）：答对隔得越来越久（1、3、7、14、30 天），答错退回明天、这一轮最后再考一次。
+   挑题：先答错的和到期的，再没学过的，最后才是还没到期的 */
+const SL_IV = [1, 3, 7, 14, 30];
+function slBox(){ S.slangBox = S.slangBox || {}; return S.slangBox; }
+function slPickRound(all, n){ const B = slBox(), tn = dnum(today()), sh = a => a.slice().sort(() => Math.random() - 0.5);
+  const due = sh(all.filter(x => B[x.en] && B[x.en].due <= tn)).sort((a, b) => (B[a.en].b || 0) - (B[b.en].b || 0)), fresh = sh(all.filter(x => !B[x.en])), later = all.filter(x => B[x.en] && B[x.en].due > tn).sort((a, b) => B[a.en].due - B[b.en].due);
+  return due.concat(fresh, later).slice(0, n); }
+ACT["sl-go"] = () => { const all = slItems(), items = slPickRound(all, 8); SL.run = {items, all, i:0, res:[], picked:null, opts:slMakeOpts(items[0], all)}; UI.render(); setTimeout(() => ACT["sl-play"](), 250); };
 ACT["sl-back"] = () => { SL.run = null; try { TTS.cancel(); } catch (e) {} UI.render(); };
 ACT["sl-play"] = () => { const R = SL.run; if (!R) return; try { TTS.cancel(); } catch (e) {} const t = String(R.items[R.i].en).replace(/（[^）]*）/g, "").replace(/—/g, ","); rtSay(t); };
 ACT["sl-pick"] = el => { const R = SL.run; if (!R || R.picked != null) return; const it = R.items[R.i], ok = el.dataset.v === it.zh; R.picked = el.dataset.v; R.res.push(ok);
+  { const B = slBox(), tn = dnum(today()), b0 = B[it.en] || {b:0};
+    if (!it._again){ if (ok){ const b = Math.min(SL_IV.length, (b0.b || 0) + 1); B[it.en] = {b, due:tn + SL_IV[b - 1]}; } else { B[it.en] = {b:0, due:tn + 1}; if (!R.items.some((x, k) => k > R.i && x.en === it.en)) R.items.push(Object.assign({}, it, {_again:true})); } } }   /* 答错：这一轮最后再考一次（重考不改间隔） */
   const st = S.slangStat = S.slangStat || {n:0, ok:0}; st.n++; if (ok) st.ok++; save(); UI.render(); };
 ACT["sl-next"] = () => { const R = SL.run; if (!R) return; R.i++; R.picked = null; SL.sel = null; if (R.i >= R.items.length){ if (typeof planAutoDone === "function") planAutoDone("slang"); UI.render(); return; } R.opts = slMakeOpts(R.items[R.i], R.all); UI.render(); setTimeout(() => ACT["sl-play"](), 200); };
 
