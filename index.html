@@ -737,7 +737,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.68.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.68.3"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -5844,11 +5844,14 @@ VIEWS.backup = {
       <div class="panel" style="margin-top:14px"><h3>备份</h3><p class="small muted" style="margin-top:4px">复习进度、导入的卡片、面试回答、日记文字都在里面，录音不在。</p>
         <div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="bk-copy">复制备份</button>${canFile ? `<button class="btn" data-act="bk-file">存成文件</button>` : ""}</div>
         <textarea id="bkOut" readonly class="small" style="min-height:80px;margin-top:10px" aria-label="备份内容"></textarea></div>
-      <div class="panel"><h3>恢复</h3><p class="small muted" style="margin-top:4px">把备份整段贴进来。会覆盖这台设备上现在的进度。</p>
+      <div class="panel"><h3>恢复</h3><p class="small muted" style="margin-top:4px">选备份文件（tuokou-backup-日期.json），或者把备份整段贴进来。会覆盖这台设备上现在的进度。</p>
+         <label class="btn" style="margin-top:10px;display:inline-flex">选备份文件<input type="file" accept=".json,application/json,text/plain" data-chg="bk-pick" style="display:none"></label>
         <textarea id="bkIn" style="margin-top:10px" aria-label="粘贴备份"></textarea><button class="btn danger block" style="margin-top:10px" data-act="bk-restore">用这份备份覆盖</button></div></div>`;
   },
   mount(){ const o = $("#bkOut"); if (o) o.value = JSON.stringify(S); }
 };
+/* v1.68.3：恢复时可以直接选备份文件（以前只能把内容整段粘贴进来，在电脑上要先用记事本打开再复制） */
+CHG["bk-pick"] = async el => { const f = el.files && el.files[0]; if (!f) return; try { const t = await f.text(); JSON.parse(t); const box = $("#bkIn"); if (box) box.value = t; toast("读好了：确认没问题就点“用这份备份覆盖”"); } catch (e) { toast("读不了这个文件：要用脱口导出的备份文件"); } el.value = ""; };
 ACT["bk-copy"] = async () => { const ok = await copyText(JSON.stringify(S)); if (ok){ L.lastBackup = Date.now(); saveLocal(); } toast(ok ? "备份已复制，存到备忘录或发给自己" : "复制没成功：长按下面的框，全选后复制"); };
 ACT["bk-file"] = async () => { if (await saveFile(`tuokou-backup-${today()}.json`, JSON.stringify(S))){ L.lastBackup = Date.now(); saveLocal(); toast("备份文件存好了，在手机的“下载”文件夹里"); } };
 ACT["bk-restore"] = async () => {
