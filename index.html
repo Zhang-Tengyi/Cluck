@@ -717,6 +717,69 @@ details.pl-day>summary{list-style:none;cursor:pointer}details.pl-day>summary::-w
 .ipa{font-family:"Charis SIL","Doulos SIL","Noto Sans","Segoe UI","DejaVu Sans",Arial,sans-serif;letter-spacing:.02em;font-size:18px}.ipa-line{min-height:22px}
 .ipa-ex svg{width:22px;height:22px;flex:none;color:var(--mute,#6B7280)}
 
+/* ---------- 成长（v1.69.0）：角色是这一页唯一“好看”的东西，其余保持安静；升级只轻轻放大一下，起步灯仍然是唯一的大动作 ---------- */
+.top-end{display:flex;align-items:center;gap:12px}
+.gr-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:6px 0 16px}
+.gr-date{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.gr-lvline{margin-top:4px}
+.gr-av{position:relative;width:64px;height:64px;flex:none;border:0;padding:0;background:none;border-radius:50%;color:var(--ink)}
+.gr-av.big{width:96px;height:96px}
+.gr-ring{position:absolute;inset:0;width:100%;height:100%}
+.gr-ring-bg{fill:none;stroke:var(--line);stroke-width:4}
+.gr-ring-fg{fill:none;stroke:var(--purple);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .6s ease-out}
+.gr-face{position:absolute;inset:7px;border-radius:50%;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center}
+.gr-av.big .gr-face{inset:9px}
+.gr-face img{width:100%;height:100%;object-fit:cover}
+.gr-face img.gr-pose{object-fit:cover;object-position:50% 12%;transform:scale(1.35);transform-origin:50% 20%}
+.gr-face .bt-thumb-rig{width:100%;height:100%;border-radius:0}
+.gr-lvn{position:absolute;right:-6px;bottom:-4px;min-width:28px;height:22px;padding:0 6px;border-radius:11px;background:var(--ink);color:var(--bg);font-size:13px;display:flex;align-items:center;justify-content:center;font-style:normal}
+.gr-av.big .gr-lvn{font-size:15px;height:26px;min-width:34px;border-radius:13px}
+.gr-lvbig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px}
+.gr-av.big .gr-lvbig{font-size:36px}
+.gr-up{animation:grUp .7s ease-out 1}
+@keyframes grUp{0%{transform:scale(1)}40%{transform:scale(1.1)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){.gr-up{animation:none}.gr-ring-fg{transition:none}}
+.gr-now b{display:block;font-size:18px;line-height:1.35;margin-top:2px}
+.gr-now .row-gap{margin-top:12px}
+.gr-if{margin-top:6px;color:var(--ink2);border-left:3px solid var(--line);padding-left:8px}
+.gr-review{margin-bottom:12px;border-color:var(--ink2)}
+.gr-week{margin-top:12px}
+.gr-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.gr-bars{margin-top:6px}
+.gr-bar{display:grid;grid-template-columns:58px minmax(0,1fr) 62px 70px;gap:8px;align-items:center;padding:6px 0}
+.gr-bar .t{height:10px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.gr-bar .t i{display:block;height:100%;background:var(--ink);border-radius:99px}
+.gr-bar.ok .t i{background:var(--green)}
+.gr-bar.best .t i{background:var(--purple)}
+.gr-bar .v{font-size:15px;min-width:54px;text-align:right}
+.gr-bar .btn{width:100%;padding:6px 4px;border:1px solid var(--line);white-space:nowrap}
+.gr-cal .btn{flex:none;white-space:nowrap}
+.gr-lab{font-weight:600;font-size:14px}
+.gr-row{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.gr-mood{display:flex;gap:6px}
+.gr-mood button{flex:1;min-height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:16px}
+.gr-mood button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gr-plan{margin-top:12px}
+.gr-plan>summary{padding:10px 4px}
+.gr-links{display:flex;gap:18px;margin:16px 2px 0}
+.pl-area{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.pl-if{font-size:13px;color:var(--ink2)}
+.gr-sec{margin-top:12px}
+.gr-sec>.small{display:block;margin:0 2px 4px}
+.gr-skill{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.gr-skill .t{grid-column:1/3;height:6px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.gr-skill .t i{display:block;height:100%;background:var(--purple);border-radius:99px}
+.gr-form{margin-top:8px;background:var(--surface2)}
+.gr-picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin-top:10px}
+.gr-pick{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:12.5px;color:var(--ink2)}
+.gr-pick img,.gr-pick .bt-thumb-rig{width:48px;height:48px;object-fit:contain;border-radius:8px}
+.gr-pick.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);color:var(--ink);font-weight:700}
+.gr-goals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gr-goals .fld input{width:100%}
+.gr-inline{display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.gr-inline input{width:64px}
+.gr-det>summary{font-weight:700;color:var(--ink)}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -731,13 +794,13 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <body>
 <main id="app"></main>
 <nav class="tabbar" aria-label="主菜单">
-<button data-act="tab" data-v="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/></svg><span>今天</span></button>
+<button data-act="tab" data-v="grow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 13c0-4.5 3-7.5 8-7.5 0 4.5-3 7.5-8 7.5z"/><path d="M12 15.5c0-3.5-2.5-6-7-6 0 3.5 2.5 6 7 6z"/></svg><span>成长</span></button>
+<button data-act="tab" data-v="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></svg><span>英语</span></button>
 <button data-act="tab" data-v="iv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg><span>面试</span></button>
-<button data-act="tab" data-v="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20v-9M12 20V5M19 20v-6M3 20h18"/></svg><span>进度</span></button>
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.68.3"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.69.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2234,7 +2297,7 @@ function chunkSentence(en){
 const REG_KEYS = {"朋友之间":"casual", "朋友":"casual", "随意":"casual", "通用":"neutral", "正式":"formal", "听懂就行":"listen", "听懂":"listen"};
 function regKey(v){ return REG_KEYS[String(v || "").trim()] || ""; }
 function parseImport(text){
-  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], meta:{date:"", who:[], replace:[]}, bad:[]};
+  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], meta:{date:"", who:[], replace:[]}, bad:[]};
   const ROLE = {"开场":"first","核心":"core","初筛":"screen","提问":"ask","基本":"core","行为":"core","电话":"screen","技术":"tech","概念":"concept","first":"first","core":"core","screen":"screen","ask":"ask","tech":"tech","concept":"concept"};
   let deck = "我的卡片";
   String(text||"").split(/\r?\n/).forEach((line, i) => {
@@ -2259,7 +2322,11 @@ function parseImport(text){
     }
     else if ((kind==="追问"||kind==="FU") && p[1] && p[2]){ res.follow.push({qid:p[1].toUpperCase(), text:p[2].trim(), ans:p.slice(3).join(" | ").trim()}); }
     else if ((kind==="计划"||kind==="PLAN") && /^(替换|replace)$/i.test(String(p[1] || "").trim())){ res.planReplace = true; }
-    else if ((kind==="计划"||kind==="PLAN") && p[1] && p[3]){ if (/^\d{4}-\d{2}-\d{2}$/.test(p[1].trim())) res.plan.push({date:p[1].trim(), cue:(p[2]||"").trim(), text:p[3].trim(), act:(p[4]||"").trim()}); else res.bad.push(line); }
+    else if ((kind==="计划"||kind==="PLAN") && /^(替换成长|replace\s*growth)$/i.test(String(p[1] || "").trim())){ res.planReplaceGrow = true; }   /* v1.69.0：只替换没做的求职、生活计划 */
+    else if ((kind==="计划"||kind==="PLAN") && p[1] && p[3]){ if (/^\d{4}-\d{2}-\d{2}$/.test(p[1].trim())){ const act = (p[4]||"").trim(), area = growArea(act); const x = {date:p[1].trim(), cue:(p[2]||"").trim(), text:p[3].trim(), act: area && area !== "english" ? "" : act}; if (area && area !== "english") x.area = area; if ((p[5]||"").trim()) x.ifthen = p.slice(5).join(" | ").trim(); res.plan.push(x); } else res.bad.push(line); }
+    else if ((kind==="成长目标"||kind==="GOAL") && growArea(p[1]) && +p[2] > 0){ res.growGoals.push({a:growArea(p[1]), n:Math.round(+p[2])}); }
+    else if ((kind==="成长行动"||kind==="ACTION") && growArea(p[1]) && (p[2]||"").trim()){ res.growActs.push({a:growArea(p[1]), name:p[2].trim().slice(0, 60), xp:Math.max(0, Math.min(100, Math.round(+p[3] || 0))), skill:(p[4]||"").trim().slice(0, 12)}); }
+    else if ((kind==="成长技能"||kind==="SKILL") && growArea(p[1]) && (p[2]||"").trim()){ res.growSkills.push({a:growArea(p[1]), name:p[2].trim().slice(0, 12)}); }
     else if ((kind==="也对"||kind==="OK") && p[1] && p[2]){ res.alts.push({id:p[1].trim(), text:p.slice(2).join(" | ")}); }
     else if ((kind==="答"||kind==="A") && p[1] && p[2]){ res.answers.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ")}); }
     else if ((kind==="要点"||kind==="K") && p[1] && p[2]){ res.keys.push({qid:p[1].toUpperCase(), keys:p.slice(2).join("；").split(/[；;、\n]/).map(x=>x.trim()).filter(Boolean)}); }
@@ -2608,6 +2675,42 @@ function compareSaid(t, alts, said){
 }
 
 
+/* ---------- 成长（v1.69.0）：三栏的经验值、周、等级、技能等级。纯函数，node 里能测 ---------- */
+/* 栏的写法：求职 / 英语 / 生活，或者 career / english / life */
+function growArea(x){
+  const v = String(x || "").trim().toLowerCase();
+  return {"求职":"career", "career":"career", "英语":"english", "english":"english", "生活":"life", "life":"life"}[v] || "";
+}
+/* 一周从周一开始（按 app 自己的“今天”，也就是一天从几点开始算之后的日期） */
+function growWeekStart(d){ const n = dnum(d); const dow = new Date(n * 86400000).getUTCDay(); return nstr(n - ((dow + 6) % 7)); }
+/* 英语经验值：在脱口里练习，每 2 分钟 1 点，每天最多 cap（默认 15） */
+function growEnXP(sec, cap){ return Math.min(cap == null ? 15 : cap, Math.floor((sec || 0) / 120)); }
+/* 角色等级：第 n 级要累计 50 × n × (n − 1)：第 2 级 100，第 3 级 300，第 4 级 600……每升一级多要 100 */
+function growLevel(total){
+  total = Math.max(0, total || 0); let lv = 1;
+  while (50 * (lv + 1) * lv <= total) lv++;
+  const lo = 50 * lv * (lv - 1), hi = 50 * (lv + 1) * lv;
+  return {lv, lo, hi, cur: total - lo, need: hi - lo, left: hi - total};
+}
+/* 技能等级：第 n 级要累计 3 × n × (n − 1) / 2 次：第 2 级 3 次，第 3 级 9 次，第 4 级 18 次，第 5 级 30 次 */
+function growSkillLevel(n){
+  n = Math.max(0, n || 0); let lv = 1;
+  while (3 * (lv + 1) * lv / 2 <= n) lv++;
+  const lo = 3 * lv * (lv - 1) / 2, hi = 3 * (lv + 1) * lv / 2;
+  return {lv, lo, hi, cur: n - lo, need: hi - lo};
+}
+/* 下周的建议目标：这周达成了就加 15%（取 5 的倍数），没达成就保持 */
+function growSuggest(goal, got){ goal = Math.max(5, goal || 0); return got >= goal ? Math.max(goal + 5, Math.round(goal * 23 / 100) * 5) : goal; }   /* goal × 1.15 ÷ 5 用整数算，免得 57.5 被浮点误差算成 57.4999 */
+/* 一周的合计：log 里这一周的记录 + 每天练英语的时间（days = S.days） */
+function growWeekSum(log, days, wk, cap){
+  const a = dnum(wk), b = a + 6; const r = {career:0, english:0, life:0, n:{}, enMin:0, enDay:{}};
+  for (const e of log || []){ const x = dnum(e.d); if (!(x >= a && x <= b)) continue;
+    if (r[e.a] != null) r[e.a] += e.xp || 0; r.english += e.en || 0; if (e.k) r.n[e.k] = (r.n[e.k] || 0) + (e.n || 1); }
+  for (let x = a; x <= b; x++){ const ds = nstr(x), dd = days && days[ds]; if (!dd) continue; const xp = growEnXP(dd.sec, cap); r.english += xp; r.enMin += Math.round((dd.sec || 0) / 60); r.enDay[ds] = Math.round((dd.sec || 0) / 60); }
+  return r;
+}
+Object.assign(CORE, {growArea, growWeekStart, growEnXP, growLevel, growSkillLevel, growSuggest, growWeekSum});
+
 /* 脱口 · 基础设施：存储、语音、录音、云同步、AI 批改、导航 */
 "use strict";
 const BUILD = window.__BUILD__ || {pwa:false, version:"1.0"};
@@ -2632,8 +2735,8 @@ const MIC = {
 const KEY = "tuokou.v1", LKEY = "tuokou.local";
 const DEF = () => ({v:1, createdAt:Date.now(), updatedAt:0, asrDocs:[], interviews:[], battle:{}, asrQ:[], game:{},
   settings:{goal:"std", profile:"", battle:true, srEngine:"device", interviewDate:"", newPerDay:12, inputMode:"auto", autoCheck:"smart", vibrate:true, sound:true, lights:true, autoSpeak:true,
-    theme:"auto", cheat:true, callQs:3, onboarded:false, planWhen:"", deck:"all", callDeck:"core", dayStart:4},
-  cards:{}, best:{}, custom:[], customQ:[], deckMeta:{}, dlgDone:{}, myAlts:{}, pending:[], hist:{}, misWords:{}, followAns:{}, refAns:{}, plan:[], ivDue:{}, soloIssues:{}, soloRate:{}, wantWords:[], answers:{}, days:{}, tags:{}, newToday:{d:"",n:0}, journal:[], calls:[]});
+    theme:"auto", cheat:true, callQs:3, onboarded:false, planWhen:"", deck:"all", callDeck:"core", dayStart:4, startPage:"grow"},
+  cards:{}, best:{}, custom:[], customQ:[], deckMeta:{}, dlgDone:{}, myAlts:{}, pending:[], hist:{}, misWords:{}, followAns:{}, refAns:{}, plan:[], ivDue:{}, soloIssues:{}, soloRate:{}, wantWords:[], answers:{}, days:{}, tags:{}, newToday:{d:"",n:0}, journal:[], calls:[], grow:{}});
 const LDEF = () => ({enVoice:"", zhVoice:"", rate:0.95, thinkSec:4, device:{}, wDraft:"", jDraft:"", voiceMix:true, accentMix:false, hfSeen:{}, ttsCN:false, slashes:false, quiet:false, quietSound:false, resume:null, rdMode:"line", rdSlow:false, rdHide:false});
 function mergeInto(d, o){
   for (const k of Object.keys(o||{})){
@@ -3300,7 +3403,7 @@ const Cloud = {
     if (!this.db) return;
     const base = "data/users/" + this.uid + "/";
     const parts = {
-      state:{v:S.v, createdAt:S.createdAt, updatedAt:S.updatedAt, settings:S.settings, cards:S.cards, best:S.best, custom:S.custom, customQ:S.customQ, deckMeta:S.deckMeta, dlgDone:S.dlgDone, myAlts:S.myAlts, pending:S.pending, misWords:S.misWords, followAns:S.followAns, refAns:S.refAns, plan:S.plan, ivDue:S.ivDue, soloIssues:S.soloIssues, soloRate:S.soloRate, wantWords:S.wantWords, asrDocs:S.asrDocs, interviews:S.interviews, battle:S.battle, asrQ:S.asrQ, game:S.game, answers:S.answers, newToday:S.newToday},
+      state:{v:S.v, createdAt:S.createdAt, updatedAt:S.updatedAt, settings:S.settings, cards:S.cards, best:S.best, custom:S.custom, customQ:S.customQ, deckMeta:S.deckMeta, dlgDone:S.dlgDone, myAlts:S.myAlts, pending:S.pending, misWords:S.misWords, followAns:S.followAns, refAns:S.refAns, plan:S.plan, ivDue:S.ivDue, soloIssues:S.soloIssues, soloRate:S.soloRate, wantWords:S.wantWords, asrDocs:S.asrDocs, interviews:S.interviews, battle:S.battle, asrQ:S.asrQ, game:S.game, answers:S.answers, newToday:S.newToday, grow:S.grow},
       stats:{updatedAt:S.updatedAt, days:S.days, tags:S.tags, calls:S.calls},
       journal:{updatedAt:S.updatedAt, journal:S.journal}
     };
@@ -3495,17 +3598,24 @@ const UI = {
   nav(name, params){ this.leave(); this.stack.push({name, params:params||{}}); this.syncHist(); this.render(); },
   replace(name, params){ this.leave(); this.stack[this.stack.length-1] = {name, params:params||{}}; this.render(); },
   tab(name){
-    this.leave();
-    this.stack = name === "home" ? [{name:"home", params:{}}] : [{name:"home", params:{}}, {name, params:{}}];
+    this.leave(); const R = rootView();
+    this.stack = name === R ? [{name:R, params:{}}] : [{name:R, params:{}}, {name, params:{}}];
     this.syncHist(); this.render();
   },
-  back(){ if (this.stack.length > 1) history.back(); else this.tab("home"); },
+  back(){ if (this.stack.length > 1) history.back(); else this.tab(rootView()); },
   onPop(){
     if (this.ignoreUntil && Date.now() < this.ignoreUntil){ this.ignoreUntil = 0; return; }
     if (this.stack.length > 1){ this.leave(); this.stack.pop(); this.histLen = Math.max(1, this.histLen - 1); this.render(); }
   }
 };
 window.addEventListener("popstate", () => UI.onPop());
+/* v1.69.0：打开 app 先到哪一页。默认“成长”（VIEWS.grow）；“我的”里可以改回英语页。
+   自动测试的浏览器（navigator.webdriver）默认还是英语页，旧测试不用改；测成长页的测试设 window.__growTest */
+function rootView(){
+  if (((S && S.settings && S.settings.startPage) || "grow") === "home") return "home";
+  if (navigator.webdriver && !window.__growTest) return "home";
+  return VIEWS.grow ? "grow" : "home";
+}
 document.addEventListener("click", e => {
   const el = e.target.closest("[data-act]"); if (!el) return;
   const fn = ACT[el.dataset.act];
@@ -3563,7 +3673,7 @@ VIEWS.home = {
     const seg = [["quick","3 分钟"],["std","10 分钟"],["deep","20 分钟"]].map(([k,l]) => `<button data-act="goal" data-v="${k}" aria-pressed="${g===k}">${l}</button>`).join("");
     const mod = (v, icon, t, d) => `<button class="mod" data-act="nav" data-v="${v}">${ICON[icon]}<b>${t}</b><span>${d}</span></button>`;
     return `<div class="wrap">
-      <div class="top"><div class="wordmark">脱口</div><div class="streak"><span class="num">${st.streak}</span><span class="lbl">天<br>连续</span></div></div>
+      <div class="top"><div class="wordmark">脱口</div><div class="top-end"><div class="streak"><span class="num">${st.streak}</span><span class="lbl">天<br>连续</span></div><button class="icon-btn" data-act="nav" data-v="progress" aria-label="进度">${ICON.chart}</button></div></div>
       ${installBanner()}${typeof asrResumeBanner === "function" ? asrResumeBanner() : ""}${typeof micBanner === "function" ? micBanner() : ""}${resumeBanner()}${typeof nextIvBanner === "function" ? nextIvBanner() : ""}${STORAGE_OK ? "" : `<div class="banner"><span>存储空间不够，进度没存上。先备份，再清理旧录音。</span><button class="btn sm primary" data-act="nav" data-v="storage">去看看</button></div>`}${typeof ttsBanner === "function" ? ttsBanner() : ""}${typeof backupBanner === "function" ? backupBanner() : ""}${typeof pendingBanner === "function" ? pendingBanner() : ""}
       <section class="hero">
         <div class="gantry" id="homeLights">${lamps()}</div>
@@ -4433,7 +4543,7 @@ ACT["iv-done"] = () => RUN.stage instanceof IvStage && RUN.stage.done();
 /* 总结 */
 function showSummary(){
   /* 保底的 3 分钟练完了：今天剩下的计划标成跳过，首页显示“✓ 保底完成” */
-  try { const d = today(); if (L.lowPending === d){ L.lowPending = null; saveLocal(); S.lowDays = (S.lowDays || []).filter(x => x !== d).concat(d).slice(-60); for (const x of S.plan || []) if (x.date === d && !x.done) x.skip = true; save(); } } catch (e) {}
+  try { const d = today(); if (L.lowPending === d){ L.lowPending = null; saveLocal(); S.lowDays = (S.lowDays || []).filter(x => x !== d).concat(d).slice(-60); for (const x of S.plan || []) if (x.date === d && !x.done && !x.area) x.skip = true; save(); } } catch (e) {}   /* v1.69.0：英语的保底只跳过英语的项，求职、生活的不动 */
   const el = stageEl(); if (!el) return;
   if (!RUN.exited && L.resume){ L.resume = null; saveLocal(); }
   if (!RUN.exited && typeof planAutoDone === "function") planAutoDone(RUN.kind);
@@ -5113,13 +5223,14 @@ async function remindVia(x){
     const ok = await copyText(`${x.date} ${hm} ${x.text}`); toast(ok ? "复制好了：粘贴到任何提醒、闹钟或备忘录 app" : "复制没成功，再点一次试试");
   }
 }
+const PLAN_AREA = {career:"Career", life:"Life"};
 function planRowHTML(x, page){
   const isToday = x.date === today();
-  return `<div class="li plan-row"><input type="checkbox" data-chg="plan-done" data-id="${x.id}" ${x.done ? "checked" : ""} aria-label="完成"><div class="grow"><b${x.done ? ' class="muted" style="text-decoration:line-through"' : ""}>${x.cue ? esc(x.cue) + " → " : ""}${esc(x.text)}</b>${x.act && planActLabel(x.act) !== x.text ? `<span>${esc(planActLabel(x.act))}</span>` : ""}${page ? `<span class="pl-tools"><button class="linkbtn" data-act="plan-edit" data-id="${x.id}">编辑</button><button class="linkbtn danger" data-act="plan-del" data-id="${x.id}">删除</button></span>` : ""}</div>
-    <span class="row-gap" style="flex:none">${x.act && !x.done && isToday ? `<button class="btn sm primary" data-act="plan-go" data-v="${esc(x.act)}">开始</button>` : ""}${planTime(x) && !x.done ? `<button class="btn sm ghost" data-act="plan-remind" data-id="${x.id}">提醒我</button>` : ""}</span></div>`;
+  return `<div class="li plan-row"><input type="checkbox" data-chg="plan-done" data-id="${x.id}" ${x.done ? "checked" : ""} aria-label="完成"><div class="grow"><b${x.done ? ' class="muted" style="text-decoration:line-through"' : ""}>${x.cue ? esc(x.cue) + " → " : ""}${esc(x.text)}</b>${PLAN_AREA[x.area] ? `<span class="pl-area">${PLAN_AREA[x.area]}</span>` : ""}${x.act && planActLabel(x.act) !== x.text ? `<span>${esc(planActLabel(x.act))}</span>` : ""}${x.ifthen ? `<span class="pl-if">${esc(x.ifthen)}</span>` : ""}${page ? `<span class="pl-tools"><button class="linkbtn" data-act="plan-edit" data-id="${x.id}">编辑</button><button class="linkbtn danger" data-act="plan-del" data-id="${x.id}">删除</button></span>` : ""}</div>
+    <span class="row-gap" style="flex:none">${x.act && !x.done && isToday ? `<button class="btn sm primary" data-act="plan-go" data-v="${esc(x.act)}">开始</button>` : ""}${x.area && !x.done && isToday && typeof growDone === "function" ? `<button class="btn sm primary" data-act="gr-done" data-id="${x.id}">做完了</button>` : ""}${planTime(x) && !x.done ? `<button class="btn sm ghost" data-act="plan-remind" data-id="${x.id}">提醒我</button>` : ""}</span></div>`;
 }
 function todayPlanHTML(){
-  const d = today(); const items = (S.plan || []).filter(x => x.date === d); const due = ivDueList();
+  const d = today(); const items = (S.plan || []).filter(x => x.date === d && !x.area); const due = ivDueList();   /* v1.69.0：英语页只放英语的项，求职、生活的在成长页 */
   const left = items.filter(x => !x.done && !x.skip), open = !!L.planOpen, low = (S.lowDays || []).includes(d), doneN = items.filter(x => x.done).length;
   /* 现在做：只给你一件事，点一下就开始 */
   const nx = left[0], c = typeof counts === "function" ? counts() : null;
@@ -5171,10 +5282,11 @@ ACT["pl-fold-all"] = el => { L.planFold = L.planFold || {}; const close = el.dat
 ACT["pl-cue"] = el => { const c = $("#plCue"); if (c) c.value = el.dataset.v; };
 ACT["pl-add"] = () => {
   const text = (($("#plText") || {}).value || "").trim(); if (!text){ toast("写一下要做什么"); return; }
-  const date = (($("#plDate") || {}).value || today()), cue = (($("#plCue") || {}).value || "").trim(), act = (($("#plAct") || {}).value || "");
+  const date = (($("#plDate") || {}).value || today()), cue = (($("#plCue") || {}).value || "").trim(), area = (($("#plArea") || {}).value || ""), act = area ? "" : (($("#plAct") || {}).value || ""), ifthen = (($("#plIf") || {}).value || "").trim();
   S.plan = S.plan || [];
-  if (PLAN_EDIT){ const x = S.plan.find(p => p.id === PLAN_EDIT); if (x){ x.date = date; x.cue = cue; x.text = text; x.act = act; x.gen = false; } PLAN_EDIT = null; toast("改好了"); }   /* 改过的推荐计划就算你自己的：重新生成、清除推荐计划都不动它 */
-  else { S.plan.push({id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), date, cue, text, act, done:false, ts:Date.now()}); toast("加上了"); }
+  const put = x => { if (area) x.area = area; else delete x.area; if (ifthen) x.ifthen = ifthen; else delete x.ifthen; return x; };   /* v1.69.0：哪一栏（不写就是英语）、如果……就…… */
+  if (PLAN_EDIT){ const x = S.plan.find(p => p.id === PLAN_EDIT); if (x){ x.date = date; x.cue = cue; x.text = text; x.act = act; x.gen = false; put(x); } PLAN_EDIT = null; toast("改好了"); }   /* 改过的推荐计划就算你自己的：重新生成、清除推荐计划都不动它 */
+  else { S.plan.push(put({id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), date, cue, text, act, done:false, ts:Date.now()})); toast("加上了"); }
   PLAN_FORM = false; save(); UI.render();
 };
 ACT["pl-tab"] = el => { L.planTab = el.dataset.v; saveLocal(); UI.render(); };
@@ -5186,8 +5298,8 @@ ACT["pl-late-del"] = async () => { if (!await sheet("删除所有没做完的旧
 ACT["pl-claude"] = () => {
   const d = today(); const all = (S.plan || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (a.ts || 0) - (b.ts || 0));
   const todo = all.filter(x => !x.done), done = all.filter(x => x.done && dnum(d) - dnum(x.date) <= 7);
-  const line = x => `计划 | ${x.date} | ${x.cue || ""} | ${x.text} | ${x.act || ""}`;
-  sendToClaude(`这是我在脱口里的计划。请帮我整理：去掉重复的和已经过时的，按日期排好，“什么时候”写清楚。给我一段导入码：第一行写“计划 | 替换”，后面每项一行：计划 | 日期 | 什么时候 | 做什么 | 动作（没有就空着）。\n今天是 ${d}。\n\n还没做的：\n${todo.map(line).join("\n") || "（没有）"}\n\n最近做完的（只是给你参考，不用放进导入码）：\n${done.map(x => `- ${x.date} ${x.cue || ""} → ${x.text}`).join("\n") || "（没有）"}`);
+  const line = x => `计划 | ${x.date} | ${x.cue || ""} | ${x.text} | ${x.area === "career" ? "求职" : x.area === "life" ? "生活" : x.act || ""}${x.ifthen ? " | " + x.ifthen : ""}`;
+  sendToClaude(`这是我在脱口里的计划。请帮我整理：去掉重复的和已经过时的，按日期排好，“什么时候”写清楚。给我一段导入码：第一行写“计划 | 替换”，后面每项一行：计划 | 日期 | 什么时候 | 做什么 | 动作（英语练习写练习的动作，求职的写“求职”，生活的写“生活”，没有就空着）| 如果……就……（可以不写）。\n今天是 ${d}。\n\n还没做的：\n${todo.map(line).join("\n") || "（没有）"}\n\n最近做完的（只是给你参考，不用放进导入码）：\n${done.map(x => `- ${x.date} ${x.cue || ""} → ${x.text}`).join("\n") || "（没有）"}`);
 };
 function callReviewHTML(){
   const st = CV.st;
@@ -5610,7 +5722,7 @@ ACT["iv-solo"] = el => {
 
 /* ---------- 进度 ---------- */
 VIEWS.progress = {
-  tab:"progress",
+  tab:"home",
   render(){
     const st = K.computeStreak(S.days, today()); const tn = dnum(today());
     let mastered = 0, learning = 0, fresh = 0;
@@ -5632,7 +5744,7 @@ VIEWS.progress = {
     const nW = allQuestions().filter(written).length; const calls = S.calls.length;
     const hardN = CAT.cards.filter(c => S.cards[c.id] && (S.cards[c.id].lapses||0) >= 2).length;
     const reps = calls ? (S.calls.reduce((a, c) => a + (c.rep || 0), 0) / calls).toFixed(1) : null;
-    return `<div class="wrap"><div class="top"><h2 style="font-size:26px">进度</h2></div>
+    return `<div class="wrap">${backBtn()}<div class="top" style="margin-top:0"><h2 style="font-size:26px">进度</h2></div>
       <div class="statgrid"><div class="stat"><span class="num">${st.streak}</span><span>连续天数</span></div><div class="stat"><span class="num">${mastered}</span><span>已掌握</span></div><div class="stat"><span class="num">${totalMin}</span><span>总分钟</span></div></div>
       <div class="sec-title">记录</div><div class="list" style="margin-bottom:12px">${liRow("today","今天练过的句子","今天每一句练得怎么样")}${liRow("dblog","对话记录", ((S.dbLog || []).length) + " 场：每一场的题、你说的话、分数")}${liRow("errlog","错误档案", typeof errTop === "function" && errTop(5).length ? "现在的清单：" + errTop(5).map(c => (ERR_DEFS[c] || {}).n || c).join("、") : "你最常犯的错，写作时自动检查")}${liRow("pron","发音", typeof pronSummary === "function" ? pronSummary() : "听辨、第一印象、重音")}</div>
       <div class="panel"><h3>开口用时</h3>${thisW ? `<p style="margin-top:6px"><span class="num" style="font-size:30px">${fmt1(thisW)}</span> 秒，这 7 天平均${lastW ? `，前 7 天是 ${fmt1(lastW)} 秒` : ""}</p><p class="small muted">从灯灭到说完一句的时间。越短，说明越接近脱口而出。</p>` : `<p class="small muted" style="margin-top:6px">用麦克风或输入框答几题，这里就会显示你开口有多快。</p>`}</div>
@@ -5663,6 +5775,7 @@ VIEWS.me = {
         <label class="fld"><span>给 AI 的自我介绍（可选）</span><textarea rows="3" data-chg="profile" placeholder="比如：机械工程硕士，正在准备美国工程类岗位面试，口语大约 A2–B1">${esc(S.settings.profile || "")}</textarea></label>
         <label class="fld"><span>说话中间停顿</span><select data-chg="srlong"><option value="on" ${L.srLong !== false ? "selected" : ""}>停 2.5 秒才算说完</option><option value="off" ${L.srLong === false ? "selected" : ""}>停一下就结束（手机默认）</option></select></label>
         <label class="fld"><span>停 2 秒自动检查</span><select data-chg="set" data-key="autoCheck">${[["smart","自动判断：语音说完自动查，打字时不查"],["on","一直开"],["off","关掉：每次自己点“检查”"]].map(([v, l]) => `<option value="${v}" ${(s.autoCheck || "smart") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+        <label class="fld"><span>打开 app 先看</span><select data-chg="set" data-key="startPage">${[["grow", "成长"], ["home", "英语"]].map(([v, l]) => `<option value="${v}" ${(s.startPage || "grow") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
         <label class="fld"><span>一天从几点开始算</span><select data-chg="set" data-key="dayStart" data-num="1">${[0,2,4,6].map(h => `<option value="${h}" ${(+s.dayStart || 0) === h ? "selected" : ""}>${h ? "凌晨 " + h + " 点" : "半夜 12 点"}</option>`).join("")}</select></label>
         <div style="margin-top:8px">${swRow("lights","起步灯：灯灭再开口")}${swRow("autoSpeak","看答案时自动朗读")}${swRow("sound","提示音")}${swRow("vibrate","振动")}${swRow("cheat","来电模拟可以看小抄")}</div></div>
       <div class="sec-title">朗读</div><div class="panel">
@@ -5688,7 +5801,7 @@ VIEWS.me = {
   }
 };
 ACT.reset = async () => {
-  if (!await sheet("清空所有进度？", "复习记录、面试回答、日记和导入的卡片都会删掉，没法撤销。需要的话先去备份。", "清空", true)) return;
+  if (!await sheet("清空所有进度？", "复习记录、面试回答、日记、导入的卡片和成长记录都会删掉，没法撤销。需要的话先去备份。", "清空", true)) return;
   const keep = Object.assign({}, S.settings); S = DEF(); S.settings = Object.assign(S.settings, keep, {interviewDate:keep.interviewDate});
   rebuildCatalog(); rebuildQ(); save(true); toast("清空了"); UI.tab("home");
 };
@@ -5732,12 +5845,12 @@ ACT["imp-preview"] = () => {
   IMP = r;
   const by = t => r.cards.filter(c => c.t === t).length; const dup = r.cards.filter(c => S.custom.some(x => x.id === c.id)).length;
   const decks = Array.from(new Set(r.cards.map(c => c.deck).concat(r.questions.map(q => q.deck))));
-  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length;
+  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length;
   const who = r.meta.who[0];
   $("#impOut").innerHTML = `<div class="panel" style="margin-top:12px"><h3>读到了</h3><ul class="issues">
     ${decks.length ? `<li>题库：${decks.map(esc).join("，")}</li>` : ""}
     <li>卡片 ${r.cards.length} 张（反射卡 ${by("r")}，找错 ${by("f")}，听力 ${by("l")}）${dup ? `，其中 ${dup} 张已经有了，会更新` : ""}</li>
-    ${r.questions.length ? `<li>面试题 ${r.questions.length} 道，追问 ${r.follow.length} 个</li>` : ""}${r.plan.length ? `<li>计划 ${r.plan.length} 项${r.planReplace ? "（会替换所有没做完的计划）" : ""}</li>` : ""}${r.alts.length ? `<li>确认算对的说法 ${r.alts.length} 条</li>` : ""}
+    ${r.questions.length ? `<li>面试题 ${r.questions.length} 道，追问 ${r.follow.length} 个</li>` : ""}${r.plan.length ? `<li>计划 ${r.plan.length} 项${r.planReplace ? "（会替换所有没做完的计划）" : r.planReplaceGrow ? "（会替换没做完的求职、生活计划，英语的不动）" : ""}</li>` : ""}${(r.growGoals || []).length ? `<li>成长目标 ${r.growGoals.length} 项</li>` : ""}${(r.growActs || []).length ? `<li>记一笔的选项 ${r.growActs.length} 项</li>` : ""}${(r.growSkills || []).length ? `<li>技能 ${r.growSkills.length} 个</li>` : ""}${r.alts.length ? `<li>确认算对的说法 ${r.alts.length} 条</li>` : ""}
     <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
     ${r.meta.date ? `<li>面试日期：${esc(r.meta.date)}</li>` : ""}${who ? `<li>面试官：${esc(who.name)}${who.company ? "，" + esc(who.company) : ""}</li>` : ""}
     ${r.bad.length ? `<li>看不懂、会跳过的：第 ${r.bad.join("、")} 行</li>` : ""}</ul>
@@ -5762,7 +5875,9 @@ ACT["imp-apply"] = () => {
     if (!mine || mine === prev || x.fromRef){ x.text = a.text; x.fromRef = true; x.updated = Date.now(); } }
   for (const k of r.keys){ const x = ans(k.qid); x.keys = k.keys; }
   S.plan = S.plan || []; if (r.planReplace) S.plan = S.plan.filter(x => x.done || x.addon);   /* 单独的计划（学音标）不被替换 */
-  for (const x of r.plan){ if (!S.plan.some(y => y.date === x.date && y.text === x.text)) S.plan.push({id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date:x.date, cue:x.cue, text:x.text, act:x.act, done:false, ts:Date.now()}); }
+  if (r.planReplaceGrow){ const d0 = today(); S.plan = S.plan.filter(x => !(x.area && !x.done && x.date >= d0)); }   /* v1.69.0：计划 | 替换成长——只换今天起没做的求职、生活计划 */
+  for (const x of r.plan){ if (!S.plan.some(y => y.date === x.date && y.text === x.text)){ const y = {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date:x.date, cue:x.cue, text:x.text, act:x.act, done:false, ts:Date.now()}; if (x.area) y.area = x.area; if (x.ifthen) y.ifthen = x.ifthen; S.plan.push(y); } }
+  if (typeof growApplyImport === "function") growApplyImport(r);
   if ((S.wantWords || []).length){
     /* 导入的单词卡和“要学的词”对上了（一样，或者一个是另一个的一部分，比如 stepped 和 stepped boss），就从列表里去掉 */
     const tk = x => String(x).toLowerCase().split(/\s+/).filter(Boolean);
@@ -6399,7 +6514,7 @@ VIEWS.grammar = {
 
 /* ---------- 今天练过的 ---------- */
 VIEWS.today = {
-  tab:"progress",
+  tab:"home",
   render(){
     const h = (S.hist || {})[today()] || []; const last = {}, worst = {}; const rank = {again:2, hard:1, good:0};
     for (const e of h){ last[e.id] = e; if (!worst[e.id] || rank[e.r] > rank[worst[e.id].r]) worst[e.id] = e; }
@@ -6429,7 +6544,7 @@ VIEWS.plan = {
     const cur = S.settings.planWhen || ""; PLAN_PICK = null;
     const d = today(), tn = dnum(d); const all = (S.plan || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (a.ts || 0) - (b.ts || 0));
     const lowD = new Set(S.lowDays || []);
-    const G = {today: all.filter(x => x.date === d && !x.done), next: all.filter(x => x.date > d && !x.done), late: all.filter(x => x.date < d && !x.done && !lowD.has(x.date)), done: all.filter(x => x.done && tn - dnum(x.date) <= 30)};
+    const G = {today: all.filter(x => x.date === d && !x.done), next: all.filter(x => x.date > d && !x.done), late: all.filter(x => x.date < d && !x.done && !x.skip && !(lowD.has(x.date) && !x.area)), done: all.filter(x => x.done && tn - dnum(x.date) <= 30)};
     const tabs = [["today","今天"],["next","接下来"],["late","没做完"],["done","已完成"]];
     const tab = G[L.planTab] ? L.planTab : "today";
     const byDate = (arr, desc) => { const g = {}; for (const x of arr) (g[x.date] = g[x.date] || []).push(x);
@@ -6447,7 +6562,9 @@ VIEWS.plan = {
         <label class="fld"><span>什么时候：每天一定会碰到的时刻，或者具体时间</span><input type="text" id="plCue" value="${esc(ed ? ed.cue || "" : "")}" placeholder="比如：晚饭后、睡前、20:00"></label>
         <div class="chips" style="margin-top:6px">${["早上起床后","午饭后","晚饭后","睡前"].map(c => `<button class="chip" data-act="pl-cue" data-v="${c}">${c}</button>`).join("")}</div>
         <label class="fld"><span>做什么</span><input type="text" id="plText" value="${esc(ed ? ed.text : "")}" placeholder="比如：模拟一场电话初筛"></label>
-        <label class="fld"><span>链接到哪个练习（可选）</span><select id="plAct">${PLAN_ACTS.concat(ed && ed.act && !PLAN_ACTS.some(a => a[0] === ed.act) ? [[ed.act, planActLabel(ed.act)]] : []).map(([v, l]) => `<option value="${esc(v)}" ${ed && ed.act === v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></label>
+        <label class="fld"><span>哪一栏</span><select id="plArea">${[["", "English（英语练习）"], ["career", "Career（求职）"], ["life", "Life（生活）"]].map(([v, l]) => `<option value="${v}" ${ed && (ed.area || "") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+        <label class="fld"><span>链接到哪个练习（可选，只用于英语）</span><select id="plAct">${PLAN_ACTS.concat(ed && ed.act && !PLAN_ACTS.some(a => a[0] === ed.act) ? [[ed.act, planActLabel(ed.act)]] : []).map(([v, l]) => `<option value="${esc(v)}" ${ed && ed.act === v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></label>
+        <label class="fld"><span>如果……就……（可选）</span><input type="text" id="plIf" value="${esc(ed ? ed.ifthen || "" : "")}" placeholder="比如：如果到了图书馆想刷手机，就把手机放进包里"></label>
         <div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="pl-add">${ed ? "保存修改" : "加上"}</button><button class="btn ghost" data-act="pl-cancel">取消</button></div></div>`;
     const dueQ = tab === "today" && typeof ivDueList === "function" ? ivDueList() : [];
     if (dueQ.length) body = `<div class="panel" style="margin-bottom:10px"><b>面试题重练（${dueQ.length} 道）</b><p class="small muted">模拟面试时没说好的题，按间隔安排；练完标“不错”就不再安排</p>
@@ -6499,7 +6616,7 @@ ACT["ob-skip"] = () => { obSave(); UI.tab("home"); };
 function boot(){
   UI.root = $("#app");
   applyTheme(); TTS.init(); MIC.init(); if (L.device && L.device.srBroken) SR.broken = true;
-  UI.stack = [{name: S.settings.onboarded ? "home" : "onboard", params:{}}];
+  UI.stack = [{name: S.settings.onboarded ? rootView() : "onboard", params:{}}];
   try { history.replaceState({d:1}, ""); } catch (e) {}
   UI.render();
   if (L.device && L.device.local === "available") SR.local = true;
@@ -15573,6 +15690,627 @@ ACT["sl-pick"] = el => { const R = SL.run; if (!R || R.picked != null) return; c
     if (!it._again){ if (ok){ const b = Math.min(SL_IV.length, (b0.b || 0) + 1); B[it.en] = {b, due:tn + SL_IV[b - 1]}; } else { B[it.en] = {b:0, due:tn + 1}; if (!R.items.some((x, k) => k > R.i && x.en === it.en)) R.items.push(Object.assign({}, it, {_again:true})); } } }   /* 答错：这一轮最后再考一次（重考不改间隔） */
   const st = S.slangStat = S.slangStat || {n:0, ok:0}; st.n++; if (ok) st.ok++; save(); UI.render(); };
 ACT["sl-next"] = () => { const R = SL.run; if (!R) return; R.i++; R.picked = null; SL.sel = null; if (R.i >= R.items.length){ if (typeof planAutoDone === "function") planAutoDone("slang"); UI.render(); return; } R.opts = slMakeOpts(R.items[R.i], R.all); UI.render(); setTimeout(() => ACT["sl-play"](), 200); };
+
+/* 脱口 · 成长（v1.69.0）
+   打开 app 先到这里。三栏（Career / English / Life）每周的经验值、角色等级、技能、记一笔、复盘。
+   规则和依据写在 DEVNOTES 的“成长页”一节；界面上的字保持短。
+   数据都在 S.grow 里（随备份、恢复一起走）；自己上传的形象图片在 IndexedDB 的 grow:av（跟对战角色一样，不进备份）。 */
+
+const GR_A = ["career", "english", "life"];
+const GR_L = {career:"Career", english:"English", life:"Life"};
+const GR_ZH = {career:"求职", english:"英语", life:"生活"};
+const GR_EN_CAP = 15;          /* 英语经验值：每 2 分钟 1 点，每天最多 15 */
+const GR_KEEP_DAYS = 120;      /* 每一笔记录保留 120 天；更早的只留每周合计（g.weeks） */
+const GR_SKILLS_DEF = [
+  {id:"resume", name:"简历", a:"career"},
+  {id:"network", name:"人脉", a:"career"},
+  {id:"interview", name:"面试", a:"career", auto:"mock"},
+  {id:"speak", name:"口语", a:"english", auto:"speak"},
+  {id:"listen", name:"听力", a:"english", auto:"listen"},
+  {id:"write", name:"写作", a:"english", auto:"write"},
+  {id:"stamina", name:"体力", a:"life"},
+  {id:"routine", name:"作息", a:"life"}
+];
+/* lab：发给朋友的英文消息里怎么说（单数、复数）。bx：另加的英语经验值（真实的英语对话两栏都加） */
+const GR_ACTS_DEF = [
+  {id:"apply", a:"career", name:"投一份认真改过的申请", xp:10, sk:"resume", qty:true, lab:["application", "applications"]},
+  {id:"msg", a:"career", name:"给真人发一条消息（校友、LinkedIn、请人内推）", xp:10, sk:"network", lab:["message to a real person", "messages to real people"]},
+  {id:"talk", a:"career", name:"一次真实的对话（coffee chat、招聘会）", xp:25, bx:10, sk:"network", skn:2, lab:["networking chat", "networking chats"]},
+  {id:"iv", a:"career", name:"一次真实的面试", xp:25, bx:10, sk:"interview", skn:2, lab:["interview", "interviews"]},
+  {id:"school", a:"career", name:"在学校或图书馆做了 2 小时求职", xp:10, lab:["job-search session", "job-search sessions"]},
+  {id:"cmin", a:"career", name:"最小的一步：看完一个职位的要求", xp:3, min:true, cap:1},
+  {id:"good", a:"career", name:"好消息：收到回复或面试邀请", xp:0, mile:true},
+  {id:"next", a:"career", name:"好消息：进了下一轮", xp:0, mile:true},
+  {id:"offer", a:"career", name:"好消息：拿到 offer", xp:0, mile:true},
+  {id:"chat", a:"english", name:"用英语和人聊了 10 分钟以上", xp:10, sk:"speak", lab:["English conversation", "English conversations"]},
+  {id:"wake", a:"life", name:"按时起床", xp:5, sk:"routine", morning:true, cap:1},
+  {id:"phone", a:"life", name:"昨晚手机不在床边", xp:5, sk:"routine", morning:true, cap:1},
+  {id:"move", a:"life", name:"运动或散步 20 分钟以上", xp:10, sk:"stamina", lab:["workout", "workouts"]},
+  {id:"lmin", a:"life", name:"最小的一步：出门走 5 分钟", xp:3, min:true, cap:1}
+];
+const GR_MOCK = ["call", "phone", "basic", "tech", "concept", "dboss:iv", "dboss:432"];   /* 脱口里的模拟面试：面试技能 +1 */
+
+function grRid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+/* 现在的时钟（测试可以设 window.__growNow）；“今天”照旧用 app 的 today()（一天从几点开始算） */
+function grNow(){ return window.__growNow ? new Date(window.__growNow) : new Date(); }
+function grDow(d){ return new Date(dnum(d) * 86400000).getUTCDay(); }
+function grDayStart(){ return (S && S.settings && +S.settings.dayStart) || 0; }
+
+/* 成长的数据：第一次用时补上默认的选项和技能 */
+function G(){
+  const g = S.grow || (S.grow = {});
+  if (!Array.isArray(g.acts)) g.acts = GR_ACTS_DEF.map(x => Object.assign({}, x));
+  if (!Array.isArray(g.skills)) g.skills = GR_SKILLS_DEF.map(x => Object.assign({}, x));
+  if (!Array.isArray(g.log)) g.log = [];
+  if (!Array.isArray(g.miles)) g.miles = [];
+  if (!Array.isArray(g.cal)) g.cal = [];
+  for (const k of ["weeks", "sk", "an", "ad", "mood", "goals"]) if (!g[k] || typeof g[k] !== "object" || Array.isArray(g[k])) g[k] = {};
+  if (g.moodOn == null) g.moodOn = true;
+  if (!g.wake) g.wake = "09:30";
+  if (!g.av || typeof g.av !== "object") g.av = {mode:"char", char:""};
+  return g;
+}
+const grAct = id => G().acts.find(a => a.id === id);
+const grSkill = id => G().skills.find(s => s.id === id);
+const grActsOf = a => G().acts.filter(x => x.a === a);
+function grActName(a){ return a.id === "wake" ? `${a.name}（${G().wake.replace(/^0/, "")} 前）` : a.name; }
+function grActLabel(a){ const x = (a.xp || 0) + (a.bx || 0); return grActName(a) + (a.mile ? "" : `（+${x} 经验值）`); }
+function grRound5(x){ return Math.max(5, Math.round(x / 5) * 5); }
+/* 这周的目标：自己定过的用自己的；Career 没定过的，有起点就按起点多两成（至少 30），没有就 60 */
+function growGoal(a){
+  const g = G(); if (+g.goals[a] > 0) return +g.goals[a];
+  if (a === "career"){ const b = g.base; if (b && (+b.apply || +b.msg)) return Math.max(30, grRound5(((+b.apply || 0) + (+b.msg || 0)) * 10 * 1.2)); return 60; }
+  return 50;
+}
+function growGoals(){ const o = {}; for (const a of GR_A) o[a] = growGoal(a); return o; }
+/* 定目标：周日定的从下周一开始算（这周的条不突然变），其余日子马上生效 */
+function growSetGoals(o){
+  const g = G(), d = today();
+  if (grDow(d) === 0){ g.next = Object.assign({}, growGoals(), g.next || {}, o); g.nextWk = nstr(dnum(K.growWeekStart(d)) + 7); }
+  else Object.assign(g.goals, o);
+}
+
+/* 整理：从“今天练过的”补上每天的口语、听力；结束的周存成合计；太旧的记录删掉；到了新的一周换上定好的目标 */
+function growSync(){
+  const g = G(), d = today(), cur = K.growWeekStart(d); let dirty = false;
+  if (!g.start){ g.start = d; dirty = true; }
+  for (const [day, arr] of Object.entries(S.hist || {})){
+    const sp = new Set(), li = new Set();
+    for (const e of arr || []){ const c = CAT.byId[e.id]; if (!c) continue; (c.t === "l" ? li : sp).add(e.id); }
+    const f = g.ad[day] || {}, s1 = sp.size >= 10 ? 1 : (f.s || 0), l1 = li.size >= 5 ? 1 : (f.l || 0);
+    if (s1 !== (f.s || 0) || l1 !== (f.l || 0)){ g.ad[day] = Object.assign({}, f, {s:s1, l:l1}); dirty = true; }
+  }
+  /* 结束的周：存合计（以前练英语的周也算进去，所以第一次打开就不是 0 级） */
+  const firsts = Object.keys(S.days || {}).concat(g.log.map(e => e.d)).filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x)).sort();
+  if (firsts.length){
+    const startWk = K.growWeekStart(g.start);
+    for (let w = dnum(K.growWeekStart(firsts[0])); w < dnum(cur); w += 7){
+      const wk = nstr(w); if (g.weeks[wk]) continue;
+      const r = K.growWeekSum(g.log, S.days, wk, GR_EN_CAP); const md = grMoodOf(wk);
+      g.weeks[wk] = {c:r.career, e:r.english, l:r.life, n:r.n, m:r.enMin, g: wk >= startWk ? growGoals() : null, md}; dirty = true;
+    }
+  }
+  if (g.next && g.nextWk && g.nextWk <= cur){ Object.assign(g.goals, g.next); delete g.next; delete g.nextWk; dirty = true; }
+  const old = dnum(d) - GR_KEEP_DAYS, n0 = g.log.length;
+  g.log = g.log.filter(e => dnum(e.d) >= old || !g.weeks[K.growWeekStart(e.d)]);
+  if (g.log.length !== n0) dirty = true;
+  if (dirty) save();
+}
+function grMoodOf(wk){ const g = G(), a = dnum(wk); let s = 0, n = 0; for (let x = a; x < a + 7; x++){ const v = g.mood[nstr(x)]; if (v){ s += v; n++; } } return n ? [s, n] : null; }
+/* 一周的合计：结束的周用存下来的，这一周现算 */
+function growWeek(wk){
+  const g = G(), cur = K.growWeekStart(today()), w = g.weeks[wk];
+  if (wk < cur && w) return {career:w.c, english:w.e, life:w.l, n:w.n || {}, enMin:w.m || 0, goals:w.g, md:w.md, enDay:{}};
+  const r = K.growWeekSum(g.log, S.days, wk, GR_EN_CAP); r.goals = wk === cur ? growGoals() : null; r.md = grMoodOf(wk); return r;
+}
+function growTotal(){
+  const g = G(), cur = K.growWeekStart(today()); const t = {career:0, english:0, life:0};
+  for (const [wk, w] of Object.entries(g.weeks)) if (wk < cur){ t.career += w.c || 0; t.english += w.e || 0; t.life += w.l || 0; }
+  const r = K.growWeekSum(g.log, S.days, cur, GR_EN_CAP); t.career += r.career; t.english += r.english; t.life += r.life;
+  t.all = t.career + t.english + t.life; return t;
+}
+/* 技能的次数：记一笔加的 + 自动的（口语、听力按天，写作、模拟面试按次） */
+function grSkillN(s){
+  const g = G(); let n = +g.sk[s.id] || 0;
+  if (s.auto === "speak") n += Object.values(g.ad).filter(f => f && f.s).length;
+  if (s.auto === "listen") n += Object.values(g.ad).filter(f => f && f.l).length;
+  if (s.auto === "write") n += +g.an.write || 0;
+  if (s.auto === "mock") n += +g.an.mock || 0;
+  return n;
+}
+/* 升级了吗：和上次看到的等级比。第一次只记下，不弹 */
+function grUps(){
+  const g = G(), lv = K.growLevel(growTotal().all).lv, sk = {};
+  for (const s of g.skills) sk[s.id] = K.growSkillLevel(grSkillN(s)).lv;
+  if (!g.seen || typeof g.seen !== "object"){ g.seen = {lv, sk}; return {msgs:[], up:false, lv}; }
+  const msgs = []; for (const s of g.skills){ const was = (g.seen.sk || {})[s.id]; if (was && sk[s.id] > was) msgs.push(`${s.name} +${sk[s.id] - was}（Lv ${sk[s.id]}）`); }
+  const up = lv > (g.seen.lv || 1); g.seen = {lv, sk}; return {msgs, up, lv};
+}
+let GR_PULSE = false;
+function grUpText(u){ const p = u.msgs.slice(); if (u.up){ p.push(`升到 Lv ${u.lv}`); GR_PULSE = true; } return p.join("，"); }
+
+/* 记一笔 */
+function growLog(id, units, opt){
+  const g = G(), a = grAct(id); if (!a) return null;
+  growSync();
+  const d = today(); let n = Math.max(1, Math.round(units || 1));
+  if (a.cap){ const done = g.log.filter(e => e.d === d && e.k === id).reduce((s, e) => s + (e.n || 1), 0); if (done >= a.cap){ toast("今天已经记过了"); return null; } n = Math.min(n, a.cap - done); }
+  const e = {id:"g" + grRid(), t:Date.now(), d, k:a.id, nm:grActName(a), a:a.a, n, xp:(a.xp || 0) * n, en:(a.bx || 0) * n, sk:{}};
+  if (a.sk && grSkill(a.sk)) e.sk[a.sk] = (a.skn || 1) * n;
+  if (a.mile){ e.mile = true; g.miles.push({id:e.id, d, nm:e.nm}); }
+  if (opt && opt.pid) e.pid = opt.pid;
+  g.log.push(e); for (const [k, v] of Object.entries(e.sk)) g.sk[k] = (+g.sk[k] || 0) + v;
+  const u = grUps(); const parts = [];
+  if (e.xp + e.en) parts.push(`+${e.xp + e.en} 经验值`);
+  if (e.mile) parts.push("记下了这个好消息");
+  if (u.msgs.length) parts.push(...u.msgs);
+  else for (const k of Object.keys(e.sk)){ const s = grSkill(k), L2 = K.growSkillLevel(grSkillN(s)); parts.push(`${s.name} ${L2.cur}/${L2.need}`); break; }
+  const up = grUpText({msgs:[], up:u.up, lv:u.lv}); if (up) parts.push(up);
+  save(); if (!(opt && opt.quiet)) toast(parts.join("，") || "记下了");
+  return e;
+}
+function growUndo(id){
+  const g = G(), i = g.log.findIndex(e => e.id === id); if (i < 0) return false;
+  const e = g.log[i]; g.log.splice(i, 1);
+  for (const [k, v] of Object.entries(e.sk || {})) g.sk[k] = Math.max(0, (+g.sk[k] || 0) - v);
+  if (e.mile) g.miles = g.miles.filter(m => m.id !== e.id);
+  if (e.pid){ const x = (S.plan || []).find(p => p.id === e.pid); if (x && !g.log.some(y => y.pid === e.pid)) x.done = false; }
+  const wk = K.growWeekStart(e.d); if (wk < K.growWeekStart(today())) delete g.weeks[wk];   /* 结束的周重新算合计 */
+  grUps(); save(); return true;
+}
+/* 计划里的求职、生活项点“做完了”：问实际做了什么（可以连着记几样） */
+const GR_GUESS = {apply:/申请|投|apply|application/i, msg:/消息|linkedin|内推|联系|message|邮件|email/i, talk:/coffee|聊|对话|招聘会|networking|meet/i, iv:/面试|interview/i, school:/学校|图书馆|library|school/i,
+  wake:/起床|wake/i, phone:/手机|phone/i, move:/运动|散步|跑步|健身|走路|walk|gym|run|workout/i};
+function grGuess(text, acts){ const hit = acts.filter(a => GR_GUESS[a.id] && GR_GUESS[a.id].test(text || "")); return hit.concat(acts.filter(a => !hit.includes(a))); }
+async function grQty(a){ if (!a.qty) return 1; const q = await choose("几份？", "", [["1", "1 份"], ["2", "2 份"], ["3", "3 份"], ["4", "4 份"], ["5", "5 份"], ["", "取消"]]); return q ? +q : 0; }
+async function growDone(id){
+  const x = (S.plan || []).find(p => p.id === id); if (!x) return;
+  if (!x.area){ x.done = true; save(); UI.render(); return; }
+  const acts = grGuess(x.text, grActsOf(x.area).filter(a => !a.mile && !a.min));
+  let any = false, first = true;
+  for (let i = 0; i < 5; i++){
+    const opts = (first ? [] : [["", "没有了"]]).concat(acts.map(a => [a.id, grActLabel(a)])).concat(first ? [["_done", "只打勾，不记经验值"], ["", "取消"]] : []);
+    const k = await choose(first ? "做了什么？" : "还做了别的吗？", first ? esc(x.text) : "", opts);
+    if (!k) break;
+    if (k === "_done"){ any = true; break; }
+    const a = grAct(k); if (!a) break; const n = await grQty(a); if (!n){ if (first) break; continue; }
+    if (growLog(k, n, {pid:x.id})) any = true;
+    first = false;
+  }
+  if (any){ x.done = true; save(); }
+  UI.render();
+}
+/* 练习做完（planAutoDone）时顺带记自动技能：写作、模拟面试按次；接话、对话练习算这天练了口语，俚语算练了听力 */
+let GR_AUTO_T = {};
+function growAuto(act){
+  if (!act || !S.grow) return; const g = G(), d = today(); let hit = false;
+  const once = k => { const t = Date.now(); if (GR_AUTO_T[k] && t - GR_AUTO_T[k] < 3000) return false; GR_AUTO_T[k] = t; return true; };
+  if (/^write:/.test(act) && once("write")){ g.an.write = (+g.an.write || 0) + 1; hit = true; }
+  if (GR_MOCK.includes(act) && once("mock")){ g.an.mock = (+g.an.mock || 0) + 1; hit = true; }
+  if (act === "react" || /^dboss:/.test(act)){ const f = g.ad[d] || {}; if (!f.s){ g.ad[d] = Object.assign({}, f, {s:1}); hit = true; } }
+  if (act === "slang"){ const f = g.ad[d] || {}; if (!f.l){ g.ad[d] = Object.assign({}, f, {l:1}); hit = true; } }
+  if (!hit) return;
+  const u = grUps(); save(); const t = grUpText(u); if (t) setTimeout(() => toast(t), 2800);
+}
+(function(){
+  if (typeof planAutoDone !== "function") return;
+  const f0 = planAutoDone;
+  planAutoDone = function(act){ const r = f0.apply(this, arguments); try { growAuto(act); } catch (e) { console.warn(e); } return r; };
+})();
+/* 我的计划页的勾：求职、生活的项打勾时也先问做了什么 */
+(function(){
+  const f0 = CHG["plan-done"];
+  CHG["plan-done"] = el => { const x = (S.plan || []).find(p => p.id === el.dataset.id); if (x && x.area && el.checked && !x.done){ el.checked = false; growDone(x.id); return; } return f0(el); };
+})();
+
+/* ---------- 形象：对战角色 / 自己的图片 / 不显示 ---------- */
+let GR_AV = {img:null, loaded:false}, GR_BAT_WAIT = false;
+function grFaceHTML(){
+  const g = G(), m = g.av.mode;
+  if (m === "none") return "";
+  if (m === "img") return GR_AV.img ? `<img src="${GR_AV.img}" alt="">` : `<span class="bt-thumb-rig"></span>`;
+  const id = g.av.char || L.batActive || "rig";
+  const list = typeof BAT_LIST !== "undefined" ? BAT_LIST : [];
+  const c = id !== "rig" && list.find(x => x.id === id);
+  return c && c.thumb ? `<img class="gr-pose" src="${c.thumb}" alt="">` : `<span class="bt-thumb-rig"></span>`;
+}
+function grAvatarHTML(big){
+  const g = G(), lv = K.growLevel(growTotal().all), p = Math.max(0, Math.min(1, lv.cur / lv.need));
+  const sz = big ? 96 : 64, r = big ? 45 : 29.5, c = 2 * Math.PI * r, none = g.av.mode === "none";
+  const ring = `<svg class="gr-ring" viewBox="0 0 ${sz} ${sz}" aria-hidden="true"><circle cx="${sz / 2}" cy="${sz / 2}" r="${r}" class="gr-ring-bg"/><circle cx="${sz / 2}" cy="${sz / 2}" r="${r}" class="gr-ring-fg" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c * (1 - p)).toFixed(1)}" transform="rotate(-90 ${sz / 2} ${sz / 2})"/></svg>`;
+  const pulse = GR_PULSE ? " gr-up" : ""; GR_PULSE = false;
+  const inner = `${ring}${none ? `<span class="gr-lvbig num">${lv.lv}</span>` : `<span class="gr-face">${grFaceHTML()}</span><span class="gr-lvn num">${lv.lv}</span>`}`;
+  /* 成长页上的形象点进角色页；角色页上的大形象只是看的 */
+  return big ? `<div class="gr-av big${none ? " none" : ""}${pulse}" role="img" aria-label="Lv ${lv.lv}">${inner}</div>`
+    : `<button class="gr-av${none ? " none" : ""}${pulse}" data-act="nav" data-v="gchar" aria-label="角色：Lv ${lv.lv}，再 ${lv.left} 经验值升级">${inner}</button>`;
+}
+function grAvatarLoad(){
+  const g = G(), redo = () => { const t = UI.top(); if (t && (t.name === "grow" || t.name === "gchar")) UI.render(); };
+  if (g.av.mode === "img" && !GR_AV.loaded){ IDB.get("grow:av").then(v => { GR_AV = {img:v || null, loaded:true}; redo(); }).catch(() => { GR_AV.loaded = true; }); }
+  if (g.av.mode === "char" && !GR_BAT_WAIT && typeof BAT_READY !== "undefined"){ GR_BAT_WAIT = true; BAT_READY.then(() => { if ((typeof BAT_LIST !== "undefined") && BAT_LIST.length) redo(); }).catch(() => {}); }
+}
+/* 自己的图片：裁成正方形、缩到 256，存在这台手机上 */
+function grSquare(file, size){
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => { const im = new Image(); im.onload = () => { const s = Math.min(im.width, im.height); if (!s) return rej(new Error("empty"));
+      const c = document.createElement("canvas"); c.width = c.height = size; const x = c.getContext("2d"); x.drawImage(im, (im.width - s) / 2, (im.height - s) / 2, s, s, 0, 0, size, size);
+      let u = ""; try { u = c.toDataURL("image/webp", 0.85); } catch (e) {} if (!/^data:image\/webp/.test(u)) u = c.toDataURL("image/png"); res(u); };
+      im.onerror = () => rej(new Error("bad image")); im.src = fr.result; };
+    fr.onerror = () => rej(fr.error); fr.readAsDataURL(file);
+  });
+}
+
+/* ---------- 成长页 ---------- */
+function grReviewWeek(){
+  const d = today(), dow = grDow(d), h = grNow().getHours();
+  if (dow === 0) return K.growWeekStart(d);
+  if (dow === 1 && h < 12 && h >= grDayStart()) return nstr(dnum(K.growWeekStart(d)) - 7);
+  return null;
+}
+/* 今天的计划按一天里的先后排：写了 13:00 这样的按时间，早上、午饭后、晚饭后、睡前这些按大概的时间，什么都没写的放最前（随时可以做） */
+const GR_CUE = [[/起床|早饭|早餐|早上|早晨/, 420], [/上午/, 540], [/中午|午饭|午餐/, 720], [/下午/, 900], [/傍晚|晚饭|晚餐/, 1080], [/晚上/, 1200], [/睡前|睡觉/, 1380]];
+function grCueMin(x){ const m = String(x.cue || "").match(/(\d{1,2})[:：](\d{2})/); if (m) return +m[1] * 60 + +m[2]; for (const [re, v] of GR_CUE) if (re.test(x.cue || "")) return v; return -1; }
+function grSorted(items){ return items.map((x, i) => [x, grCueMin(x), i]).sort((a, b) => a[1] - b[1] || a[2] - b[2]).map(a => a[0]); }
+function grBest(a, wk){ const g = G(); let b = 0; for (const [k, w] of Object.entries(g.weeks)) if (k < wk) b = Math.max(b, a === "career" ? w.c || 0 : a === "english" ? w.e || 0 : w.l || 0); return b; }
+function grUpcoming(){
+  const g = G(), d = today(), end = nstr(dnum(d) + 6);
+  return (S.plan || []).filter(x => x.area && !x.done && x.date >= d && x.date <= end && planTime(x) && !g.cal.includes(x.id) && planTime(x).getTime() > Date.now());
+}
+VIEWS.grow = {
+  tab:"grow",
+  render(){
+    const g = G(); growSync();
+    const d = today(), now = grNow(), hr = now.getHours(), ds = grDayStart();
+    const lv = K.growLevel(growTotal().all), wk = K.growWeekStart(d), sum = growWeek(wk), goals = growGoals();
+    const items = grSorted((S.plan || []).filter(x => x.date === d)), left = items.filter(x => !x.done && !x.skip), nx = left[0];
+    const low = `<p class="small muted" style="margin-top:10px">没精神？<button class="linkbtn small" data-act="gr-low">只做最小的一步</button></p>`;
+    let now1;
+    if (nx){
+      const btn = nx.area ? `<button class="btn primary" data-act="gr-done" data-id="${nx.id}">做完了</button>` : nx.act ? `<button class="btn primary" data-act="plan-go" data-v="${esc(nx.act)}">开始</button>` : `<button class="btn primary" data-act="plan-done-now" data-id="${nx.id}">做完了</button>`;
+      now1 = `<section class="panel gr-now"><span class="small muted">现在做${nx.area ? `（${GR_L[nx.area]}）` : ""}</span><b>${nx.cue ? esc(nx.cue) + " → " : ""}${esc(nx.text)}</b>${nx.ifthen ? `<p class="small gr-if">${esc(nx.ifthen)}</p>` : ""}<div class="row-gap">${btn}</div>${low}</section>`;
+    } else if (!items.length){
+      now1 = `<section class="panel gr-now"><span class="small muted">现在做</span><b>今天还没有计划</b><div class="row-gap"><button class="btn primary" data-act="gr-en">练英语</button><button class="btn" data-act="gr-log">记一笔</button><button class="btn ghost" data-act="nav" data-v="plan">加一项计划</button></div>${low}</section>`;
+    } else {
+      now1 = `<section class="panel gr-now"><span class="small muted">现在做</span><b>今天的计划都做完了 ✓</b><div class="row-gap"><button class="btn" data-act="gr-log">记一笔</button><button class="btn ghost" data-act="gr-en">练英语</button></div></section>`;
+    }
+    const bar = a => { const got = sum[a] || 0, goal = goals[a], best = grBest(a, wk), pct = Math.min(100, Math.round(100 * got / Math.max(1, goal)));
+      const cls = best > 0 && got > best ? " best" : got >= goal ? " ok" : "";
+      return `<div class="gr-bar${cls}" data-a="${a}"><span class="gr-lab">${GR_L[a]}</span><div class="t"><i style="width:${pct}%"></i></div><span class="v num">${got}/${goal}</span>${a === "english" ? `<button class="btn sm ghost" data-act="gr-en">练</button>` : `<button class="btn sm ghost" data-act="gr-log" data-v="${a}">记一笔</button>`}</div>`; };
+    const morning = hr >= ds && hr < 12 ? g.acts.filter(a => a.morning && !g.log.some(e => e.d === d && e.k === a.id)) : [];
+    const mRow = morning.length ? `<section class="panel gr-row"><span class="small muted">早上</span><div class="row-gap">${morning.map(a => `<button class="btn sm" data-act="gr-quick" data-v="${a.id}">${esc(grActName(a))}</button>`).join("")}</div></section>` : "";
+    const md = g.mood[d] || 0;
+    const moodRow = g.moodOn && (hr >= 18 || hr < ds) ? `<section class="panel gr-row"><span class="small muted">今天感觉怎么样（1 很差，5 很好）</span><div class="gr-mood" role="group" aria-label="今天的心情">${[1, 2, 3, 4, 5].map(n => `<button data-act="gr-mood" data-v="${n}" aria-pressed="${md === n}">${n}</button>`).join("")}</div></section>` : "";
+    const doneN = items.filter(x => x.done).length;
+    const fold = items.length ? `<details class="gr-plan" id="grPlan" ${L.grPlanOpen ? "open" : ""}><summary>今天的计划 ${doneN}/${items.length}</summary><div class="list" style="margin-top:6px">${items.map(x => planRowHTML(x, false)).join("")}</div><p class="small" style="margin:8px 4px 0"><button class="linkbtn small" data-act="nav" data-v="plan">我的计划</button></p></details>` : "";
+    const up = grUpcoming();
+    const cal = up.length ? `<div class="banner gr-cal" style="margin-top:12px;margin-bottom:0"><span>接下来 7 天有 ${up.length} 个求职、生活时段还没加进日历</span><button class="btn sm" data-act="gr-cal">加进日历</button></div>` : "";
+    const rw = grReviewWeek();
+    const review = rw && g.rv !== rw ? `<section class="panel gr-review"><b>本周复盘</b><p class="small muted" style="margin-top:4px">把这一周的数字发给 AI，拿回下周的目标和计划。</p><div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="nav" data-v="greview" data-wk="${rw}">开始复盘</button></div></section>` : "";
+    const banners = `${installBanner()}${STORAGE_OK ? "" : `<div class="banner"><span>存储空间不够，进度没存上。先备份，再清理旧录音。</span><button class="btn sm primary" data-act="nav" data-v="storage">去看看</button></div>`}${typeof backupBanner === "function" ? backupBanner() : ""}${typeof nextIvBanner === "function" ? nextIvBanner() : ""}${resumeBanner()}`;
+    return `<div class="wrap gr">
+      <div class="gr-top"><div><div class="gr-date">${esc(fmtDate(d))}</div><div class="small muted gr-lvline">Lv ${lv.lv}，再 ${lv.left} 经验值升级</div></div>${grAvatarHTML(false)}</div>
+      ${banners}${review}${now1}
+      <section class="panel gr-week"><div class="gr-h"><b>本周经验值</b><span class="small muted">周一清零</span></div><div class="gr-bars">${GR_A.map(bar).join("")}</div></section>
+      ${mRow}${moodRow}${fold}${cal}
+      <p class="small gr-links"><button class="linkbtn small" data-act="nav" data-v="greview" data-wk="${rw || wk}">复盘</button><button class="linkbtn small" data-act="nav" data-v="gchar">角色和设置</button></p>
+    </div>`;
+  },
+  mount(){
+    grAvatarLoad();
+    const det = $("#grPlan"); if (det) det.addEventListener("toggle", () => { L.grPlanOpen = det.open; saveLocal(); });
+    const u = grUps(), t = grUpText(u); if (t){ save(); toast(t); const av = $(".gr-av"); if (av){ av.classList.remove("gr-up"); void av.offsetWidth; av.classList.add("gr-up"); } }
+  }
+};
+
+/* 记一笔：先选哪一栏（没指定时），再选做了什么 */
+ACT["gr-log"] = async el => {
+  let a = el && el.dataset && el.dataset.v;
+  if (!a){ a = await choose("记一笔", "", [["career", "Career（求职）"], ["english", "English（英语）"], ["life", "Life（生活）"], ["", "取消"]]); if (!a) return; if (a === "english") return ACT["gr-en"](); }
+  const acts = grActsOf(a); if (!acts.length){ toast("这一栏还没有选项，在“角色和设置”里加"); return; }
+  const k = await choose(`记一笔：${GR_L[a]}`, "", acts.map(x => [x.id, grActLabel(x)]).concat([["", "取消"]])); if (!k) return;
+  const n = await grQty(grAct(k)); if (!n) return;
+  growLog(k, n); UI.render();
+};
+/* English：开始练习、游戏，或者记一笔（英语对话这类在 app 外面练的） */
+ACT["gr-en"] = async () => {
+  const acts = grActsOf("english");
+  const k = await choose("English", "", [["_std", "开始练习"], ["_game", "游戏"]].concat(acts.map(x => [x.id, "记一笔：" + grActLabel(x)])).concat([["", "取消"]]));
+  if (!k) return;
+  if (k === "_std") return startSession(S.settings.goal || "std");
+  if (k === "_game") return ACT["start-game"]({dataset:{}});
+  const n = await grQty(grAct(k)); if (!n) return; growLog(k, n); UI.render();
+};
+ACT["gr-done"] = el => growDone(el.dataset.id);
+ACT["gr-quick"] = el => { growLog(el.dataset.v, 1); UI.render(); };
+ACT["gr-mood"] = el => { const g = G(); g.mood[today()] = +el.dataset.v; save(); toast("记下了"); UI.render(); };
+ACT["gr-low"] = async () => {
+  const cm = grActsOf("career").find(a => a.min), lm = grActsOf("life").find(a => a.min), strip = a => a.name.replace(/^最小的一步[:：]\s*/, "");
+  const opts = [["en", "英语：只练 3 分钟"]].concat(cm ? [["career", "求职：" + strip(cm)]] : []).concat(lm ? [["life", "生活：" + strip(lm)]] : []).concat([["", "取消"]]);
+  const k = await choose("只做最小的一步", "", opts); if (!k) return;
+  if (k === "en") return ACT["low-day"]();
+  const a = k === "career" ? cm : lm; if (!growLog(a.id, 1)) return;
+  const d = today(); for (const x of S.plan || []) if (x.date === d && !x.done && x.area === k) x.skip = true;   /* 保底只跳过同一栏剩下的项 */
+  save(); UI.render();
+};
+/* 接下来 7 天有具体时间的求职、生活时段，一次加进日历（一个文件，好几个日程） */
+function grIcs(items){
+  const f = dt => dt.getFullYear() + String(dt.getMonth() + 1).padStart(2, "0") + String(dt.getDate()).padStart(2, "0") + "T" + String(dt.getHours()).padStart(2, "0") + String(dt.getMinutes()).padStart(2, "0") + "00";
+  const clean = s => String(s).replace(/[,;\\\n]/g, " ");
+  const ev = items.map(x => { const t = planTime(x), t2 = new Date(t.getTime() + 60 * 60000);
+    return ["BEGIN:VEVENT", "UID:" + x.id + "@tuokou", "DTSTAMP:" + f(new Date()), "DTSTART:" + f(t), "DTEND:" + f(t2), "SUMMARY:" + clean(x.text), "DESCRIPTION:" + clean(x.ifthen || "脱口的计划"), "BEGIN:VALARM", "TRIGGER:-PT10M", "ACTION:DISPLAY", "DESCRIPTION:" + clean(x.text), "END:VALARM", "END:VEVENT"].join("\r\n"); });
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//tuokou//grow//CN"].concat(ev, ["END:VCALENDAR"]).join("\r\n");
+}
+ACT["gr-cal"] = async () => {
+  const items = grUpcoming(); if (!items.length) return;
+  const c = await choose("加到哪里提醒你", `${items.length} 个时段，每个提前 10 分钟提醒。本机日历：会下载一个提醒文件，点开它，选手机自带的日历，保存就全部加进去了。`, [["local", "本机日历"], ["copy", "复制提醒内容"], ["", "取消"]]);
+  if (!c) return; const g = G();
+  if (c === "local"){
+    const url = URL.createObjectURL(new Blob([grIcs(items)], {type:"text/calendar"}));
+    const a = document.createElement("a"); a.href = url; a.download = "tuokou-本周时段.ics"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000); toast("下载好了：点通知栏里的文件，选手机自带的日历，保存");
+  } else {
+    const hm = t => String(t.getHours()).padStart(2, "0") + ":" + String(t.getMinutes()).padStart(2, "0");
+    const ok = await copyText(items.map(x => `${x.date} ${hm(planTime(x))} ${x.text}`).join("\n")); toast(ok ? "复制好了：粘贴到任何提醒、闹钟或备忘录 app" : "复制没成功，再点一次试试");
+  }
+  for (const x of items) if (!g.cal.includes(x.id)) g.cal.push(x.id); g.cal = g.cal.slice(-200); save(); UI.render();
+};
+
+/* ---------- 复盘 ---------- */
+function grRange(wk){ const a = dnum(wk), s = new Date(a * 86400000), e = new Date((a + 6) * 86400000); return `${s.getUTCMonth() + 1}月${s.getUTCDate()}日–${s.getUTCMonth() === e.getUTCMonth() ? "" : (e.getUTCMonth() + 1) + "月"}${e.getUTCDate()}日`; }
+function grRangeEn(wk){ const M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; const a = dnum(wk), s = new Date(a * 86400000), e = new Date((a + 6) * 86400000);
+  return `${M[s.getUTCMonth()]} ${s.getUTCDate()}–${s.getUTCMonth() === e.getUTCMonth() ? "" : M[e.getUTCMonth()] + " "}${e.getUTCDate()}`; }
+function grCounts(sum, a){ const g = G(); return g.acts.filter(x => x.a === a && !x.mile && (sum.n || {})[x.id]).map(x => `${x.name} ×${sum.n[x.id]}`); }
+function grWeekLog(wk){ const a = dnum(wk); return G().log.filter(e => { const x = dnum(e.d); return x >= a && x < a + 7; }); }
+function grMoodLine(wk){
+  const g = G(), a = dnum(wk), WD = "一二三四五六日", t = dnum(today()); const days = [], withC = [], without = [];
+  const logs = grWeekLog(wk);
+  for (let i = 0; i < 7; i++){ const ds = nstr(a + i), v = g.mood[ds]; days.push(`${WD[i]} ${v || "–"}`); if (!v || a + i > t) continue;
+    (logs.some(e => e.d === ds && e.a === "career" && !e.mile) ? withC : without).push(v); }
+  if (!days.some(x => !/–$/.test(x))) return "";
+  const avg = arr => (arr.reduce((s, v) => s + v, 0) / arr.length).toFixed(1);
+  return `心情（1–5）：${days.join("、")}${withC.length && without.length ? `；有求职记录的日子平均 ${avg(withC)}，其他日子 ${avg(without)}` : ""}`;
+}
+function grReviewText(wk, en){
+  const g = G(), sum = growWeek(wk), goals = sum.goals || growGoals(), d = today(), prev = growWeek(nstr(dnum(wk) - 7)), a = dnum(wk), WD = "一二三四五六日";
+  const plan = (S.plan || []).filter(x => x.area && dnum(x.date) >= a && dnum(x.date) < a + 7), done = plan.filter(x => x.done), undone = plan.filter(x => !x.done && x.date <= d);
+  const ift = plan.filter(x => x.ifthen);
+  const miles = g.miles.filter(m => dnum(m.d) >= a && dnum(m.d) < a + 7);
+  const enDays = []; for (let i = 0; i < 7; i++){ const ds = nstr(a + i); enDays.push(`${WD[i]} ${a + i > dnum(d) ? "–" : Math.round(((S.days || {})[ds] || {}).sec / 60 || 0)}`); }
+  const sug = {}; for (const k of GR_A) sug[k] = K.growSuggest(goals[k], sum[k] || 0);
+  const lines = [
+    `这是我在脱口“成长”里 ${grRange(wk)} 这一周的记录，请帮我复盘。今天是 ${d}。`, "",
+    `经验值（本周 / 目标）：Career ${sum.career}/${goals.career}，English ${sum.english}/${goals.english}，Life ${sum.life}/${goals.life}`,
+    `求职：${grCounts(sum, "career").join("；") || "没有记录"}`,
+    miles.length ? `好消息：${miles.map(m => m.nm.replace(/^好消息[:：]\s*/, "")).join("；")}` : "",
+    `英语：在脱口里练了 ${Object.keys(sum.enDay || {}).length ? Object.values(sum.enDay).reduce((s, v) => s + v, 0) : sum.enMin || 0} 分钟（${enDays.join("、")}）${grCounts(sum, "english").length ? "；" + grCounts(sum, "english").join("；") : ""}`,
+    `生活：${grCounts(sum, "life").join("；") || "没有记录"}`,
+    grMoodLine(wk),
+    plan.length ? `求职和生活的计划：${plan.length} 项，做完 ${done.length} 项${undone.length ? `。没做的：${undone.slice(0, 10).map(x => x.text).join("；")}` : ""}` : "",
+    ift.length ? `带“如果……就……”的项：${ift.map(x => `${x.text}（${x.ifthen}）${x.done ? "做了" : "没做"}`).join("；")}` : "",
+    prev && (prev.career || prev.english || prev.life) ? `上周：Career ${prev.career}，English ${prev.english}，Life ${prev.life}` : "",
+    g.base && (+g.base.apply || +g.base.msg) ? `起点（开始用之前的一周）：申请 ${+g.base.apply || 0} 份，联系 ${+g.base.msg || 0} 人` : "",
+    `按“跳一跳够得着”算的下周建议目标：Career ${sug.career}，English ${sug.english}，Life ${sug.life}（达成的加 15%，没达成的保持）`,
+    en ? `\n我用英语写的几句（请只标出错误、给提示，不要直接改写，我自己改）：\n${en}` : "",
+    "", "请帮我：",
+    "1. 这一周哪里做得好、哪里卡住了（简短）。",
+    "2. 下周三栏的目标：可以用上面的建议，也可以按你的判断调。",
+    "3. 排下周每天的求职和生活计划，写清楚什么时候、做什么；给最难的一项写一句“如果……就……”。",
+    "4. 给我一段导入码，格式：",
+    "计划 | 替换成长", "成长目标 | 求职 | 数字", "成长目标 | 英语 | 数字", "成长目标 | 生活 | 数字",
+    "计划 | 日期 | 什么时候 | 做什么 | 求职（或 生活） | 如果……就……（可以空着）",
+    "（“计划 | 替换成长”只换掉还没做的求职和生活计划，英语练习的计划不动。“什么时候”写成 13:00 这样的具体时间，我可以一次加进日历。）"
+  ];
+  return lines.filter(x => x !== "").join("\n").replace(/\n{3,}/g, "\n\n");
+}
+function grFriendText(wk){
+  const g = G(), sum = growWeek(wk), parts = [];
+  for (const a of g.acts){ const n = (sum.n || {})[a.id]; if (!n || !a.lab) continue; parts.push(`${n} ${n > 1 ? a.lab[1] : a.lab[0]}`); }
+  const min = Object.keys(sum.enDay || {}).length ? Object.values(sum.enDay).reduce((s, v) => s + v, 0) : sum.enMin || 0;
+  return `My week (${grRangeEn(wk)}): ${parts.length ? parts.join(", ") : "no job-search actions logged yet"}. English practice: ${min} min.`;
+}
+VIEWS.greview = {
+  tab:"grow",
+  render(p){
+    const g = G(); growSync(); const wk = /^\d{4}-\d{2}-\d{2}$/.test(p.wk || "") ? p.wk : K.growWeekStart(today());
+    const sum = growWeek(wk), goals = sum.goals || growGoals(), cur = wk === K.growWeekStart(today());
+    const sug = {}; for (const k of GR_A) sug[k] = K.growSuggest(goals[k], sum[k] || 0);
+    const row = a => `<div class="li"><div class="grow"><b>${GR_L[a]} ${sum[a] || 0}/${goals[a]}</b><span>${esc((a === "english" ? [`练了 ${sum.enMin || 0} 分钟`] : []).concat(grCounts(sum, a)).join("；") || "没有记录")}</span></div></div>`;
+    const mood = grMoodLine(wk);
+    return `<div class="wrap">${backBtn()}<h2>复盘</h2><p class="muted small" style="margin:4px 0 12px">${grRange(wk)}${cur ? "（这一周）" : ""}</p>
+      <div class="list">${GR_A.map(row).join("")}</div>${mood ? `<p class="small" style="margin:10px 2px 0">${esc(mood)}</p>` : ""}
+      <div class="panel" style="margin-top:14px"><b>下周的建议目标</b><p class="small muted" style="margin-top:4px">达成的加 15%，没达成的保持。</p>
+        <p style="margin-top:6px"><span class="num">Career ${sug.career}，English ${sug.english}，Life ${sug.life}</span></p>
+        <button class="btn sm" style="margin-top:8px" data-act="gr-goal-apply" data-c="${sug.career}" data-e="${sug.english}" data-l="${sug.life}">用这个当下周目标</button></div>
+      <label class="fld"><span>用英语写两三句这周的事（可选）</span><textarea id="grEn" rows="3" data-chg="gr-en-draft" placeholder="This week I went to the library three times...">${esc(L.grEnDraft || "")}</textarea></label>
+      <div class="row-gap" style="margin-top:12px"><button class="btn primary" data-act="gr-review-copy" data-wk="${wk}">复制给 AI</button><button class="btn" data-act="gr-friend" data-wk="${wk}">发给朋友</button></div>
+      <p class="small muted" style="margin-top:12px">拿到 AI 的导入码以后：<button class="linkbtn small" data-act="nav" data-v="import">导入新内容</button></p></div>`;
+  }
+};
+CHG["gr-en-draft"] = el => { L.grEnDraft = el.value; saveLocal(); };
+ACT["gr-review-copy"] = async el => {
+  const wk = el.dataset.wk, ta = $("#grEn"), en = ((ta && ta.value) || L.grEnDraft || "").trim();
+  if (ta){ L.grEnDraft = ta.value; saveLocal(); }
+  await sendToClaude(grReviewText(wk, en)); const g = G(); g.rv = wk; save();
+};
+ACT["gr-friend"] = async el => {
+  const text = grFriendText(el.dataset.wk);
+  if (navigator.share && !IN_FRAME){ try { await navigator.share({text}); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+  const ok = await copyText(text); toast(ok ? "复制好了：发给朋友之前可以改" : "复制没成功，再点一次试试");
+};
+ACT["gr-goal-apply"] = el => { growSetGoals({career:+el.dataset.c, english:+el.dataset.e, life:+el.dataset.l}); save(); toast(grDow(today()) === 0 ? "定好了：下周一开始算" : "定好了"); UI.render(); };
+
+/* ---------- 角色页：形象、技能、记一笔的选项、目标和设置、记录 ---------- */
+let GR_EDIT = null;   /* {t:"act"|"skill", id}（id 为空是新加） */
+let GR_OPEN = {};     /* 角色页上展开了哪几块（重画页面时保持；正在改选项时“记一笔的选项”一定展开） */
+const grDet = (k, title, body) => `<details class="panel gr-det" data-k="${k}" style="margin-top:12px" ${GR_OPEN[k] || (k === "acts" && GR_EDIT && GR_EDIT.t === "act") ? "open" : ""}><summary>${title}</summary>${body}</details>`;
+function grSkillRows(a){
+  const g = G(), ed = GR_EDIT && GR_EDIT.t === "skill" ? GR_EDIT.id : undefined;
+  return g.skills.filter(s => s.a === a).map(s => { const n = grSkillN(s), L2 = K.growSkillLevel(n), pct = Math.round(100 * L2.cur / L2.need);
+    if (ed === s.id) return grSkillForm(s);
+    return `<div class="gr-skill"><span><b>${esc(s.name)}</b> <span class="num">Lv ${L2.lv}</span></span><span class="small muted">${n} 次${s.auto ? "（自动）" : ""}　<button class="linkbtn small" data-act="gr-sk-edit" data-id="${s.id}">改</button></span><div class="t"><i style="width:${pct}%"></i></div></div>`; }).join("") || `<p class="small muted" style="margin:6px 0">还没有技能</p>`;
+}
+function grSkillForm(s){
+  return `<div class="panel gr-form" id="grForm"><label class="fld" style="margin-top:0"><span>名字</span><input type="text" id="grSkName" maxlength="12" value="${esc(s ? s.name : "")}" placeholder="比如：发音"></label>
+    <label class="fld"><span>哪一栏</span><select id="grSkA">${GR_A.map(a => `<option value="${a}" ${(s ? s.a : (GR_EDIT && GR_EDIT.a) || "career") === a ? "selected" : ""}>${GR_L[a]}（${GR_ZH[a]}）</option>`).join("")}</select></label>
+    <div class="row-gap" style="margin-top:10px"><button class="btn primary sm" data-act="gr-sk-save">${s ? "保存" : "加上"}</button><button class="btn ghost sm" data-act="gr-edit-cancel">取消</button>${s ? `<button class="btn ghost sm danger" data-act="gr-sk-del" data-id="${s.id}">删除</button>` : ""}</div></div>`;
+}
+function grActRows(a){
+  const g = G(), ed = GR_EDIT && GR_EDIT.t === "act" ? GR_EDIT.id : undefined;
+  return g.acts.filter(x => x.a === a).map(x => { if (ed === x.id) return grActForm(x);
+    const s = x.sk ? grSkill(x.sk) : null;
+    return `<div class="li"><div class="grow"><b>${esc(grActName(x))}</b><span>${x.mile ? "里程碑，不算经验值" : `+${(x.xp || 0) + (x.bx || 0)} 经验值${x.bx ? `（English 另加 ${x.bx}）` : ""}`}${s ? `，${esc(s.name)} +${x.skn || 1}` : ""}${x.cap ? "，每天一次" : ""}</span></div><button class="linkbtn small" data-act="gr-act-edit" data-id="${x.id}">改</button></div>`; }).join("") || `<div class="li"><span class="small muted">还没有选项</span></div>`;
+}
+function grActForm(x){
+  const g = G();
+  return `<div class="panel gr-form" id="grForm"><label class="fld" style="margin-top:0"><span>做了什么</span><input type="text" id="grActName" maxlength="60" value="${esc(x ? x.name : "")}" placeholder="比如：改了一版简历"></label>
+    <label class="fld"><span>哪一栏</span><select id="grActA">${GR_A.map(a => `<option value="${a}" ${(x ? x.a : (GR_EDIT && GR_EDIT.a) || "career") === a ? "selected" : ""}>${GR_L[a]}（${GR_ZH[a]}）</option>`).join("")}</select></label>
+    <label class="fld"><span>经验值</span><input type="number" id="grActXp" min="0" max="100" inputmode="numeric" value="${x ? x.xp || 0 : 10}"></label>
+    <label class="fld"><span>算进哪个技能</span><select id="grActSk"><option value="">不算技能</option>${g.skills.map(s => `<option value="${s.id}" ${x && x.sk === s.id ? "selected" : ""}>${esc(s.name)}（${GR_L[s.a]}）</option>`).join("")}</select></label>
+    <div class="row-gap" style="margin-top:10px"><button class="btn primary sm" data-act="gr-act-save">${x ? "保存" : "加上"}</button><button class="btn ghost sm" data-act="gr-edit-cancel">取消</button>${x ? `<button class="btn ghost sm danger" data-act="gr-act-del" data-id="${x.id}">删除</button>` : ""}</div></div>`;
+}
+VIEWS.gchar = {
+  tab:"grow", noRefresh:true,
+  render(){
+    const g = G(); growSync(); const tot = growTotal(), lv = K.growLevel(tot.all), goals = growGoals();
+    const m = g.av.mode, list = typeof BAT_LIST !== "undefined" ? BAT_LIST : [], curC = g.av.char || L.batActive || "rig";
+    const chars = [{id:"rig", name:"原创小人", thumb:""}].concat(list).map(c => `<button class="gr-pick${curC === c.id ? " on" : ""}" data-act="gr-av-char" data-v="${esc(c.id)}" aria-pressed="${curC === c.id}">${c.thumb ? `<img src="${c.thumb}" alt="">` : `<span class="bt-thumb-rig" aria-hidden="true"></span>`}<span>${esc(c.name)}</span></button>`).join("");
+    const av = `<div class="seg" role="group" aria-label="形象">${[["char", "对战角色"], ["img", "自己的图片"], ["none", "不显示"]].map(([k, l]) => `<button data-act="gr-av-mode" data-v="${k}" aria-pressed="${m === k}">${l}</button>`).join("")}</div>
+      ${m === "char" ? `<div class="gr-picks">${chars}</div>${list.length ? "" : `<p class="small muted">在“我的 → 对战角色”导入角色以后，这里就能选。</p>`}` : ""}
+      ${m === "img" ? `<div class="row-gap"><label class="btn sm">选图片<input type="file" accept="image/*" data-chg="gr-av-file" style="display:none"></label>${GR_AV.img ? `<button class="btn sm ghost danger" data-act="gr-av-del">删除这张图片</button>` : ""}</div><p class="small muted" style="margin-top:6px">会裁成正方形，只存在这台手机上，不进备份。</p>` : ""}`;
+    const editing = GR_EDIT;
+    const skills = GR_A.map(a => `<div class="gr-sec"><span class="small muted">${GR_L[a]}</span>${grSkillRows(a)}</div>`).join("") + (editing && editing.t === "skill" && !editing.id ? grSkillForm(null) : `<button class="btn sm ghost" style="margin-top:8px" data-act="gr-sk-add">＋ 加技能</button>`);
+    const acts = GR_A.map(a => `<div class="gr-sec"><span class="small muted">${GR_L[a]}</span><div class="list">${grActRows(a)}</div></div>`).join("") + (editing && editing.t === "act" && !editing.id ? grActForm(null) : `<div class="row-gap" style="margin-top:8px"><button class="btn sm ghost" data-act="gr-act-add">＋ 加一项</button><button class="btn sm ghost" data-act="gr-act-reset">恢复默认的选项</button></div>`);
+    const cur = K.growWeekStart(today()), weeks = []; for (let i = 0; i < 8; i++) weeks.push(nstr(dnum(cur) - 7 * i));
+    const wrows = weeks.map(w => { const s = growWeek(w); if (!(s.career || s.english || s.life) && w !== cur) return ""; const md = s.md ? (s.md[0] / s.md[1]).toFixed(1) : "–";
+      return `<div class="li"><div class="grow"><b>${grRange(w)}${w === cur ? "（这周）" : ""}</b><span><span class="num">Career ${s.career}，English ${s.english}，Life ${s.life}</span>，心情 ${md}</span></div></div>`; }).join("");
+    const recent = g.log.slice(-30).reverse().map(e => `<div class="li"><div class="grow"><b>${esc(e.nm)}${e.n > 1 ? ` ×${e.n}` : ""}</b><span>${esc(fmtDate(e.d))}${e.xp + e.en ? `，+${e.xp + e.en} 经验值` : ""}</span></div><button class="linkbtn small" data-act="gr-undo" data-id="${e.id}">撤销</button></div>`).join("");
+    const miles = g.miles.slice().reverse().map(x => `<div class="li"><div class="grow"><b>${esc(x.nm.replace(/^好消息[:：]\s*/, ""))}</b><span>${esc(fmtDate(x.d))}</span></div></div>`).join("");
+    const b = g.base || {};
+    return `<div class="wrap gr">${backBtn()}
+      <div class="gr-top" style="margin-top:0"><div><h2 style="font-size:26px">角色</h2><div class="small muted gr-lvline"><span class="num">Lv ${lv.lv}</span>，累计 ${tot.all} 经验值，再 ${lv.left} 升级</div></div>${grAvatarHTML(true)}</div>
+      <div class="panel"><b>形象</b>${av}</div>
+      <div class="panel" style="margin-top:12px"><div class="gr-h"><b>技能</b><span class="small muted">用得越多涨得越多</span></div>${skills}</div>
+      <div class="panel" style="margin-top:12px"><b>每周目标</b><p class="small muted" style="margin-top:4px">“跳一跳够得着”：复盘时会按这周的完成情况建议下周的。</p>
+        <div class="gr-goals">${GR_A.map(a => `<label class="fld"><span>${GR_L[a]}</span><input type="number" min="5" max="999" inputmode="numeric" data-chg="gr-goal" data-v="${a}" value="${goals[a]}"></label>`).join("")}</div>
+        ${g.next ? `<p class="small muted">下周一开始：Career ${g.next.career}，English ${g.next.english}，Life ${g.next.life}</p>` : ""}</div>
+      <div class="panel" style="margin-top:12px"><b>设置</b>
+        <label class="fld"><span>按时起床：几点前</span><input type="time" data-chg="gr-wake" value="${esc(g.wake)}"></label>
+        <div class="fld"><span>起点：开始用之前的一周，大概</span><div class="row-gap"><label class="gr-inline">投了<input type="number" min="0" max="99" inputmode="numeric" data-chg="gr-base" data-v="apply" value="${b.apply != null ? +b.apply : ""}">份</label><label class="gr-inline">联系了<input type="number" min="0" max="99" inputmode="numeric" data-chg="gr-base" data-v="msg" value="${b.msg != null ? +b.msg : ""}">个人</label></div></div>
+        <label class="switch"><span>晚上记一下心情（不算经验值）</span><input type="checkbox" data-chg="gr-mood-on" ${g.moodOn ? "checked" : ""}></label></div>
+      ${grDet("acts", "记一笔的选项", acts)}
+      ${grDet("weeks", "最近几周", `<div class="list" style="margin-top:8px">${wrows}</div>`)}
+      ${miles ? grDet("miles", `里程碑 ${g.miles.length}`, `<div class="list" style="margin-top:8px">${miles}</div>`) : ""}
+      ${recent ? grDet("recent", "最近的记录", `<div class="list" style="margin-top:8px">${recent}</div>`) : ""}
+      <div class="panel" style="margin-top:12px"><b>发给 AI</b><p class="small muted" style="margin-top:4px">复盘看一周；综合分析把设置、技能和最近四周一起发过去，帮你判断目标和选项设得合不合适。</p>
+        <div class="row-gap" style="margin-top:10px"><button class="btn sm" data-act="nav" data-v="greview" data-wk="${grReviewWeek() || cur}">复盘</button><button class="btn sm primary" data-act="gr-analyze">综合分析</button></div></div>
+      <details class="panel gr-det" data-k="rules" style="margin-top:12px" ${GR_OPEN.rules ? "open" : ""}><summary>怎么算</summary><div class="small" style="line-height:1.8;margin-top:6px">
+        <p>经验值只给你能控制的行动。English 从每天在脱口里的练习时间自动算：每 2 分钟 1 点，每天最多 ${GR_EN_CAP} 点。真实的英语对话，Career 和 English 两栏都加。</p>
+        <p>每周一清零（按“一天从几点开始算”）。等级只涨不掉：第 2 级 100，第 3 级 300，第 4 级 600，每升一级多要 100。</p>
+        <p>技能：第 2 级 3 次，第 3 级 9 次，第 4 级 18 次。口语按“这天说了 10 句以上”，听力按“这天听了 5 题以上”，写作和模拟面试按次，自动算。</p>
+        <p>手机不用非放到卧室外：下床才够得着就行。</p>
+        <p>没做完的计划不扣分；好消息记成里程碑，不算经验值。</p></div></details>
+    </div>`;
+  },
+  mount(){ grAvatarLoad(); document.querySelectorAll("details.gr-det[data-k]").forEach(d => d.addEventListener("toggle", () => { GR_OPEN[d.dataset.k] = d.open; })); }
+};
+ACT["gr-av-mode"] = el => { const g = G(); g.av.mode = el.dataset.v; save(); UI.render(); };
+ACT["gr-av-char"] = el => { const g = G(); g.av.char = el.dataset.v; g.av.mode = "char"; save(); UI.render(); };
+CHG["gr-av-file"] = async el => {
+  const f = el.files && el.files[0]; el.value = ""; if (!f) return;
+  try { const url = await grSquare(f, 256); await IDB.put("grow:av", url); GR_AV = {img:url, loaded:true}; const g = G(); g.av.mode = "img"; save(); toast("换好了"); UI.render(); }
+  catch (e) { toast("读不了这张图片，换一张试试"); }
+};
+ACT["gr-av-del"] = async () => { if (!await sheet("删除这张图片？", "删掉以后形象换回对战角色。", "删除", true)) return; await IDB.del("grow:av"); GR_AV = {img:null, loaded:true}; const g = G(); g.av.mode = "char"; save(); UI.render(); };
+CHG["gr-goal"] = el => { const v = Math.max(5, Math.min(999, Math.round(+el.value || 0))); const g = G(); g.goals[el.dataset.v] = v; save(); toast("改好了"); };
+CHG["gr-wake"] = el => { if (!/^\d{2}:\d{2}$/.test(el.value)) return; const g = G(); g.wake = el.value; save(); toast("改好了"); };
+CHG["gr-base"] = el => { const g = G(); g.base = Object.assign({}, g.base || {}); const v = el.value === "" ? null : Math.max(0, Math.min(99, Math.round(+el.value || 0))); if (v == null) delete g.base[el.dataset.v]; else g.base[el.dataset.v] = v; save(); };
+CHG["gr-mood-on"] = el => { const g = G(); g.moodOn = !!el.checked; save(); };
+ACT["gr-edit-cancel"] = () => { GR_EDIT = null; UI.render(); };
+ACT["gr-sk-add"] = () => { GR_EDIT = {t:"skill", id:""}; UI.render(); const f = $("#grForm"); if (f) f.scrollIntoView({block:"center"}); };
+ACT["gr-sk-edit"] = el => { GR_EDIT = {t:"skill", id:el.dataset.id}; UI.render(); };
+ACT["gr-sk-save"] = () => {
+  const name = (($("#grSkName") || {}).value || "").trim().slice(0, 12), a = ($("#grSkA") || {}).value || "career"; if (!name){ toast("写一下技能的名字"); return; }
+  const g = G();
+  if (g.skills.some(s => s.name === name && s.id !== GR_EDIT.id)){ toast("已经有这个技能了"); return; }
+  if (GR_EDIT.id){ const s = grSkill(GR_EDIT.id); if (s){ s.name = name; s.a = a; } } else g.skills.push({id:"s" + grRid(), name, a});
+  GR_EDIT = null; grUps(); save(); toast("记下了"); UI.render();
+};
+ACT["gr-sk-del"] = async el => {
+  const s = grSkill(el.dataset.id); if (!s) return;
+  if (!await sheet(`删除技能“${s.name}”？`, "累计的次数也会删掉。算进它的选项保留，只是不再算技能。", "删除", true)) return;
+  const g = G(); g.skills = g.skills.filter(x => x.id !== s.id); delete g.sk[s.id]; for (const a of g.acts) if (a.sk === s.id) a.sk = "";
+  GR_EDIT = null; grUps(); save(); UI.render();
+};
+ACT["gr-act-add"] = () => { GR_EDIT = {t:"act", id:""}; UI.render(); const f = $("#grForm"); if (f) f.scrollIntoView({block:"center"}); };
+ACT["gr-act-edit"] = el => { GR_EDIT = {t:"act", id:el.dataset.id}; UI.render(); };
+ACT["gr-act-save"] = () => {
+  const name = (($("#grActName") || {}).value || "").trim().slice(0, 60), a = ($("#grActA") || {}).value || "career", xp = Math.max(0, Math.min(100, Math.round(+(($("#grActXp") || {}).value) || 0))), sk = ($("#grActSk") || {}).value || "";
+  if (!name){ toast("写一下做了什么"); return; }
+  const g = G();
+  if (GR_EDIT.id){ const x = grAct(GR_EDIT.id); if (x){ x.name = name; x.a = a; x.xp = x.mile ? 0 : xp; x.sk = sk; } } else g.acts.push({id:"a" + grRid(), a, name, xp, sk});
+  GR_EDIT = null; save(); toast("记下了"); UI.render();
+};
+ACT["gr-act-del"] = async el => {
+  const x = grAct(el.dataset.id); if (!x) return;
+  if (!await sheet(`删除“${x.name}”？`, "以前记过的经验值不受影响。", "删除", true)) return;
+  const g = G(); g.acts = g.acts.filter(y => y.id !== x.id); GR_EDIT = null; save(); UI.render();
+};
+ACT["gr-act-reset"] = async () => {
+  const g = G(), miss = GR_ACTS_DEF.filter(d => !g.acts.some(a => a.id === d.id)), missS = GR_SKILLS_DEF.filter(d => !g.skills.some(s => s.id === d.id));
+  if (!miss.length && !missS.length){ toast("默认的选项和技能都在"); return; }
+  if (!await sheet("恢复默认的选项？", `把删掉的 ${miss.length} 个默认选项${missS.length ? `、${missS.length} 个默认技能` : ""}加回来。你自己加的、改过的都不动。`, "恢复")) return;
+  for (const d of missS) g.skills.push(Object.assign({}, d)); for (const d of miss) g.acts.push(Object.assign({}, d));
+  grUps(); save(); UI.render();
+};
+ACT["gr-undo"] = async el => {
+  const e = G().log.find(x => x.id === el.dataset.id); if (!e) return;
+  if (!await sheet("撤销这一笔？", `${e.nm}${e.n > 1 ? ` ×${e.n}` : ""}${e.xp + e.en ? `，${e.xp + e.en} 经验值` : ""}`, "撤销", true)) return;
+  growUndo(e.id); toast("撤销了"); UI.render();
+};
+/* 综合分析：设置、技能、最近四周，一起发给 AI */
+function grAnalyzeText(){
+  const g = G(); growSync(); const d = today(), cur = K.growWeekStart(d), goals = growGoals();
+  const acts = g.acts.map(a => `  ${GR_L[a.a]}｜${grActName(a)}｜${a.mile ? "里程碑（0）" : (a.xp || 0) + (a.bx ? `（English 另加 ${a.bx}）` : "")}｜${a.sk && grSkill(a.sk) ? grSkill(a.sk).name : "不算技能"}`);
+  const sks = g.skills.map(s => { const n = grSkillN(s); return `  ${GR_L[s.a]}｜${s.name}｜Lv ${K.growSkillLevel(n).lv}｜${n} 次${s.auto ? "（自动）" : ""}`; });
+  const weeks = []; for (let i = 3; i >= 0; i--){ const w = nstr(dnum(cur) - 7 * i), s = growWeek(w), gl = s.goals || (w === cur ? goals : null);
+    weeks.push(`- ${grRange(w)}${w === cur ? "（这一周，还没结束）" : ""}：Career ${s.career}${gl ? "/" + gl.career : ""}，English ${s.english}${gl ? "/" + gl.english : ""}，Life ${s.life}${gl ? "/" + gl.life : ""}${grCounts(s, "career").length ? "；求职：" + grCounts(s, "career").join("、") : ""}${s.md ? `；心情平均 ${(s.md[0] / s.md[1]).toFixed(1)}` : ""}`); }
+  const lv = K.growLevel(growTotal().all);
+  return [`这是我在脱口“成长”里的设置和最近四周的记录，请帮我综合分析判断。今天是 ${d}。`, "",
+    "我现在的设置：",
+    `- 三栏每周目标：Career ${goals.career}，English ${goals.english}，Life ${goals.life}`,
+    `- 按时起床：${g.wake} 前；晚上记心情：${g.moodOn ? "开" : "关"}`,
+    "- 英语经验值：在脱口里练习，每 2 分钟 1 点，每天最多 15。",
+    "- 记一笔的选项（栏｜名字｜经验值｜算哪个技能）：", ...acts,
+    "- 技能（栏｜名字｜等级｜累计次数）：", ...sks,
+    `- 角色：Lv ${lv.lv}`, "",
+    "最近四周：", ...weeks,
+    g.miles.length ? `里程碑：${g.miles.slice(-10).map(m => `${m.d} ${m.nm.replace(/^好消息[:：]\s*/, "")}`).join("；")}` : "",
+    g.base && (+g.base.apply || +g.base.msg) ? `起点（开始用之前的一周）：申请 ${+g.base.apply || 0} 份，联系 ${+g.base.msg || 0} 人` : "", "",
+    "请帮我：",
+    "1. 这些目标、选项和技能设得合不合适：有没有该加的、该删的，经验值该调的（比如哪项太容易刷、哪项太难）。",
+    "2. 最近几周的趋势：哪里在进步、哪里停住了。",
+    "3. 接下来两周最值得调整的一两件事。",
+    "需要改的话，给我导入码（贴进脱口就能用）：",
+    "成长目标 | 求职 | 数字", "成长行动 | 栏（求职 / 英语 / 生活）| 名字 | 经验值 | 技能名（可以空着）", "成长技能 | 栏 | 名字",
+    "（删选项和技能我自己在 app 里点。）"].filter((x, i, arr) => x !== "" || arr[i - 1] !== "").join("\n");
+}
+ACT["gr-analyze"] = () => sendToClaude(grAnalyzeText());
+
+/* 导入码里的成长目标、记一笔的选项、技能（ACT["imp-apply"] 调用） */
+function growApplyImport(r){
+  const g = G(); let ch = false;
+  for (const s of r.growSkills || []) if (!g.skills.some(x => x.name === s.name)){ g.skills.push({id:"s" + grRid(), name:s.name, a:s.a}); ch = true; }
+  for (const a of r.growActs || []){
+    let sk = a.skill ? g.skills.find(x => x.name === a.skill) : null;
+    if (a.skill && !sk){ sk = {id:"s" + grRid(), name:a.skill, a:a.a}; g.skills.push(sk); }
+    const ex = g.acts.find(x => x.name === a.name);
+    if (ex){ ex.a = a.a; if (!ex.mile) ex.xp = a.xp; if (a.skill) ex.sk = sk.id; } else g.acts.push({id:"a" + grRid(), a:a.a, name:a.name, xp:a.xp, sk: sk ? sk.id : ""});
+    ch = true;
+  }
+  if ((r.growGoals || []).length){ const o = {}; for (const x of r.growGoals) o[x.a] = x.n; growSetGoals(o); ch = true; }
+  if (ch){ grUps(); save(); }
+}
 
 </script>
 </body>
