@@ -729,8 +729,7 @@ details.pl-day>summary{list-style:none;cursor:pointer}details.pl-day>summary::-w
 .gr-ring-fg{fill:none;stroke:var(--purple);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .6s ease-out}
 .gr-face{position:absolute;inset:7px;border-radius:50%;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center}
 .gr-av.big .gr-face{inset:9px}
-.gr-face img{width:100%;height:100%;object-fit:cover}
-.gr-face img.gr-pose{object-fit:cover;object-position:50% 12%;transform:scale(1.35);transform-origin:50% 20%}
+.gr-face .gr-face-img{width:100%;height:100%;object-fit:contain;transform-origin:50% 50%}
 .gr-face .bt-thumb-rig{width:100%;height:100%;border-radius:0}
 .gr-lvn{position:absolute;right:-6px;bottom:-4px;min-width:28px;height:22px;padding:0 6px;border-radius:11px;background:var(--ink);color:var(--bg);font-size:13px;display:flex;align-items:center;justify-content:center;font-style:normal}
 .gr-av.big .gr-lvn{font-size:15px;height:26px;min-width:34px;border-radius:13px}
@@ -780,6 +779,98 @@ details.pl-day>summary{list-style:none;cursor:pointer}details.pl-day>summary::-w
 .gr-inline input{width:64px}
 .gr-det>summary{font-weight:700;color:var(--ink)}
 
+/* ---------- v1.69.1：角色页像游戏里的人物面板；快速记；取景；升级 ---------- */
+.gc .gr-det>summary{padding:2px 0}
+.gc-hero{position:relative;margin:4px 0 2px;padding:18px 16px 14px;border-radius:22px;color:#F2EEFF;overflow:hidden;
+  background:radial-gradient(120% 90% at 12% 0%,rgba(122,47,219,.55),transparent 62%),radial-gradient(80% 70% at 100% 100%,rgba(11,143,80,.22),transparent 60%),linear-gradient(160deg,#1C1533 0%,#121A2B 100%);
+  box-shadow:0 12px 30px rgba(18,14,40,.22)}
+.gc-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 22px)}
+.gc-top{position:relative;display:flex;gap:14px;align-items:center}
+.gc-hero .gr-av.big{width:112px;height:112px}
+.gc-hero .gr-ring-bg{stroke:rgba(255,255,255,.14)}
+.gc-hero .gr-ring-fg{stroke:#B98CFF;filter:drop-shadow(0 0 4px rgba(185,140,255,.7))}
+.gc-hero .gr-face{background:rgba(255,255,255,.07)}
+.gc-hero .gr-lvn{background:#F2EEFF;color:#1C1533}
+.gc-hero .gr-lvbig{color:#fff}
+.gc-id{position:relative;min-width:0;flex:1}
+.gc-name{display:inline-flex;align-items:center;gap:6px;max-width:100%;background:none;border:0;padding:0;color:#fff;font-size:22px;font-weight:800;letter-spacing:-.01em;text-align:left;overflow:hidden;text-overflow:ellipsis}
+.gc-pen{width:15px;height:15px;flex:none;opacity:.55}
+.gc-name-in{width:100%;font-size:17px;font-weight:700;padding:6px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff}
+.gc-name-in::placeholder{color:rgba(255,255,255,.5)}
+.gc-title{margin-top:4px;font-size:13.5px;color:#CDBFFF;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.gc-lv{font-size:15px;color:#fff}
+.gc-xp{margin-top:10px;height:10px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.gc-xp i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8E5BFF,#C9A8FF);box-shadow:0 0 12px rgba(185,140,255,.6)}
+.gc-xpn{margin-top:4px;font-size:12px;color:#BFB4E0}
+.gc-stats{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.gc-stat{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06);color:#fff;text-align:left;min-width:0}
+.gc-stat[data-a=career]{--c:#F2B544}.gc-stat[data-a=english]{--c:#C4A1FF}.gc-stat[data-a=life]{--c:#45D493}
+.gc-si{width:20px;height:20px;color:var(--c);margin-bottom:2px}
+.gc-sl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#BFB4E0}
+.gc-stat b{font-size:22px;color:#fff;line-height:1.15}
+.gc-sw{font-size:11.5px;color:#BFB4E0}
+.gc-stat:active,.gc-skill:active,.gc-badge:active,.gr-tile:active{transform:scale(.96)}
+.gc-tabs{margin:10px 0 4px}
+.gc-radar{display:block;width:100%;max-width:340px;margin:4px auto 0}
+.gc-rg{fill:none;stroke:var(--line);stroke-width:1}
+.gc-rp{fill:color-mix(in srgb,var(--purple) 22%,transparent);stroke:var(--purple);stroke-width:2;stroke-linejoin:round}
+.gc-rd{fill:var(--purple)}
+.gc-rt{font-size:12px;fill:var(--ink2);font-weight:600}
+.gc-rn{fill:var(--muted);font-weight:700}
+.gc-skills{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.gc-skill{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"i n l" "b b b";gap:7px 9px;align-items:center;padding:10px;border-radius:14px;border:1px solid var(--line);background:var(--surface);text-align:left;color:var(--ink);transition:transform .12s}
+.gc-ki{grid-area:i;width:32px;height:32px;padding:6px;border-radius:9px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.gc-kn{grid-area:n;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gc-kl{grid-area:l;font-size:13px;color:var(--ink2)}
+.gc-kb{grid-area:b;display:block;height:6px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.gc-kb i{display:block;height:100%;background:var(--c,var(--purple));border-radius:99px}
+.gc-kb.big{height:10px;margin-top:14px}
+.gc-add{border-style:dashed;color:var(--muted);--c:var(--muted);grid-template-areas:"i n n"}
+.gc-badges{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+.gc-badge{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--muted);text-align:center;min-width:0;transition:transform .12s}
+.gc-bi{width:34px;height:34px;padding:7px;border-radius:50%;background:var(--surface2);color:var(--muted)}
+.gc-bn{font-size:11.5px;line-height:1.25;word-break:break-all}
+.gc-bp{font-size:11px}
+.gc-badge.on{color:var(--ink);border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
+.gc-badge.on .gc-bi{color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 30%,transparent)}
+.gc-badge:not(.on) .gc-bi{opacity:.5}
+.gc-sheet h3{margin:0}
+.gc-sh{display:flex;gap:12px;align-items:center}
+.gc-shi{width:48px;height:48px;flex:none;padding:10px;border-radius:14px;color:var(--c);background:color-mix(in srgb,var(--c) 15%,transparent)}
+.gc-sh.locked .gc-shi{opacity:.5}
+.gc-weeks{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:12px;align-items:end}
+.gc-wk{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.gc-wb{position:relative;display:block;width:100%;height:84px;border-radius:8px;background:var(--surface2);overflow:hidden}
+.gc-wb i{position:absolute;left:0;right:0;bottom:0;background:var(--c)}
+.gc-wb b{position:absolute;left:0;right:0;height:2px;background:var(--ink)}
+.gc-wd{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.gr-pin{flex:none;width:32px;height:32px;border:0;background:none;font-size:18px;color:var(--amber)}
+.gr-pin[aria-pressed=false]{color:var(--muted)}
+.gr-quickp{margin-top:12px}
+.gr-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:8px}
+.gr-tile{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:12.5px;line-height:1.2;min-width:0;transition:transform .12s}
+.gr-ti{width:34px;height:34px;padding:7px;border-radius:10px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+.gr-tx{font-size:11.5px;color:var(--muted)}
+.gr-bar{position:relative}
+.gr-bar .t i{transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.gr-fx{position:absolute;right:76px;top:-8px;font-size:15px;font-weight:800;color:var(--green);pointer-events:none;animation:grFx 1.3s ease-out forwards}
+@keyframes grFx{0%{opacity:0;transform:translateY(8px)}15%{opacity:1}100%{opacity:0;transform:translateY(-20px)}}
+.gr-just{display:flex;gap:10px;align-items:baseline;margin:0 2px 10px;color:var(--ink2)}
+.gr-bulk{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:8px}
+.gr-bulk input{width:56px}
+.gr-fitrow{display:flex;gap:14px;align-items:center;margin-top:14px}
+.gr-fitbox{position:relative;width:128px;height:128px;flex:none;border-radius:50%;overflow:hidden;background:var(--surface2);touch-action:none;cursor:grab;box-shadow:inset 0 0 0 2px var(--line)}
+.gr-fitbox img{width:100%;height:100%;object-fit:contain;transform-origin:50% 50%;user-select:none;-webkit-user-select:none;pointer-events:none}
+.gr-fitctl{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.gr-fitctl label{width:100%}
+.gr-fitctl input[type=range]{width:100%}
+.gr-lvup{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);z-index:120;min-width:180px;padding:18px 28px;border-radius:20px;text-align:center;color:#F2EEFF;background:linear-gradient(160deg,#2A1C52,#151E33);box-shadow:0 18px 50px rgba(20,10,50,.45);pointer-events:none;animation:grLv 2s ease-out forwards}
+.gr-lvup b{display:block;font-size:12px;letter-spacing:.24em;color:#CDBFFF}
+.gr-lvup .num{display:block;font-size:42px;line-height:1.1;margin-top:2px}
+.gr-lvup-n{display:block;margin-top:2px;font-size:13px;color:#CDBFFF}
+@keyframes grLv{0%{opacity:0;transform:translate(-50%,-42%) scale(.9)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}25%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){.gr-lvup{animation:none}.gr-fx{display:none}.gr-bar .t i{transition:none}.gc-stat:active,.gc-skill:active,.gc-badge:active,.gr-tile:active{transform:none}}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -800,7 +891,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.69.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.69.1"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -15691,7 +15782,7 @@ ACT["sl-pick"] = el => { const R = SL.run; if (!R || R.picked != null) return; c
   const st = S.slangStat = S.slangStat || {n:0, ok:0}; st.n++; if (ok) st.ok++; save(); UI.render(); };
 ACT["sl-next"] = () => { const R = SL.run; if (!R) return; R.i++; R.picked = null; SL.sel = null; if (R.i >= R.items.length){ if (typeof planAutoDone === "function") planAutoDone("slang"); UI.render(); return; } R.opts = slMakeOpts(R.items[R.i], R.all); UI.render(); setTimeout(() => ACT["sl-play"](), 200); };
 
-/* 脱口 · 成长（v1.69.0）
+/* 脱口 · 成长（v1.69.0，v1.69.1 加了角色名、形象取景、角色页、快速记、成就、补记）
    打开 app 先到这里。三栏（Career / English / Life）每周的经验值、角色等级、技能、记一笔、复盘。
    规则和依据写在 DEVNOTES 的“成长页”一节；界面上的字保持短。
    数据都在 S.grow 里（随备份、恢复一起走）；自己上传的形象图片在 IndexedDB 的 grow:av（跟对战角色一样，不进备份）。 */
@@ -15701,32 +15792,57 @@ const GR_L = {career:"Career", english:"English", life:"Life"};
 const GR_ZH = {career:"求职", english:"英语", life:"生活"};
 const GR_EN_CAP = 15;          /* 英语经验值：每 2 分钟 1 点，每天最多 15 */
 const GR_KEEP_DAYS = 120;      /* 每一笔记录保留 120 天；更早的只留每周合计（g.weeks） */
+const GR_COLOR = {career:"var(--amber)", english:"var(--purple)", life:"var(--green)"};
+const GR_PINS_DEF = ["apply", "msg", "school", "move"];   /* 成长页“快速记”默认放的几项 */
+/* 小图标（24×24 线条） */
+const GR_IC = {
+  doc:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M9.5 12h6M9.5 15.5h6M9.5 8.5h2.5"/>',
+  people:'<circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/><circle cx="17" cy="9.5" r="2.4"/><path d="M15.5 14.6c2.2.1 3.9 1.5 4.6 4.4"/>',
+  case:'<rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M9 7.5V5.5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 12.5h18"/>',
+  speak:'<path d="M4 5h16v10H10l-5 4v-4H4z"/><path d="M8.5 10h.01M12 10h.01M15.5 10h.01"/>',
+  ear:'<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+  pen:'<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/>',
+  bolt:'<path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+  school:'<path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c1.5 1.5 3 2 5 2s3.5-.5 5-2v-4.5"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+  phone:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+  run:'<circle cx="14" cy="4.5" r="2"/><path d="M8 21l3-6 3 2 1 4M6 12l3-3 4 1 2 3 3 1"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.8-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1L3.2 9.4l6.1-.8z"/>',
+  trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/>',
+  flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  chat:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/>',
+  leaf:'<path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/>',
+  mail:'<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/>'
+};
+const grIco = (k, cls) => `<svg class="${cls || "gr-i"}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${GR_IC[k] || GR_IC.star}</svg>`;
+const GR_AREA_IC = {career:"case", english:"chat", life:"leaf"};
 const GR_SKILLS_DEF = [
-  {id:"resume", name:"简历", a:"career"},
-  {id:"network", name:"人脉", a:"career"},
-  {id:"interview", name:"面试", a:"career", auto:"mock"},
-  {id:"speak", name:"口语", a:"english", auto:"speak"},
-  {id:"listen", name:"听力", a:"english", auto:"listen"},
-  {id:"write", name:"写作", a:"english", auto:"write"},
-  {id:"stamina", name:"体力", a:"life"},
-  {id:"routine", name:"作息", a:"life"}
+  {id:"resume", name:"简历", a:"career", ic:"doc"},
+  {id:"network", name:"人脉", a:"career", ic:"people"},
+  {id:"interview", name:"面试", a:"career", ic:"case", auto:"mock"},
+  {id:"speak", name:"口语", a:"english", ic:"speak", auto:"speak"},
+  {id:"listen", name:"听力", a:"english", ic:"ear", auto:"listen"},
+  {id:"write", name:"写作", a:"english", ic:"pen", auto:"write"},
+  {id:"stamina", name:"体力", a:"life", ic:"bolt"},
+  {id:"routine", name:"作息", a:"life", ic:"moon"}
 ];
 /* lab：发给朋友的英文消息里怎么说（单数、复数）。bx：另加的英语经验值（真实的英语对话两栏都加） */
 const GR_ACTS_DEF = [
-  {id:"apply", a:"career", name:"投一份认真改过的申请", xp:10, sk:"resume", qty:true, lab:["application", "applications"]},
-  {id:"msg", a:"career", name:"给真人发一条消息（校友、LinkedIn、请人内推）", xp:10, sk:"network", lab:["message to a real person", "messages to real people"]},
-  {id:"talk", a:"career", name:"一次真实的对话（coffee chat、招聘会）", xp:25, bx:10, sk:"network", skn:2, lab:["networking chat", "networking chats"]},
-  {id:"iv", a:"career", name:"一次真实的面试", xp:25, bx:10, sk:"interview", skn:2, lab:["interview", "interviews"]},
-  {id:"school", a:"career", name:"在学校或图书馆做了 2 小时求职", xp:10, lab:["job-search session", "job-search sessions"]},
-  {id:"cmin", a:"career", name:"最小的一步：看完一个职位的要求", xp:3, min:true, cap:1},
-  {id:"good", a:"career", name:"好消息：收到回复或面试邀请", xp:0, mile:true},
-  {id:"next", a:"career", name:"好消息：进了下一轮", xp:0, mile:true},
-  {id:"offer", a:"career", name:"好消息：拿到 offer", xp:0, mile:true},
-  {id:"chat", a:"english", name:"用英语和人聊了 10 分钟以上", xp:10, sk:"speak", lab:["English conversation", "English conversations"]},
-  {id:"wake", a:"life", name:"按时起床", xp:5, sk:"routine", morning:true, cap:1},
-  {id:"phone", a:"life", name:"昨晚手机不在床边", xp:5, sk:"routine", morning:true, cap:1},
-  {id:"move", a:"life", name:"运动或散步 20 分钟以上", xp:10, sk:"stamina", lab:["workout", "workouts"]},
-  {id:"lmin", a:"life", name:"最小的一步：出门走 5 分钟", xp:3, min:true, cap:1}
+  {id:"apply", a:"career", name:"投一份认真改过的申请", short:"投申请", ic:"doc", xp:10, sk:"resume", qty:true, unit:"份", lab:["application", "applications"]},
+  {id:"msg", a:"career", name:"给真人发一条消息（校友、LinkedIn、请人内推）", short:"发消息", ic:"mail", xp:10, sk:"network", qty:true, unit:"条", lab:["message to a real person", "messages to real people"]},
+  {id:"talk", a:"career", name:"一次真实的对话（coffee chat、招聘会）", short:"聊了一次", ic:"people", xp:25, bx:10, sk:"network", skn:2, lab:["networking chat", "networking chats"]},
+  {id:"iv", a:"career", name:"一次真实的面试", short:"面试", ic:"case", xp:25, bx:10, sk:"interview", skn:2, lab:["interview", "interviews"]},
+  {id:"school", a:"career", name:"在学校或图书馆做了 2 小时求职", short:"去学校", ic:"school", xp:10, lab:["job-search session", "job-search sessions"]},
+  {id:"cmin", a:"career", name:"最小的一步：看完一个职位的要求", short:"最小一步", ic:"flag", xp:3, min:true, cap:1},
+  {id:"good", a:"career", name:"好消息：收到回复或面试邀请", short:"好消息", ic:"star", xp:0, mile:true},
+  {id:"next", a:"career", name:"好消息：进了下一轮", short:"进下一轮", ic:"flag", xp:0, mile:true},
+  {id:"offer", a:"career", name:"好消息：拿到 offer", short:"offer", ic:"trophy", xp:0, mile:true},
+  {id:"chat", a:"english", name:"用英语和人聊了 10 分钟以上", short:"英语聊天", ic:"chat", xp:10, sk:"speak", lab:["English conversation", "English conversations"]},
+  {id:"wake", a:"life", name:"按时起床", short:"按时起床", ic:"sun", xp:5, sk:"routine", morning:true, cap:1},
+  {id:"phone", a:"life", name:"昨晚手机不在床边", short:"手机不在床边", ic:"phone", xp:5, sk:"routine", morning:true, cap:1},
+  {id:"move", a:"life", name:"运动或散步 20 分钟以上", short:"运动", ic:"run", xp:10, sk:"stamina", lab:["workout", "workouts"]},
+  {id:"lmin", a:"life", name:"最小的一步：出门走 5 分钟", short:"出门走走", ic:"leaf", xp:3, min:true, cap:1}
 ];
 const GR_MOCK = ["call", "phone", "basic", "tech", "concept", "dboss:iv", "dboss:432"];   /* 脱口里的模拟面试：面试技能 +1 */
 
@@ -15748,13 +15864,19 @@ function G(){
   if (g.moodOn == null) g.moodOn = true;
   if (!g.wake) g.wake = "09:30";
   if (!g.av || typeof g.av !== "object") g.av = {mode:"char", char:""};
+  if (!g.av.fits || typeof g.av.fits !== "object") g.av.fits = {};
+  if (!Array.isArray(g.pins)) g.pins = GR_PINS_DEF.slice();
+  if (!g.ach || typeof g.ach !== "object") g.ach = {};
+  if (typeof g.name !== "string") g.name = "";
+  for (const s of g.skills) if (!s.ic){ const d = GR_SKILLS_DEF.find(x => x.id === s.id); s.ic = d ? d.ic : "star"; }
+  for (const a of g.acts) if (!a.ic || !a.short){ const d = GR_ACTS_DEF.find(x => x.id === a.id); if (!a.ic) a.ic = d ? d.ic : "star"; if (!a.short) a.short = d ? d.short : a.name.slice(0, 6); if (d && d.unit && !a.unit){ a.unit = d.unit; a.qty = true; } }
   return g;
 }
 const grAct = id => G().acts.find(a => a.id === id);
 const grSkill = id => G().skills.find(s => s.id === id);
 const grActsOf = a => G().acts.filter(x => x.a === a);
 function grActName(a){ return a.id === "wake" ? `${a.name}（${G().wake.replace(/^0/, "")} 前）` : a.name; }
-function grActLabel(a){ const x = (a.xp || 0) + (a.bx || 0); return grActName(a) + (a.mile ? "" : `（+${x} 经验值）`); }
+function grActLabel(a){ const x = (a.xp || 0) + (a.bx || 0); return grActName(a) + (a.mile ? "" : `  +${x}`); }
 function grRound5(x){ return Math.max(5, Math.round(x / 5) * 5); }
 /* 这周的目标：自己定过的用自己的；Career 没定过的，有起点就按起点多两成（至少 30），没有就 60 */
 function growGoal(a){
@@ -15774,6 +15896,7 @@ function growSetGoals(o){
 function growSync(){
   const g = G(), d = today(), cur = K.growWeekStart(d); let dirty = false;
   if (!g.start){ g.start = d; dirty = true; }
+  if (!g.achInit){ g.achInit = 1; grAchCheck(true); dirty = true; }   /* 第一次：已经满足的成就直接记上，不弹 */
   for (const [day, arr] of Object.entries(S.hist || {})){
     const sp = new Set(), li = new Set();
     for (const e of arr || []){ const c = CAT.byId[e.id]; if (!c) continue; (c.t === "l" ? li : sp).add(e.id); }
@@ -15831,23 +15954,36 @@ function grUpText(u){ const p = u.msgs.slice(); if (u.up){ p.push(`升到 Lv ${u
 
 /* 记一笔 */
 function growLog(id, units, opt){
+  opt = opt || {};
   const g = G(), a = grAct(id); if (!a) return null;
   growSync();
-  const d = today(); let n = Math.max(1, Math.round(units || 1));
-  if (a.cap){ const done = g.log.filter(e => e.d === d && e.k === id).reduce((s, e) => s + (e.n || 1), 0); if (done >= a.cap){ toast("今天已经记过了"); return null; } n = Math.min(n, a.cap - done); }
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(opt.d || "") ? opt.d : today(); let n = Math.max(1, Math.round(units || 1));
+  if (a.cap){ const done = g.log.filter(e => e.d === d && e.k === id).reduce((s, e) => s + (e.n || 1), 0); if (done >= a.cap){ if (!opt.quiet) toast(d === today() ? "今天已经记过了" : "那天已经记过了"); return null; } n = Math.min(n, a.cap - done); }
+  const wk = K.growWeekStart(d), cur = K.growWeekStart(today()), before = wk === cur ? (growWeek(cur)[a.a] || 0) : null;
   const e = {id:"g" + grRid(), t:Date.now(), d, k:a.id, nm:grActName(a), a:a.a, n, xp:(a.xp || 0) * n, en:(a.bx || 0) * n, sk:{}};
   if (a.sk && grSkill(a.sk)) e.sk[a.sk] = (a.skn || 1) * n;
   if (a.mile){ e.mile = true; g.miles.push({id:e.id, d, nm:e.nm}); }
   if (opt && opt.pid) e.pid = opt.pid;
   g.log.push(e); for (const [k, v] of Object.entries(e.sk)) g.sk[k] = (+g.sk[k] || 0) + v;
-  const u = grUps(); const parts = [];
+  if (wk < cur){ delete g.weeks[wk]; growSync(); }   /* 补记到已经结束的周：马上重算那周的合计 */
+  const u = grUps(), ach = grAchCheck(); const parts = [];
   if (e.xp + e.en) parts.push(`+${e.xp + e.en} 经验值`);
   if (e.mile) parts.push("记下了这个好消息");
   if (u.msgs.length) parts.push(...u.msgs);
   else for (const k of Object.keys(e.sk)){ const s = grSkill(k), L2 = K.growSkillLevel(grSkillN(s)); parts.push(`${s.name} ${L2.cur}/${L2.need}`); break; }
   const up = grUpText({msgs:[], up:u.up, lv:u.lv}); if (up) parts.push(up);
-  save(); if (!(opt && opt.quiet)) toast(parts.join("，") || "记下了");
+  if (ach.length) parts.push("解锁成就：" + ach.join("、"));
+  if (!opt.quiet && before != null && UI.top() && UI.top().name === "grow"){ const goal = growGoal(a.a); GR_FX = {a:a.a, from:Math.min(100, Math.round(100 * before / Math.max(1, goal))), xp:e.xp + (a.a === "english" ? e.en : 0)}; }
+  save(); if (!opt.quiet){ toast(parts.join("，") || "记下了"); if (u.up) grLvUp(u.lv); }
   return e;
+}
+let GR_FX = null, GR_JUST = null;
+/* 升级：屏幕中间亮一下（减少动态效果时只是静静出现再消失） */
+function grLvUp(lv){
+  document.querySelectorAll(".gr-lvup").forEach(x => x.remove());
+  const el = document.createElement("div"); el.className = "gr-lvup"; el.setAttribute("role", "status");
+  el.innerHTML = `<b>LEVEL UP</b><span class="num">Lv ${lv}</span>${G().name ? `<span class="gr-lvup-n">${esc(G().name)}</span>` : ""}`;
+  document.body.appendChild(el); setTimeout(() => el.remove(), 2000);
 }
 function growUndo(id){
   const g = G(), i = g.log.findIndex(e => e.id === id); if (i < 0) return false;
@@ -15855,21 +15991,28 @@ function growUndo(id){
   for (const [k, v] of Object.entries(e.sk || {})) g.sk[k] = Math.max(0, (+g.sk[k] || 0) - v);
   if (e.mile) g.miles = g.miles.filter(m => m.id !== e.id);
   if (e.pid){ const x = (S.plan || []).find(p => p.id === e.pid); if (x && !g.log.some(y => y.pid === e.pid)) x.done = false; }
-  const wk = K.growWeekStart(e.d); if (wk < K.growWeekStart(today())) delete g.weeks[wk];   /* 结束的周重新算合计 */
+  const wk = K.growWeekStart(e.d); if (wk < K.growWeekStart(today())){ delete g.weeks[wk]; growSync(); }   /* 结束的周马上重新算合计 */
   grUps(); save(); return true;
 }
 /* 计划里的求职、生活项点“做完了”：问实际做了什么（可以连着记几样） */
 const GR_GUESS = {apply:/申请|投|apply|application/i, msg:/消息|linkedin|内推|联系|message|邮件|email/i, talk:/coffee|聊|对话|招聘会|networking|meet/i, iv:/面试|interview/i, school:/学校|图书馆|library|school/i,
   wake:/起床|wake/i, phone:/手机|phone/i, move:/运动|散步|跑步|健身|走路|walk|gym|run|workout/i};
 function grGuess(text, acts){ const hit = acts.filter(a => GR_GUESS[a.id] && GR_GUESS[a.id].test(text || "")); return hit.concat(acts.filter(a => !hit.includes(a))); }
-async function grQty(a){ if (!a.qty) return 1; const q = await choose("几份？", "", [["1", "1 份"], ["2", "2 份"], ["3", "3 份"], ["4", "4 份"], ["5", "5 份"], ["", "取消"]]); return q ? +q : 0; }
+async function grQty(a){ if (!a.qty) return 1; const u = a.unit || "份"; const q = await choose(`几${u}？`, "", [1, 2, 3, 4, 5].map(n => [String(n), `${n} ${u}`]).concat([["", "取消"]])); return q ? +q : 0; }
+function grQtyFrom(text){ const m = String(text || "").match(/(\d+)\s*(份|条|个|次|封)/); return m ? Math.min(20, +m[1]) : 0; }
 async function growDone(id){
   const x = (S.plan || []).find(p => p.id === id); if (!x) return;
   if (!x.area){ x.done = true; save(); UI.render(); return; }
-  const acts = grGuess(x.text, grActsOf(x.area).filter(a => !a.mile && !a.min));
+  const pool = grActsOf(x.area).filter(a => !a.mile && !a.min), hits = pool.filter(a => GR_GUESS[a.id] && GR_GUESS[a.id].test(x.text || ""));
+  if (hits.length === 1){   /* 只对得上一样：直接记（“投 2 份”就记 2 份），下面给一个撤销 */
+    const a = hits[0], n = a.qty ? (grQtyFrom(x.text) || 1) : 1, e = growLog(a.id, n, {pid:x.id});
+    if (e){ x.done = true; save(); GR_JUST = {t:Date.now(), ids:[e.id], txt:`${a.short || a.name}${n > 1 ? " ×" + n : ""} +${e.xp + e.en}`}; }
+    UI.render(); return;
+  }
+  const acts = grGuess(x.text, pool);
   let any = false, first = true;
   for (let i = 0; i < 5; i++){
-    const opts = (first ? [] : [["", "没有了"]]).concat(acts.map(a => [a.id, grActLabel(a)])).concat(first ? [["_done", "只打勾，不记经验值"], ["", "取消"]] : []);
+    const opts = (first ? [] : [["", "没有了"]]).concat(acts.map(a => [a.id, grActLabel(a)])).concat(first ? [["_done", "只打勾"], ["", "取消"]] : []);
     const k = await choose(first ? "做了什么？" : "还做了别的吗？", first ? esc(x.text) : "", opts);
     if (!k) break;
     if (k === "_done"){ any = true; break; }
@@ -15890,8 +16033,33 @@ function growAuto(act){
   if (act === "react" || /^dboss:/.test(act)){ const f = g.ad[d] || {}; if (!f.s){ g.ad[d] = Object.assign({}, f, {s:1}); hit = true; } }
   if (act === "slang"){ const f = g.ad[d] || {}; if (!f.l){ g.ad[d] = Object.assign({}, f, {l:1}); hit = true; } }
   if (!hit) return;
-  const u = grUps(); save(); const t = grUpText(u); if (t) setTimeout(() => toast(t), 2800);
+  const u = grUps(), ach = grAchCheck(); save(); const t = [grUpText(u)].concat(ach.length ? ["解锁成就：" + ach.join("、")] : []).filter(Boolean).join("，"); if (t) setTimeout(() => { toast(t); if (u.up) grLvUp(u.lv); }, 2800);
 }
+/* ---------- 成就：固定的门槛，没有随机 ---------- */
+function grCnt(k){ const g = G(), cur = K.growWeekStart(today()); let n = 0; for (const [wk, w] of Object.entries(g.weeks)) if (wk < cur) n += +(w.n || {})[k] || 0; return n + (+K.growWeekSum(g.log, null, cur).n[k] || 0); }
+function grEnMinAll(){ return Math.floor(Object.values(S.days || {}).reduce((s, d) => s + ((d && d.sec) || 0), 0) / 60); }
+function grFullWeeks(){ const g = G(), cur = K.growWeekStart(today()); let n = 0; for (const [wk, w] of Object.entries(g.weeks)) if (wk < cur && w.g && w.c >= w.g.career && w.e >= w.g.english && w.l >= w.g.life) n++;
+  const s = K.growWeekSum(g.log, S.days, cur, GR_EN_CAP), gl = growGoals(); if (s.career >= gl.career && s.english >= gl.english && s.life >= gl.life) n++; return n; }
+const GR_ACH = [
+  {id:"a1", name:"第一份申请", ic:"doc", a:"career", need:() => [grCnt("apply"), 1]},
+  {id:"a10", name:"十份申请", ic:"doc", a:"career", need:() => [grCnt("apply"), 10]},
+  {id:"a50", name:"五十份申请", ic:"doc", a:"career", need:() => [grCnt("apply"), 50]},
+  {id:"n1", name:"第一条消息", ic:"mail", a:"career", need:() => [grCnt("msg"), 1]},
+  {id:"n10", name:"联系十个人", ic:"people", a:"career", need:() => [grCnt("msg") + grCnt("talk"), 10]},
+  {id:"t1", name:"第一次 coffee chat", ic:"people", a:"career", need:() => [grCnt("talk"), 1]},
+  {id:"i1", name:"第一次真实面试", ic:"case", a:"career", need:() => [grCnt("iv"), 1]},
+  {id:"g1", name:"第一个好消息", ic:"star", a:"career", need:() => [G().miles.length, 1]},
+  {id:"full", name:"三栏全满的一周", ic:"trophy", a:"", need:() => [grFullWeeks(), 1]},
+  {id:"e10", name:"英语 10 小时", ic:"chat", a:"english", need:() => [Math.floor(grEnMinAll() / 60), 10]},
+  {id:"e50", name:"英语 50 小时", ic:"chat", a:"english", need:() => [Math.floor(grEnMinAll() / 60), 50]},
+  {id:"w7", name:"按时起床 7 次", ic:"sun", a:"life", need:() => [grCnt("wake"), 7]},
+  {id:"p7", name:"手机 7 晚不在床边", ic:"phone", a:"life", need:() => [grCnt("phone"), 7]},
+  {id:"m10", name:"运动 10 次", ic:"run", a:"life", need:() => [grCnt("move"), 10]},
+  {id:"lv5", name:"Lv 5", ic:"trophy", a:"", need:() => [K.growLevel(growTotal().all).lv, 5]},
+  {id:"lv10", name:"Lv 10", ic:"trophy", a:"", need:() => [K.growLevel(growTotal().all).lv, 10]}
+];
+function grAchCheck(silent){ const g = G(), out = []; for (const a of GR_ACH){ if (g.ach[a.id]) continue; let c = 0, t = 1; try { [c, t] = a.need(); } catch (e) { continue; } if (c >= t){ g.ach[a.id] = today(); if (!silent) out.push(a.name); } } return out; }
+function grAchCount(){ const g = G(); return GR_ACH.filter(a => g.ach[a.id]).length; }
 (function(){
   if (typeof planAutoDone !== "function") return;
   const f0 = planAutoDone;
@@ -15904,15 +16072,33 @@ function growAuto(act){
 })();
 
 /* ---------- 形象：对战角色 / 自己的图片 / 不显示 ---------- */
-let GR_AV = {img:null, loaded:false}, GR_BAT_WAIT = false;
+let GR_AV = {img:null, loaded:false}, GR_BAT_WAIT = false, GR_FITAUTO = {};
+function grFitKey(){ const g = G(); return g.av.mode === "img" ? "img" : "c:" + (g.av.char || L.batActive || "rig"); }
+function grFaceSrc(){
+  const g = G(), m = g.av.mode; if (m === "none") return "";
+  if (m === "img") return GR_AV.img || "";
+  const id = g.av.char || L.batActive || "rig", list = typeof BAT_LIST !== "undefined" ? BAT_LIST : [], c = id !== "rig" && list.find(x => x.id === id);
+  return c && c.thumb ? c.thumb : "";
+}
+function grFitOf(key){ const f = (G().av.fits || {})[key] || GR_FITAUTO[key]; return f || (key === "img" ? {z:1, x:0, y:0} : {z:1.8, x:0, y:28}); }
+const grFitCss = f => `transform:translate(${(+f.x || 0).toFixed(1)}%,${(+f.y || 0).toFixed(1)}%) scale(${(+f.z || 1).toFixed(2)})`;
+/* 自动取景：找图片里看得见的部分，对准上半身（头到胸） */
+function grAutoFit(key, src){
+  if (GR_FITAUTO[key] || !src || key === "img") return Promise.resolve(false);
+  return new Promise(res => { const im = new Image(); im.onload = () => { try {
+    const W = 64, H = Math.max(1, Math.round(64 * im.height / Math.max(1, im.width))), c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d"); x.drawImage(im, 0, 0, W, H); const d = x.getImageData(0, 0, W, H).data; let t = H, b = -1, l = W, r = -1;
+    for (let yy = 0; yy < H; yy++) for (let xx = 0; xx < W; xx++) if (d[(yy * W + xx) * 4 + 3] > 24){ if (yy < t) t = yy; if (yy > b) b = yy; if (xx < l) l = xx; if (xx > r) r = xx; }
+    if (b < 0){ t = 0; b = H - 1; l = 0; r = W - 1; }
+    const sc = Math.min(1 / W, 1 / H), wf = W * sc, hf = H * sc, ox = (1 - wf) / 2, oy = (1 - hf) / 2;   /* 方框里按“完整显示”摆好以后的位置 */
+    const bh = (b + 1 - t) / H, fx = ((l + r + 1) / 2) / W, fy = t / H + 0.24 * bh, z = Math.max(1, Math.min(4, 0.9 / (0.5 * bh * hf)));
+    const cx = ox + fx * wf, cy = oy + fy * hf;
+    GR_FITAUTO[key] = {z:+z.toFixed(2), x:Math.max(-150, Math.min(150, -(cx - 0.5) * z * 100)), y:Math.max(-150, Math.min(150, -(cy - 0.5) * z * 100))};
+  } catch (e) {} res(true); }; im.onerror = () => res(false); im.src = src; });
+}
 function grFaceHTML(){
-  const g = G(), m = g.av.mode;
-  if (m === "none") return "";
-  if (m === "img") return GR_AV.img ? `<img src="${GR_AV.img}" alt="">` : `<span class="bt-thumb-rig"></span>`;
-  const id = g.av.char || L.batActive || "rig";
-  const list = typeof BAT_LIST !== "undefined" ? BAT_LIST : [];
-  const c = id !== "rig" && list.find(x => x.id === id);
-  return c && c.thumb ? `<img class="gr-pose" src="${c.thumb}" alt="">` : `<span class="bt-thumb-rig"></span>`;
+  const src = grFaceSrc(), g = G(); if (g.av.mode === "none") return "";
+  return src ? `<img class="gr-face-img" src="${src}" style="${grFitCss(grFitOf(grFitKey()))}" alt="">` : `<span class="bt-thumb-rig"></span>`;
 }
 function grAvatarHTML(big){
   const g = G(), lv = K.growLevel(growTotal().all), p = Math.max(0, Math.min(1, lv.cur / lv.need));
@@ -15928,6 +16114,7 @@ function grAvatarLoad(){
   const g = G(), redo = () => { const t = UI.top(); if (t && (t.name === "grow" || t.name === "gchar")) UI.render(); };
   if (g.av.mode === "img" && !GR_AV.loaded){ IDB.get("grow:av").then(v => { GR_AV = {img:v || null, loaded:true}; redo(); }).catch(() => { GR_AV.loaded = true; }); }
   if (g.av.mode === "char" && !GR_BAT_WAIT && typeof BAT_READY !== "undefined"){ GR_BAT_WAIT = true; BAT_READY.then(() => { if ((typeof BAT_LIST !== "undefined") && BAT_LIST.length) redo(); }).catch(() => {}); }
+  const key = grFitKey(), src = grFaceSrc(); if (src && !g.av.fits[key] && !GR_FITAUTO[key]) grAutoFit(key, src).then(ok => { if (ok) redo(); });
 }
 /* 自己的图片：裁成正方形、缩到 256，存在这台手机上 */
 function grSquare(file, size){
@@ -15968,36 +16155,42 @@ VIEWS.grow = {
     let now1;
     if (nx){
       const btn = nx.area ? `<button class="btn primary" data-act="gr-done" data-id="${nx.id}">做完了</button>` : nx.act ? `<button class="btn primary" data-act="plan-go" data-v="${esc(nx.act)}">开始</button>` : `<button class="btn primary" data-act="plan-done-now" data-id="${nx.id}">做完了</button>`;
-      now1 = `<section class="panel gr-now"><span class="small muted">现在做${nx.area ? `（${GR_L[nx.area]}）` : ""}</span><b>${nx.cue ? esc(nx.cue) + " → " : ""}${esc(nx.text)}</b>${nx.ifthen ? `<p class="small gr-if">${esc(nx.ifthen)}</p>` : ""}<div class="row-gap">${btn}</div>${low}</section>`;
+      now1 = `${grJustHTML()}<section class="panel gr-now"><span class="small muted">现在做${nx.area ? `（${GR_L[nx.area]}）` : ""}</span><b>${nx.cue ? esc(nx.cue) + " → " : ""}${esc(nx.text)}</b>${nx.ifthen ? `<p class="small gr-if">${esc(nx.ifthen)}</p>` : ""}<div class="row-gap">${btn}</div>${low}</section>`;
     } else if (!items.length){
       now1 = `<section class="panel gr-now"><span class="small muted">现在做</span><b>今天还没有计划</b><div class="row-gap"><button class="btn primary" data-act="gr-en">练英语</button><button class="btn" data-act="gr-log">记一笔</button><button class="btn ghost" data-act="nav" data-v="plan">加一项计划</button></div>${low}</section>`;
     } else {
-      now1 = `<section class="panel gr-now"><span class="small muted">现在做</span><b>今天的计划都做完了 ✓</b><div class="row-gap"><button class="btn" data-act="gr-log">记一笔</button><button class="btn ghost" data-act="gr-en">练英语</button></div></section>`;
+      now1 = `${grJustHTML()}<section class="panel gr-now"><span class="small muted">现在做</span><b>今天的计划都做完了 ✓</b><div class="row-gap"><button class="btn" data-act="gr-log">记一笔</button><button class="btn ghost" data-act="gr-en">练英语</button></div></section>`;
     }
+    const fx = GR_FX; GR_FX = null;   /* 刚记了一笔：这一条从原来的长度涨上去，旁边飘一个 +经验值 */
     const bar = a => { const got = sum[a] || 0, goal = goals[a], best = grBest(a, wk), pct = Math.min(100, Math.round(100 * got / Math.max(1, goal)));
-      const cls = best > 0 && got > best ? " best" : got >= goal ? " ok" : "";
-      return `<div class="gr-bar${cls}" data-a="${a}"><span class="gr-lab">${GR_L[a]}</span><div class="t"><i style="width:${pct}%"></i></div><span class="v num">${got}/${goal}</span>${a === "english" ? `<button class="btn sm ghost" data-act="gr-en">练</button>` : `<button class="btn sm ghost" data-act="gr-log" data-v="${a}">记一笔</button>`}</div>`; };
-    const morning = hr >= ds && hr < 12 ? g.acts.filter(a => a.morning && !g.log.some(e => e.d === d && e.k === a.id)) : [];
-    const mRow = morning.length ? `<section class="panel gr-row"><span class="small muted">早上</span><div class="row-gap">${morning.map(a => `<button class="btn sm" data-act="gr-quick" data-v="${a.id}">${esc(grActName(a))}</button>`).join("")}</div></section>` : "";
+      const cls = best > 0 && got > best ? " best" : got >= goal ? " ok" : "", anim = fx && fx.a === a && !REDUCED;
+      return `<div class="gr-bar${cls}" data-a="${a}"><span class="gr-lab">${GR_L[a]}</span><div class="t"><i style="width:${anim ? fx.from : pct}%"${anim ? ` data-to="${pct}"` : ""}></i></div><span class="v num">${got}/${goal}</span>${a === "english" ? `<button class="btn sm ghost" data-act="gr-en">练</button>` : `<button class="btn sm ghost" data-act="gr-log" data-v="${a}">记一笔</button>`}${anim && fx.xp ? `<span class="gr-fx num" aria-hidden="true">+${fx.xp}</span>` : ""}</div>`; };
+    const pins = g.pins.map(id => grAct(id)).filter(Boolean);
+    const tiles = pins.length ? `<section class="panel gr-quickp"><div class="gr-h"><b>快速记</b></div><div class="gr-tiles">${pins.map(a => `<button class="gr-tile" data-act="gr-tap" data-v="${a.id}" style="--c:${GR_COLOR[a.a]}">${grIco(a.ic, "gr-ti")}<span>${esc(a.short || a.name)}</span><span class="gr-tx num">${a.mile ? "" : "+" + ((a.xp || 0) + (a.bx || 0))}</span></button>`).join("")}</div></section>` : "";
+    const am = hr >= ds && hr < 12, morning = am ? g.acts.filter(a => a.morning && !g.log.some(e => e.d === d && e.k === a.id)) : [];
+    const yd = nstr(dnum(d) - 1), back = am && g.log.some(e => e.d < d) && !g.log.some(e => e.d === yd && !e.mile && e.a !== "english");   /* 昨天什么都没记：给一个补记的入口 */
+    const backBtn1 = back ? `<button class="linkbtn small" data-act="gr-back">补记昨天</button>` : "";
+    const mRow = morning.length || back ? `<section class="panel gr-row"><div class="gr-h"><span class="small muted">早上</span>${backBtn1}</div>${morning.length ? `<div class="row-gap">${morning.map(a => `<button class="btn sm" data-act="gr-quick" data-v="${a.id}">${esc(grActName(a))}</button>`).join("")}</div>` : ""}</section>` : "";
     const md = g.mood[d] || 0;
-    const moodRow = g.moodOn && (hr >= 18 || hr < ds) ? `<section class="panel gr-row"><span class="small muted">今天感觉怎么样（1 很差，5 很好）</span><div class="gr-mood" role="group" aria-label="今天的心情">${[1, 2, 3, 4, 5].map(n => `<button data-act="gr-mood" data-v="${n}" aria-pressed="${md === n}">${n}</button>`).join("")}</div></section>` : "";
+    const moodRow = g.moodOn && (hr >= 18 || hr < ds) ? `<section class="panel gr-row"><span class="small muted">今天心情</span><div class="gr-mood" role="group" aria-label="今天的心情">${[1, 2, 3, 4, 5].map(n => `<button data-act="gr-mood" data-v="${n}" aria-pressed="${md === n}">${n}</button>`).join("")}</div></section>` : "";
     const doneN = items.filter(x => x.done).length;
     const fold = items.length ? `<details class="gr-plan" id="grPlan" ${L.grPlanOpen ? "open" : ""}><summary>今天的计划 ${doneN}/${items.length}</summary><div class="list" style="margin-top:6px">${items.map(x => planRowHTML(x, false)).join("")}</div><p class="small" style="margin:8px 4px 0"><button class="linkbtn small" data-act="nav" data-v="plan">我的计划</button></p></details>` : "";
     const up = grUpcoming();
-    const cal = up.length ? `<div class="banner gr-cal" style="margin-top:12px;margin-bottom:0"><span>接下来 7 天有 ${up.length} 个求职、生活时段还没加进日历</span><button class="btn sm" data-act="gr-cal">加进日历</button></div>` : "";
+    const cal = up.length ? `<div class="banner gr-cal" style="margin-top:12px;margin-bottom:0"><span>${up.length} 个时段还没加进日历</span><button class="btn sm" data-act="gr-cal">加进日历</button></div>` : "";
     const rw = grReviewWeek();
-    const review = rw && g.rv !== rw ? `<section class="panel gr-review"><b>本周复盘</b><p class="small muted" style="margin-top:4px">把这一周的数字发给 AI，拿回下周的目标和计划。</p><div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="nav" data-v="greview" data-wk="${rw}">开始复盘</button></div></section>` : "";
+    const review = rw && g.rv !== rw ? `<section class="panel gr-review"><b>本周复盘</b><div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="nav" data-v="greview" data-wk="${rw}">开始复盘</button></div></section>` : "";
     const banners = `${installBanner()}${STORAGE_OK ? "" : `<div class="banner"><span>存储空间不够，进度没存上。先备份，再清理旧录音。</span><button class="btn sm primary" data-act="nav" data-v="storage">去看看</button></div>`}${typeof backupBanner === "function" ? backupBanner() : ""}${typeof nextIvBanner === "function" ? nextIvBanner() : ""}${resumeBanner()}`;
     return `<div class="wrap gr">
-      <div class="gr-top"><div><div class="gr-date">${esc(fmtDate(d))}</div><div class="small muted gr-lvline">Lv ${lv.lv}，再 ${lv.left} 经验值升级</div></div>${grAvatarHTML(false)}</div>
+      <div class="gr-top"><div><div class="gr-date">${esc(fmtDate(d))}</div><div class="small muted gr-lvline">${g.name ? esc(g.name) + "　" : ""}Lv ${lv.lv}，再 ${lv.left} 升级</div></div>${grAvatarHTML(false)}</div>
       ${banners}${review}${now1}
       <section class="panel gr-week"><div class="gr-h"><b>本周经验值</b><span class="small muted">周一清零</span></div><div class="gr-bars">${GR_A.map(bar).join("")}</div></section>
-      ${mRow}${moodRow}${fold}${cal}
-      <p class="small gr-links"><button class="linkbtn small" data-act="nav" data-v="greview" data-wk="${rw || wk}">复盘</button><button class="linkbtn small" data-act="nav" data-v="gchar">角色和设置</button></p>
+      ${tiles}${mRow}${moodRow}${fold}${cal}
+      <p class="small gr-links"><button class="linkbtn small" data-act="nav" data-v="greview" data-wk="${rw || wk}">复盘</button><button class="linkbtn small" data-act="nav" data-v="gchar">角色</button></p>
     </div>`;
   },
   mount(){
     grAvatarLoad();
+    const to = $$(".gr-bar .t i[data-to]"); if (to.length) requestAnimationFrame(() => requestAnimationFrame(() => to.forEach(i => { i.style.width = i.dataset.to + "%"; })));
     const det = $("#grPlan"); if (det) det.addEventListener("toggle", () => { L.grPlanOpen = det.open; saveLocal(); });
     const u = grUps(), t = grUpText(u); if (t){ save(); toast(t); const av = $(".gr-av"); if (av){ av.classList.remove("gr-up"); void av.offsetWidth; av.classList.add("gr-up"); } }
   }
@@ -16005,7 +16198,7 @@ VIEWS.grow = {
 
 /* 记一笔：先选哪一栏（没指定时），再选做了什么 */
 ACT["gr-log"] = async el => {
-  let a = el && el.dataset && el.dataset.v;
+  grSheetClose(); let a = el && el.dataset && el.dataset.v;
   if (!a){ a = await choose("记一笔", "", [["career", "Career（求职）"], ["english", "English（英语）"], ["life", "Life（生活）"], ["", "取消"]]); if (!a) return; if (a === "english") return ACT["gr-en"](); }
   const acts = grActsOf(a); if (!acts.length){ toast("这一栏还没有选项，在“角色和设置”里加"); return; }
   const k = await choose(`记一笔：${GR_L[a]}`, "", acts.map(x => [x.id, grActLabel(x)]).concat([["", "取消"]])); if (!k) return;
@@ -16014,7 +16207,7 @@ ACT["gr-log"] = async el => {
 };
 /* English：开始练习、游戏，或者记一笔（英语对话这类在 app 外面练的） */
 ACT["gr-en"] = async () => {
-  const acts = grActsOf("english");
+  grSheetClose(); const acts = grActsOf("english");
   const k = await choose("English", "", [["_std", "开始练习"], ["_game", "游戏"]].concat(acts.map(x => [x.id, "记一笔：" + grActLabel(x)])).concat([["", "取消"]]));
   if (!k) return;
   if (k === "_std") return startSession(S.settings.goal || "std");
@@ -16022,6 +16215,18 @@ ACT["gr-en"] = async () => {
   const n = await grQty(grAct(k)); if (!n) return; growLog(k, n); UI.render();
 };
 ACT["gr-done"] = el => growDone(el.dataset.id);
+function grJustHTML(){ return GR_JUST && Date.now() - GR_JUST.t < 30000 ? `<p class="small gr-just">刚记了：${esc(GR_JUST.txt)}<button class="linkbtn small" data-act="gr-just-undo">撤销</button></p>` : ""; }
+ACT["gr-just-undo"] = () => { if (!GR_JUST) return; for (const id of GR_JUST.ids) growUndo(id); GR_JUST = null; toast("撤销了"); UI.render(); };
+/* 快速记：点一下记一次（份数就是 1），不弹任何东西 */
+ACT["gr-tap"] = el => { growLog(el.dataset.v, 1); UI.render(); };
+/* 补记昨天：漏了一天也没关系 */
+ACT["gr-back"] = async () => {
+  const yd = nstr(dnum(today()) - 1);
+  const a = await choose("补记昨天", "", [["career", "Career"], ["life", "Life"], ["english", "English"], ["", "取消"]]); if (!a) return;
+  const acts = grActsOf(a); if (!acts.length) return;
+  const k = await choose(`补记昨天：${GR_L[a]}`, "", acts.map(x => [x.id, grActLabel(x)]).concat([["", "取消"]])); if (!k) return;
+  const n = await grQty(grAct(k)); if (!n) return; growLog(k, n, {d:yd}); UI.render();
+};
 ACT["gr-quick"] = el => { growLog(el.dataset.v, 1); UI.render(); };
 ACT["gr-mood"] = el => { const g = G(); g.mood[today()] = +el.dataset.v; save(); toast("记下了"); UI.render(); };
 ACT["gr-low"] = async () => {
@@ -16043,7 +16248,7 @@ function grIcs(items){
 }
 ACT["gr-cal"] = async () => {
   const items = grUpcoming(); if (!items.length) return;
-  const c = await choose("加到哪里提醒你", `${items.length} 个时段，每个提前 10 分钟提醒。本机日历：会下载一个提醒文件，点开它，选手机自带的日历，保存就全部加进去了。`, [["local", "本机日历"], ["copy", "复制提醒内容"], ["", "取消"]]);
+  const c = await choose("加到哪里提醒你", `${items.length} 个时段，每个提前 10 分钟提醒。`, [["local", "本机日历"], ["copy", "复制提醒内容"], ["", "取消"]]);
   if (!c) return; const g = G();
   if (c === "local"){
     const url = URL.createObjectURL(new Blob([grIcs(items)], {type:"text/calendar"}));
@@ -16119,15 +16324,26 @@ VIEWS.greview = {
     const mood = grMoodLine(wk);
     return `<div class="wrap">${backBtn()}<h2>复盘</h2><p class="muted small" style="margin:4px 0 12px">${grRange(wk)}${cur ? "（这一周）" : ""}</p>
       <div class="list">${GR_A.map(row).join("")}</div>${mood ? `<p class="small" style="margin:10px 2px 0">${esc(mood)}</p>` : ""}
-      <div class="panel" style="margin-top:14px"><b>下周的建议目标</b><p class="small muted" style="margin-top:4px">达成的加 15%，没达成的保持。</p>
+      ${grDet("bulk", "补记这周", `<div class="gr-bulk">${GR_BULK.map(k => grAct(k)).filter(Boolean).map(a => `<label class="gr-inline">${esc(a.short || a.name)}<input type="number" min="0" max="${a.cap ? 7 : 50}" inputmode="numeric" data-bulk="${a.id}"></label>`).join("")}</div><button class="btn sm" style="margin-top:10px" data-act="gr-bulk">记上</button>`)}
+      <div class="panel" style="margin-top:14px"><b>下周的建议目标</b>
         <p style="margin-top:6px"><span class="num">Career ${sug.career}，English ${sug.english}，Life ${sug.life}</span></p>
         <button class="btn sm" style="margin-top:8px" data-act="gr-goal-apply" data-c="${sug.career}" data-e="${sug.english}" data-l="${sug.life}">用这个当下周目标</button></div>
-      <label class="fld"><span>用英语写两三句这周的事（可选）</span><textarea id="grEn" rows="3" data-chg="gr-en-draft" placeholder="This week I went to the library three times...">${esc(L.grEnDraft || "")}</textarea></label>
+      <label class="fld"><span>用英语写两三句这周的事</span><textarea id="grEn" rows="3" data-chg="gr-en-draft" placeholder="This week I went to the library three times...">${esc(L.grEnDraft || "")}</textarea></label>
       <div class="row-gap" style="margin-top:12px"><button class="btn primary" data-act="gr-review-copy" data-wk="${wk}">复制给 AI</button><button class="btn" data-act="gr-friend" data-wk="${wk}">发给朋友</button></div>
-      <p class="small muted" style="margin-top:12px">拿到 AI 的导入码以后：<button class="linkbtn small" data-act="nav" data-v="import">导入新内容</button></p></div>`;
+      <p class="small" style="margin-top:12px"><button class="linkbtn small" data-act="nav" data-v="import">导入 AI 给的导入码</button></p></div>`;
   }
 };
 CHG["gr-en-draft"] = el => { L.grEnDraft = el.value; saveLocal(); };
+/* 补记这周：平时没记，复盘时一次补上。每天只能一次的（按时起床、手机）摊到这周还没记过的日子 */
+const GR_BULK = ["apply", "msg", "talk", "iv", "school", "move", "wake", "phone"];
+ACT["gr-bulk"] = () => {
+  let n0 = 0; const d = today(), a0 = dnum(K.growWeekStart(d)), t = dnum(d);
+  for (const el of $$("[data-bulk]")){ const n = Math.max(0, Math.min(50, Math.round(+el.value || 0))); if (!n) continue; const a = grAct(el.dataset.bulk); if (!a) continue;
+    if (a.cap){ let left = n; for (let x = t; x >= a0 && left > 0; x--){ if (growLog(a.id, 1, {quiet:true, d:nstr(x)})){ left--; n0++; } } }
+    else if (growLog(a.id, n, {quiet:true})) n0++;
+    el.value = ""; }
+  grUps(); const ach = grAchCheck(); save(); toast(n0 ? `补记好了${ach.length ? "，解锁成就：" + ach.join("、") : ""}` : "没有要补的"); UI.render();
+};
 ACT["gr-review-copy"] = async el => {
   const wk = el.dataset.wk, ta = $("#grEn"), en = ((ta && ta.value) || L.grEnDraft || "").trim();
   if (ta){ L.grEnDraft = ta.value; saveLocal(); }
@@ -16140,126 +16356,235 @@ ACT["gr-friend"] = async el => {
 };
 ACT["gr-goal-apply"] = el => { growSetGoals({career:+el.dataset.c, english:+el.dataset.e, life:+el.dataset.l}); save(); toast(grDow(today()) === 0 ? "定好了：下周一开始算" : "定好了"); UI.render(); };
 
-/* ---------- 角色页：形象、技能、记一笔的选项、目标和设置、记录 ---------- */
+/* ---------- 角色页（v1.69.1）：上面是角色卡（形象、名字、等级、三栏），下面是技能 / 成就，再下面是收起的设置 ----------
+   展开、收起记在内存里（GR_OPEN）：切到别的页再回来保持不变，关掉 app 再开恢复默认（技能展开，其余收起） */
 let GR_EDIT = null;   /* {t:"act"|"skill", id}（id 为空是新加） */
-let GR_OPEN = {};     /* 角色页上展开了哪几块（重画页面时保持；正在改选项时“记一笔的选项”一定展开） */
-const grDet = (k, title, body) => `<details class="panel gr-det" data-k="${k}" style="margin-top:12px" ${GR_OPEN[k] || (k === "acts" && GR_EDIT && GR_EDIT.t === "act") ? "open" : ""}><summary>${title}</summary>${body}</details>`;
-function grSkillRows(a){
-  const g = G(), ed = GR_EDIT && GR_EDIT.t === "skill" ? GR_EDIT.id : undefined;
-  return g.skills.filter(s => s.a === a).map(s => { const n = grSkillN(s), L2 = K.growSkillLevel(n), pct = Math.round(100 * L2.cur / L2.need);
-    if (ed === s.id) return grSkillForm(s);
-    return `<div class="gr-skill"><span><b>${esc(s.name)}</b> <span class="num">Lv ${L2.lv}</span></span><span class="small muted">${n} 次${s.auto ? "（自动）" : ""}　<button class="linkbtn small" data-act="gr-sk-edit" data-id="${s.id}">改</button></span><div class="t"><i style="width:${pct}%"></i></div></div>`; }).join("") || `<p class="small muted" style="margin:6px 0">还没有技能</p>`;
+let GR_OPEN = {}, GR_TAB = "skills", GR_NAME_EDIT = false, GR_SHEET = null;
+const grDet = (k, title, body, def) => { const open = GR_OPEN[k] != null ? GR_OPEN[k] : (!!def || (k === "acts" && GR_EDIT && GR_EDIT.t === "act")); return `<details class="panel gr-det" data-k="${k}" style="margin-top:12px" ${open || (k === "acts" && GR_EDIT && GR_EDIT.t === "act") ? "open" : ""}><summary>${title}</summary>${body}</details>`; };
+function grTitle(lv){
+  const t = growTotal(); if (!t.all) return "新手冒险者";
+  const tier = lv >= 12 ? "大师" : lv >= 8 ? "精英" : lv >= 5 ? "熟练" : lv >= 3 ? "见习" : "新手";
+  const top = GR_A.slice().sort((a, b) => t[b] - t[a])[0];
+  return tier + {career:"求职者", english:"英语修行者", life:"生活家"}[top];
 }
 function grSkillForm(s){
   return `<div class="panel gr-form" id="grForm"><label class="fld" style="margin-top:0"><span>名字</span><input type="text" id="grSkName" maxlength="12" value="${esc(s ? s.name : "")}" placeholder="比如：发音"></label>
-    <label class="fld"><span>哪一栏</span><select id="grSkA">${GR_A.map(a => `<option value="${a}" ${(s ? s.a : (GR_EDIT && GR_EDIT.a) || "career") === a ? "selected" : ""}>${GR_L[a]}（${GR_ZH[a]}）</option>`).join("")}</select></label>
+    <label class="fld"><span>哪一栏</span><select id="grSkA">${GR_A.map(a => `<option value="${a}" ${(s ? s.a : (GR_EDIT && GR_EDIT.a) || "career") === a ? "selected" : ""}>${GR_L[a]}</option>`).join("")}</select></label>
     <div class="row-gap" style="margin-top:10px"><button class="btn primary sm" data-act="gr-sk-save">${s ? "保存" : "加上"}</button><button class="btn ghost sm" data-act="gr-edit-cancel">取消</button>${s ? `<button class="btn ghost sm danger" data-act="gr-sk-del" data-id="${s.id}">删除</button>` : ""}</div></div>`;
-}
-function grActRows(a){
-  const g = G(), ed = GR_EDIT && GR_EDIT.t === "act" ? GR_EDIT.id : undefined;
-  return g.acts.filter(x => x.a === a).map(x => { if (ed === x.id) return grActForm(x);
-    const s = x.sk ? grSkill(x.sk) : null;
-    return `<div class="li"><div class="grow"><b>${esc(grActName(x))}</b><span>${x.mile ? "里程碑，不算经验值" : `+${(x.xp || 0) + (x.bx || 0)} 经验值${x.bx ? `（English 另加 ${x.bx}）` : ""}`}${s ? `，${esc(s.name)} +${x.skn || 1}` : ""}${x.cap ? "，每天一次" : ""}</span></div><button class="linkbtn small" data-act="gr-act-edit" data-id="${x.id}">改</button></div>`; }).join("") || `<div class="li"><span class="small muted">还没有选项</span></div>`;
 }
 function grActForm(x){
   const g = G();
   return `<div class="panel gr-form" id="grForm"><label class="fld" style="margin-top:0"><span>做了什么</span><input type="text" id="grActName" maxlength="60" value="${esc(x ? x.name : "")}" placeholder="比如：改了一版简历"></label>
-    <label class="fld"><span>哪一栏</span><select id="grActA">${GR_A.map(a => `<option value="${a}" ${(x ? x.a : (GR_EDIT && GR_EDIT.a) || "career") === a ? "selected" : ""}>${GR_L[a]}（${GR_ZH[a]}）</option>`).join("")}</select></label>
+    <label class="fld"><span>哪一栏</span><select id="grActA">${GR_A.map(a => `<option value="${a}" ${(x ? x.a : (GR_EDIT && GR_EDIT.a) || "career") === a ? "selected" : ""}>${GR_L[a]}</option>`).join("")}</select></label>
     <label class="fld"><span>经验值</span><input type="number" id="grActXp" min="0" max="100" inputmode="numeric" value="${x ? x.xp || 0 : 10}"></label>
-    <label class="fld"><span>算进哪个技能</span><select id="grActSk"><option value="">不算技能</option>${g.skills.map(s => `<option value="${s.id}" ${x && x.sk === s.id ? "selected" : ""}>${esc(s.name)}（${GR_L[s.a]}）</option>`).join("")}</select></label>
+    <label class="fld"><span>算进哪个技能</span><select id="grActSk"><option value="">不算</option>${g.skills.map(s => `<option value="${s.id}" ${x && x.sk === s.id ? "selected" : ""}>${esc(s.name)}</option>`).join("")}</select></label>
     <div class="row-gap" style="margin-top:10px"><button class="btn primary sm" data-act="gr-act-save">${x ? "保存" : "加上"}</button><button class="btn ghost sm" data-act="gr-edit-cancel">取消</button>${x ? `<button class="btn ghost sm danger" data-act="gr-act-del" data-id="${x.id}">删除</button>` : ""}</div></div>`;
+}
+function grActRows(a){
+  const g = G(), ed = GR_EDIT && GR_EDIT.t === "act" ? GR_EDIT.id : undefined;
+  return g.acts.filter(x => x.a === a).map(x => { if (ed === x.id) return grActForm(x);
+    const s = x.sk ? grSkill(x.sk) : null, pin = g.pins.includes(x.id);
+    const info = [x.mile ? "里程碑" : `+${x.xp || 0}`].concat(x.bx ? [`English +${x.bx}`] : [], s ? [`${s.name} +${x.skn || 1}`] : [], x.cap ? ["每天一次"] : []).join("，");
+    return `<div class="li"><button class="gr-pin" data-act="gr-pin" data-id="${x.id}" aria-pressed="${pin}" aria-label="放在成长页的快速记">${pin ? "★" : "☆"}</button><div class="grow"><b>${esc(grActName(x))}</b><span>${esc(info)}</span></div><button class="linkbtn small" data-act="gr-act-edit" data-id="${x.id}">改</button></div>`; }).join("") || `<div class="li"><span class="small muted">还没有</span></div>`;
+}
+/* 技能的分布图：几个技能就是几边形 */
+function grRadar(sks){
+  const n = sks.length, W = 320, H = 236, cx = 160, cy = 120, R = 80;
+  const lvs = sks.map(s => K.growSkillLevel(grSkillN(s)).lv), mx = Math.max(5, ...lvs);
+  const pt = (i, r) => { const t = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + r * Math.cos(t), cy + r * Math.sin(t)]; };
+  const ring = f => sks.map((_, i) => pt(i, R * f).map(v => v.toFixed(1)).join(",")).join(" ");
+  const grid = [0.25, 0.5, 0.75, 1].map(f => `<polygon points="${ring(f)}" class="gc-rg"/>`).join("") + sks.map((_, i) => { const [x, y] = pt(i, R); return `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="gc-rg"/>`; }).join("");
+  const poly = sks.map((_, i) => pt(i, R * Math.max(0.08, lvs[i] / mx)).map(v => v.toFixed(1)).join(",")).join(" ");
+  const labels = sks.map((s, i) => { const [x, y] = pt(i, R + 15), an = x < cx - 4 ? "end" : x > cx + 4 ? "start" : "middle"; return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${an}" class="gc-rt">${esc(s.name)}<tspan class="gc-rn" dx="3">${lvs[i]}</tspan></text>`; }).join("");
+  return `<svg class="gc-radar" viewBox="0 0 ${W} ${H}" role="img" aria-label="技能分布">${grid}<polygon points="${poly}" class="gc-rp"/>${sks.map((_, i) => { const [x, y] = pt(i, R * Math.max(0.08, lvs[i] / mx)); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" class="gc-rd"/>`; }).join("")}${labels}</svg>`;
+}
+function grSkillsHTML(){
+  const g = G(), sks = g.skills;
+  const tiles = sks.map(s => { const n = grSkillN(s), L2 = K.growSkillLevel(n), pct = Math.round(100 * L2.cur / L2.need);
+    return `<button class="gc-skill" data-act="gr-skill" data-id="${s.id}" style="--c:${GR_COLOR[s.a]}">${grIco(s.ic || "star", "gc-ki")}<span class="gc-kn">${esc(s.name)}</span><span class="gc-kl num">Lv ${L2.lv}</span><span class="gc-kb"><i style="width:${pct}%"></i></span></button>`; }).join("");
+  const form = GR_EDIT && GR_EDIT.t === "skill" ? grSkillForm(GR_EDIT.id ? grSkill(GR_EDIT.id) : null) : "";
+  return `${sks.length >= 3 ? grRadar(sks) : ""}<div class="gc-skills">${tiles}<button class="gc-skill gc-add" data-act="gr-sk-add">${grIco("star", "gc-ki")}<span class="gc-kn">加技能</span></button></div>${form}`;
+}
+function grAchHTML(){
+  const g = G();
+  const items = GR_ACH.map(a => { let c = 0, t = 1; try { [c, t] = a.need(); } catch (e) {} const got = g.ach[a.id];
+    return `<button class="gc-badge${got ? " on" : ""}" data-act="gr-ach" data-id="${a.id}" style="--c:${a.a ? GR_COLOR[a.a] : "var(--ink)"}">${grIco(a.ic, "gc-bi")}<span class="gc-bn">${esc(a.name)}</span><span class="gc-bp num">${got ? "✓" : `${Math.min(c, t)}/${t}`}</span></button>`; }).join("");
+  const miles = g.miles.slice().reverse().map(m => `<div class="li"><div class="grow"><b>${esc(m.nm.replace(/^好消息[:：]\s*/, ""))}</b><span>${esc(fmtDate(m.d))}</span></div></div>`).join("");
+  return `<div class="gc-badges">${items}</div>${miles ? `<p class="small muted" style="margin:12px 2px 4px">好消息</p><div class="list">${miles}</div>` : ""}`;
+}
+function grLookHTML(){
+  const g = G(), m = g.av.mode, list = typeof BAT_LIST !== "undefined" ? BAT_LIST : [], curC = g.av.char || L.batActive || "rig";
+  const chars = [{id:"rig", name:"原创小人", thumb:""}].concat(list).map(c => `<button class="gr-pick${curC === c.id ? " on" : ""}" data-act="gr-av-char" data-v="${esc(c.id)}" aria-pressed="${curC === c.id}">${c.thumb ? `<img src="${c.thumb}" alt="">` : `<span class="bt-thumb-rig" aria-hidden="true"></span>`}<span>${esc(c.name)}</span></button>`).join("");
+  const src = grFaceSrc(), key = grFitKey(), f = grFitOf(key);
+  const fit = src ? `<div class="gr-fitrow"><div class="gr-fitbox" id="grFit" data-key="${esc(key)}"><img id="grFitImg" src="${src}" style="${grFitCss(f)}" alt="" draggable="false"></div>
+      <div class="gr-fitctl"><label class="small">缩放<input type="range" id="grFitZ" min="1" max="4" step="0.05" value="${(+f.z || 1).toFixed(2)}"></label><span class="small muted">拖动图片调位置</span><button class="btn sm ghost" data-act="gr-fit-reset">重置</button></div></div>` : "";
+  return `<label class="fld" style="margin-top:6px"><span>名字</span><input type="text" maxlength="16" data-chg="gr-name" value="${esc(g.name || "")}" placeholder="给角色起个名字"></label>
+    <div class="seg" role="group" aria-label="形象" style="margin-top:12px">${[["char", "对战角色"], ["img", "自己的图片"], ["none", "不显示"]].map(([k, l]) => `<button data-act="gr-av-mode" data-v="${k}" aria-pressed="${m === k}">${l}</button>`).join("")}</div>
+    ${m === "char" ? `<div class="gr-picks">${chars}</div>${list.length ? "" : `<p class="small muted">导入对战角色后可以在这里选</p>`}` : ""}
+    ${m === "img" ? `<div class="row-gap" style="margin-top:10px"><label class="btn sm">选图片<input type="file" accept="image/*" data-chg="gr-av-file" style="display:none"></label>${GR_AV.img ? `<button class="btn sm ghost danger" data-act="gr-av-del">删除图片</button>` : ""}</div><p class="small muted" style="margin-top:6px">只存在这台手机上</p>` : ""}
+    ${m !== "none" ? fit : ""}`;
 }
 VIEWS.gchar = {
   tab:"grow", noRefresh:true,
   render(){
-    const g = G(); growSync(); const tot = growTotal(), lv = K.growLevel(tot.all), goals = growGoals();
-    const m = g.av.mode, list = typeof BAT_LIST !== "undefined" ? BAT_LIST : [], curC = g.av.char || L.batActive || "rig";
-    const chars = [{id:"rig", name:"原创小人", thumb:""}].concat(list).map(c => `<button class="gr-pick${curC === c.id ? " on" : ""}" data-act="gr-av-char" data-v="${esc(c.id)}" aria-pressed="${curC === c.id}">${c.thumb ? `<img src="${c.thumb}" alt="">` : `<span class="bt-thumb-rig" aria-hidden="true"></span>`}<span>${esc(c.name)}</span></button>`).join("");
-    const av = `<div class="seg" role="group" aria-label="形象">${[["char", "对战角色"], ["img", "自己的图片"], ["none", "不显示"]].map(([k, l]) => `<button data-act="gr-av-mode" data-v="${k}" aria-pressed="${m === k}">${l}</button>`).join("")}</div>
-      ${m === "char" ? `<div class="gr-picks">${chars}</div>${list.length ? "" : `<p class="small muted">在“我的 → 对战角色”导入角色以后，这里就能选。</p>`}` : ""}
-      ${m === "img" ? `<div class="row-gap"><label class="btn sm">选图片<input type="file" accept="image/*" data-chg="gr-av-file" style="display:none"></label>${GR_AV.img ? `<button class="btn sm ghost danger" data-act="gr-av-del">删除这张图片</button>` : ""}</div><p class="small muted" style="margin-top:6px">会裁成正方形，只存在这台手机上，不进备份。</p>` : ""}`;
-    const editing = GR_EDIT;
-    const skills = GR_A.map(a => `<div class="gr-sec"><span class="small muted">${GR_L[a]}</span>${grSkillRows(a)}</div>`).join("") + (editing && editing.t === "skill" && !editing.id ? grSkillForm(null) : `<button class="btn sm ghost" style="margin-top:8px" data-act="gr-sk-add">＋ 加技能</button>`);
-    const acts = GR_A.map(a => `<div class="gr-sec"><span class="small muted">${GR_L[a]}</span><div class="list">${grActRows(a)}</div></div>`).join("") + (editing && editing.t === "act" && !editing.id ? grActForm(null) : `<div class="row-gap" style="margin-top:8px"><button class="btn sm ghost" data-act="gr-act-add">＋ 加一项</button><button class="btn sm ghost" data-act="gr-act-reset">恢复默认的选项</button></div>`);
-    const cur = K.growWeekStart(today()), weeks = []; for (let i = 0; i < 8; i++) weeks.push(nstr(dnum(cur) - 7 * i));
-    const wrows = weeks.map(w => { const s = growWeek(w); if (!(s.career || s.english || s.life) && w !== cur) return ""; const md = s.md ? (s.md[0] / s.md[1]).toFixed(1) : "–";
-      return `<div class="li"><div class="grow"><b>${grRange(w)}${w === cur ? "（这周）" : ""}</b><span><span class="num">Career ${s.career}，English ${s.english}，Life ${s.life}</span>，心情 ${md}</span></div></div>`; }).join("");
-    const recent = g.log.slice(-30).reverse().map(e => `<div class="li"><div class="grow"><b>${esc(e.nm)}${e.n > 1 ? ` ×${e.n}` : ""}</b><span>${esc(fmtDate(e.d))}${e.xp + e.en ? `，+${e.xp + e.en} 经验值` : ""}</span></div><button class="linkbtn small" data-act="gr-undo" data-id="${e.id}">撤销</button></div>`).join("");
-    const miles = g.miles.slice().reverse().map(x => `<div class="li"><div class="grow"><b>${esc(x.nm.replace(/^好消息[:：]\s*/, ""))}</b><span>${esc(fmtDate(x.d))}</span></div></div>`).join("");
+    const g = G(); growSync(); const tot = growTotal(), lv = K.growLevel(tot.all), cur = K.growWeekStart(today()), sum = growWeek(cur), goals = growGoals();
+    const nameHTML = GR_NAME_EDIT ? `<input class="gc-name-in" id="grName" maxlength="16" data-chg="gr-name" value="${esc(g.name || "")}" placeholder="给角色起个名字">`
+      : `<button class="gc-name" data-act="gr-name-edit" aria-label="改名字">${esc(g.name || "我的角色")}${grIco("pen", "gc-pen")}</button>`;
+    const stat = a => `<button class="gc-stat" data-act="gr-stat" data-v="${a}" data-a="${a}">${grIco(GR_AREA_IC[a], "gc-si")}<span class="gc-sl">${GR_L[a]}</span><b class="num">${tot[a]}</b><span class="gc-sw">本周 ${sum[a] || 0}/${goals[a]}</span></button>`;
+    const hero = `<section class="gc-hero"><div class="gc-top">${grAvatarHTML(true)}<div class="gc-id">${nameHTML}<div class="gc-title"><span class="gc-lv num">Lv ${lv.lv}</span><span>${esc(grTitle(lv.lv))}</span></div>
+        <div class="gc-xp" role="progressbar" aria-label="经验值" aria-valuemin="0" aria-valuemax="${lv.need}" aria-valuenow="${lv.cur}"><i style="width:${Math.round(100 * lv.cur / lv.need)}%"></i></div><div class="gc-xpn num">${lv.cur} / ${lv.need} 经验值</div></div></div>
+      <div class="gc-stats">${GR_A.map(stat).join("")}</div></section>`;
+    const tab = GR_TAB === "ach" ? "ach" : "skills";
+    const tabs = `<div class="seg gc-tabs">${[["skills", "技能"], ["ach", `成就 ${grAchCount()}/${GR_ACH.length}`]].map(([k, l]) => `<button data-act="gr-tab" data-v="${k}" aria-pressed="${tab === k}">${l}</button>`).join("")}</div>`;
+    const acts = GR_A.map(a => `<div class="gr-sec"><span class="small muted">${GR_L[a]}</span><div class="list">${grActRows(a)}</div></div>`).join("") + (GR_EDIT && GR_EDIT.t === "act" && !GR_EDIT.id ? grActForm(null) : `<div class="row-gap" style="margin-top:8px"><button class="btn sm ghost" data-act="gr-act-add">＋ 加一项</button><button class="btn sm ghost" data-act="gr-act-reset">恢复默认</button></div>`);
+    const weeks = []; for (let i = 0; i < 8; i++) weeks.push(nstr(dnum(cur) - 7 * i));
+    const wrows = weeks.map(w => { const x = growWeek(w); if (!(x.career || x.english || x.life) && w !== cur) return ""; const md = x.md ? (x.md[0] / x.md[1]).toFixed(1) : "–";
+      return `<div class="li"><div class="grow"><b>${grRange(w)}${w === cur ? "（这周）" : ""}</b><span><span class="num">Career ${x.career}，English ${x.english}，Life ${x.life}</span>，心情 ${md}</span></div></div>`; }).join("");
+    const recent = g.log.slice(-30).reverse().map(e => `<div class="li"><div class="grow"><b>${esc(e.nm)}${e.n > 1 ? ` ×${e.n}` : ""}</b><span>${esc(fmtDate(e.d))}${e.xp + e.en ? `，+${e.xp + e.en}` : ""}</span></div><button class="linkbtn small" data-act="gr-undo" data-id="${e.id}">撤销</button></div>`).join("");
     const b = g.base || {};
-    return `<div class="wrap gr">${backBtn()}
-      <div class="gr-top" style="margin-top:0"><div><h2 style="font-size:26px">角色</h2><div class="small muted gr-lvline"><span class="num">Lv ${lv.lv}</span>，累计 ${tot.all} 经验值，再 ${lv.left} 升级</div></div>${grAvatarHTML(true)}</div>
-      <div class="panel"><b>形象</b>${av}</div>
-      <div class="panel" style="margin-top:12px"><div class="gr-h"><b>技能</b><span class="small muted">用得越多涨得越多</span></div>${skills}</div>
-      <div class="panel" style="margin-top:12px"><b>每周目标</b><p class="small muted" style="margin-top:4px">“跳一跳够得着”：复盘时会按这周的完成情况建议下周的。</p>
-        <div class="gr-goals">${GR_A.map(a => `<label class="fld"><span>${GR_L[a]}</span><input type="number" min="5" max="999" inputmode="numeric" data-chg="gr-goal" data-v="${a}" value="${goals[a]}"></label>`).join("")}</div>
-        ${g.next ? `<p class="small muted">下周一开始：Career ${g.next.career}，English ${g.next.english}，Life ${g.next.life}</p>` : ""}</div>
-      <div class="panel" style="margin-top:12px"><b>设置</b>
-        <label class="fld"><span>按时起床：几点前</span><input type="time" data-chg="gr-wake" value="${esc(g.wake)}"></label>
-        <div class="fld"><span>起点：开始用之前的一周，大概</span><div class="row-gap"><label class="gr-inline">投了<input type="number" min="0" max="99" inputmode="numeric" data-chg="gr-base" data-v="apply" value="${b.apply != null ? +b.apply : ""}">份</label><label class="gr-inline">联系了<input type="number" min="0" max="99" inputmode="numeric" data-chg="gr-base" data-v="msg" value="${b.msg != null ? +b.msg : ""}">个人</label></div></div>
-        <label class="switch"><span>晚上记一下心情（不算经验值）</span><input type="checkbox" data-chg="gr-mood-on" ${g.moodOn ? "checked" : ""}></label></div>
-      ${grDet("acts", "记一笔的选项", acts)}
+    const set = `<label class="fld" style="margin-top:6px"><span>起床时间</span><input type="time" data-chg="gr-wake" value="${esc(g.wake)}"></label>
+      <div class="fld"><span>起点（之前一周）</span><div class="row-gap"><label class="gr-inline">投了<input type="number" min="0" max="99" inputmode="numeric" data-chg="gr-base" data-v="apply" value="${b.apply != null ? +b.apply : ""}">份</label><label class="gr-inline">联系了<input type="number" min="0" max="99" inputmode="numeric" data-chg="gr-base" data-v="msg" value="${b.msg != null ? +b.msg : ""}">人</label></div></div>
+      <label class="switch"><span>晚上记心情</span><input type="checkbox" data-chg="gr-mood-on" ${g.moodOn ? "checked" : ""}></label>
+      <div class="fld"><span>每天提醒我记一下</span><div class="row-gap"><input type="time" id="grRemind" value="${esc(g.remind || "22:30")}" style="width:auto"><button class="btn sm" data-act="gr-remind">加到日历</button></div></div>`;
+    const goalsHTML = `<div class="gr-goals">${GR_A.map(a => `<label class="fld"><span>${GR_L[a]}</span><input type="number" min="5" max="999" inputmode="numeric" data-chg="gr-goal" data-v="${a}" value="${goals[a]}"></label>`).join("")}</div>${g.next ? `<p class="small muted">下周一起：Career ${g.next.career}，English ${g.next.english}，Life ${g.next.life}</p>` : ""}`;
+    const rules = `<div class="small" style="line-height:1.8;margin-top:6px">
+        <p>经验值只给你能控制的行动。English 按每天在脱口里练的时间自动算：每 2 分钟 1 点，每天最多 ${GR_EN_CAP} 点。真实的英语对话两栏都加。</p>
+        <p>每周一清零。等级只涨不掉：第 2 级 100，第 3 级 300，第 4 级 600，每级多要 100。</p>
+        <p>技能：第 2 级 3 次，第 3 级 9 次，第 4 级 18 次。口语、听力、写作、模拟面试自动算。</p>
+        <p>手机下床才够得着就行，不用放卧室外。</p>
+        <p>没做的计划不扣分。好消息算成就，不算经验值。</p></div>`;
+    return `<div class="wrap gr gc">${backBtn()}${hero}
+      ${grDet("skills", "技能和成就", tabs + (tab === "skills" ? grSkillsHTML() : grAchHTML()), true)}
+      ${grDet("look", "形象和名字", grLookHTML())}
+      ${grDet("goals", "每周目标", goalsHTML)}
+      ${grDet("set", "设置", set)}
+      ${grDet("acts", "记一笔的选项", `<p class="small muted" style="margin:6px 2px 0">★ 放在成长页的快速记里</p>` + acts)}
       ${grDet("weeks", "最近几周", `<div class="list" style="margin-top:8px">${wrows}</div>`)}
-      ${miles ? grDet("miles", `里程碑 ${g.miles.length}`, `<div class="list" style="margin-top:8px">${miles}</div>`) : ""}
       ${recent ? grDet("recent", "最近的记录", `<div class="list" style="margin-top:8px">${recent}</div>`) : ""}
-      <div class="panel" style="margin-top:12px"><b>发给 AI</b><p class="small muted" style="margin-top:4px">复盘看一周；综合分析把设置、技能和最近四周一起发过去，帮你判断目标和选项设得合不合适。</p>
-        <div class="row-gap" style="margin-top:10px"><button class="btn sm" data-act="nav" data-v="greview" data-wk="${grReviewWeek() || cur}">复盘</button><button class="btn sm primary" data-act="gr-analyze">综合分析</button></div></div>
-      <details class="panel gr-det" data-k="rules" style="margin-top:12px" ${GR_OPEN.rules ? "open" : ""}><summary>怎么算</summary><div class="small" style="line-height:1.8;margin-top:6px">
-        <p>经验值只给你能控制的行动。English 从每天在脱口里的练习时间自动算：每 2 分钟 1 点，每天最多 ${GR_EN_CAP} 点。真实的英语对话，Career 和 English 两栏都加。</p>
-        <p>每周一清零（按“一天从几点开始算”）。等级只涨不掉：第 2 级 100，第 3 级 300，第 4 级 600，每升一级多要 100。</p>
-        <p>技能：第 2 级 3 次，第 3 级 9 次，第 4 级 18 次。口语按“这天说了 10 句以上”，听力按“这天听了 5 题以上”，写作和模拟面试按次，自动算。</p>
-        <p>手机不用非放到卧室外：下床才够得着就行。</p>
-        <p>没做完的计划不扣分；好消息记成里程碑，不算经验值。</p></div></details>
+      ${grDet("rules", "怎么算", rules)}
+      <div class="row-gap" style="margin-top:14px"><button class="btn" data-act="nav" data-v="greview" data-wk="${grReviewWeek() || cur}">复盘</button><button class="btn primary" data-act="gr-analyze">综合分析</button></div>
     </div>`;
   },
-  mount(){ grAvatarLoad(); document.querySelectorAll("details.gr-det[data-k]").forEach(d => d.addEventListener("toggle", () => { GR_OPEN[d.dataset.k] = d.open; })); }
+  mount(){
+    grAvatarLoad();
+    document.querySelectorAll("details.gr-det[data-k]").forEach(d => d.addEventListener("toggle", () => { GR_OPEN[d.dataset.k] = d.open; }));
+    const ni = $("#grName"); if (ni){ ni.focus(); ni.addEventListener("blur", () => { GR_NAME_EDIT = false; setTimeout(() => UI.render(), 0); }); ni.addEventListener("keydown", e => { if (e.key === "Enter") ni.blur(); }); }
+    /* 取景：拖动调位置，滑块调大小 */
+    const box = $("#grFit"), img = $("#grFitImg"), zr = $("#grFitZ");
+    if (box && img){
+      const key = box.dataset.key; let f = Object.assign({}, grFitOf(key)), st = null;
+      const show = () => { img.style.transform = grFitCss(f).replace(/^transform:/, ""); };
+      const keep = () => { const g = G(); g.av.fits[key] = {z:+(+f.z).toFixed(2), x:+(+f.x).toFixed(1), y:+(+f.y).toFixed(1)}; save(); const face = $(".gc-hero .gr-face-img"); if (face) face.style.transform = img.style.transform; };
+      box.addEventListener("pointerdown", e => { st = {x:e.clientX, y:e.clientY, fx:f.x, fy:f.y}; try { box.setPointerCapture(e.pointerId); } catch (er) {} });
+      box.addEventListener("pointermove", e => { if (!st) return; const w = box.clientWidth || 128; f.x = Math.max(-200, Math.min(200, st.fx + (e.clientX - st.x) / w * 100)); f.y = Math.max(-200, Math.min(200, st.fy + (e.clientY - st.y) / w * 100)); show(); });
+      const end = () => { if (!st) return; st = null; keep(); };
+      box.addEventListener("pointerup", end); box.addEventListener("pointercancel", end);
+      if (zr){ zr.addEventListener("input", () => { f.z = +zr.value; show(); }); zr.addEventListener("change", () => { f.z = +zr.value; keep(); }); }
+    }
+  }
 };
+ACT["gr-tab"] = el => { GR_TAB = el.dataset.v; UI.render(); };
+ACT["gr-name-edit"] = () => { GR_NAME_EDIT = true; UI.render(); };
+CHG["gr-name"] = el => { const g = G(); g.name = String(el.value || "").trim().slice(0, 16); save(); };
+ACT["gr-fit-reset"] = () => { const g = G(), key = grFitKey(); delete g.av.fits[key]; save(); UI.render(); };
+ACT["gr-pin"] = el => { const g = G(), id = el.dataset.id; if (g.pins.includes(id)) g.pins = g.pins.filter(x => x !== id); else { if (g.pins.length >= 8){ toast("快速记最多放 8 个"); return; } g.pins.push(id); } save(); UI.render(); };
+/* 每天提醒：一个每天重复的日历日程（PWA 自己没法定时提醒） */
+function grIcsDaily(hm){
+  const [h, m] = String(hm || "22:30").split(":").map(Number), t = new Date(); t.setHours(h || 0, m || 0, 0, 0); if (t.getTime() < Date.now()) t.setDate(t.getDate() + 1);
+  const f = dt => dt.getFullYear() + String(dt.getMonth() + 1).padStart(2, "0") + String(dt.getDate()).padStart(2, "0") + "T" + String(dt.getHours()).padStart(2, "0") + String(dt.getMinutes()).padStart(2, "0") + "00";
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//tuokou//grow//CN", "BEGIN:VEVENT", "UID:grow-daily@tuokou", "DTSTAMP:" + f(new Date()), "DTSTART:" + f(t), "DTEND:" + f(new Date(t.getTime() + 5 * 60000)), "RRULE:FREQ=DAILY",
+    "SUMMARY:脱口：记一下今天", "DESCRIPTION:给手机充电前，打开成长页点一下今天做了的事", "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:脱口：记一下今天", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+}
+ACT["gr-remind"] = () => {
+  const g = G(), hm = (($("#grRemind") || {}).value || g.remind || "22:30"); if (!/^\d{2}:\d{2}$/.test(hm)) return; g.remind = hm; save();
+  const url = URL.createObjectURL(new Blob([grIcsDaily(hm)], {type:"text/calendar"})), a = document.createElement("a"); a.href = url; a.download = "tuokou-每天记一下.ics"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000); toast("下载好了：点开它，选手机自带的日历，保存");
+};
+/* 点技能、三栏、成就：弹出一张卡（像游戏里点开道具看属性） */
+function grSheet(html){
+  document.querySelectorAll(".gr-sheet-bg").forEach(x => x.remove());
+  const bg = document.createElement("div"); bg.className = "sheet-bg gr-sheet-bg";
+  bg.innerHTML = `<div class="sheet gc-sheet" role="dialog" aria-modal="true">${html}<button class="btn block" style="margin-top:16px" data-act="gr-sheet-close">关闭</button></div>`;
+  bg.addEventListener("click", e => { if (e.target === bg) grSheetClose(); }); document.body.appendChild(bg);
+}
+function grSheetClose(){ document.querySelectorAll(".gr-sheet-bg").forEach(x => x.remove()); GR_SHEET = null; }
+ACT["gr-sheet-close"] = () => grSheetClose();
+function grSkillSheet(id){
+  const s = grSkill(id); if (!s) return; GR_SHEET = {t:"skill", id}; const g = G(), n = grSkillN(s), L2 = K.growSkillLevel(n);
+  const src = g.acts.filter(a => a.sk === s.id).map(a => `<div class="li"><div class="grow"><b>${esc(a.short || a.name)}</b><span>${esc(s.name)} +${a.skn || 1}，经验值 +${(a.xp || 0) + (a.bx || 0)}</span></div><button class="btn sm" data-act="gr-sheet-log" data-v="${a.id}">记一次</button></div>`).join("");
+  const auto = {speak:"脱口里一天说了 10 句以上，自动 +1", listen:"脱口里一天听了 5 题以上，自动 +1", write:"脱口里每写完一封，自动 +1", mock:"脱口里每次模拟面试，自动 +1"}[s.auto];
+  grSheet(`<div class="gc-sh" style="--c:${GR_COLOR[s.a]}">${grIco(s.ic || "star", "gc-shi")}<div><h3>${esc(s.name)} <span class="num">Lv ${L2.lv}</span></h3><p class="small muted">${GR_L[s.a]}，累计 ${n} 次</p></div></div>
+    <div class="gc-kb big" style="--c:${GR_COLOR[s.a]}"><i style="width:${Math.round(100 * L2.cur / L2.need)}%"></i></div><p class="small num" style="margin-top:6px">${L2.cur} / ${L2.need}，再 ${L2.need - L2.cur} 次升到 Lv ${L2.lv + 1}</p>
+    ${auto ? `<p class="small muted" style="margin-top:10px">${auto}</p>` : ""}${src ? `<div class="list" style="margin-top:10px">${src}</div>` : ""}
+    <p class="small" style="margin-top:12px"><button class="linkbtn small" data-act="gr-sk-edit" data-id="${s.id}">改名或删除</button></p>`);
+}
+function grStatSheet(a){
+  GR_SHEET = {t:"stat", id:a}; const cur = K.growWeekStart(today()), tot = growTotal(), goals = growGoals(), now = growWeek(cur), rows = [];
+  for (let i = 5; i >= 0; i--){ const w = nstr(dnum(cur) - 7 * i), x = i ? growWeek(w) : now, gl = x.goals || (i ? null : goals); rows.push([w, x[a] || 0, gl ? gl[a] : 0]); }
+  const mx = Math.max(1, ...rows.map(r => Math.max(r[1], r[2])));
+  const bars = rows.map(([w, v, gl]) => `<div class="gc-wk"><span class="gc-wb"><i style="height:${Math.round(100 * v / mx)}%"></i>${gl ? `<b style="bottom:${Math.round(100 * gl / mx)}%"></b>` : ""}</span><span class="small num">${v}</span><span class="gc-wd">${grRange(w).split("–")[0]}</span></div>`).join("");
+  const counts = grCounts(now, a);
+  grSheet(`<div class="gc-sh" style="--c:${GR_COLOR[a]}">${grIco(GR_AREA_IC[a], "gc-shi")}<div><h3>${GR_L[a]}</h3><p class="small muted">累计 ${tot[a]} 经验值</p></div></div>
+    <p style="margin-top:12px"><b class="num">本周 ${now[a] || 0} / ${goals[a]}</b></p>${counts.length ? `<p class="small muted">${esc(counts.join("；"))}</p>` : ""}
+    <div class="gc-weeks" style="--c:${GR_COLOR[a]}">${bars}</div><p class="small muted" style="margin-top:4px">黑线是那周的目标</p>
+    <div class="row-gap" style="margin-top:12px">${a === "english" ? `<button class="btn primary sm" data-act="gr-en">练</button>` : `<button class="btn primary sm" data-act="gr-log" data-v="${a}">记一笔</button>`}</div>`);
+}
+function grAchSheet(id){
+  const a = GR_ACH.find(x => x.id === id); if (!a) return; GR_SHEET = {t:"ach", id}; let c = 0, t = 1; try { [c, t] = a.need(); } catch (e) {} const got = G().ach[id];
+  grSheet(`<div class="gc-sh${got ? "" : " locked"}" style="--c:${a.a ? GR_COLOR[a.a] : "var(--ink)"}">${grIco(a.ic, "gc-shi")}<div><h3>${esc(a.name)}</h3><p class="small muted">${got ? esc(fmtDate(got)) + " 解锁" : "还没解锁"}</p></div></div>
+    <div class="gc-kb big" style="--c:${a.a ? GR_COLOR[a.a] : "var(--ink)"}"><i style="width:${Math.round(100 * Math.min(1, c / t))}%"></i></div><p class="small num" style="margin-top:6px">${Math.min(c, t)} / ${t}</p>`);
+}
+ACT["gr-skill"] = el => grSkillSheet(el.dataset.id);
+ACT["gr-stat"] = el => grStatSheet(el.dataset.v);
+ACT["gr-ach"] = el => grAchSheet(el.dataset.id);
+ACT["gr-sheet-log"] = el => { growLog(el.dataset.v, 1); UI.render(); if (GR_SHEET && GR_SHEET.t === "skill") grSkillSheet(GR_SHEET.id); };
 ACT["gr-av-mode"] = el => { const g = G(); g.av.mode = el.dataset.v; save(); UI.render(); };
 ACT["gr-av-char"] = el => { const g = G(); g.av.char = el.dataset.v; g.av.mode = "char"; save(); UI.render(); };
 CHG["gr-av-file"] = async el => {
   const f = el.files && el.files[0]; el.value = ""; if (!f) return;
-  try { const url = await grSquare(f, 256); await IDB.put("grow:av", url); GR_AV = {img:url, loaded:true}; const g = G(); g.av.mode = "img"; save(); toast("换好了"); UI.render(); }
+  try { const url = await grSquare(f, 256); await IDB.put("grow:av", url); GR_AV = {img:url, loaded:true}; const g = G(); g.av.mode = "img"; delete g.av.fits.img; save(); toast("换好了"); UI.render(); }
   catch (e) { toast("读不了这张图片，换一张试试"); }
 };
-ACT["gr-av-del"] = async () => { if (!await sheet("删除这张图片？", "删掉以后形象换回对战角色。", "删除", true)) return; await IDB.del("grow:av"); GR_AV = {img:null, loaded:true}; const g = G(); g.av.mode = "char"; save(); UI.render(); };
+ACT["gr-av-del"] = async () => { if (!await sheet("删除这张图片？", "形象换回对战角色。", "删除", true)) return; await IDB.del("grow:av"); GR_AV = {img:null, loaded:true}; const g = G(); g.av.mode = "char"; delete g.av.fits.img; save(); UI.render(); };
 CHG["gr-goal"] = el => { const v = Math.max(5, Math.min(999, Math.round(+el.value || 0))); const g = G(); g.goals[el.dataset.v] = v; save(); toast("改好了"); };
 CHG["gr-wake"] = el => { if (!/^\d{2}:\d{2}$/.test(el.value)) return; const g = G(); g.wake = el.value; save(); toast("改好了"); };
 CHG["gr-base"] = el => { const g = G(); g.base = Object.assign({}, g.base || {}); const v = el.value === "" ? null : Math.max(0, Math.min(99, Math.round(+el.value || 0))); if (v == null) delete g.base[el.dataset.v]; else g.base[el.dataset.v] = v; save(); };
 CHG["gr-mood-on"] = el => { const g = G(); g.moodOn = !!el.checked; save(); };
 ACT["gr-edit-cancel"] = () => { GR_EDIT = null; UI.render(); };
-ACT["gr-sk-add"] = () => { GR_EDIT = {t:"skill", id:""}; UI.render(); const f = $("#grForm"); if (f) f.scrollIntoView({block:"center"}); };
-ACT["gr-sk-edit"] = el => { GR_EDIT = {t:"skill", id:el.dataset.id}; UI.render(); };
+const grToForm = () => { const f = $("#grForm"); if (f) f.scrollIntoView({block:"center"}); };
+ACT["gr-sk-add"] = () => { GR_EDIT = {t:"skill", id:""}; GR_OPEN.skills = true; GR_TAB = "skills"; UI.render(); grToForm(); };
+ACT["gr-sk-edit"] = el => { grSheetClose(); GR_EDIT = {t:"skill", id:el.dataset.id}; GR_OPEN.skills = true; GR_TAB = "skills"; UI.render(); grToForm(); };
 ACT["gr-sk-save"] = () => {
-  const name = (($("#grSkName") || {}).value || "").trim().slice(0, 12), a = ($("#grSkA") || {}).value || "career"; if (!name){ toast("写一下技能的名字"); return; }
+  const name = (($("#grSkName") || {}).value || "").trim().slice(0, 12), a = ($("#grSkA") || {}).value || "career"; if (!name){ toast("写一下名字"); return; }
   const g = G();
   if (g.skills.some(s => s.name === name && s.id !== GR_EDIT.id)){ toast("已经有这个技能了"); return; }
-  if (GR_EDIT.id){ const s = grSkill(GR_EDIT.id); if (s){ s.name = name; s.a = a; } } else g.skills.push({id:"s" + grRid(), name, a});
+  if (GR_EDIT.id){ const s = grSkill(GR_EDIT.id); if (s){ s.name = name; s.a = a; } } else g.skills.push({id:"s" + grRid(), name, a, ic:"star"});
   GR_EDIT = null; grUps(); save(); toast("记下了"); UI.render();
 };
 ACT["gr-sk-del"] = async el => {
   const s = grSkill(el.dataset.id); if (!s) return;
-  if (!await sheet(`删除技能“${s.name}”？`, "累计的次数也会删掉。算进它的选项保留，只是不再算技能。", "删除", true)) return;
+  if (!await sheet(`删除技能“${s.name}”？`, "累计的次数也会删掉。", "删除", true)) return;
   const g = G(); g.skills = g.skills.filter(x => x.id !== s.id); delete g.sk[s.id]; for (const a of g.acts) if (a.sk === s.id) a.sk = "";
   GR_EDIT = null; grUps(); save(); UI.render();
 };
-ACT["gr-act-add"] = () => { GR_EDIT = {t:"act", id:""}; UI.render(); const f = $("#grForm"); if (f) f.scrollIntoView({block:"center"}); };
+ACT["gr-act-add"] = () => { GR_EDIT = {t:"act", id:""}; UI.render(); grToForm(); };
 ACT["gr-act-edit"] = el => { GR_EDIT = {t:"act", id:el.dataset.id}; UI.render(); };
 ACT["gr-act-save"] = () => {
   const name = (($("#grActName") || {}).value || "").trim().slice(0, 60), a = ($("#grActA") || {}).value || "career", xp = Math.max(0, Math.min(100, Math.round(+(($("#grActXp") || {}).value) || 0))), sk = ($("#grActSk") || {}).value || "";
   if (!name){ toast("写一下做了什么"); return; }
   const g = G();
-  if (GR_EDIT.id){ const x = grAct(GR_EDIT.id); if (x){ x.name = name; x.a = a; x.xp = x.mile ? 0 : xp; x.sk = sk; } } else g.acts.push({id:"a" + grRid(), a, name, xp, sk});
+  if (GR_EDIT.id){ const x = grAct(GR_EDIT.id); if (x){ x.name = name; x.a = a; x.xp = x.mile ? 0 : xp; x.sk = sk; } } else g.acts.push({id:"a" + grRid(), a, name, short:name.slice(0, 6), ic:"star", xp, sk});
   GR_EDIT = null; save(); toast("记下了"); UI.render();
 };
 ACT["gr-act-del"] = async el => {
   const x = grAct(el.dataset.id); if (!x) return;
-  if (!await sheet(`删除“${x.name}”？`, "以前记过的经验值不受影响。", "删除", true)) return;
-  const g = G(); g.acts = g.acts.filter(y => y.id !== x.id); GR_EDIT = null; save(); UI.render();
+  if (!await sheet(`删除“${x.name}”？`, "以前记的经验值不受影响。", "删除", true)) return;
+  const g = G(); g.acts = g.acts.filter(y => y.id !== x.id); g.pins = g.pins.filter(y => y !== x.id); GR_EDIT = null; save(); UI.render();
 };
 ACT["gr-act-reset"] = async () => {
   const g = G(), miss = GR_ACTS_DEF.filter(d => !g.acts.some(a => a.id === d.id)), missS = GR_SKILLS_DEF.filter(d => !g.skills.some(s => s.id === d.id));
-  if (!miss.length && !missS.length){ toast("默认的选项和技能都在"); return; }
-  if (!await sheet("恢复默认的选项？", `把删掉的 ${miss.length} 个默认选项${missS.length ? `、${missS.length} 个默认技能` : ""}加回来。你自己加的、改过的都不动。`, "恢复")) return;
+  if (!miss.length && !missS.length){ toast("默认的都在"); return; }
+  if (!await sheet("恢复默认？", `加回删掉的 ${miss.length} 个选项${missS.length ? `、${missS.length} 个技能` : ""}。你自己加的、改过的不动。`, "恢复")) return;
   for (const d of missS) g.skills.push(Object.assign({}, d)); for (const d of miss) g.acts.push(Object.assign({}, d));
   grUps(); save(); UI.render();
 };
@@ -16300,12 +16625,12 @@ ACT["gr-analyze"] = () => sendToClaude(grAnalyzeText());
 /* 导入码里的成长目标、记一笔的选项、技能（ACT["imp-apply"] 调用） */
 function growApplyImport(r){
   const g = G(); let ch = false;
-  for (const s of r.growSkills || []) if (!g.skills.some(x => x.name === s.name)){ g.skills.push({id:"s" + grRid(), name:s.name, a:s.a}); ch = true; }
+  for (const s of r.growSkills || []) if (!g.skills.some(x => x.name === s.name)){ g.skills.push({id:"s" + grRid(), name:s.name, a:s.a, ic:"star"}); ch = true; }
   for (const a of r.growActs || []){
     let sk = a.skill ? g.skills.find(x => x.name === a.skill) : null;
-    if (a.skill && !sk){ sk = {id:"s" + grRid(), name:a.skill, a:a.a}; g.skills.push(sk); }
+    if (a.skill && !sk){ sk = {id:"s" + grRid(), name:a.skill, a:a.a, ic:"star"}; g.skills.push(sk); }
     const ex = g.acts.find(x => x.name === a.name);
-    if (ex){ ex.a = a.a; if (!ex.mile) ex.xp = a.xp; if (a.skill) ex.sk = sk.id; } else g.acts.push({id:"a" + grRid(), a:a.a, name:a.name, xp:a.xp, sk: sk ? sk.id : ""});
+    if (ex){ ex.a = a.a; if (!ex.mile) ex.xp = a.xp; if (a.skill) ex.sk = sk.id; } else g.acts.push({id:"a" + grRid(), a:a.a, name:a.name, short:a.name.slice(0, 6), ic:"star", xp:a.xp, sk: sk ? sk.id : ""});
     ch = true;
   }
   if ((r.growGoals || []).length){ const o = {}; for (const x of r.growGoals) o[x.a] = x.n; growSetGoals(o); ch = true; }
