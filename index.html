@@ -891,7 +891,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.69.1"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.69.2"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -5887,9 +5887,30 @@ VIEWS.me = {
       <div class="sec-title">数据</div><div class="list">${liRow("backup","备份与恢复","换手机或清浏览器数据前先备份")}${liRow("storage","存储空间","看占了多少、清理旧录音")}</div>
       <div class="sec-title">关于</div><div class="list">${liRow("about","关于 脱口app","怎么用、为什么这样练（可以搜）")}</div>
       <p class="small muted" style="margin:14px 4px 0">${Cloud.on ? "进度会自动同步到你的 claude.ai 账号。" : BUILD.pwa ? "进度存在这台手机上，记得偶尔备份。" : "进度存在这个浏览器里。"}${STORAGE_OK ? "" : " 注意：这个浏览器存不了数据，关掉页面进度会丢，请先备份。"}</p>
-      <p class="small muted" style="margin:4px 4px 0">脱口 ${esc(BUILD.version)}${BUILD.pwa ? "，离线版" : ""}</p>
+      <p class="small muted" style="margin:4px 4px 0">脱口 ${esc(BUILD.version)}${BUILD.pwa ? "，离线版" : ""}${BUILD.pwa ? `<button class="linkbtn small" style="margin-left:10px" data-act="sw-check">检查更新</button>` : ""}</p>
       <button class="btn danger block" style="margin-top:18px" data-act="reset">清空所有进度</button></div>`;
   }
+};
+/* v1.69.2：更新。浏览器只在 app 真正重新打开时检查新版本（从后台切回来不算），所以切回来时也检查一次（最多 30 分钟一次）；
+   新版本装好时提示 6 秒。“我的”里可以手动检查：显示服务器上的版本和手机上的版本 */
+function swSetup(){
+  if (!(BUILD.pwa && "serviceWorker" in navigator)) return;
+  let had = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (had) toast("已更新到新版本，下次打开生效", 6000); had = true; });
+  if (!(location.protocol === "https:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) return;
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
+  let last = Date.now();
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState !== "visible" || Date.now() - last < 30 * 60000) return; last = Date.now(); navigator.serviceWorker.getRegistration().then(r => r && r.update()).catch(() => {}); });
+}
+ACT["sw-check"] = async () => {
+  if (!(BUILD.pwa && "serviceWorker" in navigator)){ toast("网页版不用更新：刷新一下就是最新的"); return; }
+  toast("正在检查……", 8000);
+  let remote = "";
+  try { const r = await fetch("./sw.js?check=" + Date.now(), {cache:"no-store"}); const m = (await r.text()).match(/VERSION = "([^"]+)"/); remote = m ? m[1] : ""; } catch (e) {}
+  if (!remote){ toast("连不上，联网以后再试"); return; }
+  if (remote === BUILD.version){ toast(`已经是最新：${remote}`); return; }
+  try { const reg = await navigator.serviceWorker.getRegistration(); if (reg) await reg.update(); } catch (e) {}
+  toast(`服务器上是 ${remote}，手机上是 ${BUILD.version}。正在下载，等十几秒，关掉 app 再打开`, 9000);
 };
 ACT.reset = async () => {
   if (!await sheet("清空所有进度？", "复习记录、面试回答、日记、导入的卡片和成长记录都会删掉，没法撤销。需要的话先去备份。", "清空", true)) return;
@@ -6709,11 +6730,10 @@ function boot(){
   applyTheme(); TTS.init(); MIC.init(); if (L.device && L.device.srBroken) SR.broken = true;
   UI.stack = [{name: S.settings.onboarded ? rootView() : "onboard", params:{}}];
   try { history.replaceState({d:1}, ""); } catch (e) {}
+  swSetup();   /* v1.69.2：更新相关的先做，第一次画页面就算出错也不影响更新 */
   UI.render();
   if (L.device && L.device.local === "available") SR.local = true;
   setTimeout(() => { Cloud.init(); AI.init(); }, 0);
-  if (BUILD.pwa && "serviceWorker" in navigator && (location.protocol === "https:" || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) navigator.serviceWorker.register("./sw.js").catch(() => {});
-  if (BUILD.pwa && "serviceWorker" in navigator){ let had = !!navigator.serviceWorker.controller; navigator.serviceWorker.addEventListener("controllerchange", () => { if (had) toast("已更新到新版本，下次打开生效"); had = true; }); }
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
   setTimeout(cleanAudio, 4000);
   let day = today();

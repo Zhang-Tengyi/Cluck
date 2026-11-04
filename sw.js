@@ -1,5 +1,5 @@
 /* 脱口离线缓存 */
-const VERSION = "1.69.1";
+const VERSION = "1.69.2";
 const CACHE = "tuokou-" + VERSION;
 const FONTS = "tuokou-fonts";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./scenes/day.webp", "./scenes/night.webp", "./scenes/garage.webp", "./scenes/factory.webp", "./scenes/forest.webp", "./scenes/forestN.webp", "./scenes/gday.webp", "./scenes/gday_front.webp", "./scenes/gnight.webp", "./scenes/gnight_front.webp", "./scenes/gforest.webp", "./scenes/gforest_front.webp", "./scenes/gforestN.webp", "./scenes/gforestN_front.webp", "./scenes/amuse.webp", "./scenes/amuse_front.webp", "./scenes/amuseN.webp", "./scenes/amuseN_front.webp", "./scenes/moon.webp", "./scenes/moon_front.webp", "./scenes/gas.webp", "./scenes/gas_front.webp", "./scenes/gasN.webp", "./scenes/gasN_front.webp"];
@@ -15,6 +15,7 @@ self.addEventListener("fetch", e => {
   const req = e.request; if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin === location.origin){
+    if (url.pathname.endsWith("/sw.js")) return;   /* 检查更新时要的是服务器上的 sw.js，不走缓存 */
     e.respondWith(caches.open(CACHE).then(async c => {
       const hit = await c.match(req, {ignoreSearch:true}) || (req.mode === "navigate" ? await c.match("./index.html") : null);
       const net = fetch(req).then(res => { if (res && res.ok) c.put(req, res.clone()); return res; }).catch(() => null);
