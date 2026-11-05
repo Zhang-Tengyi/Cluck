@@ -599,7 +599,13 @@ body.g-drill .g-top::after{content:"跟读中，对战先收起来";display:bloc
 .bt-ene-opts select{font-size:12px;max-width:100%}
 
 /* ---------- 1.28：背景柔化、暗角、前景层 ---------- */
-.bt-hud{z-index:5}
+.bt-hud{z-index:90}
+/* v1.69.6：血条新样式（对接说明第 7 条 / 第五十二节第 3 点）：灰边框一头圆一头方、上半截高光、每 10% 一道刻度；名字特粗白字加深色描边，白天夜晚一套 */
+.bt-hud .bt-bar{position:relative;height:13px;border:2px solid #A3ACB8;border-radius:3px 9px 3px 9px;background:linear-gradient(180deg,#151a22,#2b323d);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.35),inset 0 2px 3px rgba(0,0,0,.65);overflow:hidden}
+.bt-hud > :last-child .bt-bar{border-radius:9px 3px 9px 3px}
+.bt-hud .bt-bar::before{content:"";position:absolute;left:0;right:0;top:0;height:45%;background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0));z-index:2;pointer-events:none}
+.bt-hud .bt-bar::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),rgba(0,0,0,.28) calc(10% - 1px) 10%);z-index:2;pointer-events:none}
+.bt-hud .bt-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;font-size:.92rem;font-weight:900;letter-spacing:.06em;line-height:1.25;margin-bottom:5px;color:#F4F7FB !important;text-shadow:0 1px 0 #000,0 0 3px rgba(0,0,0,.85),0 2px 6px rgba(0,0,0,.45) !important}
 .bt-soft{display:none}
 .bt-front{z-index:3}
 .bt-front[hidden]{display:none}
@@ -871,6 +877,135 @@ details.pl-day>summary{list-style:none;cursor:pointer}details.pl-day>summary::-w
 @keyframes grLv{0%{opacity:0;transform:translate(-50%,-42%) scale(.9)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}25%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){.gr-lvup{animation:none}.gr-fx{display:none}.gr-bar .t i{transition:none}.gc-stat:active,.gc-skill:active,.gc-badge:active,.gr-tile:active{transform:none}}
 
+/* ---------- v1.69.3：分组、角色小舞台、记一笔时的庆祝 ---------- */
+.gc-gh{margin:18px 6px 6px;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--muted)}
+.gc-group{padding:0 14px;margin-top:0}
+.gc-row+.gc-row,.gc-acts+.gc-row{border-top:1px solid var(--line)}
+.gc-row>summary{padding:14px 0;font-weight:700;color:var(--ink)}
+.gc-rowb{padding:0 0 14px}
+.gc-acts{display:flex;gap:10px;padding:14px 0}
+.gc-acts .btn{flex:1}
+.gr-undo-btn{flex:none;white-space:nowrap;background:var(--red-soft);color:var(--red);border:1px solid color-mix(in srgb,var(--red) 35%,transparent);font-weight:700}
+.gc-rsel{display:flex;justify-content:space-between;align-items:baseline;margin:10px 2px 0}
+.gc-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.gc-chip{padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);font-weight:600}
+.gc-chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gc-stagewrap{margin-top:10px}
+.gc-stagebtn{display:block;width:100%;padding:0;border:0;background:none;border-radius:16px;overflow:hidden}
+.gc-stage{position:relative;width:100%;aspect-ratio:3/2;border-radius:16px;overflow:hidden;background-size:cover;background-position:50% 100%;background-color:#141a30}
+.gc-stage.bt-stage,.gc-stage.bt-stage.night{background-color:#141a30;border:0}
+.gc-stage .bt-scene,.gc-stage .bt-hud,.gc-stage .bt-ghost,.gc-stage .bt-vignette{display:none!important}
+.gc-stagecap{text-align:center;margin-top:6px}
+.gc-holostage{display:flex;align-items:flex-end;justify-content:center}
+.gc-holo{position:relative;width:38%;margin-bottom:9%;display:flex;flex-direction:column;align-items:center;animation:grFloat 3.2s ease-in-out infinite}
+.gc-holo-face{position:relative;width:100%;aspect-ratio:1;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#E9FBFF;font-size:26px;
+  background:radial-gradient(circle,rgba(95,212,255,.22),rgba(95,212,255,.05));box-shadow:0 0 0 2px rgba(95,212,255,.65),0 0 24px rgba(95,212,255,.45)}
+.gc-holo-face img{width:100%;height:100%;object-fit:contain;transform-origin:50% 50%;opacity:.92}
+.gc-holo-face::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.09) 0 1px,transparent 1px 4px);mix-blend-mode:screen;pointer-events:none}
+.gc-holo-beam{width:70%;height:22px;margin-top:-2px;background:linear-gradient(rgba(95,212,255,.35),transparent);clip-path:polygon(18% 0,82% 0,100% 100%,0 100%)}
+.gc-holo.cheer{animation:grHoloWin 1.3s ease-out 1}
+.gc-holo.cheer .gc-holo-face{animation:grHoloFlash 1.3s ease-out 1}
+@keyframes grFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes grHoloWin{0%{transform:translateY(0)}22%{transform:translateY(-16%)}40%{transform:translateY(0)}58%{transform:translateY(-8%)}76%,100%{transform:translateY(0)}}
+@keyframes grHoloFlash{0%{box-shadow:0 0 0 2px rgba(95,212,255,.65),0 0 24px rgba(95,212,255,.45)}20%{box-shadow:0 0 0 4px #fff,0 0 46px rgba(185,140,255,.95)}100%{box-shadow:0 0 0 2px rgba(95,212,255,.65),0 0 24px rgba(95,212,255,.45)}}
+.gr-pop{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:110;width:min(260px,70vw);pointer-events:none;animation:grPop 2.6s ease-out forwards}
+.gr-pop-stage{box-shadow:0 14px 40px rgba(20,10,50,.4)}
+.gr-pop>b{position:absolute;right:10px;top:8px;font-size:20px;color:#7CF0B2;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+@keyframes grPop{0%{opacity:0;transform:translate(-50%,24px)}10%{opacity:1;transform:translate(-50%,0)}85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,12px)}}
+@media (prefers-reduced-motion: reduce){.gc-holo,.gc-holo.cheer,.gc-holo.cheer .gc-holo-face{animation:none}.gr-pop{animation:none}}
+.gc-labbg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:50% 100%;pointer-events:none}
+
+/* ---------- 求职页（v1.70.0） ---------- */
+.job .top{margin-bottom:10px}
+.job-seg{margin:0 0 16px}
+.job-seg button{font-size:15px;padding:9px 4px}
+.job .panel+.panel,.job .panel+button.panel,.job button.panel+.panel{margin-top:12px}
+.job-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.job-row>b{font-size:16.5px;line-height:1.3}
+.job-pill{flex:none;font-size:12.5px;padding:3px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+.job-pill.hot{background:var(--amber-soft);border-color:transparent;color:var(--ink);font-weight:700}
+.job-72{margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.job-72>summary{font-weight:500;color:var(--ink2)}
+/* 今天的面试练习：这一页唯一反色的卡片，打开就知道先做什么 */
+.job-prac{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.job-prac .job-row>b{color:var(--surface)}
+.job-prac .job-min{font-size:13.5px;color:color-mix(in srgb, var(--surface) 72%, var(--ink));white-space:nowrap}
+.job-prac .job-min b{font-size:17px;color:var(--surface)}
+.job-plan{display:grid;gap:9px;margin-top:12px}
+.job-pl{display:grid;grid-template-columns:104px minmax(0,1fr);gap:10px;align-items:baseline;font-size:14px;line-height:1.45}
+.job-pl-k{color:color-mix(in srgb, var(--surface) 70%, var(--ink));white-space:nowrap}
+.job-pl-k i{font-style:normal;font-weight:700;margin-left:6px;color:var(--surface)}
+.job-pl-v{color:var(--surface)}
+.job-prac .btn{background:transparent;color:var(--surface);border-color:color-mix(in srgb, var(--surface) 40%, var(--ink))}
+.job-prac .btn.primary{background:var(--surface);color:var(--ink);border-color:var(--surface)}
+.job-prac .job-why{margin-top:12px;border-top:1px solid color-mix(in srgb, var(--surface) 22%, var(--ink));padding-top:8px}
+.job-prac .job-why>summary{color:color-mix(in srgb, var(--surface) 78%, var(--ink));font-weight:500}
+.job-prac .job-why p{color:color-mix(in srgb, var(--surface) 80%, var(--ink));line-height:1.6}
+.job-prac.done,.job-prac.empty{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.job-prac.done .job-row>b,.job-prac.empty .job-row>b{color:var(--ink)}
+.job-prac.done .btn,.job-prac.empty .btn{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.job-prac.done .small,.job-prac.empty .small{color:var(--muted)}
+.job-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:12px}
+.job-count{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:9px 10px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);text-align:left;color:var(--ink)}
+.job-count b{font-size:20px;line-height:1.1}
+.job-count span{font-size:12px;color:var(--muted);line-height:1.25}
+.job-count.on{background:var(--purple-soft);border-color:transparent}
+.job-count.on b{color:var(--purple)}
+button.panel.job-chkcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:var(--ink);background:var(--amber-soft);border-color:transparent}
+.job-chkcard .grow{flex:1;min-width:0}
+.job-chkcard .grow b{display:block}
+.job-go-arrow svg{width:18px;height:18px;transform:rotate(180deg);color:var(--muted)}
+.job-filter{margin:14px 0 2px}
+.job-filter .chip{cursor:pointer}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.job-sec-note{font-weight:400;margin-left:8px;color:var(--muted)}
+.job-app .grow b{font-size:15.5px}
+.job-tags{display:flex!important;gap:6px;flex-wrap:wrap;margin-top:5px}
+.job-tag{font-style:normal;font-size:11.5px;line-height:1.6;padding:0 8px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--ink2);white-space:nowrap}
+.job-tag.tier{border-color:var(--ink2);color:var(--ink);font-weight:700}
+.job-tag.ghost{background:none;color:var(--muted)}
+.job-app .end{text-align:right;line-height:1.5}
+.job-st{font-weight:700;color:var(--ink2)}
+.job-st.st-screen,.job-st.st-interview{color:var(--purple)}
+.job-st.st-offer{color:var(--green)}
+.job-st.st-rejected,.job-st.st-failed{color:var(--red)}
+.job-st.st-draft,.job-st.st-dropped{color:var(--muted);font-weight:500}
+.job-stats>summary{font-weight:500;color:var(--ink)}
+.job-tbl{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.job-tr{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(4,minmax(0,.62fr));gap:6px;padding:8px 12px;border-top:1px solid var(--line);font-size:14px;align-items:baseline}
+.job-tr:first-child{border-top:0}
+.job-tr.th{background:var(--surface2);font-size:12px;color:var(--muted)}
+.job-tr span:not(:first-child){text-align:right}
+.job-tbl3 .job-tr{grid-template-columns:minmax(0,1.5fr) repeat(2,minmax(0,.8fr))}
+.job-ready .job-rg{display:grid;grid-template-columns:92px minmax(0,1fr) 48px;gap:12px;align-items:center;width:100%;padding:10px 0;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:var(--ink)}
+.job-ready .job-rg:first-child{border-top:0;padding-top:2px}
+.job-rg-l{font-size:14.5px;font-weight:600}
+.job-rg-n{text-align:right;font-size:14px;color:var(--ink2)}
+.job-chk{flex-wrap:wrap}
+.job-chk .grow span{white-space:normal}
+.job-chk-acts{display:flex;gap:6px;flex:none}
+.job-2col{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.job-hand{margin-top:16px;text-align:left}
+.job-grow .job-row>b{font-size:15.5px}
+.iv-stuck{margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--amber-soft);color:var(--ink);text-align:left}
+.iv-stuck .en{margin-top:4px;color:var(--ink)}
+.iv-met .chip{margin:2px 4px 2px 0}
+@media (max-width:360px){ .job-pl{grid-template-columns:88px minmax(0,1fr)} .job-counts{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+/* 知识复习（v1.70.0） */
+.job-know .job-row>b{font-size:16px}
+.rbar.know i{background:var(--green)}
+.job-rg-sub{margin:-4px 0 4px 104px}
+.jk-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.jk .runbar{margin-bottom:14px}
+.jk-card{min-height:0}
+.jk-q{font-size:19px;line-height:1.4;margin-top:12px}
+.jk-en{margin-top:6px;color:var(--ink2)}
+.jk-ans{margin-top:16px;padding:12px 14px;border-radius:14px;background:var(--surface2);border:1px solid var(--line)}
+.jk-ex{margin-top:12px;padding:12px 14px;border-radius:14px;background:var(--purple-soft);color:var(--ink);font-size:14.5px;line-height:1.7}
+.jk-rate{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.jk-rate .btn{padding:10px 6px;font-size:14.5px}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -887,11 +1022,11 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <nav class="tabbar" aria-label="主菜单">
 <button data-act="tab" data-v="grow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 13c0-4.5 3-7.5 8-7.5 0 4.5-3 7.5-8 7.5z"/><path d="M12 15.5c0-3.5-2.5-6-7-6 0 3.5 2.5 6 7 6z"/></svg><span>成长</span></button>
 <button data-act="tab" data-v="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></svg><span>英语</span></button>
-<button data-act="tab" data-v="iv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg><span>面试</span></button>
+<button data-act="tab" data-v="iv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg><span>求职</span></button>
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.69.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.70.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2387,8 +2522,23 @@ function chunkSentence(en){
 /* 语域：朋友之间 / 通用 / 正式 / 听懂就行（导入码里卡的第 6 个字段） */
 const REG_KEYS = {"朋友之间":"casual", "朋友":"casual", "随意":"casual", "通用":"neutral", "正式":"formal", "听懂就行":"listen", "听懂":"listen"};
 function regKey(v){ return REG_KEYS[String(v || "").trim()] || ""; }
+/* ---------- 求职（v1.70.0）：导入码里的方向、状态、日期 ---------- */
+const JOB_TRACK_KEYS = [[/^(cs|控制|自动化|controls?|automation|plc)/i, "cs"], [/^(rd|r&d|测试|研发|test|research)/i, "rd"], [/^(me|机械|mechanical)/i, "me"], [/^(golf|高尔夫)/i, "golf"], [/^(all|通用|全部|general)/i, "all"], [/^(other|其他|电气|软件|设备)/i, "other"]];
+function jobTrackKey(v){ const t = String(v || "").trim(); if (!t) return ""; for (const [re, k] of JOB_TRACK_KEYS) if (re.test(t)) return k; return "other"; }
+const JOB_STATUS_KEYS = [[/^(准备|draft|没投|还没投)/i, "draft"], [/^(已投|投了|applied|submitted|v$|\?)/i, "applied"], [/^(初筛|电话|screen|recruiter)/i, "screen"], [/^(面试中|面试|interview|hm|onsite|技术面)/i, "interview"], [/^offer/i, "offer"], [/^(被拒|拒|reject)/i, "rejected"], [/^(没过|面试没过|not pass|failed)/i, "failed"], [/^(不投|不担保|撤回|放弃|dropped|withdrawn|no sponsorship)/i, "dropped"]];
+function jobStatusKey(v){ const t = String(v || "").trim(); if (!t) return ""; for (const [re, k] of JOB_STATUS_KEYS) if (re.test(t)) return k; return ""; }
+function jobRealDate(t){ const [y, m, d] = String(t).split("-").map(Number); const x = new Date(Date.UTC(y, m - 1, d)); return x.getUTCFullYear() === y && x.getUTCMonth() === m - 1 && x.getUTCDate() === d; }
+/* 日期：2026-10-09；只记得月份就写 2026-10（按 15 号算，标成大概） */
+function jobDateKey(v){ const t = String(v || "").trim(); if (/^\d{4}-\d{2}-\d{2}$/.test(t) && jobRealDate(t)) return {d:t, approx:false}; const m = t.match(/^(\d{4})-(\d{1,2})$/); if (m && +m[2] >= 1 && +m[2] <= 12) return {d:m[1] + "-" + pad(+m[2]) + "-15", approx:true}; return {d:"", approx:false}; }
+/* 口头禅：转写里数得出来的（um、uh 常被识别吞掉，所以只算出现了的）。like 只算插在中间的（, like, 或者句首 like,）；重复开头：I, I / the the */
+function fillerCount(text){
+  const t = " " + String(text || "").toLowerCase().replace(/[“”]/g, '"') + " ";
+  const n = re => (t.match(re) || []).length;
+  const out = {um: n(/\b(?:um+|uh+|erm+|uhm+)\b/g), like: n(/(?:^|[,.!?]\s*|\s)like\s*,|,\s*like\b(?!\s+(?:to|a|the|this|that|it|when|how)\b)/g), yeah: n(/\byeah\b/g), know: n(/\byou know\b/g), mean: n(/\bi mean\b/g), rep: n(/\b(i|the|a|it|we|so|and|my)\b[,\s]+\1\b/g)};
+  out.total = out.um + out.like + out.yeah + out.know + out.mean + out.rep; return out;
+}
 function parseImport(text){
-  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], meta:{date:"", who:[], replace:[]}, bad:[]};
+  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], apps:[], qtags:[], checks:[], real:[], explains:[], meta:{date:"", who:[], replace:[]}, bad:[]};
   const ROLE = {"开场":"first","核心":"core","初筛":"screen","提问":"ask","基本":"core","行为":"core","电话":"screen","技术":"tech","概念":"concept","first":"first","core":"core","screen":"screen","ask":"ask","tech":"tech","concept":"concept"};
   let deck = "我的卡片";
   String(text||"").split(/\r?\n/).forEach((line, i) => {
@@ -2421,6 +2571,16 @@ function parseImport(text){
     else if ((kind==="也对"||kind==="OK") && p[1] && p[2]){ res.alts.push({id:p[1].trim(), text:p.slice(2).join(" | ")}); }
     else if ((kind==="答"||kind==="A") && p[1] && p[2]){ res.answers.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ")}); }
     else if ((kind==="要点"||kind==="K") && p[1] && p[2]){ res.keys.push({qid:p[1].toUpperCase(), keys:p.slice(2).join("；").split(/[；;、\n]/).map(x=>x.trim()).filter(Boolean)}); }
+    /* v1.70.0 求职：投递 | 公司 | 职位 | 方向 | 档位 | 日期 | 状态 | 来源 | 简历版本 | 备注 */
+    else if ((kind==="投递"||kind==="APP") && (p[1]||"").trim()){ const d = jobDateKey(p[5]); res.apps.push({co:p[1].trim().slice(0, 60), role:(p[2]||"").trim().slice(0, 120), track:jobTrackKey(p[3]), tier:/^[ABC]$/i.test((p[4]||"").trim()) ? p[4].trim().toUpperCase() : "", d:d.d, dApprox:d.approx, st:jobStatusKey(p[6]) || "applied", src:(p[7]||"").trim().slice(0, 60), res:(p[8]||"").trim().slice(0, 80), note:p.slice(9).join(" | ").trim().slice(0, 600)}); }
+    /* 标签 | 题号 | P0–P3 | 方向 | 公司 */
+    else if ((kind==="标签"||kind==="TAG") && p[1] && /^P[0-3]$/i.test((p[2]||"").trim())){ res.qtags.push({qid:p[1].toUpperCase(), pri:p[2].trim().toUpperCase(), track:jobTrackKey(p[3]), co:(p[4]||"").trim().slice(0, 60)}); }
+    /* 待确认 | 题号 | 要确认的事 */
+    else if ((kind==="待确认"||kind==="CHECK") && p[1] && (p[2]||"").trim()){ res.checks.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ").trim().slice(0, 300)}); }
+    /* 讲解 | 题号 | 中文讲解（知识卡：为什么、怎么联系自己的经历、容易和什么混） */
+    else if ((kind==="讲解"||kind==="EX") && p[1] && (p[2]||"").trim()){ res.explains.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ").trim().slice(0, 1500)}); }
+    /* 真题 | 题号 | 公司 | 日期 */
+    else if ((kind==="真题"||kind==="REAL") && p[1]){ res.real.push({qid:p[1].toUpperCase(), co:(p[2]||"").trim().slice(0, 60), d:jobDateKey(p[3]).d}); }
     else res.bad.push(i+1);
   });
   for (const c of res.cards) c.id = "c" + hash(c.t + "|" + tokens(c.en).join(" "));
@@ -2743,7 +2903,7 @@ function battlePickOrder(entries){
 
 const CORE = {wordDiff, nearMiss, soundSim, sndKey, battlePlan, battleFirst, battleSpecial, battleTicks, battleBeats, battleRef, battleOutcome, battlePickOrder, BAT_DMG,TAGS,TYPE_LABEL,TENSE_NOTE,tagKey,dstr,dnum,nstr,splitAlts,shuffle,hash,buildCatalog,INTERVALS,MASTERED_BOX,srsRate,
   tokens,lcsOps,compareSaid,meaningCheck,speechFlags,hasWord,wordsMatch,speakEN,thoughtGroups,pronTip,splitSentences,chunkLex,findChunks,sayVariants,chunkSentence,hintNotes,classifySub,pastOf,regPast,lev,parseImport,checkWriting,checkPast,dayDone,computeStreak,tagAgg,
-  buildSession,diversify,interleave,pickQuestions,IRR,SESSION_CFG};
+  buildSession,diversify,interleave,pickQuestions,IRR,SESSION_CFG,jobTrackKey,jobStatusKey,jobDateKey,jobRealDate,fillerCount};
 
 
 /* 按词比：错了几个词（最长公共子序列以外的词，多的、少的取大的） */
@@ -2827,7 +2987,7 @@ const KEY = "tuokou.v1", LKEY = "tuokou.local";
 const DEF = () => ({v:1, createdAt:Date.now(), updatedAt:0, asrDocs:[], interviews:[], battle:{}, asrQ:[], game:{},
   settings:{goal:"std", profile:"", battle:true, srEngine:"device", interviewDate:"", newPerDay:12, inputMode:"auto", autoCheck:"smart", vibrate:true, sound:true, lights:true, autoSpeak:true,
     theme:"auto", cheat:true, callQs:3, onboarded:false, planWhen:"", deck:"all", callDeck:"core", dayStart:4, startPage:"grow"},
-  cards:{}, best:{}, custom:[], customQ:[], deckMeta:{}, dlgDone:{}, myAlts:{}, pending:[], hist:{}, misWords:{}, followAns:{}, refAns:{}, plan:[], ivDue:{}, soloIssues:{}, soloRate:{}, wantWords:[], answers:{}, days:{}, tags:{}, newToday:{d:"",n:0}, journal:[], calls:[], grow:{}});
+  cards:{}, best:{}, custom:[], customQ:[], deckMeta:{}, dlgDone:{}, myAlts:{}, pending:[], hist:{}, misWords:{}, followAns:{}, refAns:{}, plan:[], ivDue:{}, soloIssues:{}, soloRate:{}, wantWords:[], answers:{}, days:{}, tags:{}, newToday:{d:"",n:0}, journal:[], calls:[], grow:{}, job:{}, qmeta:{}, ivMet:{}});
 const LDEF = () => ({enVoice:"", zhVoice:"", rate:0.95, thinkSec:4, device:{}, wDraft:"", jDraft:"", voiceMix:true, accentMix:false, hfSeen:{}, ttsCN:false, slashes:false, quiet:false, quietSound:false, resume:null, rdMode:"line", rdSlow:false, rdHide:false});
 function mergeInto(d, o){
   for (const k of Object.keys(o||{})){
@@ -3156,7 +3316,7 @@ const Rec = {
     this.mr = new MediaRecorder(this.stream, mt ? {mimeType:mt} : undefined);
     this.chunks = [];
     this.mr.ondataavailable = e => { if (e.data && e.data.size) this.chunks.push(e.data); };
-    this.mr.start(250); this.t0 = Date.now(); this.loudAt = 0; this.nSum = 0; this.nCnt = 0;
+    this.mr.start(250); this.t0 = Date.now(); this.loudAt = 0; this.nSum = 0; this.nCnt = 0; this.firstAt = 0; this.pauses = 0; this.maxGap = 0;
     this.lvlEl = lvlEl || null;
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
@@ -3165,7 +3325,10 @@ const Rec = {
       const loop = () => { an.getByteTimeDomainData(buf); let s = 0; for (let i = 0; i < buf.length; i++){ const v = (buf[i]-128)/128; s += v*v; }
         const rms = Math.min(1, Math.sqrt(s/buf.length) * 4); this.lv = rms;
         /* 前 0.3 秒先听环境噪音，按噪音高低定“在说话”的门槛 */
-        const tt = Date.now() - this.t0; if (tt < 300){ this.nSum += rms; this.nCnt++; } else { const thr = Math.max(0.06, Math.min(0.2, (this.nCnt ? this.nSum / this.nCnt : 0.04) * 3)); if (rms > thr) this.loudAt = Date.now(); }
+        const tt = Date.now() - this.t0; if (tt < 300){ this.nSum += rms; this.nCnt++; } else { const thr = Math.max(0.06, Math.min(0.2, (this.nCnt ? this.nSum / this.nCnt : 0.04) * 3)); if (rms > thr){ const now = Date.now();
+          /* v1.70.0：第一次开口的时间、开口以后 3 秒以上的停顿（次数和最长的一次） */
+          if (!this.firstAt) this.firstAt = now; else { const gap = now - this.loudAt; if (gap >= 3000) this.pauses++; if (gap > this.maxGap) this.maxGap = gap; }
+          this.loudAt = now; } }
         if (this.lvlEl && this.lvlEl.isConnected) this.lvlEl.style.setProperty("--lvl", rms.toFixed(2)); this.raf = requestAnimationFrame(loop); };
       loop();
     } catch (e) {}
@@ -3180,6 +3343,8 @@ const Rec = {
     });
   },
   cancel(){ if (this.mr){ try { this.mr.onstop = null; this.mr.stop(); } catch (e) {} } this.release(); },
+  /* 这一段录音里：从 t0（比如开始回答的那一刻）到第一次开口用了多久；3 秒以上的停顿几次、最长多久。没听到声音时 first 是 null */
+  metrics(t0){ return {first: this.firstAt ? Math.max(0, this.firstAt - (t0 || this.t0)) : null, pauses: this.pauses || 0, maxGap: this.maxGap || 0}; },
   release(){
     cancelAnimationFrame(this.raf);
     if (this.stream) this.stream.getTracks().forEach(t => t.stop());
@@ -3817,7 +3982,7 @@ ACT.start = async el => {
 };
 function sessionCtx(extra){
   return Object.assign({cat:CAT, prog:S.cards, todayN:dnum(today()), newLimit: (typeof newPausedToday === "function" && newPausedToday()) ? 0 : S.settings.newPerDay, newUsed:newUsedToday(),
-    acc:K.tagAgg(S.tags, today(), 0, 14), mode:interviewMode(), questions:deckQuestions(curDeck()), filter:deckPred(curDeck()), answers:S.answers, ivDue:S.ivDue, today:dnum(today())}, extra || {});
+    acc:K.tagAgg(S.tags, today(), 0, 14), mode:interviewMode(), questions:(typeof jobOwnsIv === "function" && jobOwnsIv()) ? [] : deckQuestions(curDeck()), filter:deckPred(curDeck()), answers:S.answers, ivDue:S.ivDue, today:dnum(today())}, extra || {});
 }
 /* 游戏模式只出“说英语”的卡：每张都能出招。面试长回答、听力题、新单词介绍留在学习模式 */
 function gameItems(items){
@@ -4192,7 +4357,7 @@ class CardStage {
         h += `<div class="diff">${diffHTML(cmp.ops)}</div>`;
         const nl = cmp.notes.filter(n => !gcMsgs.has(n.msg));
         if (nl.length) h += `<ul class="fb">${nl.map(n => `<li>${esc(n.msg)}</li>`).join("")}</ul>`;
-        if ((cmp.notes || []).some(n => /^(tense|plural|agree|be)$/.test(n.k)) || this.flags.some(f => /时态|复数|be|一致/.test(f.tag || ""))) h += `<p style="margin:-4px 0 10px"><button class="linkbtn small" data-act="nav" data-v="grammar">为什么？看语法要点</button></p>`;
+        h += `<p style="margin:-4px 0 10px"><button class="linkbtn small" data-act="c-why">为什么这样说</button></p>`;   /* v1.69.5：讲这一句用到的语法点 */
         const fl2 = this.flags.filter(f => !gcMsgs.has(f.msg));
         if (fl2.length) h += `<ul class="fb">${fl2.slice(0, 2).map(f => `<li>${esc(f.msg)}</li>`).join("")}</ul>`;
         h += mineRow;
@@ -4363,6 +4528,71 @@ function diffHTML(ops){
   }).join(" ");
 }
 ACT["c-mic"] = () => RUN.stage && RUN.stage.mic && RUN.stage.mic();
+/* ---------- 为什么这样说（v1.69.5）：在你刚说完的时候讲这一句用到的语法点（研究里“在用的时候讲、一次只讲一两个点”最有效：focus on form、noticing）。
+   每条：规则一两句 + 这句里的例子 + 常见的错误对比。你说错的那个点排在最前面，最多讲 3 个 ---------- */
+const PP = "been|done|made|written|seen|gone|taken|given|known|built|run|led|got|gotten|eaten|begun|chosen|driven|grown|spoken|broken|forgotten|taught|thought|bought|brought|found|kept|left|lost|met|paid|put|read|said|sent|spent|told|won|understood|become|come|drawn|fallen|felt|flown|heard|held|hurt|let|meant|sold|shown|sung|sat|slept|stood|struck|swum|thrown|woken|worn|\\w+ed";
+const GWHY = [
+ {k:"pp", t:"现在完成时：have / has + 过去分词", re:new RegExp("\\b(?:i've|we've|you've|they've|have|has|he's been|she's been|it's been)\\s+(?:already\\s+|just\\s+|never\\s+|ever\\s+|always\\s+|recently\\s+)?(?:" + PP + ")\\b", "i"),
+  rule:"讲经历，或者到现在还有影响的事，不说具体是什么时候。面试讲经验最常用。", bad:"带了具体的过去时间（yesterday、last year、in 2023）就用过去式：I wrote it last year."},
+ {k:"thanpast", t:"比较里的过去式：than I expected", re:/\bthan (?:i|we|you|they|he|she) (?:expected|thought|imagined|planned|hoped|assumed|guessed)\b/i,
+  rule:"“比我想的……”：想法是之前就有的，所以用过去式。", bad:"than I expect 的意思是“比我现在预期的”，放在这里不通。"},
+ {k:"much", t:"比较级前面加 much", re:/\b(?:much|far|a lot|way)\s+(?:\w+er|more|less|better|worse)\b/i,
+  rule:"much、a lot、far 放在比较级前面，表示“……多了”。", bad:"very 不能修饰比较级：very harder ✗"},
+ {k:"pasttime", t:"有具体的过去时间，用过去式", re:/\b(?:yesterday|last (?:week|month|year|night|semester|summer|time)|\w+ ago|in (?:19|20)\d\d)\b/i,
+  rule:"说了是过去哪个时间，动词用过去式。", bad:"不能用现在完成时：I have finished it yesterday ✗"},
+ {k:"modal", t:"can / could / should / would + 动词原形", re:/\b(?:could|can|should|would|might|may|must|will)\s+(?:not\s+|also\s+|still\s+)?(?!be\b|have\b)[a-z]+\b/i,
+  rule:"这类词后面直接跟动词原形，不加 to，也不加 -s、-ed。could 比 can 客气，提建议常用：We could use…", bad:"can to use ✗　can uses ✗"},
+ {k:"preping", t:"介词后面用 -ing", re:/\b(?:about|of|for|at|in|on|without|before|after|by|from|instead of)\s+(?!thing\b|morning\b|evening\b|nothing\b|something\b|anything\b|everything\b|spring\b|king\b|ring\b|wing\b|building\b|meeting\b|ceiling\b)\w+ing\b/i,
+  rule:"in、about、for、of 这些介词后面要接名词，动词就变成 -ing。", bad:"I'm interested in work here ✗ → in working here"},
+ {k:"toing", t:"look forward to / be used to + -ing", re:/\b(?:look(?:ing)? forward to|(?:am|is|are|was|were|get|got) used to)\s+\w+ing\b/i,
+  rule:"这里的 to 是介词，不是不定式，后面用 -ing。", bad:"I look forward to meet you ✗ → to meeting you"},
+ {k:"ving", t:"enjoy、finish、keep… 后面跟 -ing", re:/\b(?:enjoy|enjoyed|finish|finished|mind|avoid|consider|keep|kept|practice|suggest|miss|quit|stop|stopped|spend|spent)\s+(?:\w+\s+)?\w+ing\b/i,
+  rule:"enjoy、finish、avoid、keep、practice、suggest、spend（时间）这些词后面直接跟 -ing。", bad:"I enjoy to play golf ✗ → enjoy playing"},
+ {k:"todo", t:"want、need、plan… 后面跟 to + 动词原形", re:/\b(?:want|wanted|need|needed|plan|planned|decide|decided|hope|hoped|would like|'d like|try|tried|learn|learned|agree|manage|managed|expect)\s+to\s+(?!the\b|a\b|my\b|your\b)[a-z]+\b/i,
+  rule:"want、need、plan、decide、hope、would like 后面用 to + 动词原形。", bad:"I want working here ✗ → want to work"},
+ {k:"aan", t:"a / an 怎么选", re:/\ban\s+\w+|\ba\s+(?:uni|use|usu|one)\w*/i,
+  rule:"看读音，不看字母：元音开头用 an（an STM32 读 es-tee-em、an hour），辅音开头用 a（a university、a one-time fee）。", bad:"a STM32 ✗ → an STM32"},
+ {k:"art", t:"冠词：a / the / 不加", re:/\b(?:a|an|the)\s+\w+/i,
+  rule:"第一次提到、或者“一个”用 a / an；双方都知道是哪个用 the；泛指一类、或者不可数的事情（practice、golf、data）不加。", bad:"The practice taught me a lot（泛指时）✗ → Practice taught me a lot"},
+ {k:"plural", t:"泛指一类东西用复数", re:/\b(?:years|fittings|microcontrollers|sensors|projects|clubs|customers|engineers|tools|parts|motors|tests|products|people)\b/i,
+  rule:"说的是这一类东西、不是某一个，用复数：club fittings、microcontrollers。", bad:"firmware for microcontroller ✗ → microcontrollers"},
+ {k:"passive", t:"被动：be + 过去分词", re:new RegExp("\\b(?:is|are|was|were|be|been|being|get|got)\\s+(?:not\\s+|already\\s+|usually\\s+)?(?:" + PP + ")\\b(?!\\s+(?:to|of|in|about|with)\\b)", "i"),
+  rule:"东西是被处理的一方时：be + 过去分词。The parts are tested every week.", bad:"The parts test every week ✗"},
+ {k:"taught", t:"“让我学到很多”：taught me a lot", re:/\btaught (?:me|us)\b|\blearned a lot from\b/i,
+  rule:"英语说“……教会了我很多”：X taught me a lot；或者 I learned a lot from X。", bad:"X let me learn a lot ✗（let 是“允许”）"},
+ {k:"causative", t:"make / let / have + 人 + 动词原形", re:/\b(?:make|made|let|have|had|help|helped)\s+(?:me|us|him|her|them|you|people)\s+(?!to\b|a\b|the\b)[a-z]+\b/i,
+  rule:"make、let、have + 人 + 动词原形，不加 to。help 后面加不加 to 都行。", bad:"It made me to think ✗ → made me think"},
+ {k:"ifwill", t:"if 后面用一般现在时说将来", re:/\bif\b[^.?!]*\b(?:will|'ll)\b|\b(?:will|'ll)\b[^.?!]*\bif\b/i,
+  rule:"if 这半句用一般现在时，另一半才用 will：If it rains, we'll stay home.", bad:"If it will rain ✗"},
+ {k:"forsince", t:"for + 一段时间，since + 起点", re:/\b(?:for (?:\d+|a|an|two|three|four|five|six|several|many|a few) (?:years?|months?|weeks?|days?|hours?)|since (?:\d{4}|last|then|i was|college|school))\b/i,
+  rule:"和现在完成时一起说“多久了”：for 五年、since 2020。", bad:"since five years ✗ → for five years"},
+ {k:"whq", t:"特殊疑问句：疑问词 + 助动词 + 主语", re:/^(?:what|where|when|why|how|who|which)(?:\s+\w+)?\s+(?:are|is|was|were|do|does|did|can|could|would|will|have|has|should)\s+(?:you|we|they|he|she|it|i|your|the)\b/i,
+  rule:"问 what、where、how 时，疑问词后面先放 do / are / can 这类词，再放主语：Where are you going?", bad:"Where you are going? ✗"},
+ {k:"qorder", t:"问句：助动词放在前面", re:/^(?:could|can|would|will|do|does|did|are|is|have|has|should)\s+(?:you|we|i|it|they|he|she)\b/i,
+  rule:"一般疑问句把 do / can / could 这类词放在主语前面；could you 比 can you 客气。", bad:"You can help me? ✗（口语可以，但正式场合说 Could you help me?）"},
+ {k:"third", t:"he / she / it 后面的动词加 -s", re:/\b(?:he|she|it|this|that|everyone|someone)\s+(?:usually\s+|always\s+|often\s+)?(?!is\b|was\b|has\b|does\b)[a-z]+s\b/i,
+  rule:"主语是 he、she、it 或者单数的东西时，一般现在时的动词加 -s。", bad:"She work here ✗ → works"}
+];
+function grammarWhy(ref, said){
+  const r = String(ref || ""), miss = new Set(), tok = s => K.tokens(String(s || ""));
+  const rt = tok(r), st = new Set(tok(said)); for (const w of rt) if (!st.has(w)) miss.add(w);
+  const out = [];
+  for (const g of GWHY){
+    let hit = null;
+    if (g.k === "art" || g.k === "plural"){ const all = [...r.matchAll(new RegExp(g.re.source, "gi"))].map(x => x[0]); hit = all.find(h => tok(h).some(w => miss.has(w))) || null; if (!hit) continue; }   /* 冠词、复数：找你说错的那个 */
+    else { const m = r.match(g.re); if (!m) continue; hit = m[0]; }
+    if (g.k === "art" && !tok(hit).some(w => miss.has(w)) ) continue;   /* 冠词只在你漏了、用错了的时候讲 */
+    if (g.k === "plural" && !tok(hit).some(w => miss.has(w))) continue;
+    const pri = tok(hit).some(w => miss.has(w)) ? 0 : 1; out.push({k:g.k, t:g.t, rule:g.rule, bad:g.bad, ex:hit, pri}); }
+  out.sort((a, b) => a.pri - b.pri); return out.slice(0, 3);
+}
+
+ACT["c-why"] = async () => { const st = RUN.stage; if (!st || !st.card) return; const ref = st.target().en, said = st.said || "", list = grammarWhy(ref, said);
+  const body = list.length ? list.map(x => `<div style="margin:0 0 12px"><b>${esc(x.t)}</b>${x.pri ? "" : `<span class="chip" style="margin-left:6px">你这里错了</span>`}<p class="small" style="margin:4px 0">${esc(x.rule)}</p><p class="small" style="margin:2px 0">这句：<b class="en">${esc(x.ex)}</b></p><p class="small muted" style="margin:2px 0">${esc(x.bad)}</p></div>`).join("")
+    : `<p class="small">这句没有常见的语法点。还想知道为什么，就复制问题问 AI。</p>`;
+  const q = `“${ref}”${said ? `（我说的是：${said}）` : ""}——为什么这样说？请用中文简单解释用到的语法，再给一个类似的例句。`;
+  const c = await choose("为什么这样说", body, [["copy", "复制问题问 AI"], ["ok", "知道了"]]);
+  if (c === "copy"){ try { await navigator.clipboard.writeText(q); toast("问题复制好了"); } catch (e) { toast("复制不了：手动长按复制"); } } };
 ACT["c-check"] = () => { if (typeof GAME !== "undefined" && GAME.idleStop) GAME.idleStop(); const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; const v = ($("#typed")||{}).value || ""; if (!v.trim()){ toast("先说出来，或在输入框里输入"); return; } SR.abort(); s.typed = true; s.finish(v.trim()); };
 ACT["c-reveal"] = () => { const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; SR.abort(); const v = ($("#typed")||{}).value || ""; s.finish(v.trim()); };
 ACT["c-speak"] = () => { const s = RUN.stage; s && TTS.speak(s.target().en); };
@@ -4556,6 +4786,18 @@ ACT["l-misrec"] = () => { const s = RUN.stage; if (!(s instanceof ListenStage) |
 ACT["l-giveup"] = () => { const s = RUN.stage; if (!(s instanceof ListenStage) || s.done) return; SR.abort(); s.repeatCheck(""); };
 
 /* 面试一题（练习里、单题彩排共用） */
+/* v1.70.0：开口用时、长停顿、卡住提示——每次回答都记下来（每题留最近 12 次） */
+function ivMetSave(qid, m, ms){ if (!qid || !m) return; S.ivMet = S.ivMet || {}; const a = S.ivMet[qid] || (S.ivMet[qid] = []); a.push({ts:Date.now(), f:m.first, p:m.pauses, g:m.maxGap, s:m.stuck || 0, ms:ms || 0}); if (a.length > 12) a.splice(0, a.length - 12); }
+function ivMetHTML(m){
+  if (!m) return "";
+  const parts = [m.first == null ? "没听到开口" : `开口 ${fmt1(m.first)} 秒`, `3 秒以上的停顿 ${m.pauses} 次${m.pauses ? `（最长 ${Math.round(m.maxGap / 1000)} 秒）` : ""}`];
+  if (m.stuck) parts.push(`卡住提示 ${m.stuck} 次`);
+  return parts.map(x => `<span class="chip">${esc(x)}</span>`).join(" ") + `<p class="small muted" style="margin-top:4px">听的人主要按停顿和语速判断你流不流利；说错了改口影响很小，停下来才吃亏。</p>`;
+}
+/* 卡住时给的提示：这题的第一句（要点的第一条，或者参考回答的第一句）+ 一句救急句 */
+function ivStuckFirst(q){ if (!q) return ""; const a = S.answers[q.id] || {}; const k0 = (a.keys || [])[0] || ""; if (/[a-z]{3}/i.test(k0)) return k0; const ref = refFor(q) || (a.text || ""); return (K.splitSentences(ref)[0] || "").trim(); }
+function ivStuckHTML(q, id){ const f = ivStuckFirst(q);
+  return `<div id="${id}" class="iv-stuck hide" aria-live="polite"><span class="small muted">卡住了？先说出来，再接着讲：</span>${f ? `<div class="en sm">${esc(f)}</div>` : ""}<div class="small muted">或者：That's a good question. Let me think for a second.</div></div>`; }
 class IvStage {
   constructor(q, o){ this.q = q; this.o = o || {}; this.alive = true; this.phase = "ask"; this.round = 0; this.plays = 0; this.peek = false;
     if (q) this.variant = q.v[Math.floor(Math.random() * q.v.length)]; this.voice = TTS.mixVoice(); }
@@ -4576,6 +4818,7 @@ class IvStage {
       el.innerHTML = `<div class="card center"><div class="kind" style="justify-content:center"><span class="chip k">${this.round ? "压缩版" : "正在回答"}</span></div>
         <div class="timer num" id="ivClock">0:00</div><div class="small muted">目标 ${this.targets[this.round]} 秒</div>${this.round && this.focus && this.focus.length ? `<div class="panel" style="margin-top:12px;text-align:left;background:var(--amber-soft);border-color:transparent"><b>这一轮注意</b><ul class="fb" style="margin:6px 0 0">${this.focus.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>` : ""}
         ${this.recOn ? `<div class="level" id="lvl"><i></i></div>` : `<p class="small muted">${esc(this.recErr || "这次不录音")}：照样大声说，说完点结束。</p>`}
+        ${this.recOn && S.settings.ivStuck !== false ? ivStuckHTML(this.q, "ivStuck") : ""}
         <button class="btn primary block big" style="margin-top:16px" data-act="iv-stop">我答完了</button>
         <div style="text-align:left">${this.keysHTML()}</div></div>`;
     } else {
@@ -4583,6 +4826,7 @@ class IvStage {
       const checks = ["第一句直接回答了问题（先给结论）","讲经历用了过去式（I designed / I tested…）","没有 although…but、because…so","说了一个具体例子或数字","在目标时间以内"];
       el.innerHTML = `<div class="card"><div class="kind"><span class="chip k">复盘</span>${this.ms ? `<span class="num" style="margin-left:auto;font-size:18px">${fmtSec(this.ms)}</span>` : ""}</div>
         <div class="en sm">${esc(this.variant)}</div><div class="small muted">${esc(q.zh)}</div>
+        ${this.met ? `<div class="iv-met" style="margin-top:8px">${ivMetHTML(this.met)}</div>` : ""}
         ${this.url ? `<audio controls src="${this.url}"></audio>` : ""}
         ${this.blob && typeof ASR !== "undefined" && ASR.supported() ? `<div id="ivAsr" style="margin-top:8px">${(typeof soloAsrHTML === "function" && soloAsrHTML(q, this.recAt)) || `<button class="btn sm" data-act="iv-asr">把录音转成文字</button>`}</div>` : ""}
         <h3 style="margin-top:16px">${this.url ? "听回放，对照检查" : "回想一下，对照检查"}</h3>
@@ -4590,6 +4834,7 @@ class IvStage {
         ${(() => { const ref = refFor(q); const mine = a && a.text ? a.text.trim() : "";
           return `<div style="margin-top:10px">${slashBtn()}</div>` + ivRateHTML(q.id) + selfCheckHTML(q.id, "solo", 0, ((S.soloIssues || {})[q.id] || {}).k)
             + (ref ? `<details style="margin-top:10px" open><summary>参考回答</summary><div class="en sm" style="margin-top:6px;line-height:1.7">${wordsHTML(ref)}</div><button class="btn sm" style="margin-top:8px" data-act="nav" data-v="reader" data-q="${q.id}" data-src="ref">跟读参考回答</button></details>` : "")
+            + ((((S.qmeta || {})[q.id] || {}).ex) ? `<details style="margin-top:10px"><summary>讲解</summary><p class="small" style="margin-top:6px;line-height:1.7">${esc(S.qmeta[q.id].ex)}</p></details>` : "")
             + (mine && mine !== ref ? `<details style="margin-top:10px"><summary>我写好的回答</summary><div class="en sm" style="margin-top:6px">${esc(mine)}</div></details>` : "")
             + (!ref && !mine ? `<div class="note">${esc(q.tip)}</div>${q.tpl ? `<details style="margin-top:8px"><summary>参考结构</summary><div class="en sm" style="margin-top:6px">${esc(q.tpl)}</div></details>` : ""}` : ""); })()}
         <div class="row-gap" style="margin-top:16px"><button class="btn" data-act="iv-same">再说一遍</button>${nextT ? `<button class="btn" data-act="iv-redo">再答一次，压到 ${nextT} 秒</button>` : ""}<button class="btn primary" data-act="iv-done">完成</button></div></div>`;
@@ -4603,11 +4848,15 @@ class IvStage {
     if (!this.alive){ Rec.cancel(); return; }
     this.render(); if (this.recOn) Rec.lvlEl = $("#lvl");
     this.t0 = Date.now(); const ck = $("#ivClock"); const tgt = this.targets[this.round] * 1000;
-    clearInterval(this.clock);
-    this.clock = setInterval(() => { const ms = Date.now() - this.t0; if (ck && ck.isConnected){ ck.textContent = fmtSec(ms); ck.classList.toggle("over", ms > tgt); } }, 250);
+    clearInterval(this.clock); this.stuckN = 0; this.stuckShown = false; this.met = null;
+    this.clock = setInterval(() => { const ms = Date.now() - this.t0; if (ck && ck.isConnected){ ck.textContent = fmtSec(ms); ck.classList.toggle("over", ms > tgt); }
+      /* v1.70.0 卡住提醒：超过 5 秒没出声（一开始就没开口，或者说着说着停了），显示这题的第一句和一句救急句；一开口就收起来 */
+      if (this.recOn && S.settings.ivStuck !== false){ const show = Date.now() - Math.max(Rec.loudAt || 0, this.t0 + 300) > 5000;
+        if (show !== this.stuckShown){ this.stuckShown = show; const el = $("#ivStuck"); if (el) el.classList.toggle("hide", !show); if (show) this.stuckN++; } } }, 250);
   }
   async stop(){
     clearInterval(this.clock); this.ms = Date.now() - this.t0;
+    if (this.recOn){ this.met = Object.assign(Rec.metrics(this.t0), {stuck: this.stuckN || 0}); ivMetSave(this.q.id, this.met, this.ms); }
     if (this.recOn){ const r = await Rec.stop(); if (r && r.blob && r.blob.size){ if (this.url) URL.revokeObjectURL(this.url); this.url = URL.createObjectURL(r.blob); this.blob = r.blob; this.recAt = Date.now(); } }
     if (!this.alive) return;
     this.phase = "review"; this.render();
@@ -4860,6 +5109,7 @@ function callRender(){
     ${!talk && st.recOn ? `<div class="level" id="callLvl" style="max-width:420px;width:100%;margin:12px auto 0"><i></i></div>` : ""}
     ${!talk && !st.recOn ? `<p class="small muted center" style="margin-top:10px">${MIC.blocked ? "这个版本不能录音，照样大声说" : "没有在录音，照样大声说"}</p>` : ""}
     ${!talk && st.showCheat && keys ? `<div class="cheat">我的小抄<br>${keys.map(esc).join("<br>")}</div>` : ""}
+    ${!talk && st.recOn && S.settings.ivStuck !== false ? callStuckHTML(seg, st.stuckShown) : ""}
     ${!talk && showText && seg.hint ? `<div class="cheat">可以这样回：<span class="en" style="font-size:16px">${esc(seg.hint)}</span></div>` : ""}
     <div class="controls">
       <button class="btn block" data-act="call-repeat" ${talk ? "disabled" : ""}>Sorry, could you say that again?</button>
@@ -4875,7 +5125,7 @@ function callRing(){
   ring(); st.ringTimer = setInterval(ring, 2300);
 }
 function stopRing(){ const st = CV.st; if (st && st.ringTimer){ clearInterval(st.ringTimer); st.ringTimer = null; } try { navigator.vibrate && navigator.vibrate(0); } catch (e) {} }
-function callStop(){ const st = CV.st; if (!st) return; if (st.phase !== "ended") st.alive = false; stopRing(); clearInterval(st.clock); TTS.cancel(); Rec.cancel(); Wake.off(); Act.stop(); }
+function callStop(){ const st = CV.st; if (!st) return; if (st.phase !== "ended") st.alive = false; stopRing(); clearInterval(st.clock); clearInterval(st.stuckT); TTS.cancel(); Rec.cancel(); Wake.off(); Act.stop(); }
 const callOk = st => CV.st === st && st.alive && st.phase !== "ended";
 ACT["call-decline"] = () => UI.back();
 ACT["call-accept"] = async () => {
@@ -4895,14 +5145,26 @@ async function callTurn(st){
   st.phase = "turn"; st.recOn = false;
   if (Rec.ok && st.recAllowed !== false){ try { await Rec.start(null); st.recOn = true; } catch (e) { st.recAllowed = false; toast("录音用不了，照样开口说"); } }
   if (!callOk(st)){ Rec.cancel(); return; }
-  st.turnT0 = Date.now(); callRender(); vib(20);
+  st.turnT0 = Date.now(); st.stuckShown = false; st.stuckN = st.stuckN || {}; callRender(); vib(20);
+  /* v1.70.0 卡住提醒：超过 5 秒没出声，显示第一句和救急句；一开口就收起来 */
+  clearInterval(st.stuckT);
+  if (st.recOn && S.settings.ivStuck !== false) st.stuckT = setInterval(() => { if (!callOk(st) || st.phase !== "turn"){ clearInterval(st.stuckT); return; }
+    const show = Date.now() - Math.max(Rec.loudAt || 0, st.turnT0 + 300) > 5000;
+    if (show !== st.stuckShown){ st.stuckShown = show; const el = $("#callStuck"); if (el) el.classList.toggle("hide", !show); if (show) st.stuckN[st.i] = (st.stuckN[st.i] || 0) + 1; } }, 250);
+}
+function callStuckHTML(seg, shown){
+  const first = seg.kind === "q" ? ivStuckFirst(QBY[seg.qid]) : seg.kind === "f" ? (K.splitSentences(seg.hint || "")[0] || "") : "";
+  return `<div id="callStuck" class="cheat iv-stuck${shown ? "" : " hide"}" aria-live="polite"><span class="small">卡住了？先说出来，再接着讲：</span>${first ? `<div class="en" style="font-size:16px">${esc(first)}</div>` : ""}<div class="small">或者：That's a good question. Let me think for a second.</div></div>`;
 }
 ACT["call-next"] = async () => {
   const st = CV.st; if (!st || st.phase !== "turn") return;
   st.phase = "busy";
   const seg = st.segs[st.i];
+  clearInterval(st.stuckT);
+  const met = st.recOn ? Object.assign(Rec.metrics(st.turnT0), {stuck: (st.stuckN || {})[st.i] || 0}) : null;
   const r = st.recOn ? await Rec.stop() : null;
-  st.recs[st.i] = {url: r && r.blob && r.blob.size ? URL.createObjectURL(r.blob) : null, ms: Date.now() - st.turnT0, blob: r && r.blob && r.blob.size ? r.blob : null};
+  st.recs[st.i] = {url: r && r.blob && r.blob.size ? URL.createObjectURL(r.blob) : null, ms: Date.now() - st.turnT0, blob: r && r.blob && r.blob.size ? r.blob : null, m: met};
+  if (met && seg.kind === "q" && typeof ivMetSave === "function") ivMetSave(seg.qid, met, st.recs[st.i].ms);
   if (seg.kind === "q"){ const a = ans(seg.qid); a.practiced = (a.practiced||0) + 1; a.lastAt = Date.now(); if (r && r.blob && r.blob.size) IDB.put("iv:" + seg.qid, r.blob); save(); }
   if (!callOk(st)) return;
   st.i++; st.showText = false;
@@ -4911,7 +5173,7 @@ ACT["call-next"] = async () => {
 };
 ACT["call-repeat"] = async () => {
   const st = CV.st; if (!st || st.phase !== "turn") return;
-  Rec.cancel(); st.rep[st.i] = (st.rep[st.i]||0) + 1; st.phase = "talk"; callRender();
+  clearInterval(st.stuckT); Rec.cancel(); st.rep[st.i] = (st.rep[st.i]||0) + 1; st.phase = "talk"; callRender();
   await TTS.speak(st.segs[st.i].say, {voice:st.voice, rate: st.rep[st.i] > 1 ? 0.78 : 0.9});
   if (!callOk(st)) return;
   await callTurn(st);
@@ -4927,7 +5189,8 @@ function callEnd(){
   st.phase = "ended"; st.dur = Date.now() - st.t0;
   const reps = Object.values(st.rep).reduce((a, b) => a + b, 0), peeks = Object.keys(st.peek).length;
   const id = "k" + Date.now().toString(36);
-  const segs = st.segs.map((s, i0) => ({k:s.kind, qid:s.qid || "", say:s.say, zh:s.zh || "", hint:s.hint || "", i0})).filter(s => (s.k === "q" || s.k === "f") && st.recs[s.i0]);
+  clearInterval(st.stuckT);
+  const segs = st.segs.map((s, i0) => Object.assign({k:s.kind, qid:s.qid || "", say:s.say, zh:s.zh || "", hint:s.hint || "", i0}, st.recs[i0] && st.recs[i0].m ? {m:st.recs[i0].m} : {})).filter(s => (s.k === "q" || s.k === "f") && st.recs[s.i0]);
   S.calls.push({id, ts:Date.now(), mode:CV.mode || "", n:st.segs.filter(s => s.kind === "q").length, sec:Math.round(st.dur/1000), rep:reps, peek:peeks, segs, rate:{}, note:{}});
   CV.recId = id;
   segs.forEach((s, i) => { const r = st.recs[s.i0]; if (r && r.blob) IDB.put("cr:" + id + ":" + i, r.blob); });
@@ -5103,8 +5366,10 @@ function crRowsHTML(rec, urlFor, live){
     const r = s.k === "q" ? (rec.rate || {})[s.qid] || "" : "";
     const note = s.k === "q" ? (rec.note || {})[s.qid] || "" : "";
     const ref = s.k === "q" ? refFor(q) : (s.hint || "");
+    const fc = s.k === "q" && typeof K.fillerCount === "function" ? K.fillerCount(((rec.asr || {})[s.qid]) || note) : null;
     return `<div class="panel"><b>${esc(title)}</b>
       <div class="en sm" style="margin-top:6px">${wordsHTML(s.say)}</div>
+      ${s.m && typeof ivMetHTML === "function" ? `<div class="iv-met" style="margin-top:8px">${ivMetHTML(s.m)}</div>` : ""}${fc && fc.total ? `<p class="small" style="margin-top:6px">${fillerLine(fc)}</p>` : ""}
       ${url ? `<audio controls src="${url}"></audio>` : `<p class="small muted" style="margin-top:6px">${live ? "没有录音" : "录音只保留最近 5 次模拟"}</p>`}
       ${url && s.k === "q" && ASR.supported() ? `<button class="btn sm" style="margin-top:6px" data-act="cr-asr" data-id="${rec.id}" data-q="${s.qid}" data-i="${i}">把这段录音转成文字</button>` : ""}
       ${ref ? `<details style="margin-top:8px" ${s.k === "f" ? "open" : ""}><summary>参考回答</summary><div class="en sm" style="margin-top:6px;line-height:1.7">${wordsHTML(ref)}</div>${s.k === "q" ? `<button class="btn sm" style="margin-top:8px" data-act="nav" data-v="reader" data-q="${s.qid}" data-src="ref">跟读参考回答</button>` : ""}</details>` : ""}
@@ -5131,11 +5396,14 @@ function chunkMiss(text, ref){
   const used = new Set(ck(text)); return Array.from(new Set(ck(ref))).filter(p => !used.has(p)).slice(0, 6);
 }
 /* 单题彩排复盘：录音转成的文字 + 语法问题 + 没用上的说法（只显示这一次录音的转写） */
+/* 口头禅一行：like 2、yeah 1、重复开头 1（um、uh 常被识别吞掉，只能算出现在文字里的） */
+function fillerLine(fc){ const parts = [["like", fc.like], ["yeah", fc.yeah], ["um / uh", fc.um], ["you know", fc.know], ["I mean", fc.mean], ["重复开头（I, I）", fc.rep]].filter(x => x[1]).map(([k, n]) => `${k} ${n}`); return `口头禅：${esc(parts.join("、"))}<span class="muted">（um、uh 常被识别吞掉，只算文字里有的）</span>`; }
 function soloAsrHTML(q, at){
   const x = (S.soloText || {})[q.id]; if (!x || x.at !== at) return "";
   const t = x.text || ""; if (!t.trim()) return `<p class="small muted">没识别出内容。录音太短、太小声都会这样。</p>`;
   const iss = K.checkWriting(t).filter(i => i.tag !== "书写"); const ref = refFor(q); const miss = ref ? chunkMiss(t, ref) : [];
-  return `<div class="panel" style="margin:8px 0 0"><b>录音转成的文字</b><div class="en sm asr-text" style="margin-top:6px">${esc(t)}</div>
+  const fc = K.fillerCount(t);
+  return `<div class="panel" style="margin:8px 0 0"><b>录音转成的文字</b><div class="en sm asr-text" style="margin-top:6px">${esc(t)}</div>${fc.total ? `<p class="small" style="margin-top:8px">${fillerLine(fc)}</p>` : ""}
     ${iss.length ? `<ul class="fb" style="margin-top:8px">${iss.slice(0, 6).map(i => `<li>${esc(i.msg)}</li>`).join("")}</ul>` : `<p class="small muted" style="margin-top:8px">规则没查出问题。不过规则查不出所有错，拿不准就存起来问 AI。</p>`}
     ${ref ? (miss.length ? `<div class="small" style="margin-top:8px">参考回答里这些固定搭配，你这次没用上（点一下听）：</div><div class="chips" style="margin-top:4px">${miss.map(p => `<button class="chip" data-act="say-chunk" data-v="${esc(p)}">${esc(p)}</button>`).join("")}</div>` : `<p class="small muted" style="margin-top:8px">参考回答里的固定搭配，你都用上了。</p>`) : ""}
     <p class="small muted" style="margin-top:6px">转写工具有时会把口误“修好”，拿不准的地方再听一遍录音。</p>
@@ -5599,7 +5867,7 @@ ACT["w-copy"] = () => { const t = ($("#wText")||{}).value || ""; if (!t.trim()){
 const written = q => !!(S.answers[q.id] && S.answers[q.id].text && S.answers[q.id].text.trim().length > 10);
 /* ---------- 面试安排：可以有好几场，每场有名称、日期、时间、准备用的题库 ----------
    最近的一场决定 S.settings.interviewDate（面试前 3 周内，每天的练习多放面试内容） */
-let IVS_FORM = false, IVS_EDIT = null;
+let IVS_FORM = false, IVS_EDIT = null, IVS_PRE = null;
 function ivsSorted(){ return (S.interviews || []).slice().sort((a, b) => (a.date + (a.time || "")) < (b.date + (b.time || "")) ? -1 : 1); }
 function nextInterview(){ const d = today(); return ivsSorted().find(x => x.date >= d) || null; }
 function syncInterviewDate(){ const n = nextInterview(); const v = n ? n.date : ""; if (S.settings.interviewDate !== v){ S.settings.interviewDate = v; save(); } }
@@ -5614,10 +5882,11 @@ function interviewsPanelHTML(){
   /* 所有导入过面试题的题库都能选（不要求已经写了回答） */
   const decks = Array.from(new Set((S.customQ || []).map(q => q.deck).filter(Boolean))).map(d => ({id:"u:" + d, label:d}));
   const form = `<div id="ivsForm" style="margin-top:10px;border-top:1px solid var(--line, #e2e2e2);padding-top:10px"><b>${ed ? "修改这场面试" : "添加一场面试"}</b>
-    <label class="fld"><span>名称</span><input type="text" id="ivsName" value="${esc(ed ? ed.name : "")}" placeholder="比如：某公司招聘经理面试"></label>
+    <label class="fld"><span>名称</span><input type="text" id="ivsName" value="${esc(ed ? ed.name : (IVS_PRE && IVS_PRE.name) || "")}" placeholder="比如：某公司招聘经理面试"></label>
     <label class="fld"><span>日期</span><input type="date" id="ivsDate" value="${esc(ed ? ed.date : "")}"></label>
     <label class="fld"><span>时间（可选）</span><input type="time" id="ivsTime" value="${esc(ed ? ed.time || "" : "")}"></label>
     <label class="fld"><span>用哪个题库准备（可选）</span><select id="ivsDeck"><option value="">不指定</option>${decks.map(s => `<option value="${esc(s.id)}" ${ed && ed.deck === s.id ? "selected" : ""}>${esc(s.label)}</option>`).join("")}</select></label>
+    ${typeof jobAppOptionsHTML === "function" ? `<label class="fld"><span>是哪一份投递（可选）</span><select id="ivsApp"><option value="">不指定</option>${jobAppOptionsHTML(ed ? ed.app : (IVS_PRE && IVS_PRE.app) || "")}</select></label>` : ""}
     <div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="ivs-save">${ed ? "保存修改" : "添加"}</button><button class="btn ghost" data-act="ivs-cancel">取消</button></div></div>`;
   const n = up[0];
   return `<div class="panel"><div class="row-gap" style="justify-content:space-between;align-items:center"><b>面试安排</b>${IVS_FORM || ed ? "" : `<button class="btn sm" data-act="ivs-open">＋ 添加面试</button>`}</div>
@@ -5633,14 +5902,16 @@ function nextIvBanner(){
   return `<div class="banner iv-banner"><span>📅 ${esc(n.name)}：${esc(ivLeftText(n))}（${esc(ivWhen(n))}）</span><button class="btn sm primary" data-act="tab" data-v="iv">去准备</button></div>`;
 }
 ACT["ivs-open"] = () => { IVS_FORM = true; IVS_EDIT = null; UI.render(); const f = $("#ivsForm"); if (f && f.scrollIntoView) f.scrollIntoView({behavior:"smooth", block:"center"}); };
-ACT["ivs-cancel"] = () => { IVS_FORM = false; IVS_EDIT = null; UI.render(); };
+ACT["ivs-cancel"] = () => { IVS_FORM = false; IVS_EDIT = null; IVS_PRE = null; UI.render(); };
 ACT["ivs-edit"] = el => { IVS_EDIT = el.dataset.id; IVS_FORM = true; UI.render(); const f = $("#ivsForm"); if (f && f.scrollIntoView) f.scrollIntoView({behavior:"smooth", block:"center"}); };
 ACT["ivs-save"] = () => {
-  const name = (($("#ivsName") || {}).value || "").trim(), date = ($("#ivsDate") || {}).value || "", time = ($("#ivsTime") || {}).value || "", deck = ($("#ivsDeck") || {}).value || "";
+  const name = (($("#ivsName") || {}).value || "").trim(), date = ($("#ivsDate") || {}).value || "", time = ($("#ivsTime") || {}).value || "", deck = ($("#ivsDeck") || {}).value || "", app = ($("#ivsApp") || {}).value || "";
   if (!name){ toast("写一下这场面试叫什么"); return; } if (!date){ toast("选一下日期"); return; }
   S.interviews = S.interviews || [];
-  if (IVS_EDIT){ const x = S.interviews.find(i => i.id === IVS_EDIT); if (x) Object.assign(x, {name, date, time, deck}); }
-  else S.interviews.push({id:"i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 4), name, date, time, deck});
+  if (IVS_EDIT){ const x = S.interviews.find(i => i.id === IVS_EDIT); if (x) Object.assign(x, {name, date, time, deck, app}); }
+  else S.interviews.push({id:"i" + Date.now().toString(36) + Math.random().toString(36).slice(2, 4), name, date, time, deck, app, chk:[]});
+  if (app && typeof jobOnInterview === "function") jobOnInterview(app, name);
+  IVS_PRE = null;
   /* 选了题库、模拟面试又还没指定题库，就顺手设成这个题库 */
   if (deck && !(S.settings.callDeck || "").startsWith("u:")) S.settings.callDeck = deck;
   const wasEdit = !!IVS_EDIT; IVS_FORM = false; IVS_EDIT = null; syncInterviewDate(); save(); toast(wasEdit ? "改好了" : "加上了"); UI.render();
@@ -5954,16 +6225,19 @@ ACT["imp-preview"] = () => {
   r.keys = r.keys.filter(a => { if (known.has(a.qid)) return true; r.bad.push("要点 " + a.qid); return false; });
   r.follow = r.follow.filter(a => { if (known.has(a.qid)) return true; r.bad.push("追问 " + a.qid); return false; });
   r.alts = r.alts.filter(a => { if (CAT.byId[a.id]) return true; r.bad.push("也对 " + a.id); return false; });
+  /* v1.70.0：题目的标签、待确认、真题只认已经有的题号 */
+  for (const k of ["qtags", "checks", "real", "explains"]) r[k] = (r[k] || []).filter(a => { if (known.has(a.qid)) return true; r.bad.push({qtags:"标签", checks:"待确认", real:"真题", explains:"讲解"}[k] + " " + a.qid); return false; });
   IMP = r;
   const by = t => r.cards.filter(c => c.t === t).length; const dup = r.cards.filter(c => S.custom.some(x => x.id === c.id)).length;
   const decks = Array.from(new Set(r.cards.map(c => c.deck).concat(r.questions.map(q => q.deck))));
-  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length;
+  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length + (r.apps || []).length + (r.qtags || []).length + (r.checks || []).length + (r.real || []).length + (r.explains || []).length;
+  const appNew = (r.apps || []).filter(a => !jobFindApp(a)).length;
   const who = r.meta.who[0];
   $("#impOut").innerHTML = `<div class="panel" style="margin-top:12px"><h3>读到了</h3><ul class="issues">
     ${decks.length ? `<li>题库：${decks.map(esc).join("，")}</li>` : ""}
     <li>卡片 ${r.cards.length} 张（反射卡 ${by("r")}，找错 ${by("f")}，听力 ${by("l")}）${dup ? `，其中 ${dup} 张已经有了，会更新` : ""}</li>
     ${r.questions.length ? `<li>面试题 ${r.questions.length} 道，追问 ${r.follow.length} 个</li>` : ""}${r.plan.length ? `<li>计划 ${r.plan.length} 项${r.planReplace ? "（会替换所有没做完的计划）" : r.planReplaceGrow ? "（会替换没做完的求职、生活计划，英语的不动）" : ""}</li>` : ""}${(r.growGoals || []).length ? `<li>成长目标 ${r.growGoals.length} 项</li>` : ""}${(r.growActs || []).length ? `<li>记一笔的选项 ${r.growActs.length} 项</li>` : ""}${(r.growSkills || []).length ? `<li>技能 ${r.growSkills.length} 个</li>` : ""}${r.alts.length ? `<li>确认算对的说法 ${r.alts.length} 条</li>` : ""}
-    <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
+    <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.apps || []).length ? `<li>投递 ${r.apps.length} 份（新的 ${appNew}，已有的会更新）</li>` : ""}${(r.qtags || []).length ? `<li>题目标签 ${r.qtags.length} 条（优先级、方向）</li>` : ""}${(r.checks || []).length ? `<li>待确认 ${r.checks.length} 条（确认前，相关的题不算达标）</li>` : ""}${(r.real || []).length ? `<li>真题 ${r.real.length} 道</li>` : ""}${(r.explains || []).length ? `<li>讲解 ${r.explains.length} 条（知识卡翻过来能看到）</li>` : ""}${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
     ${r.meta.date ? `<li>面试日期：${esc(r.meta.date)}</li>` : ""}${who ? `<li>面试官：${esc(who.name)}${who.company ? "，" + esc(who.company) : ""}</li>` : ""}
     ${r.bad.length ? `<li>看不懂、会跳过的：第 ${r.bad.join("、")} 行</li>` : ""}</ul>
     ${n ? `<button class="btn primary block" style="margin-top:12px" data-act="imp-apply">确认导入</button>` : `<p class="note">没有能导入的内容，检查一下格式。</p>`}</div>`;
@@ -5990,6 +6264,7 @@ ACT["imp-apply"] = () => {
   if (r.planReplaceGrow){ const d0 = today(); S.plan = S.plan.filter(x => !(x.area && !x.done && x.date >= d0)); }   /* v1.69.0：计划 | 替换成长——只换今天起没做的求职、生活计划 */
   for (const x of r.plan){ if (!S.plan.some(y => y.date === x.date && y.text === x.text)){ const y = {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date:x.date, cue:x.cue, text:x.text, act:x.act, done:false, ts:Date.now()}; if (x.area) y.area = x.area; if (x.ifthen) y.ifthen = x.ifthen; S.plan.push(y); } }
   if (typeof growApplyImport === "function") growApplyImport(r);
+  if (typeof jobApplyImport === "function") jobApplyImport(r);
   if ((S.wantWords || []).length){
     /* 导入的单词卡和“要学的词”对上了（一样，或者一个是另一个的一部分，比如 stepped 和 stepped boss），就从列表里去掉 */
     const tk = x => String(x).toLowerCase().split(/\s+/).filter(Boolean);
@@ -6000,7 +6275,7 @@ ACT["imp-apply"] = () => {
   if (r.alts.length && S.pending && S.pending.length){ const ok = new Set(r.alts.map(a => a.id + "|" + K.tokens(a.text).join(" "))); S.pending = S.pending.filter(p => !ok.has(p.cid + "|" + K.tokens(p.said).join(" "))); }
   if (r.meta.date){ S.interviews = S.interviews || []; if (!S.interviews.some(x => x.date === r.meta.date)){ const dk = (r.questions[0] || r.cards[0] || {}).deck || ""; const nm = dk && dk !== "core" && dk !== "daily" ? (/面试/.test(dk) ? dk : dk + " 面试") : "面试"; S.interviews.push({id:"i" + Date.now().toString(36), name:nm, date:r.meta.date, time:"", deck: dk && dk !== "core" && dk !== "daily" ? "u:" + dk : ""}); } syncInterviewDate(); }
   S.deckMeta = S.deckMeta || {}; for (const w of r.meta.who) S.deckMeta[w.deck] = {name:w.name, company:w.company};
-  if (r.questions.length) S.settings.callDeck = "u:" + r.questions[0].deck;
+  if (r.questions.length){ const ds = new Set(r.questions.map(q => q.deck)); S.settings.callDeck = ds.size > 1 ? "all" : "u:" + r.questions[0].deck; }   /* v1.70.0：一次导入好几个题库（通用、故事库、各方向），模拟面试就用全部题库 */
   if ((r.slang || []).length){ S.slangCustom = S.slangCustom || []; for (const x of r.slang) if (!S.slangCustom.some(y => y.en === x.en)) S.slangCustom.push(x); S.slangCustom = S.slangCustom.slice(-300); }
   if ((r.articles || []).length){ S.reads = S.reads || []; for (const a of r.articles) if (!S.reads.some(x => x.text === a.text)) S.reads.push({id:"rd" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), title:a.title, text:a.text, ts:Date.now(), done:false}); S.reads = S.reads.slice(-30); }
   if ((r.errStats || []).length){ S.errStats = S.errStats || {}; for (const e of r.errStats){ const x = S.errStats[e.c] = S.errStats[e.c] || {seed:0, hits:[]}; x.seed = Math.max(x.seed || 0, e.n); if (e.pri) x.pri = true; } }   /* 错误档案的起点；“优先”的排在清单前面 */
@@ -6094,8 +6369,8 @@ VIEWS.device = {
   tab:"me", noRefresh:true,
   render(p){
     const d = L.device || {};
-    const st = k => d[k] === "ok" ? `<span class="chip" style="color:var(--green)">能用</span>` : d[k] === "no" ? `<span class="chip" style="color:var(--red)">不能用</span>` : d[k] === "net" ? `<span class="chip" style="color:var(--amber)">要联网</span>` : `<span class="chip">还没测</span>`;
-    const head = (t, k) => `<div class="row-gap" style="justify-content:space-between"><h3>${t}</h3>${st(k)}</div>`;
+    const st = k => dvChip(k);
+    const head = (t, k) => `<div class="row-gap" style="justify-content:space-between"><h3>${t}</h3><span id="dvSt-${k}">${st(k)}</span></div>`;   /* v1.68.4：测完马上刷新这个标签 */
     const env = IN_FRAME ? "claude.ai 版（在 claude.ai 的页面里运行）" : isStandalone() ? "离线版，已装到桌面" : IS_WEBVIEW ? "App 里的内置浏览器" : "浏览器里的独立网页";
     return `<div class="wrap">${p.from === "ob" ? "" : backBtn()}<h2>设备检测</h2><p class="muted small" style="margin:6px 0 14px">测一遍，app 会按结果调整练法。</p>
       <div class="panel"><h3>运行环境</h3><p class="small" style="margin-top:6px">${env}</p>
@@ -6131,6 +6406,8 @@ async function dvLocal(){
   else if (r === "unavailable") el.innerHTML = "这台设备不支持离线识别，没网时用键盘语音输入。";
   else el.innerHTML = "";
 }
+function dvChip(k){ const d = L.device || {}; return d[k] === "ok" ? `<span class="chip" style="color:var(--green)">能用</span>` : d[k] === "no" ? `<span class="chip" style="color:var(--red)">不能用</span>` : d[k] === "net" ? `<span class="chip" style="color:var(--amber)">要联网</span>` : `<span class="chip">还没测</span>`; }
+function dvChipRefresh(k){ const el = document.getElementById("dvSt-" + k); if (el) el.innerHTML = dvChip(k); }
 ACT["dv-say"] = el => TTS.speak(el.dataset.lang === "zh" ? "这是中文朗读测试。" : "Hi, this is a speech test. Can you hear me okay?", {lang:el.dataset.lang});
 ACT["dv-mark"] = el => { L.device = L.device || {}; L.device[el.dataset.k] = el.dataset.v; saveLocal(); UI.render(); };
 ACT["dv-mic-reset"] = () => { MIC.blocked = false; L.device = L.device || {}; L.device.micBlocked = false; saveLocal(); UI.render(); };
@@ -6140,9 +6417,11 @@ ACT["dv-sr"] = async el => {
   const r = await SR.listen({short:true, onInterim: t => { if (h && h.isConnected) h.textContent = t; }});
   if (!el.isConnected) return; el.disabled = false;
   L.device = L.device || {};
-  if (r.text){ L.device.sr = "ok"; if (h) h.textContent = "识别到：" + r.text; }
+  if (r.text){ L.device.sr = "ok";
+    const lv = K.compareSaid("It's a little windy today.", [], r.text).level;   /* v1.68.4：自动和要说的那句比 */
+    if (h) h.innerHTML = `识别到：<b class="en">${esc(r.text)}</b><br>${lv === "exact" || lv === "close" ? `<span style="color:var(--green)">✓ 识别得很准，能用</span>` : `<span style="color:var(--amber)">和原句不太一样：说慢一点、靠近一点，再试一次</span>`}`; }
   else { L.device.sr = r.error === "network" ? "net" : "no"; if (h) h.textContent = srErrorText(r.error || "no-speech"); }
-  saveLocal(); if (r.broke) UI.render();
+  saveLocal(); dvChipRefresh("sr"); if (r.broke) UI.render();
 };
 ACT["dv-sr-reset"] = () => { SR.broken = false; SR.fails = 0; L.device = L.device || {}; L.device.srBroken = false; delete L.device.sr; saveLocal(); UI.render(); toast("可以再点“测试”了"); };
 ACT["dv-install"] = async () => { const el = $("#dvLocal"); if (el) el.textContent = "正在下载……"; const ok = await SR.installLocal(); if (ok) srUnbreak(); if (el && el.isConnected) el.textContent = ok ? "离线识别：已就绪，回到上面点“测试”试试。" : "下载没成功，联网后再试。"; };
@@ -6151,7 +6430,7 @@ ACT["dv-rec"] = async el => {
   try { await Rec.start(null); } catch (e) { el.disabled = false; L.device.rec = "no"; saveLocal(); if (box) box.innerHTML = `<p class="note">${MIC.blocked ? "这个版本不能录音，和手机设置无关；离线版可以。" : e && e.name === "NotAllowedError" ? "麦克风被拒绝了：在 Chrome 的网站设置里给这个页面开麦克风。" : "这台设备不能录音。"}</p>`; UI.render(); return; }
   if (box) box.innerHTML = `<p class="small muted">录音中，说点什么……</p>`;
   await sleep(3000); const r = await Rec.stop(); el.disabled = false;
-  L.device = L.device || {}; L.device.rec = r && r.blob && r.blob.size ? "ok" : "no"; saveLocal();
+  L.device = L.device || {}; L.device.rec = r && r.blob && r.blob.size ? "ok" : "no"; saveLocal(); dvChipRefresh("rec");
   if (box && box.isConnected) box.innerHTML = r && r.blob && r.blob.size ? `<audio controls src="${URL.createObjectURL(r.blob)}"></audio>` : `<p class="note">没录到声音。</p>`;
 };
 ACT["dv-done"] = el => { if (el.dataset.from === "ob") UI.tab("home"); else UI.back(); };
@@ -6196,6 +6475,7 @@ const ABOUT_QA = [
   ["说错以后的补练是什么？说对了还要补练吗？", "没说出来的句子会先听正确的、跟着说，这一轮隔几题再考一次（最多 3 次），剩下的交给明天。说对了不用补练：同一轮里马上多说几遍，好处很快就消失，隔开复习更有效。"],
   ["提示会影响练习效果吗？", "会有一点：提示越多，回忆越省力，记得也就没那么牢。所以最好先自己试着说，真的卡住了再看提示；提示也会随着你说对逐渐撤掉（完整的词 → 开头字母 → 不给）。"],
   ["练完一句下面的语法提示是怎么来的？", "按一组常见错误规则检查你说的句子（比如时态、复数、语序、being 用多了），只用那些不容易误判的规则，所以没提示不代表一定没错；拿不准就存起来问 AI。"],
+  ["不知道为什么要这样说（比如 written 不是 wrote）怎么办？", "结果页点“为什么这样说”：讲这一句用到的语法点（规则、这句里的例子、常见的错误），你说错的排最前面，一次最多讲 3 个。没有常见的语法点时，可以复制问题问 AI。在刚用到的时候讲一两个点，比集中背语法更有效。"],
   ["标点、撇号会影响判断吗？", "不会。比较前会先去掉标点；you're 和 you are 都算对，master's 和 masters 读音一样也算对。但如果你说成了 master（少了 's），会提示“这里是所有格：master's（……的）”。"],
   ["每天最多几道新题是固定的吗？练得多要不要自动加？", "固定的：不管今天练几轮（包括自由练习），新题加起来不超过设置里的数。不自动加，因为每张新卡之后一个月里大约还要复习 5 次（2、4、7、15、30 天），新题一多，几天后复习就会堆起来、正确率下降；今天多练几轮，主要是把已经学过的练得更熟。要不要调，看两件事：最近复习大多第一遍就能说对、每天的复习也练得完，可以从 12 调到 20；复习常常做不完或者老是忘，就调回 6。"],
   ["题库怎么选？", "首页“练哪个题库”可以只练通用、日常生活，或者你导入的题库（比如某家公司的面试准备），可以多选，按组折叠。"]]],
@@ -10498,13 +10778,22 @@ const BT = (() => {
     /* 红奈（第二十五节）：起手式 ÷ 站直 0.86，身高 187，巨大化 49 米 */
     nexus:  {name:"红奈型", light:"bigPunch", heavy:"sideKick", skill:"overRay", hover:false, r:0.86, cm:187, giantM:49},
     /* 梦比优斯（数据角色）：r 大于 1 是正常的——起手式举着拳头，外框比站直还高一点 */
-    Mebius: {name:"梦比优斯型", light:"Mebius.light", heavy:"Mebius.heavy", skill:"Mebius.skill", hover:false, r:1.005, cm:180, giantM:50}
+    Mebius: {name:"梦比优斯型", light:"Mebius.light", heavy:"Mebius.heavy", skill:"Mebius.skill", hover:false, r:1.045, cm:180, giantM:50}
   };
   const tplOf = id => TEMPLATES[MS_ALIAS[id] || id] ? (MS_ALIAS[id] || id) : null;
   /* 这套组合正好是哪个模板；对不上就是“自定义” */
   /* 模板的名字：直接写三招（不写“格斗型”这类笼统的叫法，放在 GitHub 上也通用） */
   const tplLabel = t => { const n = (s, id) => (MOVE_LIST[s].find(x => x[0] === id) || [id, id])[1]; return `${n("light", t.light)} · ${n("heavy", t.heavy)} · ${n("skill", t.skill)}${t.hover ? "（悬浮）" : ""}`; };
-  const CHAR_SCALE = {nexus:195 / 180};   /* 角色看起来的大小：只有红奈 */
+  /* v1.69.6：体型表（用户在角色设计工具里调好的）。角色：cm 站直身高、r 起手式比例、giantM 巨大化身高（米，0 = 不能巨大化）；
+     怪：cm 起手式实际高度、scale 放大、giantM 巨大化时起手式的米数。scenes：场景里 1 米像素再乘的倍数。红奈原来的 CHAR_SCALE 去掉（体型表的 r 已经是 0.925） */
+  const HERO_BODY = {"shodai": {"cm": 180, "r": 0.905, "giantM": 0}, "seven": {"cm": 180, "r": 0.905, "giantM": 0}, "bemular": {"cm": 190, "r": 1.01, "giantM": 0}, "zett": {"cm": 180, "r": 0.917, "giantM": 50}, "tiga": {"cm": 180, "r": 1.005, "giantM": 50}, "nexus": {"cm": 180, "r": 0.925, "giantM": 50}, "Mebius": {"cm": 180, "r": 1.045, "giantM": 50}};
+  const MON_BODY = {"scree": {"cm": 150, "scale": 1.055, "giantM": 41.7}, "ashmoth": {"cm": 180, "scale": 1.037, "giantM": 50}, "drillback": {"cm": 125, "scale": 1.198, "giantM": 34.7}, "voltail": {"cm": 207, "scale": 1.144, "giantM": 57.5}, "rimeback": {"cm": 180, "scale": 1.093, "giantM": 50}, "rustwarden": {"cm": 196, "scale": 1.184, "giantM": 54.4}, "corefang": {"cm": 225, "scale": 1.026, "giantM": 62.5}, "abyssmaw": {"cm": 215, "scale": 1.057, "giantM": 59.5}, "prismward": {"cm": 240, "scale": 1.031, "giantM": 62}, "twinhood": {"cm": 240, "scale": 0.964, "giantM": 60}, "galecrest": {"cm": 210, "scale": 0.972, "giantM": 58.3}, "starhorn": {"cm": 230, "scale": 1.006, "giantM": 63.9}, "colossus": {"cm": 215, "scale": 1.09, "giantM": 59.7}, "nullwraith": {"cm": 250, "scale": 1.039, "giantM": 64}, "brawler": {"cm": 165, "scale": 1.042, "giantM": 45.8}, "shocker": {"cm": 165, "scale": 1.042, "giantM": 45.8}, "gunner": {"cm": 175, "scale": 1.053, "giantM": 48.6}, "guard": {"cm": 175, "scale": 1.053, "giantM": 48.6}, "blade": {"cm": 185, "scale": 1.051, "giantM": 51.4}};
+  const SCENE_FIX = {"gforest": 0.98, "gforestN": 0.98, "gday": 0.89, "gnight": 0.89}, BODY_REF_CM = 154.8;
+  /* 招式模板 → 体型表的角色（没导入发光部位时也能认出来） */
+  const TPL_BODY = {brawler:"shodai", slash:"seven", blade:"seven", beam:"bemular", storm:"zett", tiga:"tiga", nexus:"nexus", Mebius:"Mebius"};
+  function heroBodyOf(rec, lo){ if (!rec) return null; lo = lo || {}; let tk = ""; try { tk = tplMatch(lo); } catch (e) {}
+    return HERO_BODY[rec.glowName] || HERO_BODY[rec.toolId] || HERO_BODY[rec.id] || (lo.skill === "overRay" ? HERO_BODY.nexus : null) || (/^Mebius/.test(String(lo.skill || "")) ? HERO_BODY.Mebius : null) || HERO_BODY[TPL_BODY[tk]] || null; }
+  const CHAR_SCALE = {};
   const tplMatch = lo => Object.keys(TEMPLATES).find(k => ["light", "heavy", "skill", "hover"].every(x => TEMPLATES[k][x] === lo[x])) || "custom";
   /* 旧记录（moveset）读出来变成 loadout 和 r */
   function loadoutOf(rec){
@@ -10628,12 +10917,14 @@ const BT = (() => {
     const lo = loadoutOf(rec), t = TEMPLATES[tplMatch(lo)] || TEMPLATES[tplOf(rec.moveset) || "brawler"] || TEMPLATES.brawler;
     /* 没拖过滑块（rSet、cmSet 为假）就跟着模板走，不用导入时存下来的值 */
     const custom = tplMatch(lo) === "custom";
-    const r = rec.rSet || (custom && rec.r) ? rec.r : t.r, cm = rec.cmSet || (custom && rec.cm) ? rec.cm : t.cm, big = !!(giant && rec.giantM);
+    const hb = heroBodyOf(rec, lo);   /* 体型表里有的角色：按体型表；没有的照旧（模板 / 滑块） */
+    const r = hb ? hb.r : rec.rSet || (custom && rec.r) ? rec.r : t.r, cm = hb ? hb.cm : rec.cmSet || (custom && rec.cm) ? rec.cm : t.cm, gM = hb ? hb.giantM : (rec.giantM || 0), big = !!(giant && gM);
     /* v1.65.0：红奈起手压得很低，看起来比别人小一圈——按角色本身放大 195/180（用户：设 180 时应该是以前设 195 的样子）。
        认角色：发光部位认出是红奈，或者技能是层叠风暴；不管身高、比例来自模板还是滑块、招式是不是自定义，巨大化同样放大 */
     const vis = CHAR_SCALE[rec.glowName] || CHAR_SCALE[lo.skill === "overRay" ? "nexus" : ""] || 1;
-    const ready = big ? rec.giantM * r * vis : 0;
-    return {loadout:lo, r, cm, kh: big ? ready / Math.max(CITY_READY_M, ready) : ((cm / 100) * r * vis) / READY_M, giantReady: big ? Math.max(CITY_READY_M, ready) : 0, hover:!!lo.hover, giant:big, glow: rec.glow || null, glowName: rec.glowName || "", glowScale: rec.glowScale || 1, glowName: rec.glowName || "", glowId: rec.glow ? (rec.glowName || "g") + (rec.at || "") : ""};
+    /* 巨大化：镜头按这个角色自己的“巨大化身高 × r”取景（对接说明第三部分第 3 条），所以它自己 kh = 1 */
+    const ready = big ? gM * r * vis : 0;
+    return {loadout:lo, r, cm, giantM:gM, kh: big ? 1 : ((cm / 100) * r * vis) / READY_M, giantReady: big ? ready : 0, hover:!!lo.hover, giant:big, glow: rec.glow || null, glowName: rec.glowName || "", glowScale: rec.glowScale || 1, glowName: rec.glowName || "", glowId: rec.glow ? (rec.glowName || "g") + (rec.at || "") : ""};
   }
 
   /* ---------- 内置背景（量过一次：店门口的售货机 1.83 米定比例，近处车道的中间定脚的位置） ---------- */
@@ -10671,7 +10962,7 @@ const BT = (() => {
   const CITY_READY_M = 46;
   const sceneOf = sc => ({pxPerM: sc.pxPerM || sc.vendPx / 1.83, readyM: sc.readyM || READY_M, depth: sc.depth || DEPTH});
   /* 每局开始时定一次大小：能巨大化的角色，sizeMode 是 random 时一半对一半 */
-  function rollGiant(rec){ if (!rec || !rec.giantM) return false; const m = rec.sizeMode || "random"; return m === "giant" || (m === "random" && Math.random() < 0.5); }
+  function rollGiant(rec){ const hb = heroBodyOf(rec, rec ? loadoutOf(rec) : null); if (!rec || !(hb ? hb.giantM : rec.giantM)) return false; const m = rec.sizeMode || "random"; return m === "giant" || (m === "random" && Math.random() < 0.5); }
   const DEPTH = 3.45, READY_M = 1.52, FEET_AT = 0.10;
   function ensureWisp(){
     if (document.getElementById("bt-wisp")) return;
@@ -10879,7 +11170,7 @@ const BT = (() => {
     /* 角色：poses 为空就用原创小人 */
     A.setChar = (poses, meta) => {
       A.dropCode(); A.clear(); ghost.monster = null; ghost.classList.remove("monster", "rigmon", "imgmon"); ghost.style.height = "";
-      meta = meta || {loadout:rigLoadout(), kh:1, hover:false}; A.loadout = meta.loadout || rigLoadout(); A.giantReady = meta.giantReady || 0; A.rNow = meta.r || 0;
+      meta = meta || {loadout:rigLoadout(), kh:1, hover:false}; A.loadout = meta.loadout || rigLoadout(); A.giantReady = meta.giantReady || 0; A.rNow = meta.r || 0; A.khNow = meta.kh || 1; A.heroBody = {cm:meta.cm || 180, r:meta.r || 0.9, giantM:meta.giantM || 0};
       [you, ghost].forEach(f => {
         /* 每个出场的人自己的身高（kh）和悬浮 */
         f.style.setProperty("--kh", String(poses ? meta.kh || 1 : 1)); f.classList.toggle("hover", !!meta.hover); f.classList.remove("landed");
@@ -10937,8 +11228,9 @@ const BT = (() => {
       f.style.setProperty("--kh", "1"); f.classList.remove("hover", "landed");
       poseTo(r, POSES.idle, 0); A.shields = 0; paintShields(); requestAnimationFrame(placeFighters);
     };
+    A.isDown = () => !!A.cmDown || ghost.classList.contains("still");
     /* 回放用：把已经倒下的对手先扶起来 */
-    A.revive = () => { if (A.cm){ A.cmDown = false; A.cm.idle(); return; } ghost.getAnimations().forEach(a => a.cancel()); faceOf(ghost).getAnimations().forEach(a => a.cancel()); ghost.style.opacity = ""; ghost.classList.remove("still"); if (ghost.rig) poseTo(ghost.rig, POSES.idle, 0); };
+    A.revive = () => { if (A.cm){ A.cmDown = false; ghost.classList.remove("still"); A.cm.idle(); return; }   /* v1.69.4：“定住”也要清掉，不然扶起来以后还是动不了 */ ghost.getAnimations().forEach(a => a.cancel()); faceOf(ghost).getAnimations().forEach(a => a.cancel()); ghost.style.opacity = ""; ghost.classList.remove("still"); if (ghost.rig) poseTo(ghost.rig, POSES.idle, 0); };
     A.enemyIn = async () => { if (reduced()) return; await run(ghost, [{transform:"translateX(-40%)", opacity:0}, {transform:"none", opacity:1}], {duration:420, easing:"ease-out"}); };
     /* 打倒怪物：闪一下、倒下、淡出 */
     A.knockout = async () => {
@@ -10996,7 +11288,12 @@ const BT = (() => {
       A.cm = TuokouMonsters.create(m.code, {
         host: stage,
         foot: () => ({x: stage.clientWidth * A.spots[0] + (A.cmDX || 0), y: stage.clientHeight * (1 - A.groundPct / 100)}),
-        height: () => stage.clientHeight * A.sizeNow,
+        /* v1.69.6：按主角实际画出来的起手式高度、按比例（普通：怪 cm ÷ 主角 cm × r；巨大化：怪 giantM ÷ 主角 giantM × r），每次 layout 都重算；没在体型表里的怪照旧 */
+        height: () => { const mb = MON_BODY[m.code], hb = A.heroBody || {cm:180, r:0.9, giantM:50}, base = stage.clientHeight * A.sizeNow;
+          if (!mb) return base; const heroPx = base * (A.khNow || 1);
+          const ratio = A.giant && mb.giantM && hb.giantM ? mb.giantM / (hb.giantM * hb.r) : mb.cm / (hb.cm * hb.r);
+          return heroPx * ratio / mb.cm * BODY_REF_CM; },
+        scale: (MON_BODY[m.code] || {}).scale || 1,
         target: () => box(bodyOf(you)),
         onHit: power => { if (A._codeHit) A._codeHit(power); },
         onShake: k => shake(4 * k),
@@ -11109,7 +11406,7 @@ const BT = (() => {
     /* 扣血：打的是对手就扣对手的血；打的是你，交给 A.onYouHit（以后掉血用） */
     function dealt(def, d){
       /* 首领被连续扣血（光线这种持续攻击）：每扣一次快速受击一下（只做受击开头那一小段）；最后一次之后 0.3 秒完整播一次受击（被打死的话，倒下排在它后面） */
-      if (def === ghost && A.cm && !A._noFlinch && A.cm.flinch && d > 0){ A.cm.flinch(); clearTimeout(A._cmFinal); const tk = A.token; A._cmFinal = setTimeout(() => { if (tk === A.token && A.cm) A.cm.play("hit"); }, 300); } if (!(d > 0)) return; A.lastDmg += d; if (def === ghost) A.setHP(A.hp - d); else if (A.onYouHit) A.onYouHit(d); }
+      if (def === ghost && A.cm && !A._noFlinch && A.cm.flinch && d > 0){ A.cm.flinch(); clearTimeout(A._cmFinal); const tk = A.token; A._cmFinal = setTimeout(() => { if (tk === A.token && A.cm) A.cm.play("hit"); }, 300); } if (!(d > 0)) return; if (A._replay) return;   /* 回放：只放动画，不扣血 */ A.lastDmg += d; if (def === ghost) A.setHP(A.hp - d); else if (A.onYouHit) A.onYouHit(d); }
     function hurt(def, dir, dmg, big, pt){
       if (def === ghost && A.cm){ A.cm.play("hit"); A._noFlinch = true; dealt(def, dmg); A._noFlinch = false; codeRecoil(big); return; }   /* 近身一下：完整受击一次（扣血那一下不再另外快速受击） */
       const face = faceOf(def);
@@ -13019,7 +13316,8 @@ const BT = (() => {
       if (!root.isConnected) return;
       const list = PLACES[A.giant ? "giant" : "human"], pe = list.find(p => p[0] === A.place) || list[0];
       const key = A.night ? pe[3] : pe[2]; const S0 = stage.getBoundingClientRect(); const sc = SCENES[key]; const m = sceneOf(sc);
-      if (A.giant && A.giantReady > m.readyM) m.readyM = A.giantReady;   /* 比 46 米高的巨人：镜头拉远，城市跟着变小 */
+      if (A.giant && A.giantReady) m.readyM = A.giantReady;   /* v1.69.6：巨大化按角色自己的巨大化身高 × r 取景 */
+      m.pxPerM *= SCENE_FIX[key] || 1;   /* 场景修正（体型表 scenes），没有的按 1 */
       stage.classList.toggle("giant", !!A.giant); stage.classList.toggle("soft", S.settings.bgSoft !== false);
       stage.style.setProperty("--bt-bg-blur", Math.max(1, S0.width / 520).toFixed(2) + "px");
       /* 画面里脚上方的部分不够、镜头拉不远的时候，就把人物画大，保证人物和场景的比例对 */
@@ -13485,14 +13783,15 @@ const GAME = {
     const old = K.battleFirst(Object.assign({}, entry, {mis:false})), wasOk = ["exact", "close", "meaning", "sound"].includes(old);
     /* 大招卡被识别错了：改判成说对，就放大招（能量用在大招上，不再补） */
     if (entry.special && !wasOk){ st.combo++; st.best = Math.max(st.best, st.combo); st.energy = 0; GAME.meter(); const e = st.enemy, dmg = Math.round(40 * (e.boss && entry.tag === e.tag ? 1.5 : 1));
-      st.sessionDmg += delta; GAME.score(); GAME.say(`识别错了，按说对算：大招！-${dmg}`); st.last = [{kind:"special", dmg, label:`大招！-${dmg}`}]; await st.A.special(dmg); await GAME.afterHit(); return; }
+      st.sessionDmg += delta; GAME.score(); GAME.say(`识别错了，按说对算：大招！-${dmg}`); st.lastEnemy = st.enemy; st.last = [{kind:"special", dmg, label:`大招！-${dmg}`}]; await st.A.special(dmg); await GAME.afterHit(); return; }
     if (!wasOk){ st.combo++; st.best = Math.max(st.best, st.combo); if (st.energy < 5){ st.energy++; if (st.energy >= 5) GAME.armSpecial(); } GAME.meter(); }
     /* 暴击只加在打到对手身上的伤害里（和正常打中一样），和昨天比的成绩只算底数 */
     const critBonus = entry.ms > 0 && entry.ms <= critMs(entry) ? 5 : 0; if (critBonus) st.A.pop("暴击！", "crit");
     st.sessionDmg += delta; GAME.score(); delta += critBonus;
     const e = st.enemy, weak = e.boss && entry.tag === e.tag ? 1.5 : 1, dmg = Math.max(1, Math.round(delta * weak));
-    GAME.say(`识别错了，按说对算：-${dmg}`); if (weak > 1) st.A.pop("弱点！", "weak");
-    st.last = [{kind:"hit", mv:"heavy", dmg, breaks: shield ? 1 : 0, label:`识别错了，按说对算：-${dmg}`, pops:[]}];
+    const oldD = Math.round(((K.battlePlan([Object.assign({}, entry, {mis:false})]) || {}).card || 0) * weak), lab = `识别错了，按说对算：补 ${dmg} 点（这一题一共 ${oldD + dmg}）`;   /* v1.69.4：以前只写 -2，看着像擦伤 */
+    GAME.say(lab); if (weak > 1) st.A.pop("弱点！", "weak");
+    st.lastEnemy = st.enemy; st.last = [{kind:"hit", mv:"heavy", dmg, breaks: shield ? 1 : 0, label:lab, pops:[]}];
     await st.A.move("heavy", dmg, {breaks: shield ? 1 : 0}); await GAME.afterHit();
   }).catch(() => {}); },
   say(t){ const el = document.getElementById("gSay"); if (el) el.textContent = t; },
@@ -13513,7 +13812,7 @@ const GAME = {
     const st = GAME.st; if (!st || !st.A.root.isConnected) return;
     if (st.pendingNext){ st.pendingNext = false; await GAME.next(false); }
     const A = st.A; const plan = K.battlePlan([entry]); const lv1 = K.battleFirst(entry);
-    st.sessionDmg += plan.card; GAME.score(); st.last = [];
+    st.sessionDmg += plan.card; GAME.score(); st.lastEnemy = st.enemy; st.last = [];
     const ok1 = ["exact", "close", "meaning", "sound"].includes(lv1);
     if (ok1){ st.combo++; st.best = Math.max(st.best, st.combo); } else st.combo = 0;
     if (entry.spoke || entry.mis) st.giveups = 0;   /* 开口说了任何一句，就从头算 */
@@ -13609,22 +13908,22 @@ const GAME = {
   /* 回放：没看到的话，再放一遍刚才那一下（只是动画，不再扣血） */
   replay(){
     const st = GAME.st; if (!st || !st.last.length){ toast("还没有可以回放的出招"); return; }
+    if (st.lastEnemy && st.lastEnemy !== st.enemy && !st.pendingNext){ toast("对手换了，上一只的出招没法回放"); return; }   /* v1.69.4：以前会拿新出场的对手来放 */
     if (st.replaying) return;   /* 正在回放：再按不理会，免得一遍一遍排队重复放 */
     st.replaying = true; const btns = () => document.querySelectorAll('[data-act="g-replay"]'); btns().forEach(b => b.disabled = true);
     const steps = st.last.slice(); GAME.focus();
     st.chain = st.chain.then(async () => {
       const A = st.A; if (!A.root.isConnected) return;
-      if (st.pendingNext) A.revive();
-      for (const x of steps){
+      if (st.pendingNext || (A.isDown && A.isDown())) A.revive();
+      A._replay = true;   /* 回放只放动画：不改血、不再打倒（v1.69.4） */
+      try { for (const x of steps){
         if (x.kind === "ko"){ await A.knockout(); A.cheer(); continue; }
         if (x.kind === "counter"){ GAME.say("回放：" + x.label); const keep = A.onYouHit; A.onYouHit = null; await A.enemyMove(x.mv, 0); A.onYouHit = keep; continue; }
         GAME.say("回放：" + x.label);
         if (x.kind === "shield"){ A.pop("护盾 +1", "shield"); await new Promise(r => setTimeout(r, 500)); continue; }
-        const hp0 = A.hp; A.setHP(Math.min(A.max, hp0 + x.dmg), true);
         (x.pops || []).forEach(([t, c]) => A.pop(t, c));
         if (x.kind === "special") await A.special(x.dmg); else await A.move(x.mv || "light", x.dmg);
-        A.setHP(hp0, true);
-      }
+      } } finally { A._replay = false; }
     }).catch(() => {}).then(() => { st.replaying = false; btns().forEach(b => b.disabled = false); });
   },
   stop(){ if (GAME.st){ GAME.st.A.clear(); GAME.st = null; } }
@@ -13856,7 +14155,8 @@ function batGalInit(){
 }
 CHG["bt-look"] = el => { S.settings[el.dataset.key] = !!el.checked; save(); if (BAT_PREV){ BAT_PREV.layout(); BAT_PREV.relight(true); } };
 /* 结算的大招：再看一遍（血条先补回去，放完再恢复） */
-ACT["bt-sp-replay"] = async () => { const R = BAT_RUN; if (!R || !R.A || !R.special || R.spBusy) return; R.spBusy = true; setTimeout(() => { R.spBusy = false; }, 4500);   /* 正在放：再按不理会（不然会清掉舞台从头放，特效放到一半消失） */ const hp0 = R.A.hp; R.A.clear(); R.A.setHP(Math.min(R.A.max, hp0 + R.special), true); await R.A.special(R.special); R.A.setHP(hp0, true);  R.spBusy = false; };
+ACT["bt-sp-replay"] = async () => { const R = BAT_RUN; if (!R || !R.A || !R.special || R.spBusy) return; R.spBusy = true; setTimeout(() => { R.spBusy = false; }, 4500);   /* 正在放：再按不理会（不然会清掉舞台从头放，特效放到一半消失） */ const down = R.A.isDown && R.A.isDown(); R.A.clear(); if (down) R.A.revive(); R.A._replay = true;   /* v1.69.4：回放只放动画；被这一招打倒的，放完再倒下（以前起来以后一直卡在受击） */
+  try { await R.A.special(R.special); } finally { R.A._replay = false; } if (down) await R.A.knockout();  R.spBusy = false; };
 ACT["bt-tab"] = el => {
   const t = el.dataset.v; L.btTab = t; saveLocal(); const all = !!window.__allPanes;
   document.querySelectorAll(".bt-tab").forEach(b => { const on = b.dataset.v === t; b.classList.toggle("on", on); b.setAttribute("aria-selected", String(on)); });
@@ -15994,7 +16294,8 @@ function growLog(id, units, opt){
   const up = grUpText({msgs:[], up:u.up, lv:u.lv}); if (up) parts.push(up);
   if (ach.length) parts.push("解锁成就：" + ach.join("、"));
   if (!opt.quiet && before != null && UI.top() && UI.top().name === "grow"){ const goal = growGoal(a.a); GR_FX = {a:a.a, from:Math.min(100, Math.round(100 * before / Math.max(1, goal))), xp:e.xp + (a.a === "english" ? e.en : 0)}; }
-  save(); if (!opt.quiet){ toast(parts.join("，") || "记下了"); if (u.up) grLvUp(u.lv); }
+  save(); if (!opt.quiet){ toast(parts.join("，") || "记下了"); if (u.up) grLvUp(u.lv);
+    const top = UI.top() && UI.top().name; if (top === "grow" && !e.mile) setTimeout(() => grCelebrate(e.xp + e.en), 0); else if (top === "gchar") GR_CHEER = true; }
   return e;
 }
 let GR_FX = null, GR_JUST = null;
@@ -16127,11 +16428,11 @@ function grAvatarHTML(big){
   const pulse = GR_PULSE ? " gr-up" : ""; GR_PULSE = false;
   const inner = `${ring}${none ? `<span class="gr-lvbig num">${lv.lv}</span>` : `<span class="gr-face">${grFaceHTML()}</span><span class="gr-lvn num">${lv.lv}</span>`}`;
   /* 成长页上的形象点进角色页；角色页上的大形象只是看的 */
-  return big ? `<div class="gr-av big${none ? " none" : ""}${pulse}" role="img" aria-label="Lv ${lv.lv}">${inner}</div>`
+  return big ? `<button class="gr-av big${none ? " none" : ""}${pulse}" data-act="gr-look" aria-label="形象和名字（Lv ${lv.lv}）">${inner}</button>`
     : `<button class="gr-av${none ? " none" : ""}${pulse}" data-act="nav" data-v="gchar" aria-label="角色：Lv ${lv.lv}，再 ${lv.left} 经验值升级">${inner}</button>`;
 }
 function grAvatarLoad(){
-  const g = G(), redo = () => { const t = UI.top(); if (t && (t.name === "grow" || t.name === "gchar")) UI.render(); };
+  const g = G(), redo = () => { const t = UI.top(); if (t && (t.name === "grow" || t.name === "gchar")) UI.render(); if (GR_SHEET && GR_SHEET.t === "look") grLookSheet(); };
   if (g.av.mode === "img" && !GR_AV.loaded){ IDB.get("grow:av").then(v => { GR_AV = {img:v || null, loaded:true}; redo(); }).catch(() => { GR_AV.loaded = true; }); }
   if (g.av.mode === "char" && !GR_BAT_WAIT && typeof BAT_READY !== "undefined"){ GR_BAT_WAIT = true; BAT_READY.then(() => { if ((typeof BAT_LIST !== "undefined") && BAT_LIST.length) redo(); }).catch(() => {}); }
   const key = grFitKey(), src = grFaceSrc(); if (src && !g.av.fits[key] && !GR_FITAUTO[key]) grAutoFit(key, src).then(ok => { if (ok) redo(); });
@@ -16186,13 +16487,13 @@ VIEWS.grow = {
       const cls = best > 0 && got > best ? " best" : got >= goal ? " ok" : "", anim = fx && fx.a === a && !REDUCED;
       return `<div class="gr-bar${cls}" data-a="${a}"><span class="gr-lab">${GR_L[a]}</span><div class="t"><i style="width:${anim ? fx.from : pct}%"${anim ? ` data-to="${pct}"` : ""}></i></div><span class="v num">${got}/${goal}</span>${a === "english" ? `<button class="btn sm ghost" data-act="gr-en">练</button>` : `<button class="btn sm ghost" data-act="gr-log" data-v="${a}">记一笔</button>`}${anim && fx.xp ? `<span class="gr-fx num" aria-hidden="true">+${fx.xp}</span>` : ""}</div>`; };
     const pins = g.pins.map(id => grAct(id)).filter(Boolean);
-    const tiles = pins.length ? `<section class="panel gr-quickp"><div class="gr-h"><b>快速记</b></div><div class="gr-tiles">${pins.map(a => `<button class="gr-tile" data-act="gr-tap" data-v="${a.id}" style="--c:${GR_COLOR[a.a]}">${grIco(a.ic, "gr-ti")}<span>${esc(a.short || a.name)}</span><span class="gr-tx num">${a.mile ? "" : "+" + ((a.xp || 0) + (a.bx || 0))}</span></button>`).join("")}</div></section>` : "";
+    const tiles = pins.length ? `<section class="panel gr-quickp"><div class="gr-h"><b>快速记</b><button class="linkbtn small" data-act="gr-pins-edit">编辑</button></div><div class="gr-tiles">${pins.map(a => `<button class="gr-tile" data-act="gr-tap" data-v="${a.id}" style="--c:${GR_COLOR[a.a]}">${grIco(a.ic, "gr-ti")}<span>${esc(a.short || a.name)}</span><span class="gr-tx num">${a.mile ? "" : "+" + ((a.xp || 0) + (a.bx || 0))}</span></button>`).join("")}</div></section>` : "";
     const am = hr >= ds && hr < 12, morning = am ? g.acts.filter(a => a.morning && !g.log.some(e => e.d === d && e.k === a.id)) : [];
     const yd = nstr(dnum(d) - 1), back = am && g.log.some(e => e.d < d) && !g.log.some(e => e.d === yd && !e.mile && e.a !== "english");   /* 昨天什么都没记：给一个补记的入口 */
     const backBtn1 = back ? `<button class="linkbtn small" data-act="gr-back">补记昨天</button>` : "";
     const mRow = morning.length || back ? `<section class="panel gr-row"><div class="gr-h"><span class="small muted">早上</span>${backBtn1}</div>${morning.length ? `<div class="row-gap">${morning.map(a => `<button class="btn sm" data-act="gr-quick" data-v="${a.id}">${esc(grActName(a))}</button>`).join("")}</div>` : ""}</section>` : "";
     const md = g.mood[d] || 0;
-    const moodRow = g.moodOn && (hr >= 18 || hr < ds) ? `<section class="panel gr-row"><span class="small muted">今天心情</span><div class="gr-mood" role="group" aria-label="今天的心情">${[1, 2, 3, 4, 5].map(n => `<button data-act="gr-mood" data-v="${n}" aria-pressed="${md === n}">${n}</button>`).join("")}</div></section>` : "";
+    const moodRow = g.moodOn && (hr >= 18 || hr < ds) ? `<section class="panel gr-row"><span class="small muted">今天心情</span><div class="gr-mood" role="group" aria-label="今天的心情">${[1, 2, 3, 4, 5].map(n => `<button data-act="gr-mood" data-v="${n}" aria-pressed="${md === n}" aria-label="心情 ${n}"><span style="font-size:20px;line-height:1">${GR_MOOD_EMO[n]}</span><span class="small" style="display:block">${n}</span></button>`).join("")}</div></section>` : "";
     const doneN = items.filter(x => x.done).length;
     const fold = items.length ? `<details class="gr-plan" id="grPlan" ${L.grPlanOpen ? "open" : ""}><summary>今天的计划 ${doneN}/${items.length}</summary><div class="list" style="margin-top:6px">${items.map(x => planRowHTML(x, false)).join("")}</div><p class="small" style="margin:8px 4px 0"><button class="linkbtn small" data-act="nav" data-v="plan">我的计划</button></p></details>` : "";
     const up = grUpcoming();
@@ -16202,8 +16503,8 @@ VIEWS.grow = {
     const banners = `${installBanner()}${STORAGE_OK ? "" : `<div class="banner"><span>存储空间不够，进度没存上。先备份，再清理旧录音。</span><button class="btn sm primary" data-act="nav" data-v="storage">去看看</button></div>`}${typeof backupBanner === "function" ? backupBanner() : ""}${typeof nextIvBanner === "function" ? nextIvBanner() : ""}${resumeBanner()}`;
     return `<div class="wrap gr">
       <div class="gr-top"><div><div class="gr-date">${esc(fmtDate(d))}</div><div class="small muted gr-lvline">${g.name ? esc(g.name) + "　" : ""}Lv ${lv.lv}，再 ${lv.left} 升级</div></div>${grAvatarHTML(false)}</div>
-      ${banners}${review}${now1}
-      <section class="panel gr-week"><div class="gr-h"><b>本周经验值</b><span class="small muted">周一清零</span></div><div class="gr-bars">${GR_A.map(bar).join("")}</div></section>
+      ${banners}${review}${now1}${typeof jobGrowHTML === "function" ? jobGrowHTML() : ""}
+      <section class="panel gr-week"><div class="gr-h"><b>本周经验值</b><span class="small muted">周一清零 · <button class="linkbtn small" data-act="gr-weeks">以前几周</button></span></div><div class="gr-bars">${GR_A.map(bar).join("")}</div></section>
       ${tiles}${mRow}${moodRow}${fold}${cal}
       <p class="small gr-links"><button class="linkbtn small" data-act="nav" data-v="greview" data-wk="${rw || wk}">复盘</button><button class="linkbtn small" data-act="nav" data-v="gchar">角色</button></p>
     </div>`;
@@ -16247,6 +16548,9 @@ ACT["gr-back"] = async () => {
   const k = await choose(`补记昨天：${GR_L[a]}`, "", acts.map(x => [x.id, grActLabel(x)]).concat([["", "取消"]])); if (!k) return;
   const n = await grQty(grAct(k)); if (!n) return; growLog(k, n, {d:yd}); UI.render();
 };
+/* v1.69.5：从成长页直接打开“以前几周”“记一笔的选项” */
+ACT["gr-weeks"] = () => { GR_OPEN.weeks = true; UI.nav("gchar"); setTimeout(() => { const d = document.querySelector('details.gr-det[data-k="weeks"]'); if (d){ d.open = true; d.scrollIntoView({block:"start", behavior:"smooth"}); } }, 80); };
+ACT["gr-pins-edit"] = () => { GR_OPEN.acts = true; UI.nav("gchar"); setTimeout(() => { const d = document.querySelector('details.gr-det[data-k="acts"]'); if (d){ d.open = true; d.scrollIntoView({block:"start", behavior:"smooth"}); } }, 80); };
 ACT["gr-quick"] = el => { growLog(el.dataset.v, 1); UI.render(); };
 ACT["gr-mood"] = el => { const g = G(); g.mood[today()] = +el.dataset.v; save(); toast("记下了"); UI.render(); };
 ACT["gr-low"] = async () => {
@@ -16287,6 +16591,11 @@ function grRangeEn(wk){ const M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Ju
   return `${M[s.getUTCMonth()]} ${s.getUTCDate()}–${s.getUTCMonth() === e.getUTCMonth() ? "" : M[e.getUTCMonth()] + " "}${e.getUTCDate()}`; }
 function grCounts(sum, a){ const g = G(); return g.acts.filter(x => x.a === a && !x.mile && (sum.n || {})[x.id]).map(x => `${x.name} ×${sum.n[x.id]}`); }
 function grWeekLog(wk){ const a = dnum(wk); return G().log.filter(e => { const x = dnum(e.d); return x >= a && x < a + 7; }); }
+const GR_MOOD_EMO = {1:"😣", 2:"🙁", 3:"😐", 4:"🙂", 5:"😄"};   /* v1.69.5：每个心情配一个小表情 */
+function grMoodListHTML(wk){ const g = G(), a = dnum(wk), WD = "一二三四五六日"; let any = false;
+  const rows = Array.from({length:7}, (_, i) => { const v = g.mood[nstr(a + i)]; if (v) any = true; return `<div class="li" style="padding:6px 12px"><span class="grow">周${WD[i]}</span><span>${v ? `${GR_MOOD_EMO[v]} ${v}` : `<span class="muted">–</span>`}</span></div>`; }).join("");
+  if (!any) return ""; const ln = grMoodLine(wk), cmp = ln.includes("；") ? ln.slice(ln.indexOf("；") + 1) : "";
+  return `<div class="list" style="margin-top:6px">${rows}</div>${cmp ? `<p class="small muted" style="margin:6px 2px 0">${esc(cmp)}</p>` : ""}`; }
 function grMoodLine(wk){
   const g = G(), a = dnum(wk), WD = "一二三四五六日", t = dnum(today()); const days = [], withC = [], without = [];
   const logs = grWeekLog(wk);
@@ -16307,6 +16616,7 @@ function grReviewText(wk, en){
     `这是我在脱口“成长”里 ${grRange(wk)} 这一周的记录，请帮我复盘。今天是 ${d}。`, "",
     `经验值（本周 / 目标）：Career ${sum.career}/${goals.career}，English ${sum.english}/${goals.english}，Life ${sum.life}/${goals.life}`,
     `求职：${grCounts(sum, "career").join("；") || "没有记录"}`,
+    typeof jobWeekLine === "function" ? jobWeekLine(wk) : "",
     miles.length ? `好消息：${miles.map(m => m.nm.replace(/^好消息[:：]\s*/, "")).join("；")}` : "",
     `英语：在脱口里练了 ${Object.keys(sum.enDay || {}).length ? Object.values(sum.enDay).reduce((s, v) => s + v, 0) : sum.enMin || 0} 分钟（${enDays.join("、")}）${grCounts(sum, "english").length ? "；" + grCounts(sum, "english").join("；") : ""}`,
     `生活：${grCounts(sum, "life").join("；") || "没有记录"}`,
@@ -16343,7 +16653,7 @@ VIEWS.greview = {
     const row = a => `<div class="li"><div class="grow"><b>${GR_L[a]} ${sum[a] || 0}/${goals[a]}</b><span>${esc((a === "english" ? [`练了 ${sum.enMin || 0} 分钟`] : []).concat(grCounts(sum, a)).join("；") || "没有记录")}</span></div></div>`;
     const mood = grMoodLine(wk);
     return `<div class="wrap">${backBtn()}<h2>复盘</h2><p class="muted small" style="margin:4px 0 12px">${grRange(wk)}${cur ? "（这一周）" : ""}</p>
-      <div class="list">${GR_A.map(row).join("")}</div>${mood ? `<p class="small" style="margin:10px 2px 0">${esc(mood)}</p>` : ""}
+      <div class="list">${GR_A.map(row).join("")}</div>${mood ? `<p class="small" style="margin:12px 2px 0"><b>心情</b></p>${grMoodListHTML(wk)}` : ""}
       ${grDet("bulk", "补记这周", `<div class="gr-bulk">${GR_BULK.map(k => grAct(k)).filter(Boolean).map(a => `<label class="gr-inline">${esc(a.short || a.name)}<input type="number" min="0" max="${a.cap ? 7 : 50}" inputmode="numeric" data-bulk="${a.id}"></label>`).join("")}</div><button class="btn sm" style="margin-top:10px" data-act="gr-bulk">记上</button>`)}
       <div class="panel" style="margin-top:14px"><b>下周的建议目标</b>
         <p style="margin-top:6px"><span class="num">Career ${sug.career}，English ${sug.english}，Life ${sug.life}</span></p>
@@ -16379,7 +16689,9 @@ ACT["gr-goal-apply"] = el => { growSetGoals({career:+el.dataset.c, english:+el.d
 /* ---------- 角色页（v1.69.1）：上面是角色卡（形象、名字、等级、三栏），下面是技能 / 成就，再下面是收起的设置 ----------
    展开、收起记在内存里（GR_OPEN）：切到别的页再回来保持不变，关掉 app 再开恢复默认（技能展开，其余收起） */
 let GR_EDIT = null;   /* {t:"act"|"skill", id}（id 为空是新加） */
-let GR_OPEN = {}, GR_TAB = "skills", GR_NAME_EDIT = false, GR_SHEET = null;
+let GR_OPEN = {}, GR_TAB = "stage", GR_NAME_EDIT = false, GR_SHEET = null, GR_CHEER = false, GR_STAGE_A = null;
+/* 角色页下面按“记录、设置、AI”分组：同一组的几项挨在一个框里，用分隔线隔开 */
+const grRow = (k, title, body) => `<details class="gc-row gr-det" data-k="${k}" ${GR_OPEN[k] || (k === "acts" && GR_EDIT && GR_EDIT.t === "act") ? "open" : ""}><summary>${title}</summary><div class="gc-rowb">${body}</div></details>`;
 const grDet = (k, title, body, def) => { const open = GR_OPEN[k] != null ? GR_OPEN[k] : (!!def || (k === "acts" && GR_EDIT && GR_EDIT.t === "act")); return `<details class="panel gr-det" data-k="${k}" style="margin-top:12px" ${open || (k === "acts" && GR_EDIT && GR_EDIT.t === "act") ? "open" : ""}><summary>${title}</summary>${body}</details>`; };
 function grTitle(lv){
   const t = growTotal(); if (!t.all) return "新手冒险者";
@@ -16418,12 +16730,14 @@ function grRadar(sks){
   const labels = sks.map((s, i) => { const [x, y] = pt(i, R + 15), an = x < cx - 4 ? "end" : x > cx + 4 ? "start" : "middle"; return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${an}" class="gc-rt">${esc(s.name)}<tspan class="gc-rn" dx="3">${lvs[i]}</tspan></text>`; }).join("");
   return `<svg class="gc-radar" viewBox="0 0 ${W} ${H}" role="img" aria-label="技能分布">${grid}<polygon points="${poly}" class="gc-rp"/>${sks.map((_, i) => { const [x, y] = pt(i, R * Math.max(0.08, lvs[i] / mx)); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" class="gc-rd"/>`; }).join("")}${labels}</svg>`;
 }
+function grRadarIds(){ const g = G(), ids = Array.isArray(g.radar) ? g.radar.filter(id => grSkill(id)) : null; return ids && ids.length >= 3 ? ids : g.skills.map(s => s.id); }
 function grSkillsHTML(){
-  const g = G(), sks = g.skills;
+  const g = G(), sks = g.skills, rs = grRadarIds().map(grSkill).filter(Boolean);
   const tiles = sks.map(s => { const n = grSkillN(s), L2 = K.growSkillLevel(n), pct = Math.round(100 * L2.cur / L2.need);
     return `<button class="gc-skill" data-act="gr-skill" data-id="${s.id}" style="--c:${GR_COLOR[s.a]}">${grIco(s.ic || "star", "gc-ki")}<span class="gc-kn">${esc(s.name)}</span><span class="gc-kl num">Lv ${L2.lv}</span><span class="gc-kb"><i style="width:${pct}%"></i></span></button>`; }).join("");
   const form = GR_EDIT && GR_EDIT.t === "skill" ? grSkillForm(GR_EDIT.id ? grSkill(GR_EDIT.id) : null) : "";
-  return `${sks.length >= 3 ? grRadar(sks) : ""}<div class="gc-skills">${tiles}<button class="gc-skill gc-add" data-act="gr-sk-add">${grIco("star", "gc-ki")}<span class="gc-kn">加技能</span></button></div>${form}`;
+  const pick = sks.length > 3 ? `<div class="gc-rsel"><span class="small muted">分布图</span><button class="linkbtn small" data-act="gr-radar-pick">${rs.length === sks.length ? "全部" : `${rs.length} 个`}，换</button></div>` : "";
+  return `${pick}${rs.length >= 3 ? grRadar(rs) : ""}<div class="gc-skills">${tiles}<button class="gc-skill gc-add" data-act="gr-sk-add">${grIco("star", "gc-ki")}<span class="gc-kn">加技能</span></button></div>${form}`;
 }
 function grAchHTML(){
   const g = G();
@@ -16438,7 +16752,7 @@ function grLookHTML(){
   const src = grFaceSrc(), key = grFitKey(), f = grFitOf(key);
   const fit = src ? `<div class="gr-fitrow"><div class="gr-fitbox" id="grFit" data-key="${esc(key)}"><img id="grFitImg" src="${src}" style="${grFitCss(f)}" alt="" draggable="false"></div>
       <div class="gr-fitctl"><label class="small">缩放<input type="range" id="grFitZ" min="1" max="4" step="0.05" value="${(+f.z || 1).toFixed(2)}"></label><span class="small muted">拖动图片调位置</span><button class="btn sm ghost" data-act="gr-fit-reset">重置</button></div></div>` : "";
-  return `<label class="fld" style="margin-top:6px"><span>名字</span><input type="text" maxlength="16" data-chg="gr-name" value="${esc(g.name || "")}" placeholder="给角色起个名字"></label>
+  return `<label class="fld" style="margin-top:10px"><span>名字</span><input type="text" maxlength="16" data-chg="gr-name" value="${esc(g.name || "")}" placeholder="给角色起个名字"></label>
     <div class="seg" role="group" aria-label="形象" style="margin-top:12px">${[["char", "对战角色"], ["img", "自己的图片"], ["none", "不显示"]].map(([k, l]) => `<button data-act="gr-av-mode" data-v="${k}" aria-pressed="${m === k}">${l}</button>`).join("")}</div>
     ${m === "char" ? `<div class="gr-picks">${chars}</div>${list.length ? "" : `<p class="small muted">导入对战角色后可以在这里选</p>`}` : ""}
     ${m === "img" ? `<div class="row-gap" style="margin-top:10px"><label class="btn sm">选图片<input type="file" accept="image/*" data-chg="gr-av-file" style="display:none"></label>${GR_AV.img ? `<button class="btn sm ghost danger" data-act="gr-av-del">删除图片</button>` : ""}</div><p class="small muted" style="margin-top:6px">只存在这台手机上</p>` : ""}
@@ -16454,17 +16768,20 @@ VIEWS.gchar = {
     const hero = `<section class="gc-hero"><div class="gc-top">${grAvatarHTML(true)}<div class="gc-id">${nameHTML}<div class="gc-title"><span class="gc-lv num">Lv ${lv.lv}</span><span>${esc(grTitle(lv.lv))}</span></div>
         <div class="gc-xp" role="progressbar" aria-label="经验值" aria-valuemin="0" aria-valuemax="${lv.need}" aria-valuenow="${lv.cur}"><i style="width:${Math.round(100 * lv.cur / lv.need)}%"></i></div><div class="gc-xpn num">${lv.cur} / ${lv.need} 经验值</div></div></div>
       <div class="gc-stats">${GR_A.map(stat).join("")}</div></section>`;
-    const tab = GR_TAB === "ach" ? "ach" : "skills";
-    const tabs = `<div class="seg gc-tabs">${[["skills", "技能"], ["ach", `成就 ${grAchCount()}/${GR_ACH.length}`]].map(([k, l]) => `<button data-act="gr-tab" data-v="${k}" aria-pressed="${tab === k}">${l}</button>`).join("")}</div>`;
+    if (GR_EDIT && GR_EDIT.t === "skill") GR_TAB = "skills";
+    const tab = ["stage", "skills", "ach"].includes(GR_TAB) ? GR_TAB : "stage";
+    const tabs = `<div class="seg gc-tabs">${[["stage", "角色"], ["skills", "技能"], ["ach", `成就 ${grAchCount()}/${GR_ACH.length}`]].map(([k, l]) => `<button data-act="gr-tab" data-v="${k}" aria-pressed="${tab === k}">${l}</button>`).join("")}</div>`;
+    const tabBody = tab === "stage" ? grStageHTML() : tab === "skills" ? grSkillsHTML() : grAchHTML();
     const acts = GR_A.map(a => `<div class="gr-sec"><span class="small muted">${GR_L[a]}</span><div class="list">${grActRows(a)}</div></div>`).join("") + (GR_EDIT && GR_EDIT.t === "act" && !GR_EDIT.id ? grActForm(null) : `<div class="row-gap" style="margin-top:8px"><button class="btn sm ghost" data-act="gr-act-add">＋ 加一项</button><button class="btn sm ghost" data-act="gr-act-reset">恢复默认</button></div>`);
     const weeks = []; for (let i = 0; i < 8; i++) weeks.push(nstr(dnum(cur) - 7 * i));
     const wrows = weeks.map(w => { const x = growWeek(w); if (!(x.career || x.english || x.life) && w !== cur) return ""; const md = x.md ? (x.md[0] / x.md[1]).toFixed(1) : "–";
       return `<div class="li"><div class="grow"><b>${grRange(w)}${w === cur ? "（这周）" : ""}</b><span><span class="num">Career ${x.career}，English ${x.english}，Life ${x.life}</span>，心情 ${md}</span></div></div>`; }).join("");
-    const recent = g.log.slice(-30).reverse().map(e => `<div class="li"><div class="grow"><b>${esc(e.nm)}${e.n > 1 ? ` ×${e.n}` : ""}</b><span>${esc(fmtDate(e.d))}${e.xp + e.en ? `，+${e.xp + e.en}` : ""}</span></div><button class="linkbtn small" data-act="gr-undo" data-id="${e.id}">撤销</button></div>`).join("");
+    const recent = g.log.slice(-30).reverse().map(e => `<div class="li"><div class="grow"><b>${esc(e.nm)}${e.n > 1 ? ` ×${e.n}` : ""}</b><span>${esc(fmtDate(e.d))}${e.xp + e.en ? `，+${e.xp + e.en}` : ""}</span></div><button class="btn sm gr-undo-btn" data-act="gr-undo" data-id="${e.id}">撤销</button></div>`).join("");
     const b = g.base || {};
     const set = `<label class="fld" style="margin-top:6px"><span>起床时间</span><input type="time" data-chg="gr-wake" value="${esc(g.wake)}"></label>
       <div class="fld"><span>起点（之前一周）</span><div class="row-gap"><label class="gr-inline">投了<input type="number" min="0" max="99" inputmode="numeric" data-chg="gr-base" data-v="apply" value="${b.apply != null ? +b.apply : ""}">份</label><label class="gr-inline">联系了<input type="number" min="0" max="99" inputmode="numeric" data-chg="gr-base" data-v="msg" value="${b.msg != null ? +b.msg : ""}">人</label></div></div>
       <label class="switch"><span>晚上记心情</span><input type="checkbox" data-chg="gr-mood-on" ${g.moodOn ? "checked" : ""}></label>
+      <label class="switch"><span>记一笔时角色出来庆祝</span><input type="checkbox" data-chg="gr-cheer-on" ${g.cheerOn !== false ? "checked" : ""}></label>
       <div class="fld"><span>每天提醒我记一下</span><div class="row-gap"><input type="time" id="grRemind" value="${esc(g.remind || "22:30")}" style="width:auto"><button class="btn sm" data-act="gr-remind">加到日历</button></div></div>`;
     const goalsHTML = `<div class="gr-goals">${GR_A.map(a => `<label class="fld"><span>${GR_L[a]}</span><input type="number" min="5" max="999" inputmode="numeric" data-chg="gr-goal" data-v="${a}" value="${goals[a]}"></label>`).join("")}</div>${g.next ? `<p class="small muted">下周一起：Career ${g.next.career}，English ${g.next.english}，Life ${g.next.life}</p>` : ""}`;
     const rules = `<div class="small" style="line-height:1.8;margin-top:6px">
@@ -16474,39 +16791,103 @@ VIEWS.gchar = {
         <p>手机下床才够得着就行，不用放卧室外。</p>
         <p>没做的计划不扣分。好消息算成就，不算经验值。</p></div>`;
     return `<div class="wrap gr gc">${backBtn()}${hero}
-      ${grDet("skills", "技能和成就", tabs + (tab === "skills" ? grSkillsHTML() : grAchHTML()), true)}
-      ${grDet("look", "形象和名字", grLookHTML())}
-      ${grDet("goals", "每周目标", goalsHTML)}
-      ${grDet("set", "设置", set)}
-      ${grDet("acts", "记一笔的选项", `<p class="small muted" style="margin:6px 2px 0">★ 放在成长页的快速记里</p>` + acts)}
-      ${grDet("weeks", "最近几周", `<div class="list" style="margin-top:8px">${wrows}</div>`)}
-      ${recent ? grDet("recent", "最近的记录", `<div class="list" style="margin-top:8px">${recent}</div>`) : ""}
-      ${grDet("rules", "怎么算", rules)}
-      <div class="row-gap" style="margin-top:14px"><button class="btn" data-act="nav" data-v="greview" data-wk="${grReviewWeek() || cur}">复盘</button><button class="btn primary" data-act="gr-analyze">综合分析</button></div>
+      ${grDet("skills", "角色、技能和成就", tabs + tabBody, true)}
+      <p class="gc-gh">记录</p>
+      <div class="panel gc-group">${grRow("weeks", "最近几周", `<div class="list">${wrows}</div>`)}${recent ? grRow("recent", "最近的记录", `<div class="list">${recent}</div>`) : ""}</div>
+      <p class="gc-gh">设置</p>
+      <div class="panel gc-group">${grRow("goals", "每周目标", goalsHTML)}${grRow("set", "提醒和其他", set)}${grRow("acts", "记一笔的选项", `<p class="small muted" style="margin:0 2px">点 ★ 放进快速记（最多 8 个）</p>` + acts)}</div>
+      <p class="gc-gh">AI</p>
+      <div class="panel gc-group"><div class="gc-acts"><button class="btn" data-act="nav" data-v="greview" data-wk="${grReviewWeek() || cur}">复盘</button><button class="btn primary" data-act="gr-analyze">综合分析</button></div>${grRow("rules", "怎么算", rules)}</div>
     </div>`;
   },
   mount(){
     grAvatarLoad();
     document.querySelectorAll("details.gr-det[data-k]").forEach(d => d.addEventListener("toggle", () => { GR_OPEN[d.dataset.k] = d.open; }));
     const ni = $("#grName"); if (ni){ ni.focus(); ni.addEventListener("blur", () => { GR_NAME_EDIT = false; setTimeout(() => UI.render(), 0); }); ni.addEventListener("keydown", e => { if (e.key === "Enter") ni.blur(); }); }
-    /* 取景：拖动调位置，滑块调大小 */
-    const box = $("#grFit"), img = $("#grFitImg"), zr = $("#grFitZ");
-    if (box && img){
-      const key = box.dataset.key; let f = Object.assign({}, grFitOf(key)), st = null;
-      const show = () => { img.style.transform = grFitCss(f).replace(/^transform:/, ""); };
-      const keep = () => { const g = G(); g.av.fits[key] = {z:+(+f.z).toFixed(2), x:+(+f.x).toFixed(1), y:+(+f.y).toFixed(1)}; save(); const face = $(".gc-hero .gr-face-img"); if (face) face.style.transform = img.style.transform; };
-      box.addEventListener("pointerdown", e => { st = {x:e.clientX, y:e.clientY, fx:f.x, fy:f.y}; try { box.setPointerCapture(e.pointerId); } catch (er) {} });
-      box.addEventListener("pointermove", e => { if (!st) return; const w = box.clientWidth || 128; f.x = Math.max(-200, Math.min(200, st.fx + (e.clientX - st.x) / w * 100)); f.y = Math.max(-200, Math.min(200, st.fy + (e.clientY - st.y) / w * 100)); show(); });
-      const end = () => { if (!st) return; st = null; keep(); };
-      box.addEventListener("pointerup", end); box.addEventListener("pointercancel", end);
-      if (zr){ zr.addEventListener("input", () => { f.z = +zr.value; show(); }); zr.addEventListener("change", () => { f.z = +zr.value; keep(); }); }
-    }
+    grStageMount();
   }
 };
 ACT["gr-tab"] = el => { GR_TAB = el.dataset.v; UI.render(); };
+/* 角色小舞台：实验室的背景（自己画的），对战角色站在中间摆起手式；记一笔或点一下，播一遍胜利的动作。
+   自己的图片、不显示：做成实验室里的全息投影（图片或等级），庆祝时跳一下、闪一下 */
+const GR_LAB_SVG = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200' preserveAspectRatio='xMidYMid slice'><defs><linearGradient id='w' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#1b1638'/><stop offset='1' stop-color='#101a2d'/></linearGradient><radialGradient id='p' cx='.5' cy='.5' r='.5'><stop offset='0' stop-color='#8e5bff' stop-opacity='.6'/><stop offset='1' stop-color='#8e5bff' stop-opacity='0'/></radialGradient><pattern id='g' width='20' height='20' patternUnits='userSpaceOnUse'><path d='M20 0H0V20' fill='none' stroke='#fff' stroke-opacity='.05'/></pattern></defs><rect width='300' height='200' fill='url(#w)'/><rect width='300' height='152' fill='url(#g)'/><rect x='105' y='0' width='90' height='3' fill='#fff' fill-opacity='.1'/><path d='M0 152H300V200H0z' fill='#0c1322'/><path d='M0 152H300' stroke='#8e5bff' stroke-opacity='.4'/><g stroke='#fff' stroke-opacity='.06'><path d='M150 152L40 200M150 152L260 200M150 152L-70 200M150 152L370 200'/><path d='M0 167H300M0 184H300'/></g><rect x='16' y='34' width='76' height='50' rx='4' fill='#101c33' stroke='#5fd4ff' stroke-opacity='.5'/><path d='M23 72l10-8 9 4 10-14 10 6 10-12 13 8' fill='none' stroke='#5fd4ff' stroke-width='2' stroke-opacity='.85'/><path d='M23 78h62' stroke='#5fd4ff' stroke-opacity='.25'/><rect x='48' y='84' width='12' height='16' fill='#101c33'/><path d='M212 62h74M212 104h74' stroke='#fff' stroke-opacity='.13'/><rect x='218' y='46' width='8' height='16' rx='2' fill='#5fd4ff' fill-opacity='.55'/><path d='M234 62l4-14h4l4 14z' fill='#c4a1ff' fill-opacity='.6'/><circle cx='260' cy='55' r='7' fill='#45d493' fill-opacity='.45'/><rect x='272' y='48' width='6' height='14' rx='2' fill='#f2b544' fill-opacity='.5'/><rect x='222' y='88' width='16' height='16' rx='3' fill='#5fd4ff' fill-opacity='.3'/><path d='M248 104l5-16h4l5 16z' fill='#45d493' fill-opacity='.45'/><circle cx='274' cy='96' r='8' fill='#c4a1ff' fill-opacity='.4'/><ellipse cx='150' cy='178' rx='76' ry='13' fill='url(#p)'/><ellipse cx='150' cy='178' rx='50' ry='8' fill='none' stroke='#b98cff' stroke-opacity='.7'/><ellipse cx='150' cy='178' rx='32' ry='5' fill='none' stroke='#5fd4ff' stroke-opacity='.5'/></svg>`;
+const GR_LAB = `url("data:image/svg+xml,${encodeURIComponent(GR_LAB_SVG).replace(/'/g, "%27")}")`;   /* 单引号也要编码：它放在 style='…' 里 */
+function grHoloHTML(){
+  const g = G(), src = grFaceSrc(), lv = K.growLevel(growTotal().all).lv;
+  const inner = g.av.mode === "img" && src ? `<img src="${src}" style="${grFitCss(grFitOf(grFitKey()))}" alt="">` : `<span class="num">Lv ${lv}</span>`;
+  return `<div class="gc-holo"><div class="gc-holo-face">${inner}</div><div class="gc-holo-beam"></div></div>`;
+}
+function grStageHTML(){
+  const g = G(), arena = g.av.mode === "char" && typeof BT !== "undefined";
+  return `<div class="gc-stagewrap"><button class="gc-stagebtn" data-act="gr-cheer" aria-label="播一遍庆祝的动作">${arena ? `<div class="gc-stage" id="gcStage" style='background-image:${GR_LAB}'></div>` : `<div class="gc-stage gc-holostage" id="gcHolo" style='background-image:${GR_LAB}'>${grHoloHTML()}</div>`}</button>
+    <p class="small muted gc-stagecap">点一下看庆祝的动作</p></div>`;
+}
+let GR_REC = {};
+async function grStageRec(){
+  const g = G(), id = g.av.char || L.batActive || "rig"; if (id === "rig") return null; if (id in GR_REC) return GR_REC[id];
+  let rec = null; try { if (typeof BAT_READY !== "undefined") await BAT_READY; rec = (await IDB.get("battle:char:" + id)) || null; } catch (e) {} GR_REC[id] = rec; return rec;
+}
+async function grArena(el){
+  const rec = await grStageRec(); if (!el || !el.isConnected || typeof BT === "undefined") return null;
+  const A = BT.makeArena(el); A.setOpt({charSize:0.64, spots:[0.1, 0.5], place:"street", giant:false});
+  el.insertAdjacentHTML("afterbegin", `<div class="gc-labbg" aria-hidden="true" style='background-image:${GR_LAB}'></div>`);   /* 舞台自己会改背景，实验室画在最底下单独一层 */
+  A.setChar(rec ? BT.rebuild(rec) : null, BT.metaOf(rec || null, false)); if (A.setNight) A.setNight(false);
+  try { A.setNames("", ""); A.setScore(""); } catch (e) {}
+  return A;
+}
+function grCheerA(A){ if (!A) return; try { const p = A.cheer(); setTimeout(() => { try { if (A.root.isConnected && A.youIdle) A.youIdle(); } catch (e) {} }, 1900); return p; } catch (e) {} }
+function grHoloCheer(root){ const h = root && root.querySelector(".gc-holo"); if (!h) return; h.classList.remove("cheer"); void h.offsetWidth; h.classList.add("cheer"); }
+function grStageMount(){
+  const st = $("#gcStage"), ho = $("#gcHolo"); GR_STAGE_A = null;
+  if (st) grArena(st).then(A => { GR_STAGE_A = A; if (GR_CHEER && A){ GR_CHEER = false; grCheerA(A); } }).catch(() => {});
+  if (ho && GR_CHEER){ GR_CHEER = false; grHoloCheer(ho); }
+}
+ACT["gr-cheer"] = () => { const ho = $("#gcHolo"); if (ho) return grHoloCheer(ho); if (GR_STAGE_A && GR_STAGE_A.root.isConnected) grCheerA(GR_STAGE_A); };
+/* 在成长页记一笔：角色从下面出来庆祝一下（2.6 秒，不挡点击）；“提醒和其他”里可以关 */
+let GR_POP = null;
+function grPopClose(){ if (!GR_POP) return; clearTimeout(GR_POP.t); try { if (GR_POP.A) GR_POP.A.dispose(); } catch (e) {} GR_POP.el.remove(); GR_POP = null; }
+async function grCelebrate(xp){
+  const g = G(); if (g.cheerOn === false || REDUCED) return;
+  grPopClose();
+  const el = document.createElement("div"); el.className = "gr-pop"; el.setAttribute("aria-hidden", "true");
+  el.innerHTML = `<div class="gc-stage gr-pop-stage" style='background-image:${GR_LAB}'></div>${xp ? `<b class="num">+${xp}</b>` : ""}`;
+  document.body.appendChild(el); const st = el.querySelector(".gr-pop-stage"), me = {el, A:null, t:setTimeout(grPopClose, 2600)}; GR_POP = me;
+  if (g.av.mode === "char" && typeof BT !== "undefined"){ try { const A = await grArena(st); if (GR_POP === me && A){ me.A = A; grCheerA(A); } else if (A) A.dispose(); } catch (e) {} }
+  else { st.classList.add("gc-holostage"); st.innerHTML = grHoloHTML(); requestAnimationFrame(() => grHoloCheer(st)); }
+}
+/* 形象和名字：在角色卡上点形象打开 */
+function grLookSheet(){ GR_SHEET = {t:"look"}; grSheet(`<h3>形象和名字</h3>${grLookHTML()}`); grFitBind(document.querySelector(".gr-sheet-bg")); }
+function grLookRefresh(){ UI.render(); if (GR_SHEET && GR_SHEET.t === "look") grLookSheet(); }
+ACT["gr-look"] = () => grLookSheet();
+/* 取景：拖动调位置，滑块调大小 */
+function grFitBind(root){
+  const box = root && root.querySelector("#grFit"), img = root && root.querySelector("#grFitImg"), zr = root && root.querySelector("#grFitZ"); if (!box || !img) return;
+  const key = box.dataset.key; let f = Object.assign({}, grFitOf(key)), st = null;
+  const show = () => { img.style.transform = grFitCss(f).replace(/^transform:/, ""); };
+  const keep = () => { const g = G(); g.av.fits[key] = {z:+(+f.z).toFixed(2), x:+(+f.x).toFixed(1), y:+(+f.y).toFixed(1)}; save(); document.querySelectorAll(".gr-av .gr-face-img, .gc-holo-face img").forEach(x => { x.style.transform = img.style.transform; }); };
+  box.addEventListener("pointerdown", e => { st = {x:e.clientX, y:e.clientY, fx:f.x, fy:f.y}; try { box.setPointerCapture(e.pointerId); } catch (er) {} });
+  box.addEventListener("pointermove", e => { if (!st) return; const w = box.clientWidth || 128; f.x = Math.max(-200, Math.min(200, st.fx + (e.clientX - st.x) / w * 100)); f.y = Math.max(-200, Math.min(200, st.fy + (e.clientY - st.y) / w * 100)); show(); });
+  const end = () => { if (!st) return; st = null; keep(); };
+  box.addEventListener("pointerup", end); box.addEventListener("pointercancel", end);
+  if (zr){ zr.addEventListener("input", () => { f.z = +zr.value; show(); }); zr.addEventListener("change", () => { f.z = +zr.value; keep(); }); }
+}
+/* 分布图显示哪些技能（至少 3 个） */
+function grRadarSheet(){
+  GR_SHEET = {t:"radar"}; const g = G(), sel = new Set(grRadarIds());
+  grSheet(`<h3>分布图显示哪些技能</h3><div class="gc-chips">${g.skills.map(s => `<button class="gc-chip${sel.has(s.id) ? " on" : ""}" data-act="gr-radar-tog" data-id="${s.id}" aria-pressed="${sel.has(s.id)}">${esc(s.name)}</button>`).join("")}</div>
+    <div class="row-gap" style="margin-top:12px"><button class="btn sm" data-act="gr-radar-all">全部</button><span class="small muted">至少 3 个</span></div>`);
+}
+ACT["gr-radar-pick"] = () => grRadarSheet();
+ACT["gr-radar-tog"] = el => {
+  const g = G(), id = el.dataset.id; let ids = grRadarIds().slice();
+  if (ids.includes(id)){ if (ids.length <= 3){ toast("至少留 3 个"); return; } ids = ids.filter(x => x !== id); } else ids.push(id);
+  g.radar = ids.length === g.skills.length ? null : g.skills.map(s => s.id).filter(x => ids.includes(x)); save(); UI.render(); grRadarSheet();
+};
+ACT["gr-radar-all"] = () => { G().radar = null; save(); UI.render(); grRadarSheet(); };
+CHG["gr-cheer-on"] = el => { const g = G(); g.cheerOn = !!el.checked; save(); };
 ACT["gr-name-edit"] = () => { GR_NAME_EDIT = true; UI.render(); };
 CHG["gr-name"] = el => { const g = G(); g.name = String(el.value || "").trim().slice(0, 16); save(); };
-ACT["gr-fit-reset"] = () => { const g = G(), key = grFitKey(); delete g.av.fits[key]; save(); UI.render(); };
+ACT["gr-fit-reset"] = () => { const g = G(), key = grFitKey(); delete g.av.fits[key]; save(); grLookRefresh(); };
 ACT["gr-pin"] = el => { const g = G(), id = el.dataset.id; if (g.pins.includes(id)) g.pins = g.pins.filter(x => x !== id); else { if (g.pins.length >= 8){ toast("快速记最多放 8 个"); return; } g.pins.push(id); } save(); UI.render(); };
 /* 每天提醒：一个每天重复的日历日程（PWA 自己没法定时提醒） */
 function grIcsDaily(hm){
@@ -16558,14 +16939,14 @@ ACT["gr-skill"] = el => grSkillSheet(el.dataset.id);
 ACT["gr-stat"] = el => grStatSheet(el.dataset.v);
 ACT["gr-ach"] = el => grAchSheet(el.dataset.id);
 ACT["gr-sheet-log"] = el => { growLog(el.dataset.v, 1); UI.render(); if (GR_SHEET && GR_SHEET.t === "skill") grSkillSheet(GR_SHEET.id); };
-ACT["gr-av-mode"] = el => { const g = G(); g.av.mode = el.dataset.v; save(); UI.render(); };
-ACT["gr-av-char"] = el => { const g = G(); g.av.char = el.dataset.v; g.av.mode = "char"; save(); UI.render(); };
+ACT["gr-av-mode"] = el => { const g = G(); g.av.mode = el.dataset.v; save(); grLookRefresh(); if (el.dataset.v === "img" && !GR_AV.loaded) grAvatarLoad(); };
+ACT["gr-av-char"] = el => { const g = G(); g.av.char = el.dataset.v; g.av.mode = "char"; save(); grLookRefresh(); grAvatarLoad(); };
 CHG["gr-av-file"] = async el => {
   const f = el.files && el.files[0]; el.value = ""; if (!f) return;
-  try { const url = await grSquare(f, 256); await IDB.put("grow:av", url); GR_AV = {img:url, loaded:true}; const g = G(); g.av.mode = "img"; delete g.av.fits.img; save(); toast("换好了"); UI.render(); }
+  try { const url = await grSquare(f, 256); await IDB.put("grow:av", url); GR_AV = {img:url, loaded:true}; const g = G(); g.av.mode = "img"; delete g.av.fits.img; save(); toast("换好了"); grLookRefresh(); }
   catch (e) { toast("读不了这张图片，换一张试试"); }
 };
-ACT["gr-av-del"] = async () => { if (!await sheet("删除这张图片？", "形象换回对战角色。", "删除", true)) return; await IDB.del("grow:av"); GR_AV = {img:null, loaded:true}; const g = G(); g.av.mode = "char"; delete g.av.fits.img; save(); UI.render(); };
+ACT["gr-av-del"] = async () => { if (!await sheet("删除这张图片？", "形象换回对战角色。", "删除", true)) return; await IDB.del("grow:av"); GR_AV = {img:null, loaded:true}; const g = G(); g.av.mode = "char"; delete g.av.fits.img; save(); grLookRefresh(); };
 CHG["gr-goal"] = el => { const v = Math.max(5, Math.min(999, Math.round(+el.value || 0))); const g = G(); g.goals[el.dataset.v] = v; save(); toast("改好了"); };
 CHG["gr-wake"] = el => { if (!/^\d{2}:\d{2}$/.test(el.value)) return; const g = G(); g.wake = el.value; save(); toast("改好了"); };
 CHG["gr-base"] = el => { const g = G(); g.base = Object.assign({}, g.base || {}); const v = el.value === "" ? null : Math.max(0, Math.min(99, Math.round(+el.value || 0))); if (v == null) delete g.base[el.dataset.v]; else g.base[el.dataset.v] = v; save(); };
@@ -16656,6 +17037,719 @@ function growApplyImport(r){
   if ((r.growGoals || []).length){ const o = {}; for (const x of r.growGoals) o[x.a] = x.n; growSetGoals(o); ch = true; }
   if (ch){ grUps(); save(); }
 }
+
+/* 脱口 · 求职（v1.70.0）：底部“面试”标签升级成“求职”，页内分四段：今天 / 投递 / 准备 / 复盘。
+   规则和依据见 DEVNOTES “求职页（v1.70.0）”。打包时放在 grow.js 后面：要包一层 showSummary、startSession、ivRunQs、iv-solo */
+"use strict";
+
+/* ---------- 基础数据 ---------- */
+const JOB_TRACKS = [["cs", "控制"], ["rd", "测试 / R&D"], ["me", "机械"], ["golf", "高尔夫"], ["other", "其他"]];
+const JOB_TL = {cs:"控制", rd:"测试 / R&D", me:"机械", golf:"高尔夫", other:"其他", all:"通用"};
+const JOB_ST = [["draft", "准备投"], ["applied", "已投"], ["screen", "电话初筛"], ["interview", "面试中"], ["offer", "offer"], ["rejected", "被拒"], ["failed", "面试没过"], ["dropped", "不投了"]];
+const JOB_SL = Object.fromEntries(JOB_ST);
+const JOB_STALE = 28;   /* 投了 4 周还没动静：归到“没回音”（自己定的规则，不是研究结论） */
+const JOB_GROUPS = [["live", "面试中"], ["wait", "等待回音"], ["stale", "没回音"], ["draft", "准备投"], ["ended", "已结束"]];
+const JOB_QUICK = [["screen", "约了电话初筛"], ["interview", "进了下一轮"], ["offer", "拿到 offer"], ["rejected", "被拒"], ["failed", "面试没过"], ["dropped", "不投了"]];
+/* 约到面试后 72 小时内要做的事（总纲【十一】） */
+const JOB_CHK = ["问清形式：多长时间、和谁面、要不要讲项目或做题", "JD 逐条配一个证据、故事或缺口答法", "看官网的产品和新闻、面试官的 LinkedIn", "选 2–3 个最对口的项目，准备讲解", "补这家公司要的领域知识", "定 3 个反问；过一遍签证、薪资、到岗的说法", "用无痕窗口打开作品集链接，确认能看、是对应的版本"];
+const JOB_ROUNDS = [["screen", "电话初筛"], ["hm", "招聘经理"], ["tech", "技术面"], ["onsite", "现场面"], ["other", "其他"]];
+const JOB_SKIP_DECK = /coffee|chat|社交|闲聊|networking|实验室|组会/i;
+
+function JB(){
+  const j = S.job || (S.job = {});
+  if (!Array.isArray(j.apps)) j.apps = [];
+  if (!Array.isArray(j.debriefs)) j.debriefs = [];
+  if (!j.ivSec || typeof j.ivSec !== "object" || Array.isArray(j.ivSec)) j.ivSec = {};
+  return j;
+}
+const jobRid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const jobNorm = x => String(x || "").toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/g, "");
+function jobFindApp(a){ const c = jobNorm(a.co), r = jobNorm(a.role); return JB().apps.find(x => jobNorm(x.co) === c && jobNorm(x.role) === r) || null; }
+const jobApp = id => JB().apps.find(x => x.id === id) || null;
+function jobDays(a){ return a && a.d ? dnum(today()) - dnum(a.d) : null; }
+function jobGroup(a){
+  if (["screen", "interview", "offer"].includes(a.st)) return "live";
+  if (["rejected", "failed", "dropped"].includes(a.st)) return "ended";
+  if (a.st === "draft") return "draft";
+  const n = jobDays(a); return n != null && n >= JOB_STALE ? "stale" : "wait";
+}
+const jobSent = a => !["draft", "dropped"].includes(a.st);
+const jobHadIv = a => ["screen", "interview", "offer", "failed"].includes(a.st) || !!a.ivEver;
+const jobTrackMap = t => t === "golf" ? "rd" : t;   /* 高尔夫公司的岗位练习时按测试 / R&D 算 */
+const jobShort = (s, n) => { s = String(s || ""); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
+
+/* 改状态：记进经过；第一次约到面试、进下一轮、拿到 offer 时，成长页记一个里程碑（导入时不记） */
+function jobSetStatus(a, st, note, quiet){
+  if (!a || !JOB_SL[st] || a.st === st) return;
+  const was = a.st; a.st = st; a.hist = a.hist || []; a.hist.push({d:today(), st, note:note || ""}); a.ts = Date.now();
+  if (["screen", "interview", "offer"].includes(st)) a.ivEver = true;
+  if (quiet || typeof growLog !== "function") return;
+  const live = ["screen", "interview", "offer"];
+  if ((st === "screen" || st === "interview") && !live.includes(was)) growLog("good", 1, {quiet:true});
+  else if (st === "interview" && was === "screen") growLog("next", 1, {quiet:true});
+  if (st === "offer") growLog("offer", 1, {quiet:true});
+}
+
+/* ---------- 导入 ---------- */
+function jobApplyImport(r){
+  const j = JB(); let nNew = 0, nUp = 0;
+  for (const a of (r.apps || [])){
+    const x = jobFindApp(a);
+    if (x){
+      for (const k of ["track", "tier", "src", "res"]) if (a[k]) x[k] = a[k];
+      if (a.d){ x.d = a.d; x.dApprox = !!a.dApprox; }
+      if (a.note && !(x.note || "").includes(a.note)) x.note = x.note ? x.note + "\n" + a.note : a.note;
+      if (a.st && a.st !== x.st) jobSetStatus(x, a.st, "导入", true);
+      nUp++;
+    } else {
+      const y = Object.assign({id:"a" + jobRid(), ts:Date.now(), hist:[{d:today(), st:a.st, note:"导入"}]}, a);
+      if (["screen", "interview", "offer", "failed"].includes(a.st)) y.ivEver = true;
+      j.apps.push(y); nNew++;
+    }
+  }
+  S.qmeta = S.qmeta || {};
+  for (const t of (r.qtags || [])){ const m = S.qmeta[t.qid] = S.qmeta[t.qid] || {}; m.pri = t.pri; if (t.track) m.track = t.track; if (t.co) m.co = t.co; }
+  for (const c of (r.checks || [])){ const m = S.qmeta[c.qid] = S.qmeta[c.qid] || {}; m.chk = m.chk || []; if (!m.chk.some(x => x.t === c.text)) m.chk.push({t:c.text, ok:false}); }
+  for (const x of (r.real || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.real = {co:x.co, d:x.d}; }
+  for (const x of (r.explains || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.ex = x.text; }
+  return {nNew, nUp};
+}
+
+/* ---------- 题目：优先级、方向、公司、待确认 ---------- */
+const jobQM = q => (S.qmeta || {})[q.id] || {};
+function jobCoDeck(deck){ const d = jobNorm(deck); if (!d) return null; return JB().apps.find(a => a.co && jobNorm(a.co).length >= 3 && d.includes(jobNorm(a.co))) || null; }
+function jobPri(q){ const m = jobQM(q); if (m.pri) return m.pri; if (q.deck && jobCoDeck(q.deck)) return "P3"; return ["first", "screen", "ask"].includes(qRole(q)) ? "P0" : "P1"; }
+function jobTrackOf(q){ const m = jobQM(q); if (m.track) return m.track; const d = String(q.deck || ""); if (/控制|自动化|controls?/i.test(d)) return "cs"; if (/测试|R&D|研发/i.test(d)) return "rd"; if (/机械|mechanical/i.test(d)) return "me"; return "all"; }
+function jobCoOf(q){ const m = jobQM(q); if (m.co) return m.co; const a = q.deck ? jobCoDeck(q.deck) : null; return a ? a.co : ""; }
+const jobChecksOpen = q => (jobQM(q).chk || []).filter(x => !x.ok);
+const jobUsable = q => !!q && !JOB_SKIP_DECK.test(q.deck || "") && !!(refFor(q) || written(q));
+/* 有了自己导入的面试题（5 道以上），就只练自己的；英语练习里也不再插面试题，统一到这里 */
+function jobOwnsIv(){ return (S.customQ || []).filter(q => jobUsable(q) && !jobIsKnow(q)).length >= 5; }
+/* 知识卡（题库名以“知识”开头）先在“知识复习”里学懂：复习对两次（盒子 ≥ 2）以后，才进每天的面试练习，用英文说 */
+function jobPool(){ const own = (S.customQ || []).filter(q => jobUsable(q) && (!jobIsKnow(q) || jobKnowLearned(q))); return own.length >= 5 ? own : allQuestions().filter(q => jobUsable(q) && !jobIsKnow(q)); }
+function jobAllChecks(){ const out = []; for (const [qid, m] of Object.entries(S.qmeta || {})) (m.chk || []).forEach((c, i) => { if (!c.ok && QBY[qid]) out.push({qid, i, t:c.t, q:QBY[qid]}); }); return out; }
+
+/* 准备度（successive relearning）：同一题在 3 次不同时间（隔 2 小时以上）都打了“还行”或更好才算达标；有待确认的不算 */
+function jobReady(qid){
+  const ev = [];
+  for (const c of (S.calls || [])) if (c.segs && c.rate && c.rate[qid]) ev.push({ts:c.ts, r:c.rate[qid]});
+  for (const e of ((S.soloRate || {})[qid] || [])) ev.push(e);
+  ev.sort((a, b) => a.ts - b.ts); let n = 0, last = -Infinity;
+  for (const e of ev) if ((e.r === "good" || e.r === "great") && e.ts - last >= 2 * 3600e3){ n++; last = e.ts; }
+  const a = (S.answers || {})[qid] || {};
+  return {n:Math.min(n, 3), lastR: ev.length ? ev[ev.length - 1].r : "", lastTs: Math.max(ev.length ? ev[ev.length - 1].ts : 0, a.lastAt || 0)};
+}
+const jobIsReady = q => jobReady(q.id).n >= 3 && !jobChecksOpen(q).length;
+/* 某个时间戳在 app 里算哪一天（一天从凌晨 dayStart 点开始） */
+function jobDayOf(ts){ const h = (S.settings && +S.settings.dayStart) || 0; return dnum(dstr(new Date(ts - h * 3600e3))); }
+
+/* ---------- 面试安排 ---------- */
+function jobUpcoming(){ const d = today(); return (S.interviews || []).filter(x => x.date >= d).sort((a, b) => (a.date + (a.time || "")) < (b.date + (b.time || "")) ? -1 : 1); }
+/* 这道题和哪一场面试有关：离那一场还有几天（没有就是 null） */
+function jobIvRel(q){
+  let best = null; const pri = jobPri(q), tr = jobTrackOf(q), co = jobCoOf(q);
+  for (const iv of jobUpcoming()){
+    const app = iv.app ? jobApp(iv.app) : null, days = dnum(iv.date) - dnum(today());
+    const rel = pri === "P0" || (iv.deck && iv.deck === "u:" + q.deck) || (co && app && jobNorm(co) === jobNorm(app.co)) || (!!app && pri !== "P3" && (tr === "all" || tr === jobTrackMap(app.track)));
+    if (rel && (best == null || days < best)) best = days;
+  }
+  return best;
+}
+function jobOnInterview(appId, name){
+  const a = jobApp(appId); if (!a) return;
+  if (["draft", "applied"].includes(a.st)) jobSetStatus(a, /初筛|电话|phone|recruiter|screen/i.test(name || "") ? "screen" : "interview", name || "");
+  else if (a.st === "screen" && !/初筛|电话|phone|recruiter|screen/i.test(name || "")) jobSetStatus(a, "interview", name || "");
+}
+function jobAppOptionsHTML(sel){
+  const order = {live:0, wait:1, stale:2, draft:3, ended:4};
+  return JB().apps.slice().sort((a, b) => order[jobGroup(a)] - order[jobGroup(b)] || String(a.co).localeCompare(String(b.co))).map(a => `<option value="${esc(a.id)}"${a.id === sel ? " selected" : ""}>${esc(jobShort(a.co + (a.role ? "，" + a.role : ""), 42))}</option>`).join("");
+}
+
+/* ---------- 每天的面试练习怎么排（总纲【一】：出现频率 × 现在的差距 × 离面试多远） ---------- */
+/* 每个方向在“面试中 + 等待回音”的投递里占多少 */
+function jobShares(){
+  const n = {cs:0, rd:0, me:0};
+  for (const a of JB().apps){ if (!["live", "wait"].includes(jobGroup(a))) continue; const t = jobTrackMap(a.track); if (n[t] != null) n[t]++; }
+  const tot = n.cs + n.rd + n.me; const out = {}; for (const k of Object.keys(n)) out[k] = tot ? n[k] / tot : 1 / 3; return out;
+}
+const jobEst = q => Math.min(240, (q.sec || 60) + 40);   /* 听题、回答、看回放打分，一道题大约多久（秒） */
+function jobScore(q, sh){
+  const pri = jobPri(q), tr = jobTrackOf(q), rd = jobReady(q.id), ready = rd.n >= 3 && !jobChecksOpen(q).length, N = jobIvRel(q);
+  let F;   /* 重要度 */
+  if (pri === "P3"){ if (N == null) return null; F = 3; }
+  else if (pri === "P0") F = 3 * (["all", "other", "golf"].includes(tr) ? 1 : 0.4 + (sh[tr] || 0));
+  else if (pri === "P2") F = 1.5;
+  else F = tr === "all" || tr === "other" ? 1.6 : 2 * Math.max(0.3, sh[jobTrackMap(tr)] || 0);
+  if (jobQM(q).real) F *= 1.5;   /* 真题 */
+  if (qRole(q) === "first") F *= 1.3;   /* 自我介绍：几乎每场第一题 */
+  const G = ready ? 0.3 : rd.lastR === "again" ? 1 : rd.lastR === "hard" ? 0.85 : [1, 0.7, 0.5][rd.n] || 0.5;   /* 差距 */
+  const U = N != null && N <= 14 ? 1 + 3 / (N + 1) : 1;   /* 紧迫度 */
+  /* 到期没有：没达标的一天最多一次（分开几次各想起来一次，比一次连说几遍记得牢）；
+     达标的隔 7 天；约了面试，隔离面试天数的四分之一（1–7 天），最后一次自然落在面试前一天 */
+  const tn = dnum(today()), lastDay = rd.lastTs ? jobDayOf(rd.lastTs) : -Infinity;
+  const dv = (S.ivDue || {})[q.id], due = !!(dv && dv.due <= tn);
+  const gap = ready ? (N != null ? Math.max(1, Math.min(7, Math.round(N / 4))) : 7) : 1;
+  if (!due && tn - lastDay < gap) return null;
+  return {q, s:F * G * U * (due ? 1.3 : 1), pri, tr, ready, N};
+}
+const jobLong = q => (q.sec || 60) >= 60;   /* 讲经历、讲项目的长回答 */
+/* 一轮的搭配：每场都会问的先上（自我介绍优先，15 分钟最多 4 道），再 1–2 个故事，再技术和快答；还有时间再补。
+   同一个问法（三个方向的自我介绍、缺点）一轮只练一个 */
+function jobPlan(budget){
+  const sh = jobShares(); const all = jobPool().map(q => jobScore(q, sh)).filter(Boolean).sort((a, b) => b.s - a.s);
+  const fam = x => jobNorm((x.q.v || [])[0] || x.q.id);
+  const pick = [], fams = new Set(); let t = 0, nP0 = 0, nLong = 0;
+  const can = x => !pick.includes(x) && !fams.has(fam(x)) && t + jobEst(x.q) <= budget;
+  const take = x => { pick.push(x); fams.add(fam(x)); t += jobEst(x.q); if (x.pri === "P0") nP0++; else if (jobLong(x.q)) nLong++; };
+  const p0max = budget <= 360 ? 2 : budget <= 900 ? 4 : 6, longMax = budget <= 360 ? 1 : 2;
+  for (const x of all) if (x.pri === "P0" && nP0 < p0max && (can(x) || (!pick.length && !fams.has(fam(x))))) take(x);
+  for (const x of all) if (x.pri !== "P0" && jobLong(x.q) && nLong < longMax && can(x)) take(x);
+  for (const x of all) if (x.pri !== "P0" && !jobLong(x.q) && can(x)) take(x);
+  for (const x of all) if (can(x)) take(x);
+  const rank = x => x.pri === "P0" ? 0 : x.pri === "P3" ? 1 : jobLong(x.q) ? 2 : 3;
+  pick.sort((a, b) => rank(a) - rank(b) || b.s - a.s);
+  return {items:pick, sec:t, due:all.length};
+}
+/* 每天的量：自己定了就用自己的；没定，按过去两周实际练过的日子平均多加两成（规划谬误：按过去的实际定，比按理想定准） */
+function jobBudget(){
+  const j = JB(); if (+j.budget > 0) return +j.budget * 60;
+  return jobAutoBudget();
+}
+function jobAutoBudget(){
+  const j = JB(), tn = dnum(today()), days = [];
+  for (let i = 1; i <= 14; i++){ const v = +j.ivSec[nstr(tn - i)] || 0; if (v > 60) days.push(v); }
+  if (days.length < 3) return 15 * 60;
+  const avg = days.reduce((a, b) => a + b, 0) / days.length;
+  return Math.max(5, Math.min(30, Math.round(avg * 1.2 / 60 / 5) * 5)) * 60;
+}
+function jobToday(){ const j = JB(); return {sec:+j.ivSec[today()] || 0, done: j.doneDay === today()}; }
+
+/* 开始练：用单题彩排的流程一题一题过（听题、开口、回放、打分） */
+function jobRun(budget, title){
+  const p = jobPlan(budget); if (!p.items.length){ toast("今天没有到期要练的题"); return; }
+  RUN.items = p.items.map(x => ({k:"iv", qid:x.q.id})); RUN.i = 0; RUN.title = title || "今天的面试练习"; RUN.kind = "redo"; RUN.job = true;
+  RUN.res = {good:0, hard:0, again:0, pb:0, ms:[], listenOk:0, listenN:0, iv:0}; RUN.t0 = Date.now(); RUN.weak = {}; RUN.retries = {}; RUN.limitMs = 0; RUN.timeUp = false; RUN.rest = []; RUN.exited = false;
+  UI.nav("run");
+}
+ACT["job-go"] = el => { const m = el && el.dataset && +el.dataset.v; jobRun(m ? m * 60 : jobBudget(), m ? `面试练习 ${m} 分钟` : "今天的面试练习"); };
+/* 别的练习开始时清掉 RUN.job，免得结算时被当成面试练习 */
+{ const ss = startSession; startSession = function(){ RUN.job = false; return ss.apply(this, arguments); }; }
+{ const rq = ivRunQs; ivRunQs = function(){ RUN.job = false; return rq.apply(this, arguments); }; }
+{ const so = ACT["iv-solo"]; if (so) ACT["iv-solo"] = function(){ RUN.job = false; return so.apply(this, arguments); }; }
+/* 练完结算：面试练习记下用了多久、今天做完了；英语练完了，提醒接着练 5 分钟面试 */
+{ const sm = showSummary;
+  showSummary = function(){
+    const isJob = !!RUN.job, sec = Math.round((Date.now() - (RUN.t0 || Date.now())) / 1000);
+    sm.apply(this, arguments);
+    try {
+      const j = JB(), el = stageEl(); if (!el) return;
+      if (isJob){
+        RUN.job = false; j.ivSec[today()] = Math.min(7200, (+j.ivSec[today()] || 0) + Math.min(sec, 3600)); if (!RUN.exited) j.doneDay = today(); save();
+        const b = el.querySelector('[data-act="again-session"]'); if (b){ b.dataset.act = "job-go"; b.dataset.v = "5"; b.textContent = "再练 5 分钟"; }
+      } else if (jobOwnsIv() && !jobToday().done){
+        const p = jobPlan(300); if (!p.items.length) return;
+        const div = document.createElement("div"); div.className = "panel job-hand";
+        div.innerHTML = `<b>接着练几道面试题？</b><p class="small muted" style="margin-top:4px">今天的面试练习还没做：先来 ${p.items.length} 道，约 ${Math.max(1, Math.round(p.sec / 60))} 分钟。</p><button class="btn primary block" style="margin-top:10px" data-act="job-go" data-v="5">接着练面试 5 分钟</button>`;
+        (el.querySelector(".summary") || el).appendChild(div);
+      }
+    } catch (e) { console.error(e); }
+  };
+}
+
+/* ---------- 成长页上的一行、周复盘里的一行 ---------- */
+function jobGrowHTML(){
+  if (!jobOwnsIv() || jobToday().done) return "";
+  const p = jobPlan(jobBudget()); if (!p.items.length) return "";
+  const n = jobUpcoming()[0], left = n ? dnum(n.date) - dnum(today()) : null;
+  const kq = jobKnowCards().length ? jobKnowQueue().length : 0;
+  return `<section class="panel job-grow"><div class="job-row"><b>今天的面试练习</b><span class="small muted">${p.items.length} 道，约 ${Math.max(1, Math.round(p.sec / 60))} 分钟${kq ? `；知识复习 ${kq} 张` : ""}</span></div>
+    ${n && left <= 14 ? `<p class="small muted" style="margin-top:4px">${esc(n.name)}：${left === 0 ? "就是今天" : left === 1 ? "明天" : `还有 ${left} 天`}</p>` : ""}
+    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-go">开始</button><button class="btn sm" data-act="job-go" data-v="5">只做 5 分钟</button></div></section>`;
+}
+function jobWeekLine(wk){
+  const apps = JB().apps; const a0 = dnum(wk); let ivMin = 0;
+  for (let i = 0; i < 7; i++) ivMin += (+JB().ivSec[nstr(a0 + i)] || 0) / 60;
+  if (!apps.length && !ivMin) return "";
+  const nw = apps.filter(x => x.d && !x.dApprox && dnum(x.d) >= a0 && dnum(x.d) < a0 + 7 && jobSent(x));
+  const by = {}; for (const x of nw){ const k = JOB_TL[x.track] || "其他"; by[k] = (by[k] || 0) + 1; }
+  const g = {}; for (const x of apps) g[jobGroup(x)] = (g[jobGroup(x)] || 0) + 1;
+  const p0 = jobReadyGroups().find(x => x.k === "P0");
+  const kc = jobKnowCards(), km = kc.filter(jobKnowMastered).length;
+  return `${kc.length ? `知识卡：掌握 ${km}/${kc.length}；` : ""}投递（脱口的求职页）：这周新投 ${nw.length} 份${nw.length ? `（${Object.entries(by).map(([k, n]) => k + " " + n).join("，")}）` : ""}；现在面试中 ${g.live || 0}、等待回音 ${g.wait || 0}、投了 4 周以上没回音 ${g.stale || 0}；这周面试练习 ${Math.round(ivMin)} 分钟${p0 ? `；每场都会问的题达标 ${p0.ready}/${p0.total}` : ""}`;
+}
+
+/* ---------- 求职页 ---------- */
+VIEWS.iv = {
+  tab:"iv",
+  render(){
+    const seg = ["today", "apps", "prep", "rev"].includes(L.jobSeg) ? L.jobSeg : "today";
+    const apps = JB().apps, sent = apps.filter(jobSent).length, nx = jobUpcoming()[0];
+    const sub = nx ? `下一场：${esc(ivLeftText(nx))}` : apps.length ? `等待回音 ${apps.filter(a => jobGroup(a) === "wait").length} 份` : "";
+    const tabs = [["today", "今天"], ["apps", sent ? `投递 ${sent}` : "投递"], ["prep", "准备"], ["rev", "复盘"]];
+    const body = seg === "today" ? jobTodaySeg() : seg === "apps" ? jobAppsSeg() : seg === "prep" ? jobPrepSeg() : jobRevSeg();
+    return `<div class="wrap job"><div class="top"><h2 style="font-size:26px">求职</h2><span class="muted small">${sub}</span></div>
+      <div class="seg job-seg" role="tablist" aria-label="求职">${tabs.map(([k, l]) => `<button role="tab" data-act="job-seg" data-v="${k}" aria-pressed="${seg === k}" aria-selected="${seg === k}">${esc(l)}</button>`).join("")}</div>
+      ${body}</div>`;
+  }
+};
+ACT["job-seg"] = el => {
+  L.jobSeg = el.dataset.v; if (el.dataset.f) L.jobF = el.dataset.f; saveLocal();
+  const top = UI.top(); if (!top || top.name !== "iv"){ UI.tab ? UI.tab("iv") : UI.nav("iv"); } else UI.render();
+  const to = el.dataset.to;
+  setTimeout(() => { const t = to && document.getElementById(to); if (t && t.scrollIntoView) t.scrollIntoView({behavior:"smooth", block:"start"}); else window.scrollTo(0, 0); }, 30);
+};
+ACT["job-f"] = el => { L.jobF = el.dataset.v; saveLocal(); UI.render(); };
+
+/* ---------- 今天 ---------- */
+function jobTodaySeg(){
+  const out = [], up = jobUpcoming();
+  if (up.length) out.push(jobNextIvHTML(up[0]));
+  out.push(jobPracticeHTML());
+  out.push(jobKnowTodayHTML());
+  out.push(jobPipeSumHTML());
+  const nChk = jobAllChecks().length;
+  if (nChk) out.push(`<button class="panel job-chkcard" data-act="job-seg" data-v="prep" data-to="jobChk"><div class="grow"><b>待确认 ${nChk} 条</b><span class="small muted">确认前，相关的题不算达标</span></div><span class="job-go-arrow" aria-hidden="true">${ICON.chev}</span></button>`);
+  return out.join("");
+}
+function jobNextIvHTML(iv){
+  const left = dnum(iv.date) - dnum(today()), app = iv.app ? jobApp(iv.app) : null, chk = iv.chk || [], done = JOB_CHK.filter((_, i) => chk[i]).length;
+  return `<section class="panel job-next"><div class="job-row"><b>${esc(iv.name)}</b><span class="job-pill${left <= 3 ? " hot" : ""}">${left === 0 ? "就是今天" : left === 1 ? "明天" : `还有 ${left} 天`}</span></div>
+    <p class="small muted" style="margin-top:2px">${esc(ivWhen(iv))}${app ? `　${esc(app.co)}${app.role ? "，" + esc(jobShort(app.role, 30)) : ""}` : ""}</p>
+    <details class="job-72"${left <= 3 && done < JOB_CHK.length ? " open" : ""}><summary class="small">72 小时清单 <b id="job72-${iv.id}">${done}/${JOB_CHK.length}</b></summary>
+      <div style="margin-top:6px">${JOB_CHK.map((t, i) => `<label class="check"><input type="checkbox" data-chg="job-chk" data-id="${iv.id}" data-i="${i}"${chk[i] ? " checked" : ""}><span>${esc(t)}</span></label>`).join("")}</div></details>
+    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-go">练这一场要用的题</button><button class="btn sm ghost" data-act="job-seg" data-v="apps" data-to="jobIvs">面试安排</button></div></section>`;
+}
+CHG["job-chk"] = el => {
+  const iv = (S.interviews || []).find(x => x.id === el.dataset.id); if (!iv) return;
+  iv.chk = iv.chk || []; iv.chk[+el.dataset.i] = el.checked; save();
+  const b = document.getElementById("job72-" + iv.id); if (b) b.textContent = `${JOB_CHK.filter((_, i) => iv.chk[i]).length}/${JOB_CHK.length}`;
+};
+const JOB_KIND = [["P0", "每场都会问"], ["story", "经历和故事"], ["co", "这家公司"], ["quick", "技术和快答"]];
+function jobKind(x){ return x.pri === "P0" ? "P0" : x.pri === "P3" ? "co" : jobLong(x.q) ? "story" : "quick"; }
+function jobPracticeHTML(){
+  if (!jobPool().length) return `<section class="panel job-prac empty"><b>今天的面试练习</b><p class="small" style="margin-top:6px">还没有面试题。把 AI 给你的面试题导入码导进来，这里每天会排好要练的题。</p><button class="btn sm" style="margin-top:10px" data-act="nav" data-v="import">导入题目</button></section>`;
+  const t = jobToday(), p = jobPlan(jobBudget());
+  if (t.done || !p.items.length){
+    const mins = Math.round(t.sec / 60);
+    return `<section class="panel job-prac done"><div class="job-row"><b>${t.done ? "今天的面试练习做完了" : "今天没有到期的题"}</b>${mins ? `<span class="small">练了 ${mins} 分钟</span>` : ""}</div>
+      <p class="small" style="margin-top:6px">${t.done ? "明天会按今天的打分重新排。想多练，就再来一轮。" : "达标的题要隔几天再复习，这样记得更牢。"}</p>
+      <div class="row-gap" style="margin-top:10px"><button class="btn sm" data-act="job-more">再练 5 分钟</button></div></section>`;
+  }
+  const grp = {}; for (const x of p.items) (grp[jobKind(x)] = grp[jobKind(x)] || []).push(x);
+  const rows = JOB_KIND.filter(([k]) => grp[k]).map(([k, l]) => `<div class="job-pl"><span class="job-pl-k">${l}<i class="num">${grp[k].length}</i></span><span class="job-pl-v">${grp[k].slice(0, 3).map(x => esc(jobShort(x.q.zh || x.q.v[0], 16))).join("、")}${grp[k].length > 3 ? " 等" : ""}</span></div>`).join("");
+  const nx = jobUpcoming()[0], left = nx ? dnum(nx.date) - dnum(today()) : null;
+  return `<section class="panel job-prac"><div class="job-row"><b>今天的面试练习</b><span class="job-min">${p.items.length} 道，约 <b class="num">${Math.max(1, Math.round(p.sec / 60))}</b> 分钟</span></div>
+    <div class="job-plan">${rows}</div>
+    <div class="row-gap" style="margin-top:14px"><button class="btn primary" data-act="job-go">开始</button><button class="btn" data-act="job-go" data-v="5">只做 5 分钟</button></div>
+    <details class="job-why"><summary class="small">这些题是怎么挑的</summary><p class="small" style="margin-top:6px">每场都会问的题天天轮；方向题按你“等待回音”的投递里各方向的比例分；公司的题约到那家才出现${nx && left <= 14 ? `，现在离“${esc(nx.name)}”越近，相关的题隔得越短` : ""}。没达标的题一天最多练一次，同一题在 3 次不同时间都说得还行才算达标，之后隔一周复习。每天的量按你过去两周实际练的时间多加两成，可以在“准备”里改。</p></details></section>`;
+}
+ACT["job-more"] = () => jobRunMore(300);
+/* 今天的都做完了还想练：把还没达标的题再挑一轮（不管到期没有） */
+function jobRunMore(budget){
+  const pool = jobPool().filter(q => jobPri(q) !== "P3" || jobIvRel(q) != null);
+  const ranked = pool.map(q => ({q, r:jobReady(q.id)})).sort((a, b) => (jobIsReady(a.q) ? 1 : 0) - (jobIsReady(b.q) ? 1 : 0) || a.r.n - b.r.n || a.r.lastTs - b.r.lastTs);
+  const items = []; let t = 0; for (const x of ranked){ if (t + jobEst(x.q) > budget && items.length) continue; items.push(x.q.id); t += jobEst(x.q); if (t >= budget - 30) break; }
+  if (!items.length){ toast("还没有能练的题"); return; }
+  ivRunQs(items, "面试加练 5 分钟"); RUN.job = true;
+}
+function jobPipeSumHTML(){
+  const apps = JB().apps;
+  if (!apps.length) return `<section class="panel job-pipe"><b>投递</b><p class="small muted" style="margin-top:6px">把投过的职位记下来，过一阵就能看出哪个方向回音多、哪份简历管用。</p><button class="btn sm" style="margin-top:10px" data-act="job-new">记一份投递</button></section>`;
+  const g = {}; for (const a of apps) g[jobGroup(a)] = (g[jobGroup(a)] || 0) + 1;
+  const wk = K.growWeekStart ? K.growWeekStart(today()) : today();
+  const thisWk = apps.filter(a => a.d && !a.dApprox && dnum(a.d) >= dnum(wk) && jobSent(a)).length;
+  const old = apps.filter(a => jobGroup(a) === "wait" && a.d).sort((a, b) => dnum(a.d) - dnum(b.d)).slice(0, 2);
+  return `<section class="panel job-pipe"><div class="job-row"><b>投递</b><span class="small muted">本周投了 ${thisWk} 份</span></div>
+    <div class="job-counts">${[["live", "面试中"], ["wait", "等待回音"], ["stale", "没回音"], ["ended", "已结束"]].map(([k, l]) => `<button class="job-count${k === "live" && g[k] ? " on" : ""}" data-act="job-seg" data-v="apps" data-f="${k}"><b class="num">${g[k] || 0}</b><span>${l}</span></button>`).join("")}</div>
+    ${old.length ? `<p class="small muted" style="margin-top:8px">等得最久：${old.map(a => `${esc(a.co)} ${jobDays(a)} 天`).join("，")}</p>` : ""}
+    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-new">记一份投递</button><button class="btn sm ghost" data-act="job-seg" data-v="apps" data-f="all">看全部</button></div></section>`;
+}
+
+/* ---------- 投递 ---------- */
+function jobSortIn(k){ return k === "ended" ? (a, b) => (b.ts || 0) - (a.ts || 0) : (a, b) => (a.d ? dnum(a.d) : 1e9) - (b.d ? dnum(b.d) : 1e9) || String(a.co).localeCompare(String(b.co)); }
+function jobAppRowHTML(a){
+  const n = jobDays(a), grp = jobGroup(a);
+  return `<button class="li job-app" data-act="nav" data-v="japp" data-id="${a.id}"><div class="grow"><b>${esc(a.co)}</b><span>${esc(a.role || "职位没写")}</span>
+    <span class="job-tags">${a.track ? `<em class="job-tag">${esc(JOB_TL[a.track] || "其他")}</em>` : ""}${a.tier ? `<em class="job-tag tier">${esc(a.tier)} 档</em>` : ""}${(a.res || "").trim() ? `<em class="job-tag ghost">${esc(jobShort(a.res, 14))}</em>` : ""}</span></div>
+    <span class="end"><span class="job-st st-${a.st}">${esc(JOB_SL[a.st] || "")}</span>${n != null && grp !== "ended" && grp !== "draft" ? `<br>${a.dApprox ? "约 " : ""}${n} 天` : ""}</span></button>`;
+}
+function jobAppsSeg(){
+  const apps = JB().apps, f = JOB_GROUPS.some(x => x[0] === L.jobF) ? L.jobF : "all";
+  const g = {}; for (const a of apps) (g[jobGroup(a)] = g[jobGroup(a)] || []).push(a);
+  const top = `<div class="row-gap" style="margin:2px 0 4px"><button class="btn primary" style="flex:1" data-act="job-new">记一份投递</button></div>`;
+  if (!apps.length) return top + `<p class="panel small muted" style="margin-top:10px">还没有投递记录。点上面“记一份投递”，或者把 AI 给的投递导入码导进来（我的 → 导入新内容）。</p>` + jobIvsHTML();
+  const chips = `<div class="chips job-filter">${[["all", "全部", apps.length], ...JOB_GROUPS.map(([k, l]) => [k, l, (g[k] || []).length])].filter(x => x[0] === "all" || x[2]).map(([k, l, n]) => `<button class="chip${f === k ? " on" : ""}" data-act="job-f" data-v="${k}" aria-pressed="${f === k}">${l} ${n}</button>`).join("")}</div>`;
+  const lists = JOB_GROUPS.filter(([k]) => (g[k] || []).length && (f === "all" || f === k)).map(([k, l]) => `<div class="sec-title">${l} ${g[k].length}${k === "stale" ? `<span class="job-sec-note">投了 4 周以上还没动静</span>` : ""}</div><div class="list">${g[k].slice().sort(jobSortIn(k)).map(jobAppRowHTML).join("")}</div>`).join("");
+  return top + chips + lists + jobStatsHTML() + jobAppsToolsHTML() + jobIvsHTML();
+}
+function jobIvsHTML(){ return `<div id="jobIvs" style="height:16px"></div>${interviewsPanelHTML()}`; }
+function jobStatsRows(key){
+  const rows = {};
+  for (const a of JB().apps){ if (!jobSent(a)) continue;
+    const k = key === "track" ? (JOB_TL[a.track] || "没定方向") : key === "tier" ? (a.tier ? a.tier + " 档" : "没标档位") : ((a.res || "").trim() || "没写版本");
+    const r = rows[k] = rows[k] || {sent:0, rej:0, iv:0, wait:0}; r.sent++; if (jobHadIv(a)) r.iv++; if (a.st === "rejected") r.rej++; if (["wait", "stale"].includes(jobGroup(a))) r.wait++; }
+  return Object.entries(rows).sort((a, b) => b[1].sent - a[1].sent);
+}
+function jobStatsHTML(){
+  const sent = JB().apps.filter(jobSent).length, ivN = JB().apps.filter(jobHadIv).length;
+  const tbl = (title, key) => { const rs = jobStatsRows(key); return rs.length ? `<div class="job-tbl"><div class="job-tr th"><span>${title}</span><span>投出</span><span>被拒</span><span>面试</span><span>等待</span></div>${rs.map(([k, r]) => `<div class="job-tr"><span>${esc(jobShort(k, 18))}</span><span class="num">${r.sent}</span><span class="num">${r.rej}</span><span class="num">${r.iv}</span><span class="num">${r.wait}</span></div>`).join("")}</div>` : ""; };
+  return `<details class="panel job-stats" style="margin-top:16px"><summary><b>统计</b>　投出 ${sent} 份，进面试 ${ivN} 次</summary>
+    ${ivN < 5 ? `<p class="note">面试还不到 5 次，下面各行之间的差别基本是噪声：先只看数字，别下结论。</p>` : ""}
+    ${tbl("方向", "track")}${tbl("档位", "tier")}${tbl("简历版本", "res")}
+    <p class="small muted" style="margin-top:8px">“面试”从电话初筛算起；“等待”包括投了 4 周以上没回音的。</p></details>`;
+}
+function jobAppsToolsHTML(){
+  const nJD = JB().apps.filter(a => (a.jd || "").trim().length > 80).length;
+  return `<div class="row-gap" style="margin-top:12px"><button class="btn sm" data-act="job-export">导出给状态文件</button><button class="btn sm" data-act="job-jd-ai">统计 JD 高频要求</button></div>
+    <p class="small muted" style="margin-top:6px">统计高频要求要用 JD 原文：在投递里存够 3 份（现在 ${nJD} 份），一起发给 AI。</p>`;
+}
+ACT["job-new"] = () => UI.nav("japp", {});
+VIEWS.japp = {
+  tab:"iv", noRefresh:true,
+  render(p){
+    const a = p && p.id ? jobApp(p.id) : null;
+    const x = a || {co:"", role:"", track:"", tier:"", d:today(), st:"applied", src:"", res:"", visa:"", note:"", jd:"", next:"", nextD:""};
+    const sel = (id, opts, v) => `<select id="${id}">${opts.map(([k, l]) => `<option value="${k}"${k === (v || "") ? " selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
+    const n = a ? jobDays(a) : null;
+    const quick = a ? `<div class="panel"><div class="small">现在：<b class="job-st st-${a.st}">${esc(JOB_SL[a.st])}</b>${n != null ? `<span class="muted">，投了 ${a.dApprox ? "约 " : ""}${n} 天</span>` : ""}</div>
+      <div class="chips" style="margin-top:10px">${JOB_QUICK.filter(([st]) => st !== a.st).map(([st, l]) => `<button class="chip" data-act="job-st" data-id="${a.id}" data-v="${st}">${l}</button>`).join("")}</div>
+      <div class="row-gap" style="margin-top:12px"><button class="btn sm primary" data-act="job-iv-new" data-id="${a.id}">约到面试了，加进面试安排</button><button class="btn sm" data-act="nav" data-v="jdeb" data-app="${a.id}">写面试复盘</button></div></div>` : "";
+    const hist = a && (a.hist || []).length ? `<div class="sec-title">经过</div><div class="list">${a.hist.slice().reverse().map(h => `<div class="li"><div class="grow"><b>${esc(JOB_SL[h.st] || h.st)}</b><span>${esc(h.d)}${h.note ? "　" + esc(h.note) : ""}</span></div></div>`).join("")}</div>` : "";
+    const debs = a ? JB().debriefs.filter(d => d.app === a.id) : [];
+    return `<div class="wrap">${backBtn()}<h2>${a ? esc(a.co) : "记一份投递"}</h2>${a && a.role ? `<p class="small muted" style="margin:4px 0 12px">${esc(a.role)}</p>` : `<div style="height:10px"></div>`}
+      ${quick}
+      <div class="panel"${a ? ` style="margin-top:12px"` : ""}>
+        <label class="fld" style="margin-top:0"><span>公司</span><input type="text" id="jaCo" value="${esc(x.co)}" placeholder="比如：Acme Robotics"></label>
+        <label class="fld"><span>职位</span><input type="text" id="jaRole" value="${esc(x.role)}"></label>
+        <div class="job-2col"><label class="fld"><span>方向</span>${sel("jaTrack", [["", "没定"], ...JOB_TRACKS], x.track)}</label><label class="fld"><span>档位</span>${sel("jaTier", [["", "没定"], ["A", "A：很想去、高度对口"], ["B", "B：对口"], ["C", "C：碰运气"]], x.tier)}</label></div>
+        <div class="job-2col"><label class="fld"><span>投递日期</span><input type="date" id="jaD" value="${esc(x.d || "")}"></label><label class="fld"><span>状态</span>${sel("jaSt", JOB_ST, x.st)}</label></div>
+        <label class="fld"><span>平台、来源</span><input type="text" id="jaSrc" value="${esc(x.src || "")}" placeholder="比如：Workday、内推、招聘会"></label>
+        <label class="fld"><span>用的简历版本</span><input type="text" id="jaRes" value="${esc(x.res || "")}" placeholder="比如：海投_ME"></label>
+        <label class="fld"><span>签证信息</span><input type="text" id="jaVisa" value="${esc(x.visa || "")}" placeholder="原帖怎么写、有没有 H-1B 记录、E-Verify"></label>
+        <div class="job-2col"><label class="fld"><span>下一步</span><input type="text" id="jaNext" value="${esc(x.next || "")}" placeholder="比如：周五前回复"></label><label class="fld"><span>日期</span><input type="date" id="jaNextD" value="${esc(x.nextD || "")}"></label></div>
+        <label class="fld"><span>备注</span><textarea id="jaNote" rows="3">${esc(x.note || "")}</textarea></label>
+        <details style="margin-top:12px"${(x.jd || "").trim() ? " open" : ""}><summary class="small">JD 原文（可选，统计高频要求时用）</summary><textarea id="jaJD" rows="6" style="margin-top:8px">${esc(x.jd || "")}</textarea></details>
+        <div class="row-gap" style="margin-top:16px"><button class="btn primary" data-act="job-save" data-id="${a ? a.id : ""}">${a ? "保存" : "记下来"}</button>${a ? `<button class="btn danger" data-act="job-del" data-id="${a.id}">删除</button>` : ""}</div></div>
+      ${hist}${debs.length ? `<div class="sec-title">面试复盘</div><div class="list">${debs.map(jobDebRowHTML).join("")}</div>` : ""}</div>`;
+  }
+};
+ACT["job-save"] = () => {
+  const v = id => (($("#" + id) || {}).value || "").trim();
+  const co = v("jaCo"); if (!co){ toast("写一下公司名"); return; }
+  const id = ($('[data-act="job-save"]') || {dataset:{}}).dataset.id;
+  const data = {co, role:v("jaRole"), track:v("jaTrack"), tier:v("jaTier"), src:v("jaSrc"), res:v("jaRes"), visa:v("jaVisa"), next:v("jaNext"), nextD:v("jaNextD"), note:v("jaNote"), jd:v("jaJD").slice(0, 8000)};
+  const d = v("jaD"), st = v("jaSt") || "applied";
+  if (id){
+    const a = jobApp(id); if (!a) return;
+    if (d !== a.d){ a.d = d; a.dApprox = false; }
+    Object.assign(a, data); jobSetStatus(a, st, "手动改"); a.ts = Date.now(); save(); toast("保存好了");
+  } else {
+    if (jobFindApp(data)){ toast("这份投递已经记过了"); return; }
+    const a = Object.assign({id:"a" + jobRid(), d, dApprox:false, st, hist:[{d:today(), st, note:"记下来"}], ts:Date.now()}, data);
+    JB().apps.push(a);
+    let msg = "记好了";
+    if (jobSent(a) && typeof growLog === "function" && d === today()){ growLog("apply", 1, {quiet:true}); msg = "记好了，成长页也记了一笔"; }
+    save(); toast(msg);
+  }
+  UI.back();
+};
+ACT["job-st"] = el => {
+  const a = jobApp(el.dataset.id); if (!a) return; const st = el.dataset.v;
+  jobSetStatus(a, st, "");
+  save(); toast(["screen", "interview", "offer"].includes(st) ? `改成“${JOB_SL[st]}”了，成长页记了一个好消息` : `改成“${JOB_SL[st]}”了`);
+  if (st === "screen" || st === "interview"){ setTimeout(() => ACT["job-iv-new"]({dataset:{id:a.id}}), 300); return; }
+  UI.render();
+};
+ACT["job-del"] = async el => {
+  const a = jobApp(el.dataset.id); if (!a) return;
+  if (!await sheet("删除这份投递？", `${a.co}${a.role ? "，" + a.role : ""}。面试复盘和练习记录不受影响。`, "删除", true)) return;
+  JB().apps = JB().apps.filter(x => x.id !== a.id); save(); UI.back();
+};
+/* 约到面试了：回到求职页的“面试安排”，表单里填好这份投递 */
+ACT["job-iv-new"] = el => {
+  const a = jobApp(el.dataset.id); if (!a) return;
+  L.jobSeg = "apps"; saveLocal(); IVS_FORM = true; IVS_EDIT = null;
+  IVS_PRE = {app:a.id, name:`${a.co} ${a.st === "interview" ? "面试" : "电话初筛"}`};
+  const t = UI.top(); if (t && t.name === "japp") UI.back(); else UI.render();
+  setTimeout(() => { const f = $("#ivsForm"); if (f && f.scrollIntoView) f.scrollIntoView({behavior:"smooth", block:"center"}); }, 80);
+};
+function jobExportText(){
+  const by = {}; for (const a of JB().apps) (by[jobGroup(a)] = by[jobGroup(a)] || []).push(a);
+  const meta = a => [a.d ? (a.dApprox ? a.d.slice(0, 7) : a.d.slice(5).replace("-", "/")) : "", a.src, [a.tier, a.track ? JOB_TL[a.track] : ""].filter(Boolean).join(" / ")].filter(Boolean).join("，");
+  const line = (a, k) => `  - ${a.co}${a.role ? " " + a.role : ""}${meta(a) ? `（${meta(a)}）` : ""}${k === "ended" ? "：" + JOB_SL[a.st] : ""}${a.note ? "；" + a.note.split("\n")[0] : ""}`;
+  const parts = [["live", "面试中"], ["wait", "等待中"], ["stale", "没回音（投了 4 周以上）"], ["draft", "准备投"], ["ended", "已结束"]].filter(([k]) => by[k]).map(([k, l]) => `- ${l}：\n` + by[k].slice().sort(jobSortIn(k)).map(a => line(a, k)).join("\n"));
+  return [`【十、投递记录（截至 ${today()}，从脱口导出）】`, ...parts].join("\n");
+}
+ACT["job-export"] = async () => { const ok = await copyText(jobExportText()); toast(ok ? "复制好了：贴进状态文件的【十】" : "复制没成功，再点一次"); };
+ACT["job-jd-ai"] = () => {
+  const list = JB().apps.filter(a => (a.jd || "").trim().length > 80);
+  if (list.length < 3){ toast(`还差 ${3 - list.length} 份：在投递里点开一份，把 JD 原文贴进“JD 原文”`); return; }
+  sendToClaude(`下面是我投的 ${list.length} 个职位的 JD 原文。请：
+1. 统计反复出现的要求（技能、工具、知识点），按出现的职位数从多到少排，标出每条在哪几家出现。
+2. 按我的状态文件标出：有证据的、只有课程或自学的、完全没有的。
+3. 列出最该先准备的 10 个知识点，每个给一句面试版的英文回答（每句尽量 13 个词以内，最长不超过 20 个词）。
+4. 做成脱口的导入码：题库 | 面试·高频知识；问 | 题号 | 英文问法 | 中文 | 30 | 概念 | 提示；答 | 题号 | 回答；要点 | 题号 | 开口第一句；标签 | 题号 | P1 | 方向（控制 / 测试 / 机械）。
+
+` + list.map((a, i) => `【${i + 1}】${a.co}，${a.role || ""}（${JOB_TL[a.track] || "方向没定"}）\n${a.jd.trim().slice(0, 5000)}`).join("\n\n"));
+};
+
+/* ---------- 准备 ---------- */
+function jobReadyGroups(){
+  const pool = jobPool().filter(q => !jobIsKnow(q)), notP = q => !["P0", "P3"].includes(jobPri(q));
+  const defs = [["P0", "每场都会问", q => jobPri(q) === "P0"],
+    ["story", "经历和故事", q => notP(q) && qRole(q) === "core" && jobTrackOf(q) === "all"],
+    ["cs", "控制", q => notP(q) && jobTrackOf(q) === "cs"], ["rd", "测试 / R&D", q => notP(q) && ["rd", "golf"].includes(jobTrackOf(q))], ["me", "机械", q => notP(q) && jobTrackOf(q) === "me"],
+    ["tech", "其他技术题", q => notP(q) && ["all", "other"].includes(jobTrackOf(q)) && qRole(q) !== "core"],
+    ["co", "公司专属", q => jobPri(q) === "P3"]];
+  return defs.map(([k, l, f]) => { const qs = pool.filter(f); return {k, l, qs, ready:qs.filter(jobIsReady).length, total:qs.length}; }).filter(g => g.total);
+}
+function jobPrepSeg(){
+  const gs = jobReadyGroups(), chks = jobAllChecks();
+  const ready = gs.length ? `<div class="sec-title">准备度</div><div class="panel job-ready">${gs.map(g => { const pct = Math.round(g.ready / g.total * 100); return `<button class="job-rg" data-act="nav" data-v="jready" data-g="${g.k}"><span class="job-rg-l">${esc(g.l)}</span><span class="rbar"><i style="width:${pct}%"></i></span><span class="job-rg-n num">${g.ready}/${g.total}</span></button>`; }).join("")}
+    <p class="small muted" style="margin-top:10px">达标：同一题在 3 次不同时间（隔 2 小时以上）都打了“还行”或“不错”。有待确认内容的题，确认前不算达标。点一行看每题的进度。</p></div>` : `<p class="panel small muted">还没有面试题。导入题目以后，这里显示每一类准备得怎么样。</p>`;
+  const chk = chks.length ? `<div class="sec-title" id="jobChk">待确认 ${chks.length}</div><div class="list">${chks.map(c => `<div class="li job-chk"><div class="grow"><b>${esc(c.q.zh || c.qid)}</b><span>${esc(c.t)}</span></div><span class="job-chk-acts"><button class="btn sm" data-act="job-chk-ok" data-q="${c.qid}" data-i="${c.i}">确认了</button><button class="btn sm ghost" data-act="nav" data-v="ivedit" data-q="${c.qid}">改回答</button></span></div>`).join("")}</div>
+    <p class="small muted" style="margin-top:6px">“确认了”是说：这件事是真的，回答里的说法也对。要改说法，先点“改回答”，或者把这一条发给 AI 改好再导入。</p>` : "";
+  const j = JB(), b = +j.budget || 0, auto = Math.round(jobAutoBudget() / 60);
+  const set = `<div class="sec-title">练习设置</div><div class="panel"><label class="switch" style="border-top:0;padding-top:0"><span>卡住 5 秒时提示第一句</span><input type="checkbox" data-chg="set" data-key="ivStuck" ${S.settings.ivStuck !== false ? "checked" : ""}></label>
+    <label class="fld"><span>每天的面试练习：自动是按你过去两周实际练的时间多加两成</span><select data-chg="job-budget">${[[0, `自动（现在约 ${auto} 分钟）`], [10, "10 分钟"], [15, "15 分钟"], [20, "20 分钟"], [30, "30 分钟"]].map(([v, l]) => `<option value="${v}"${b === v ? " selected" : ""}>${l}</option>`).join("")}</select></label></div>`;
+  return ready + jobKnowPrepHTML() + chk + jobModsHTML() + set;
+}
+CHG["job-budget"] = el => { JB().budget = +el.value || 0; save(); UI.refresh(); };
+ACT["job-chk-ok"] = el => { const m = (S.qmeta || {})[el.dataset.q]; const c = m && (m.chk || [])[+el.dataset.i]; if (!c) return; c.ok = true; save(); toast("确认了"); UI.render(); };
+/* 原来面试页的模拟面试模块和题目列表，搬到“准备”里 */
+function jobModsHTML(){
+  const pool = ivPool(), cur = IV_MODS.some(m => m.id === L.ivMod) ? L.ivMod : "phone";
+  const cards = IV_MODS.map(m => { const qs = modQs(m.id, pool); return `<div class="panel ivmod${m.id === cur ? " on" : ""}"><div class="row-gap" style="justify-content:space-between;align-items:center"><b>${ICON[m.icon] || ""} ${esc(m.name)}</b><span class="small muted">${qs.length} 题</span></div>
+      <p class="small muted" style="margin:4px 0 10px">${esc(m.sub)}</p><div class="row-gap"><button class="btn primary sm" data-act="mod-go" data-v="${m.id}" ${qs.length ? "" : "disabled"}>模拟一场</button><button class="btn sm" data-act="mod-list" data-v="${m.id}" aria-pressed="${m.id === cur}">${m.id === cur ? "题目在下面" : "看题目"}</button></div></div>`; }).join("");
+  const st = q => { if (jobChecksOpen(q).length) return "待确认"; const r = jobReady(q.id); return r.n >= 3 ? "达标 ✓" : r.n ? `还行 ${r.n}/3` : (S.answers[q.id] || {}).practiced ? "练过" : "还没练"; };
+  const row = q => `<button class="li" data-act="nav" data-v="ivedit" data-q="${q.id}"><div class="grow"><b>${esc(q.zh)}<em class="dchip">${esc(q.deck || "通用")}</em></b><span class="en" style="font-size:14.5px">${esc(q.v[0])}</span></div><span class="end">${st(q)}${(q.follow || []).length ? `<br>追问 ${q.follow.length}` : ""}</span></button>`;
+  const curQs = modQs(cur, pool), curName = (IV_MODS.find(m => m.id === cur) || {}).name || "";
+  return `<div class="sec-title">模拟面试</div>
+    <label class="fld" style="margin-top:0"><span>模拟用哪个题库的回答</span><select data-chg="set" data-key="callDeck" data-rerender="1"><option value="all" ${!(S.settings.callDeck || "").startsWith("u:") ? "selected" : ""}>全部题库</option>${callSets().filter(s => s.id.startsWith("u:")).map(s => `<option value="${esc(s.id)}" ${S.settings.callDeck === s.id ? "selected" : ""}>${esc(s.label)}</option>`).join("")}</select></label>
+    <p class="small muted" style="margin:6px 0 12px">每个模块都是一通模拟面试：面试官念题、你开口答、全程录音，结束后逐题回放、看参考说法。</p>
+    ${cards}
+    <div class="row-gap" style="margin:10px 0 6px"><button class="btn sm" data-act="iv-listen">听面试官怎么问</button><button class="btn sm ghost" data-act="nav" data-v="callsetup">自己挑题数的来电模拟</button></div>
+    <div class="sec-title">${esc(curName)}：${curQs.length} 题</div>${curQs.length ? `<div class="list">${curQs.map(row).join("")}</div>` : `<p class="small muted">这一类还没有题目。把 AI 给你的面试题库导入码导进来，这里就有了。</p>`}
+    <button class="btn block" style="margin-top:16px" data-act="iv-copyall">把写好的回答一起复制给 AI</button>`;
+}
+VIEWS.jready = {
+  tab:"iv",
+  render(p){
+    const g = jobReadyGroups().find(x => x.k === (p && p.g)) || jobReadyGroups()[0];
+    if (!g) return `<div class="wrap">${backBtn()}<h2>准备度</h2><p class="muted">还没有面试题。</p></div>`;
+    const stTxt = q => { if (jobChecksOpen(q).length) return "待确认"; const r = jobReady(q.id); return r.n >= 3 ? "达标 ✓" : r.n ? `还行 ${r.n}/3` : r.lastR ? "还没打过“还行”" : "还没练"; };
+    const list = g.qs.slice().sort((a, b) => (jobIsReady(a) ? 1 : 0) - (jobIsReady(b) ? 1 : 0) || jobReady(a.id).n - jobReady(b.id).n);
+    const todo = list.filter(q => !jobIsReady(q));
+    return `<div class="wrap">${backBtn()}<h2>${esc(g.l)}</h2><p class="muted small" style="margin:6px 0 12px">达标 ${g.ready}/${g.total}。同一题要在 3 次不同时间（隔 2 小时以上）都打“还行”才算达标：分开几次各想起来一次，比一次连说几遍记得牢。</p>
+      ${todo.length ? `<button class="btn primary block" data-act="job-ready-go" data-g="${g.k}">练这一类没达标的（${todo.length} 题）</button>` : `<p class="panel">这一类都达标了，按时复习就行。</p>`}
+      <div class="list" style="margin-top:12px">${list.map(q => `<div class="li" style="gap:8px"><div class="grow"><b>${esc(q.zh || q.id)}</b><span>${esc(stTxt(q))}</span></div><button class="btn sm" data-act="iv-solo" data-q="${q.id}">单题彩排</button></div>`).join("")}</div></div>`;
+  }
+};
+ACT["job-ready-go"] = el => { const g = jobReadyGroups().find(x => x.k === el.dataset.g); if (!g) return; const ids = g.qs.filter(q => !jobIsReady(q)).slice(0, 8).map(q => q.id); ivRunQs(ids, `${g.l}：没达标的题`); RUN.job = true; };
+
+/* ---------- 复盘 ---------- */
+function jobDebRowHTML(x){
+  const a = x.app ? jobApp(x.app) : null, rd = (JOB_ROUNDS.find(r => r[0] === x.round) || [])[1] || "";
+  const nq = String(x.qs || "").split(/\n/).filter(s => s.trim()).length;
+  return `<button class="li" data-act="nav" data-v="jdeb" data-id="${x.id}"><div class="grow"><b>${esc(a ? a.co : x.co || "没选投递")}${rd ? "，" + esc(rd) : ""}</b><span>${esc(x.d || "")}${nq ? `　记了 ${nq} 道题` : ""}</span></div><span class="end">${x.sent ? "发给 AI 了" : "还没发"}</span></button>`;
+}
+function jobRevSeg(){
+  const db = JB().debriefs.slice().sort((a, b) => String(b.d || "").localeCompare(String(a.d || "")) || (b.ts || 0) - (a.ts || 0));
+  const calls = (S.calls || []).filter(c => c.segs);
+  return `<div class="row-gap" style="margin:2px 0 4px"><button class="btn primary" style="flex:1" data-act="nav" data-v="jdeb">记一次真实面试</button></div>
+    <div class="sec-title">真实面试 ${db.length}</div>${db.length ? `<div class="list">${db.map(jobDebRowHTML).join("")}</div>` : `<p class="panel small">面完 24 小时内记一下：被问了什么、哪里卡住、对方说的下一步。发给 AI 以后，拿回这一场的导入码、感谢信草稿和给状态文件的更新。<span class="muted">复盘的研究里，针对一次具体经历、再加上外部反馈的复盘，平均能让之后的表现提高两成左右。</span></p>`}
+    <div class="sec-title">模拟面试</div><div class="list"><button class="li" data-act="nav" data-v="calls"><div class="grow"><b>模拟面试的复盘记录</b><span>${calls.length} 次：听录音、看参考回答、给每题打分</span></div><span class="job-go-arrow" aria-hidden="true">${ICON.chev}</span></button></div>
+    ${jobMetTrendHTML()}`;
+}
+/* 最近的回答：开口用时、长停顿（来自单题彩排、来电模拟、今天的面试练习） */
+function jobMetTrendHTML(){
+  const all = []; for (const arr of Object.values(S.ivMet || {})) for (const m of arr) all.push(m);
+  all.sort((a, b) => a.ts - b.ts); if (all.length < 4) return "";
+  const avg = (xs, f) => { const v = xs.map(f).filter(x => x != null); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : null; };
+  const half = Math.min(10, Math.floor(all.length / 2)), old = all.slice(0, half), now = all.slice(-half);
+  const fo = avg(old, m => m.f), fn = avg(now, m => m.f), po = avg(old, m => m.p), pn = avg(now, m => m.p);
+  const cell = (l, a, b, unit, dig) => `<div class="job-tr"><span>${l}</span><span class="num">${a == null ? "–" : a.toFixed(dig) + unit}</span><span class="num">${b == null ? "–" : b.toFixed(dig) + unit}</span></div>`;
+  return `<div class="sec-title">开口和停顿</div><div class="job-tbl job-tbl3"><div class="job-tr th"><span>最近 ${all.length} 次回答</span><span>早的 ${half} 次</span><span>近的 ${half} 次</span></div>${cell("开口用时", fo == null ? null : fo / 1000, fn == null ? null : fn / 1000, " 秒", 1)}${cell("3 秒以上的停顿（每次回答）", po, pn, " 次", 1)}</div>
+    <p class="small muted" style="margin-top:6px">听的人判断流不流利，主要看停顿和语速。开口快一点、长停顿少一点，比用词完美更要紧。</p>`;
+}
+VIEWS.jdeb = {
+  tab:"iv", noRefresh:true,
+  render(p){
+    const x = p && p.id ? JB().debriefs.find(d => d.id === p.id) : null;
+    const y = x || {app:(p && p.app) || "", round:"screen", d:today(), who:"", qs:"", stuck:"", good:"", change:"", learn:"", next:""};
+    const ta = (id, label, ph, v, rows) => `<label class="fld"><span>${label}</span><textarea id="${id}" rows="${rows || 3}" placeholder="${esc(ph)}">${esc(v || "")}</textarea></label>`;
+    return `<div class="wrap">${backBtn()}<h2>${x ? "面试复盘" : "记一次真实面试"}</h2><p class="small muted" style="margin:4px 0 12px">趁记得清楚，尽量写原话。写得乱没关系，AI 会帮你理。</p>
+      <div class="panel">
+        <label class="fld" style="margin-top:0"><span>哪一份投递</span><select id="jdApp"><option value="">没在投递里</option>${jobAppOptionsHTML(y.app)}</select></label>
+        <div class="job-2col"><label class="fld"><span>哪一轮</span><select id="jdRound">${JOB_ROUNDS.map(([k, l]) => `<option value="${k}"${k === y.round ? " selected" : ""}>${l}</option>`).join("")}</select></label><label class="fld"><span>日期</span><input type="date" id="jdD" value="${esc(y.d || "")}"></label></div>
+        <label class="fld"><span>面试官</span><input type="text" id="jdWho" value="${esc(y.who || "")}" placeholder="名字和职位，比如：Cody，recruiter"></label>
+        ${ta("jdQs", "被问到的问题（一行一题，尽量写原话）", "Tell me about yourself.\nHave you calibrated sensors before?", y.qs, 5)}
+        ${ta("jdStuck", "哪里卡住或停顿了", "比如：传感器标定那题停了很久", y.stuck)}
+        ${ta("jdGood", "哪里说得好", "", y.good)}
+        ${ta("jdChange", "下次想改成怎么说", "", y.change)}
+        ${ta("jdLearn", "要补的知识", "", y.learn, 2)}
+        <label class="fld"><span>对方说的下一步、时间线</span><input type="text" id="jdNext" value="${esc(y.next || "")}" placeholder="比如：下周一前给答复"></label>
+        <div class="row-gap" style="margin-top:16px"><button class="btn primary" data-act="jdeb-save" data-id="${x ? x.id : ""}">保存</button><button class="btn" data-act="jdeb-ai" data-id="${x ? x.id : ""}">保存并发给 AI</button>${x ? `<button class="btn danger" data-act="jdeb-del" data-id="${x.id}">删除</button>` : ""}</div>
+        <p class="small muted" style="margin-top:8px">发给 AI 以后，会拿回三样：这一场的导入码（真题、改好的回答、改错卡、要补的知识）、一封感谢信草稿、一段贴进状态文件的更新。</p></div></div>`;
+  }
+};
+function jobDebSave(id){
+  const v = k => (($("#" + k) || {}).value || "").trim();
+  const data = {app:v("jdApp"), round:v("jdRound") || "screen", d:v("jdD") || today(), who:v("jdWho"), qs:v("jdQs"), stuck:v("jdStuck"), good:v("jdGood"), change:v("jdChange"), learn:v("jdLearn"), next:v("jdNext")};
+  if (!data.app && !data.qs){ toast("至少选一份投递，或者写下被问到的问题"); return null; }
+  const j = JB(); let x = id ? j.debriefs.find(d => d.id === id) : null;
+  if (x) Object.assign(x, data, {ts:Date.now()});
+  else {
+    x = Object.assign({id:"d" + jobRid(), ts:Date.now()}, data); j.debriefs.push(x);
+    if (typeof growLog === "function"){ growLog("iv", 1, {quiet:true}); x.grew = true; }
+  }
+  const a = x.app ? jobApp(x.app) : null;
+  if (a && ["draft", "applied"].includes(a.st)) jobSetStatus(a, x.round === "screen" ? "screen" : "interview", "面试复盘");
+  else if (a && a.st === "screen" && x.round !== "screen") jobSetStatus(a, "interview", "面试复盘");
+  save(); return x;
+}
+ACT["jdeb-save"] = el => { const x = jobDebSave(el.dataset.id); if (!x) return; toast(x.grew && !el.dataset.id ? "保存好了，成长页记了一次真实的面试" : "保存好了"); UI.back(); };
+ACT["jdeb-ai"] = async el => { const x = jobDebSave(el.dataset.id); if (!x) return; await sendToClaude(jobDebText(x)); x.sent = Date.now(); save(); };
+ACT["jdeb-del"] = async el => { const x = JB().debriefs.find(d => d.id === el.dataset.id); if (!x) return; if (!await sheet("删除这次复盘？", "只删这条记录，导入过的题目不受影响。", "删除", true)) return; JB().debriefs = JB().debriefs.filter(d => d.id !== x.id); save(); UI.back(); };
+function jobDebText(x){
+  const a = x.app ? jobApp(x.app) : null, rd = (JOB_ROUNDS.find(r => r[0] === x.round) || [])[1] || "";
+  const f = (l, v) => v ? `${l}：\n${v}` : "";
+  return [`这是我刚面完的一场面试的复盘，请按我的状态文件核对事实（状态文件里没有、拿不准的先问我，不要替我编经历）。`, "",
+    `公司和职位：${a ? `${a.co}${a.role ? "，" + a.role : ""}` : "（没在投递里）"}；轮次：${rd}；日期：${x.d}${x.who ? `；面试官：${x.who}` : ""}`,
+    f("被问到的问题", x.qs), f("卡住或停顿的地方", x.stuck), f("说得好的", x.good), f("下次想改成怎么说", x.change), f("要补的知识", x.learn), x.next ? `对方说的下一步：${x.next}` : "",
+    "", "请给我三样：",
+    "1. 脱口的导入码：",
+    "   - 第一行：题库 | 面试·真题",
+    "   - 每道被问到的题：问 | 题号 | 英文问法 // 其他问法 | 中文 | 秒数 | 角色（开场 / 初筛 / 核心 / 技术 / 概念 / 提问） | 提示",
+    "   - 答 | 题号 | 按我真实经历写的参考回答（每句尽量 13 个词以内，最长不超过 20 个词；先说结论）",
+    "   - 要点 | 题号 | 开口第一句；后面每句的开头",
+    "   - 真题 | 题号 | 公司 | 日期",
+    "   - 拿不准的事实：待确认 | 题号 | 要确认的事",
+    "   - 我说错的英文：改 | 原句 | 正确说法 | 类型 | 提示",
+    "   - 要补的知识：问（角色写 概念）+ 答 + 标签 | 题号 | P1 | 方向",
+    "   - 计划：今天发感谢信；对方说的时间线过后约一周还没消息就跟进（计划 | 日期 | 什么时候 | 做什么 | 求职）",
+    "2. 一封感谢信草稿（24 小时内发）。",
+    "3. 一段贴进状态文件【十】【十五】的更新：日期｜公司和轮次｜面试官｜被问到的题｜我的回答要点｜答得好的｜要改的｜要补的知识｜跟进事项。"
+  ].filter(s => s !== "").join("\n");
+}
+
+/* ---------- 知识复习：基础和技术知识（控制、测试、机械……）——先想、再看答案、按想起来多少排下次 ----------
+   依据：提取练习和分散练习效果最好（Dunlosky 等 2013）；同一张卡在几次分开的复习里各想起来一次（successive relearning，Rawson & Dunlosky）；
+   没学过也先猜（先测后学，Richland 等 2009）；不同题库轮着出（交错练习，帮助分清相近的概念，Kornell & Bjork 2008）；
+   讲解里写“为什么”和“你在哪儿用过”（精细加工、和自己有关的信息记得更牢）；先想再打分（看着答案打分会高估自己） */
+const JOB_KNOW_RE = /^知识/;
+function jobIsKnow(q){ return !!q && JOB_KNOW_RE.test(q.deck || ""); }
+const JOB_KNOW_GAP = [1, 1, 3, 7, 16, 35];   /* 盒子 0–5：下次隔几天 */
+function KN(){ const j = JB(); if (!j.know || typeof j.know !== "object" || Array.isArray(j.know)) j.know = {}; if (!j.knowNewDay || j.knowNewDay.d !== today()) j.knowNewDay = {d:today(), n:0}; return j.know; }
+function jobKnowCards(){ return (S.customQ || []).filter(q => jobIsKnow(q) && refFor(q) && (jobPri(q) !== "P3" || jobIvRel(q) != null)); }
+const jobKnowState = q => KN()[q.id] || null;
+function jobKnowLearned(q){ const k = (((S.job || {}).know) || {})[q.id]; return !!k && k.box >= 2; }
+function jobKnowMastered(q){ const k = KN()[q.id]; return !!k && k.box >= 3; }   /* 3 次分开的复习都想起来了 */
+const jobKnowDeckName = d => String(d || "").replace(/^知识\s*[·・:：\-]?\s*/, "") || "知识";
+/* 不同题库轮着来 */
+function jobInterleave(list){
+  const by = new Map(); for (const q of list){ if (!by.has(q.deck)) by.set(q.deck, []); by.get(q.deck).push(q); }
+  const qs = [...by.values()], out = []; let k = 0;
+  while (out.length < list.length){ const a = qs[k % qs.length]; if (a.length) out.push(a.shift()); k++; }
+  return out;
+}
+/* 今天要复习的：到期的 + 新的（每天默认 5 张；新卡按你投递里各方向的比例先学） */
+function jobKnowQueue(extraNew){
+  const tn = dnum(today()), cards = jobKnowCards(), K0 = KN(), sh = jobShares();
+  const due = cards.filter(q => K0[q.id] && K0[q.id].due <= tn).sort((a, b) => K0[a.id].due - K0[b.id].due);
+  const left = extraNew != null ? extraNew : Math.max(0, (+JB().knowNew || 5) - JB().knowNewDay.n);
+  const order = new Map((S.customQ || []).map((q, i) => [q.id, i]));
+  const w = q => { const t = jobTrackMap(jobTrackOf(q)); return sh[t] != null ? 0.3 + sh[t] : 0.6; };
+  const fresh = cards.filter(q => !K0[q.id]).sort((a, b) => w(b) - w(a) || order.get(a.id) - order.get(b.id)).slice(0, left);
+  return jobInterleave(extraNew != null ? fresh : due.concat(fresh));
+}
+function jobKnowRate(qid, r){
+  const K0 = KN(), tn = dnum(today()); const k = K0[qid] || (K0[qid] = {box:0, due:tn, n:0, lapses:0});
+  if (!k.n) JB().knowNewDay.n++;
+  k.n++; k.last = Date.now();
+  if (r === "again"){ k.box = 0; k.lapses = (k.lapses || 0) + 1; k.due = tn + 1; }
+  else if (r === "hard"){ k.box = Math.max(1, k.box - 1); k.due = tn + Math.max(1, Math.round(JOB_KNOW_GAP[k.box] / 2)); }
+  else { k.box = Math.min(5, k.box + 1); k.due = tn + JOB_KNOW_GAP[k.box]; }
+  save();
+}
+function jobKnowTodayHTML(){
+  const cards = jobKnowCards(); if (!cards.length) return "";
+  const q = jobKnowQueue(), due = q.filter(x => jobKnowState(x)).length, fresh = q.length - due, m = cards.filter(jobKnowMastered).length;
+  if (!q.length) return `<section class="panel job-know"><div class="job-row"><b>知识复习</b><span class="small muted">今天的做完了</span></div><p class="small muted" style="margin-top:4px">掌握 ${m}/${cards.length} 张。想多学，可以再学 5 张新的。</p><div class="row-gap" style="margin-top:10px"><button class="btn sm" data-act="jk-more">再学 5 张新的</button></div></section>`;
+  return `<section class="panel job-know"><div class="job-row"><b>知识复习</b><span class="small muted">${q.length} 张，约 ${Math.max(1, Math.round(q.length * 35 / 60))} 分钟</span></div>
+    <p class="small" style="margin-top:4px">${due ? `到期复习 ${due} 张` : ""}${due && fresh ? "，" : ""}${fresh ? `新学 ${fresh} 张` : ""}。先自己想，再看答案，最后按想起来多少打分。</p>
+    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="jk-go">开始</button><button class="btn sm ghost" data-act="job-seg" data-v="prep" data-to="jobKnow">看各组的进度</button></div></section>`;
+}
+function jobKnowPrepHTML(){
+  const all = (S.customQ || []).filter(jobIsKnow);
+  if (!all.length) return `<div class="sec-title" id="jobKnow">知识</div><p class="panel small muted">基础和技术知识的复习卡（控制、测试、机械……）导入以后在这里：每张卡先想、再看答案，按你想起来多少安排下次复习；复习对了两次的，会进每天的面试练习，用英文说。</p>`;
+  const by = new Map(); for (const q of all){ if (!by.has(q.deck)) by.set(q.deck, []); by.get(q.deck).push(q); }
+  const K0 = KN(), tn = dnum(today()), cards = new Set(jobKnowCards().map(q => q.id));
+  const rows = [...by.entries()].map(([d, qs]) => { const live = qs.filter(q => cards.has(q.id)); const m = live.filter(jobKnowMastered).length, seen = live.filter(q => K0[q.id]).length, due = live.filter(q => K0[q.id] && K0[q.id].due <= tn).length; const pct = live.length ? Math.round(m / live.length * 100) : 0;
+    return `<button class="job-rg" data-act="nav" data-v="jkdeck" data-d="${esc(d)}"><span class="job-rg-l">${esc(jobKnowDeckName(d))}</span><span class="rbar know"><i style="width:${pct}%"></i></span><span class="job-rg-n num">${m}/${live.length}</span></button>${due || seen < live.length ? `<p class="job-rg-sub small muted">${due ? `到期 ${due} 张` : ""}${due && seen < live.length ? "，" : ""}${seen < live.length ? `没学 ${live.length - seen} 张` : ""}</p>` : ""}`; }).join("");
+  const n = jobKnowQueue().length, nn = +JB().knowNew || 5;
+  return `<div class="sec-title" id="jobKnow">知识</div><div class="panel job-ready">${rows}
+    <p class="small muted" style="margin-top:10px">掌握：3 次分开的复习都想起来了。复习对了两次的卡，会进每天的面试练习，用英文说一遍。</p>
+    <div class="row-gap" style="margin-top:10px">${n ? `<button class="btn sm primary" data-act="jk-go">复习今天的 ${n} 张</button>` : ""}<button class="btn sm" data-act="jk-more">再学 5 张新的</button></div>
+    <label class="fld"><span>每天学几张新的</span><select data-chg="jk-new">${[3, 5, 8, 10].map(v => `<option value="${v}"${v === nn ? " selected" : ""}>${v} 张</option>`).join("")}</select></label></div>`;
+}
+CHG["jk-new"] = el => { JB().knowNew = +el.value || 5; save(); UI.refresh(); };
+VIEWS.jkdeck = {
+  tab:"iv",
+  render(p){
+    const d = p && p.d, qs = (S.customQ || []).filter(q => q.deck === d && jobIsKnow(q)); const K0 = KN(), tn = dnum(today());
+    const st = q => { const k = K0[q.id]; if (!k) return "还没学"; if (k.box >= 3) return `掌握 ✓，${k.due <= tn ? "今天复习" : `${nstr(k.due).slice(5).replace("-", "/")} 复习`}`; return `学过 ${k.n} 次，${k.due <= tn ? "今天复习" : `${nstr(k.due).slice(5).replace("-", "/")} 复习`}`; };
+    return `<div class="wrap">${backBtn()}<h2>${esc(jobKnowDeckName(d))}</h2><p class="muted small" style="margin:6px 0 12px">${qs.length} 张。点“学这一组”只练这一组：到期的和还没学的（最多 8 张）。</p>
+      <button class="btn primary block" data-act="jk-deck" data-d="${esc(d)}">学这一组</button>
+      <div class="list" style="margin-top:12px">${qs.map(q => `<div class="li"><div class="grow"><b>${esc(q.zh || q.id)}</b><span>${esc(st(q))}</span></div><button class="btn sm ghost" data-act="iv-solo" data-q="${q.id}">用英文说</button></div>`).join("")}</div></div>`;
+  }
+};
+/* 复习一轮：正面（中文题目 + 英文问法）→ 看答案（英文说法 + 讲解）→ 打分；没想起来的，这一轮最后再来一次 */
+let JKS = null;
+function jkStart(ids, title){ if (!ids.length){ toast("现在没有要复习的卡"); return; } JKS = {ids:ids.slice(), i:0, flip:false, re:{}, res:{again:0, hard:0, good:0}, t0:Date.now(), title:title || "知识复习"}; UI.nav("jknow"); }
+ACT["jk-go"] = () => jkStart(jobKnowQueue().map(q => q.id));
+ACT["jk-more"] = () => { const q = jobKnowQueue(5); if (!q.length){ toast("新卡都学过了"); return; } jkStart(q.map(x => x.id), "学新的知识卡"); };
+ACT["jk-deck"] = el => { const d = el.dataset.d, K0 = KN(), tn = dnum(today()); const qs = jobKnowCards().filter(q => q.deck === d); const due = qs.filter(q => K0[q.id] && K0[q.id].due <= tn), fresh = qs.filter(q => !K0[q.id]); jkStart(due.concat(fresh).slice(0, 8).map(q => q.id), jobKnowDeckName(d)); };
+VIEWS.jknow = {
+  tab:"iv", noRefresh:true,
+  render(){
+    const st = JKS; if (!st) return `<div class="wrap">${backBtn()}<p class="muted">没有在复习。</p></div>`;
+    const n = st.ids.length;
+    if (st.i >= n){
+      const j = JB(); j.knowSec = j.knowSec || {}; j.knowSec[today()] = (+j.knowSec[today()] || 0) + Math.round((Date.now() - st.t0) / 1000); st.t0 = Date.now(); save();
+      const cards = jobKnowCards(), m = cards.filter(jobKnowMastered).length, left = jobKnowQueue().length;
+      return `<div class="wrap">${backBtn()}<h2>${esc(st.title)}：完成了</h2>
+        <div class="statgrid"><div class="stat"><span class="num">${st.res.good}</span><span>想起来了</span></div><div class="stat"><span class="num">${st.res.hard}</span><span>想起一部分</span></div><div class="stat"><span class="num">${st.res.again}</span><span>没想起来</span></div></div>
+        <p class="note">掌握 ${m}/${cards.length} 张。没想起来的明天再见；想起来的，隔的天数会越来越长。</p>
+        <p class="note">复习对了两次的卡，会出现在“今天的面试练习”里，用英文说出来，这是面试真要用的说法。</p>
+        <div class="row-gap" style="margin-top:16px">${left ? `<button class="btn" data-act="jk-go">接着复习 ${left} 张</button>` : `<button class="btn" data-act="jk-more">再学 5 张新的</button>`}<button class="btn primary" data-act="back">完成</button></div></div>`;
+    }
+    const q = QBY[st.ids[st.i]]; if (!q){ st.i++; return this.render(); }
+    const k = jobKnowState(q), isNew = !k, ex = ((S.qmeta || {})[q.id] || {}).ex || "", ref = refFor(q);
+    const head = `<div class="jk-top"><button class="back" data-act="back">${ICON.chev}退出</button><span class="num muted">${st.i + 1}/${n}</span></div>
+      <div class="runbar"><div class="track"><i style="width:${Math.round(st.i / n * 100)}%"></i></div></div>`;
+    const front = `<div class="kind"><span class="chip k">${isNew ? "新的" : st.re[q.id] ? "再来一次" : "复习"}</span><span class="chip">${esc(jobKnowDeckName(q.deck))}</span></div>
+      <h3 class="jk-q">${esc(q.zh || q.id)}</h3><div class="en sm jk-en">${esc((q.v || [])[0] || "")}</div>`;
+    if (!st.flip) return `<div class="wrap jk">${head}<div class="card jk-card">${front}
+      ${TTS.ok ? `<button class="btn sm ghost" style="margin-top:6px" data-act="jk-say" data-v="q">${ICON.speak}听英文问法</button>` : ""}
+      <p class="small muted" style="margin-top:14px">${isNew ? "没学过也先猜一下，再看答案：先猜后学，记得更牢。" : "先自己说出来，中文英文都行，再看答案。"}</p>
+      <button class="btn primary block big" style="margin-top:16px" data-act="jk-flip">看答案</button></div></div>`;
+    return `<div class="wrap jk">${head}<div class="card jk-card">${front}
+      <div class="jk-ans"><div class="small muted">面试里可以这样说</div><div class="en sm" style="margin-top:4px;line-height:1.65">${esc(ref)}</div>${TTS.ok ? `<button class="btn sm ghost" style="margin-top:6px" data-act="jk-say" data-v="a">${ICON.speak}听一遍</button>` : ""}</div>
+      ${ex ? `<div class="jk-ex"><div class="small muted">讲解</div><p style="margin-top:4px">${esc(ex)}</p></div>` : ""}
+      <div class="small muted" style="margin-top:14px">刚才你想起来多少？</div>
+      <div class="jk-rate"><button class="btn" data-act="jk-rate" data-r="again">没想起来</button><button class="btn" data-act="jk-rate" data-r="hard">想起一部分</button><button class="btn primary" data-act="jk-rate" data-r="good">想起来了</button></div></div></div>`;
+  },
+  leave(){ try { TTS.cancel(); } catch (e) {} }
+};
+ACT["jk-flip"] = () => { if (!JKS) return; JKS.flip = true; UI.render(); window.scrollTo(0, 0); };
+ACT["jk-say"] = el => { if (!JKS) return; const q = QBY[JKS.ids[JKS.i]]; if (!q) return; TTS.speak(el.dataset.v === "q" ? (q.v || [])[0] : refFor(q), {rate:0.95}); };
+ACT["jk-rate"] = el => {
+  const st = JKS; if (!st) return; const qid = st.ids[st.i], r = el.dataset.r; if (!qid) return;
+  jobKnowRate(qid, r); st.res[r] = (st.res[r] || 0) + 1;
+  if (r === "again" && !st.re[qid]){ st.re[qid] = 1; st.ids.push(qid); }   /* 这一轮里先学到能想起来一次 */
+  st.i++; st.flip = false; try { TTS.cancel(); } catch (e) {} UI.render(); window.scrollTo(0, 0);
+};
 
 </script>
 </body>
