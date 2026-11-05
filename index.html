@@ -1006,6 +1006,20 @@ button.panel.job-chkcard{display:flex;align-items:center;gap:12px;width:100%;tex
 .jk-rate{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
 .jk-rate .btn{padding:10px 6px;font-size:14.5px}
 
+/* v1.70.1：导入按钮、每周目标、该跟进的、一次记好几份、知识卡的词和中文意思 */
+.gr-topr{display:flex;align-items:center;gap:10px}
+.job .top-end{display:flex;align-items:center;gap:10px}
+.job-sub{text-align:right;max-width:52vw}
+.rbar.job-goal i{background:var(--purple)}
+.rbar.job-goal.ok i{background:var(--green)}
+.job-goalset{margin-top:10px}
+.job-fu{background:var(--amber-soft);border-color:transparent}
+.job-fu-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:10px}
+.job-fu-row .linkbtn{font-weight:700;color:var(--ink);text-decoration:none}
+.jk-zh{margin-top:8px}
+.jk-vocab{margin-top:10px}
+.jk-vocab .chip{cursor:pointer}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -1026,7 +1040,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.70.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.70.2"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2523,8 +2537,16 @@ function chunkSentence(en){
 const REG_KEYS = {"朋友之间":"casual", "朋友":"casual", "随意":"casual", "通用":"neutral", "正式":"formal", "听懂就行":"listen", "听懂":"listen"};
 function regKey(v){ return REG_KEYS[String(v || "").trim()] || ""; }
 /* ---------- 求职（v1.70.0）：导入码里的方向、状态、日期 ---------- */
-const JOB_TRACK_KEYS = [[/^(cs|控制|自动化|controls?|automation|plc)/i, "cs"], [/^(rd|r&d|测试|研发|test|research)/i, "rd"], [/^(me|机械|mechanical)/i, "me"], [/^(golf|高尔夫)/i, "golf"], [/^(all|通用|全部|general)/i, "all"], [/^(other|其他|电气|软件|设备)/i, "other"]];
-function jobTrackKey(v){ const t = String(v || "").trim(); if (!t) return ""; for (const [re, k] of JOB_TRACK_KEYS) if (re.test(t)) return k; return "other"; }
+/* 方向：内置的几种认中英文和缩写；认不出的返回空，由 app 按名字建一个自己的方向（高尔夫是旧数据，app 里会改成“测试 / 研发 + 行业：高尔夫”） */
+const JOB_TRACK_KEYS = [[/^(cs|控制|自动化|controls?|automation|plc)/i, "cs"], [/^(rd|r&d|测试|研发|test|research|validation|验证)/i, "rd"], [/^(me|机械|mechanical)/i, "me"], [/^(ee|电气|硬件|electrical|hardware)/i, "ee"], [/^(sw|软件|嵌入式|software|firmware|embedded)/i, "sw"], [/^(mfg|制造|工艺|设备|manufacturing|process|equipment)/i, "mfg"], [/^(qa|质量|quality)/i, "qa"], [/^(data|数据)/i, "data"], [/^(golf|高尔夫)/i, "golf"], [/^(all|通用|全部|general)/i, "all"], [/^(other|其他)$/i, "other"]];
+function jobTrackKey(v){ const t = String(v || "").trim(); if (!t) return ""; for (const [re, k] of JOB_TRACK_KEYS) if (re.test(t)) return k; return ""; }
+/* 只有职位名时猜方向（快速记、AI 没给方向时用）；猜不出就是“其他” */
+const JOB_ROLE_GUESS = [[/quality|\bqa\b|\bqc\b/i, "qa"], [/control|automation|\bplc\b|scada/i, "cs"], [/test|validation|verification|v&v|reliability/i, "rd"], [/software|firmware|embedded|developer|programmer/i, "sw"], [/electrical|hardware|\bpcb\b|power electronics/i, "ee"], [/manufactur|process engineer|production|industrial engineer|equipment/i, "mfg"], [/\bdata\b|analytics|machine learning/i, "data"], [/r&d|research|development/i, "rd"], [/mechanical|mechatronics|design engineer|\bcad\b/i, "me"]];
+function jobGuessTrack(role){ const t = String(role || ""); for (const [re, k] of JOB_ROLE_GUESS) if (re.test(t)) return k; return "other"; }
+/* 渠道：按来源、备注里的字猜（内推、招聘会、recruiter 联系、学校平台），默认网申 */
+const JOB_CH_KEYS = [[/内推|referr/i, "ref"], [/招聘会|career fair|\bfair\b/i, "fair"], [/recruiter|猎头|headhunt|主动联系/i, "rec"], [/nuworks|handshake|学校/i, "school"], [/网申|官网|linkedin|indeed|workday|greenhouse|lever|ashby|ukg|adp|icims|taleo/i, "web"]];
+function jobGuessCh(...xs){ const t = xs.map(x => String(x || "")).join(" "); for (const [re, k] of JOB_CH_KEYS) if (re.test(t)) return k; return "web"; }
+const JOB_CH_NAMES = {网申:"web", 内推:"ref", 招聘会:"fair", recruiter:"rec", 猎头:"rec", 学校平台:"school", 学校:"school", 其他:"other"};
 const JOB_STATUS_KEYS = [[/^(准备|draft|没投|还没投)/i, "draft"], [/^(已投|投了|applied|submitted|v$|\?)/i, "applied"], [/^(初筛|电话|screen|recruiter)/i, "screen"], [/^(面试中|面试|interview|hm|onsite|技术面)/i, "interview"], [/^offer/i, "offer"], [/^(被拒|拒|reject)/i, "rejected"], [/^(没过|面试没过|not pass|failed)/i, "failed"], [/^(不投|不担保|撤回|放弃|dropped|withdrawn|no sponsorship)/i, "dropped"]];
 function jobStatusKey(v){ const t = String(v || "").trim(); if (!t) return ""; for (const [re, k] of JOB_STATUS_KEYS) if (re.test(t)) return k; return ""; }
 function jobRealDate(t){ const [y, m, d] = String(t).split("-").map(Number); const x = new Date(Date.UTC(y, m - 1, d)); return x.getUTCFullYear() === y && x.getUTCMonth() === m - 1 && x.getUTCDate() === d; }
@@ -2537,8 +2559,20 @@ function fillerCount(text){
   const out = {um: n(/\b(?:um+|uh+|erm+|uhm+)\b/g), like: n(/(?:^|[,.!?]\s*|\s)like\s*,|,\s*like\b(?!\s+(?:to|a|the|this|that|it|when|how)\b)/g), yeah: n(/\byeah\b/g), know: n(/\byou know\b/g), mean: n(/\bi mean\b/g), rep: n(/\b(i|the|a|it|we|so|and|my)\b[,\s]+\1\b/g)};
   out.total = out.um + out.like + out.yeah + out.know + out.mean + out.rep; return out;
 }
+/* 一次导入好几个文件、好几段：每一份单独解析（“题库”行只管自己那一份），再合起来 */
+function mergeImports(list){
+  const out = parseImport(""), single = list.length <= 1;
+  for (const {name, r} of list){
+    for (const k of Object.keys(out)) if (Array.isArray(out[k]) && k !== "bad") out[k].push(...(r[k] || []));
+    for (const b of (r.bad || [])) out.bad.push(single ? b : `${name}：${typeof b === "number" ? `第 ${b} 行` : b}`);
+    if (r.meta.date && !out.meta.date) out.meta.date = r.meta.date;
+    out.meta.who.push(...r.meta.who); for (const d of r.meta.replace) if (!out.meta.replace.includes(d)) out.meta.replace.push(d);
+    if (r.planReplace) out.planReplace = true; if (r.planReplaceGrow) out.planReplaceGrow = true;
+  }
+  return out;
+}
 function parseImport(text){
-  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], apps:[], qtags:[], checks:[], real:[], explains:[], meta:{date:"", who:[], replace:[]}, bad:[]};
+  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], apps:[], qtags:[], checks:[], real:[], explains:[], zhs:[], meta:{date:"", who:[], replace:[]}, bad:[]};
   const ROLE = {"开场":"first","核心":"core","初筛":"screen","提问":"ask","基本":"core","行为":"core","电话":"screen","技术":"tech","概念":"concept","first":"first","core":"core","screen":"screen","ask":"ask","tech":"tech","concept":"concept"};
   let deck = "我的卡片";
   String(text||"").split(/\r?\n/).forEach((line, i) => {
@@ -2572,9 +2606,13 @@ function parseImport(text){
     else if ((kind==="答"||kind==="A") && p[1] && p[2]){ res.answers.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ")}); }
     else if ((kind==="要点"||kind==="K") && p[1] && p[2]){ res.keys.push({qid:p[1].toUpperCase(), keys:p.slice(2).join("；").split(/[；;、\n]/).map(x=>x.trim()).filter(Boolean)}); }
     /* v1.70.0 求职：投递 | 公司 | 职位 | 方向 | 档位 | 日期 | 状态 | 来源 | 简历版本 | 备注 */
-    else if ((kind==="投递"||kind==="APP") && (p[1]||"").trim()){ const d = jobDateKey(p[5]); res.apps.push({co:p[1].trim().slice(0, 60), role:(p[2]||"").trim().slice(0, 120), track:jobTrackKey(p[3]), tier:/^[ABC]$/i.test((p[4]||"").trim()) ? p[4].trim().toUpperCase() : "", d:d.d, dApprox:d.approx, st:jobStatusKey(p[6]) || "applied", src:(p[7]||"").trim().slice(0, 60), res:(p[8]||"").trim().slice(0, 80), note:p.slice(9).join(" | ").trim().slice(0, 600)}); }
+    /* v1.70.1：后面可以再加两栏：| 行业 | 渠道（网申 / 内推 / 招聘会 / recruiter / 学校平台 / 其他） */
+    else if ((kind==="投递"||kind==="APP") && (p[1]||"").trim()){ const d = jobDateKey(p[5]), v2 = p.length >= 11; const note = (v2 ? (p[9]||"") : p.slice(9).join(" | ")).trim().slice(0, 600), src = (p[7]||"").trim().slice(0, 60); const chRaw = v2 ? (p[11]||"").trim() : "";
+      res.apps.push({co:p[1].trim().slice(0, 60), role:(p[2]||"").trim().slice(0, 120), track:jobTrackKey(p[3]), trackRaw:(p[3]||"").trim().slice(0, 20), tier:/^[ABC]$/i.test((p[4]||"").trim()) ? p[4].trim().toUpperCase() : "", d:d.d, dApprox:d.approx, st:jobStatusKey(p[6]) || "applied", src, res:(p[8]||"").trim().slice(0, 80), note, ind: v2 ? (p[10]||"").trim().slice(0, 20) : "", ch: JOB_CH_NAMES[chRaw] || (chRaw ? jobGuessCh(chRaw) : ""), chGuess: jobGuessCh(src, note)}); }
     /* 标签 | 题号 | P0–P3 | 方向 | 公司 */
-    else if ((kind==="标签"||kind==="TAG") && p[1] && /^P[0-3]$/i.test((p[2]||"").trim())){ res.qtags.push({qid:p[1].toUpperCase(), pri:p[2].trim().toUpperCase(), track:jobTrackKey(p[3]), co:(p[4]||"").trim().slice(0, 60)}); }
+    else if ((kind==="标签"||kind==="TAG") && p[1] && /^P[0-3]$/i.test((p[2]||"").trim())){ res.qtags.push({qid:p[1].toUpperCase(), pri:p[2].trim().toUpperCase(), track:jobTrackKey(p[3]), trackRaw:(p[3]||"").trim().slice(0, 20), co:(p[4]||"").trim().slice(0, 60)}); }
+    /* 译 | 题号 | 参考回答的中文意思（英语一般时看不懂可以对照） */
+    else if ((kind==="译"||kind==="ZH") && p[1] && (p[2]||"").trim()){ res.zhs.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ").trim().slice(0, 2000)}); }
     /* 待确认 | 题号 | 要确认的事 */
     else if ((kind==="待确认"||kind==="CHECK") && p[1] && (p[2]||"").trim()){ res.checks.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ").trim().slice(0, 300)}); }
     /* 讲解 | 题号 | 中文讲解（知识卡：为什么、怎么联系自己的经历、容易和什么混） */
@@ -2903,7 +2941,7 @@ function battlePickOrder(entries){
 
 const CORE = {wordDiff, nearMiss, soundSim, sndKey, battlePlan, battleFirst, battleSpecial, battleTicks, battleBeats, battleRef, battleOutcome, battlePickOrder, BAT_DMG,TAGS,TYPE_LABEL,TENSE_NOTE,tagKey,dstr,dnum,nstr,splitAlts,shuffle,hash,buildCatalog,INTERVALS,MASTERED_BOX,srsRate,
   tokens,lcsOps,compareSaid,meaningCheck,speechFlags,hasWord,wordsMatch,speakEN,thoughtGroups,pronTip,splitSentences,chunkLex,findChunks,sayVariants,chunkSentence,hintNotes,classifySub,pastOf,regPast,lev,parseImport,checkWriting,checkPast,dayDone,computeStreak,tagAgg,
-  buildSession,diversify,interleave,pickQuestions,IRR,SESSION_CFG,jobTrackKey,jobStatusKey,jobDateKey,jobRealDate,fillerCount};
+  buildSession,diversify,interleave,pickQuestions,IRR,SESSION_CFG,jobTrackKey,jobStatusKey,jobDateKey,jobRealDate,fillerCount,mergeImports,jobGuessTrack,jobGuessCh};
 
 
 /* 按词比：错了几个词（最长公共子序列以外的词，多的、少的取大的） */
@@ -3929,7 +3967,7 @@ VIEWS.home = {
     const seg = [["quick","3 分钟"],["std","10 分钟"],["deep","20 分钟"]].map(([k,l]) => `<button data-act="goal" data-v="${k}" aria-pressed="${g===k}">${l}</button>`).join("");
     const mod = (v, icon, t, d) => `<button class="mod" data-act="nav" data-v="${v}">${ICON[icon]}<b>${t}</b><span>${d}</span></button>`;
     return `<div class="wrap">
-      <div class="top"><div class="wordmark">脱口</div><div class="top-end"><div class="streak"><span class="num">${st.streak}</span><span class="lbl">天<br>连续</span></div><button class="icon-btn" data-act="nav" data-v="progress" aria-label="进度">${ICON.chart}</button></div></div>
+      <div class="top"><div class="wordmark">脱口</div><div class="top-end"><div class="streak"><span class="num">${st.streak}</span><span class="lbl">天<br>连续</span></div><button class="icon-btn" data-act="imp-open" aria-label="导入新内容">${ICON.imp}</button><button class="icon-btn" data-act="nav" data-v="progress" aria-label="进度">${ICON.chart}</button></div></div>
       ${installBanner()}${typeof asrResumeBanner === "function" ? asrResumeBanner() : ""}${typeof micBanner === "function" ? micBanner() : ""}${resumeBanner()}${typeof nextIvBanner === "function" ? nextIvBanner() : ""}${STORAGE_OK ? "" : `<div class="banner"><span>存储空间不够，进度没存上。先备份，再清理旧录音。</span><button class="btn sm primary" data-act="nav" data-v="storage">去看看</button></div>`}${typeof ttsBanner === "function" ? ttsBanner() : ""}${typeof backupBanner === "function" ? backupBanner() : ""}${typeof pendingBanner === "function" ? pendingBanner() : ""}
       <section class="hero">
         <div class="gantry" id="homeLights">${lamps()}</div>
@@ -3959,7 +3997,7 @@ VIEWS.home = {
       <div class="mods">
         ${mod("chunks","chat","常用语块","聊天、写邮件现成的说法")}${mod("pron","ear","发音","听辨、第一印象、重音")}${mod("read","book","阅读","边听边读，挑有用的词和短语")}${wordsTile()}${mod("tips","chat","说话技巧","重音、语调、断句、连读")}${mod("grammar","pen","语法要点","时态、-s、-ed、语序")}
       </div>
-      <p class="small muted" style="margin:12px 2px 0">有 AI 给的导入码？<button class="linkbtn small" data-act="nav" data-v="import">导入新内容</button></p>
+      <p class="small muted" style="margin:12px 2px 0">有 AI 给的导入码？<button class="linkbtn small" data-act="imp-open">导入新内容</button></p>
       <p class="tip">${esc(tipOfDay())}</p>
     </div>`;
   }
@@ -4834,6 +4872,8 @@ class IvStage {
         ${(() => { const ref = refFor(q); const mine = a && a.text ? a.text.trim() : "";
           return `<div style="margin-top:10px">${slashBtn()}</div>` + ivRateHTML(q.id) + selfCheckHTML(q.id, "solo", 0, ((S.soloIssues || {})[q.id] || {}).k)
             + (ref ? `<details style="margin-top:10px" open><summary>参考回答</summary><div class="en sm" style="margin-top:6px;line-height:1.7">${wordsHTML(ref)}</div><button class="btn sm" style="margin-top:8px" data-act="nav" data-v="reader" data-q="${q.id}" data-src="ref">跟读参考回答</button></details>` : "")
+            + ((((S.qmeta || {})[q.id] || {}).zhA) ? `<details style="margin-top:10px"><summary>参考回答的中文意思</summary><p class="small" style="margin-top:6px;line-height:1.7">${esc(S.qmeta[q.id].zhA)}</p></details>` : "")
+            + (ref && typeof jobVocabHTML === "function" ? jobVocabHTML(ref) : "")
             + ((((S.qmeta || {})[q.id] || {}).ex) ? `<details style="margin-top:10px"><summary>讲解</summary><p class="small" style="margin-top:6px;line-height:1.7">${esc(S.qmeta[q.id].ex)}</p></details>` : "")
             + (mine && mine !== ref ? `<details style="margin-top:10px"><summary>我写好的回答</summary><div class="en sm" style="margin-top:6px">${esc(mine)}</div></details>` : "")
             + (!ref && !mine ? `<div class="note">${esc(q.tip)}</div>${q.tpl ? `<details style="margin-top:8px"><summary>参考结构</summary><div class="en sm" style="margin-top:6px">${esc(q.tpl)}</div></details>` : ""}` : ""); })()}
@@ -4970,7 +5010,7 @@ const IV_MODS = [
   {id:"phone", name:"电话初筛", sub:"recruiter 打来：自我介绍、工作身份、薪资、搬家、入职时间", icon:"phone"},
   {id:"basic", name:"基本面试", sub:"招聘经理：项目、失败、意见不合、优缺点，用 STAR 讲经历", icon:"case"},
   {id:"tech", name:"技术面试：追问到底", sub:"先问你的项目，再一层一层往下追问细节", icon:"bolt"},
-  {id:"concept", name:"基础概念快答", sub:"PLC、传感器、Modbus、PID、电机……两三句说清楚", icon:"chat"}
+  {id:"concept", name:"基础概念快答", sub:"专业里的基础概念，两三句说清楚；题目来自你导入的知识卡和概念题", icon:"chat"}
 ];
 const ROLE_LABEL = {first:"开场", core:"基本面试", screen:"电话初筛", ask:"你来提问", tech:"技术面试", concept:"基础概念"};
 function qRole(q){ return q.role || (q.grp === "screen" ? "screen" : q.id === "Q1" ? "first" : q.id === "Q8" ? "ask" : "core"); }
@@ -6153,7 +6193,7 @@ VIEWS.me = {
         <p class="small muted" style="margin-top:6px">这台手机现在能用 ${TTS.list("en").length} 个英文声音。想换男声、女声：手机设置里搜“文字转语音”，首选引擎选“Google 语音识别和语音合成”，点它旁边的齿轮 → 安装语音数据 → 英语（美国），列表里有好几个声音，点一下能试听，选一个就行。没有齿轮的话，在手机的应用列表里找到“Google 语音识别和语音合成”（Speech Services by Google），打开它的设置。换完回来点“试听英文”听听。</p>
         ${!TTS.ok ? `<p class="note">这个浏览器不支持朗读。</p>` : !enV.length ? `<p class="note">还没读到语音列表。试听没声音的话，去设备检测看看。</p>` : ""}</div>
       <div class="sec-title">外观</div><div class="panel"><select data-chg="set" data-key="theme" aria-label="外观">${[["auto","跟随系统"],["light","浅色"],["dark","深色"]].map(([k, l]) => `<option value="${k}" ${s.theme === k ? "selected" : ""}>${l}</option>`).join("")}</select></div>
-      <div class="sec-title">内容</div><div class="list">${liRow("import","导入新内容","把 AI 给的导入码贴进来")}${liRow("custom","我导入的内容", S.custom.length + " 张卡，" + (S.customQ || []).length + " 道面试题")}${liRow("pending","问 AI", ((S.pending || []).length) + " 句说法，" + ((S.wantWords || []).length) + " 个词，" + ((S.dbAsk || []).length + (S.replyAsk || []).length) + " 条回答和回复")}${liRow("battle","对战角色","练完一轮，和昨天的你打一场；可以导入你自己的角色")}</div>
+      <div class="sec-title">内容</div><div class="list"><button class="li" data-act="imp-open"><div class="grow"><b>导入新内容</b><span>把 AI 给的导入码贴进来，可以一次导好几个文件</span></div><span class="end">›</span></button>${liRow("custom","我导入的内容", S.custom.length + " 张卡，" + (S.customQ || []).length + " 道面试题")}${liRow("pending","问 AI", ((S.pending || []).length) + " 句说法，" + ((S.wantWords || []).length) + " 个词，" + ((S.dbAsk || []).length + (S.replyAsk || []).length) + " 条回答和回复")}${liRow("battle","对战角色","练完一轮，和昨天的你打一场；可以导入你自己的角色")}</div>
       <div class="sec-title">工具</div><div class="list">${liRow("plan","练习计划", "每天练什么、固定的练习时间" + (S.settings.planWhen ? "（" + esc(S.settings.planWhen) + "）" : ""))}${liRow("asr","录音转文字", BUILD.pwa ? "在手机上识别录音，转好了会提醒你" : "要在安装到手机上的版本里用")}${liRow("device","设备检测","朗读、识别、录音能不能用")}${liRow("install", BUILD.pwa ? "离线安装" : "离线版说明", BUILD.pwa ? "装到桌面，没网也能练" : "这个版本需要联网")}</div>
       <div class="sec-title">数据</div><div class="list">${liRow("backup","备份与恢复","换手机或清浏览器数据前先备份")}${liRow("storage","存储空间","看占了多少、清理旧录音")}</div>
       <div class="sec-title">关于</div><div class="list">${liRow("about","关于 脱口app","怎么用、为什么这样练（可以搜）")}</div>
@@ -6191,55 +6231,81 @@ ACT.reset = async () => {
 
 /* ---------- 导入 ---------- */
 let IMP = null;
+/* v1.70.1：导入页可以从成长、英语、求职、我的四个地方打开（右上角的导入按钮，底部标签跟着来的地方亮）；
+   可以一次选好几个文件、贴好几段，每一份单独解析再合起来 */
+let IMP_SRC = [];
+const IMP_HINT = {iv:"求职页的内容都能贴在这里：投递记录、面试题、知识卡、真实面试复盘拿回来的导入码。", grow:"成长页的内容：周复盘拿回来的计划和目标。", home:"英语练习的内容：卡片、单词、改错、对话。"};
+ACT["imp-open"] = () => { const t = UI.top(), v = t && VIEWS[t.name]; VIEWS.import.tab = (v && v.tab) || "me"; IMP_SRC = []; UI.nav("import", {from:VIEWS.import.tab}); };
+function impFilesHTML(){ return IMP_SRC.length ? `<div class="list" style="margin-bottom:10px">${IMP_SRC.map((f, i) => `<div class="li"><div class="grow"><b>${esc(f.name)}</b><span>${String(f.text).split(/\r?\n/).filter(x => x.trim() && !x.trim().startsWith("#")).length} 行</span></div><button class="btn sm ghost" data-act="imp-rmfile" data-i="${i}">去掉</button></div>`).join("")}</div>` : ""; }
+ACT["imp-rmfile"] = el => { IMP_SRC.splice(+el.dataset.i, 1); const b = $("#impFiles"); if (b) b.innerHTML = impFilesHTML(); const o = $("#impOut"); if (o) o.innerHTML = ""; IMP = null; };
+ACT["imp-addtext"] = () => { const box = $("#impTexts"); if (!box) return; const ta = document.createElement("textarea"); ta.className = "imp-text"; ta.style.cssText = "min-height:120px;margin-top:10px"; ta.placeholder = "再贴一段导入码"; box.appendChild(ta); ta.focus(); };
 VIEWS.import = {
   tab:"me", noRefresh:true,
-  render(){
+  render(p){
+    const hint = IMP_HINT[(p && p.from) || ""] || "";
     return `<div class="wrap">${backBtn()}<h2>导入新内容</h2>
-      <p class="muted small" style="margin:6px 0 14px">把 AI 给的导入码整段贴进来，或者直接选导入码文件。带“题库”行的内容会单独放进一个题库，首页可以选着练。</p>
-      <label class="btn block" style="margin-bottom:10px">${ICON.imp}从文件导入<input type="file" id="impFile" accept=".txt,.md,text/plain" class="hide"></label>
-      <textarea id="impText" style="min-height:160px" placeholder="卡 | 中文 | English | 类型 | 提示"></textarea>
+      <p class="muted small" style="margin:6px 0 14px">把 AI 给的导入码贴进来，或者选导入码文件。可以一次选好几个文件，也可以贴好几段；每一份单独读，带“题库”行的内容会放进各自的题库。${hint ? "<br>" + esc(hint) : ""}</p>
+      <label class="btn block" style="margin-bottom:10px">${ICON.imp}选文件（可以一次选好几个）<input type="file" id="impFile" accept=".txt,.md,text/plain" multiple class="hide"></label>
+      <div id="impFiles">${impFilesHTML()}</div>
+      <div id="impTexts"><textarea id="impText" class="imp-text" style="min-height:160px" placeholder="卡 | 中文 | English | 类型 | 提示"></textarea></div>
+      <button class="btn sm ghost" style="margin-top:6px" data-act="imp-addtext">再贴一段</button>
       <button class="btn primary block" style="margin-top:10px" data-act="imp-preview">预览</button><div id="impOut"></div>
       <details class="panel" style="margin-top:14px"><summary>导入码长什么样</summary><div class="small" style="margin-top:8px;line-height:1.9">每行一条，用 | 隔开：<br>
         <code>题库 | 某公司面试</code>（下面的内容都放进这个题库）<br>
-        <code>卡 | 中文 | English | 类型 | 提示</code><br><code>改 | 错句 | 正确句 | 类型</code><br><code>听 | English | 中文意思</code><br>
-        <code>问 | A01 | English question // 另一种问法 | 中文 | 秒数 | 开场/核心/初筛/提问 | 提示</code><br>
-        <code>答 | A01 | 完整回答</code><br><code>要点 | A01 | 要点一；要点二</code><br><code>追问 | A01 | Follow-up question?</code><br>
-        <code>面试日期 | 2026-10-22</code><br><code>面试官 | 名字 | 公司</code><br>英文有几种说法时用 // 隔开。</div></details></div>`;
+        <code>卡 | 中文 | English | 类型 | 提示</code><br><code>改 | 错句 | 正确句 | 类型</code><br><code>听 | English | 中文意思</code><br><code>词 | word | 中文意思 | 例句 | 例句的中文</code><br>
+        <code>问 | A01 | English question // 另一种问法 | 中文 | 秒数 | 开场/核心/初筛/提问/技术/概念 | 提示</code><br>
+        <code>答 | A01 | 完整回答</code><br><code>要点 | A01 | 要点一；要点二</code><br><code>追问 | A01 | Follow-up question? | 参考回答</code><br><code>译 | A01 | 回答的中文意思</code><br><code>讲解 | A01 | 中文讲解（知识卡）</code><br>
+        <code>标签 | A01 | P0–P3 | 方向 | 公司</code><br><code>待确认 | A01 | 要确认的事</code><br><code>真题 | A01 | 公司 | 日期</code><br>
+        <code>投递 | 公司 | 职位 | 方向 | 档位 | 日期 | 状态 | 来源 | 简历版本 | 备注 | 行业 | 渠道</code><br>
+        <code>面试日期 | 2026-10-22</code><br><code>面试官 | 名字 | 公司</code><br>英文有几种说法时用 // 隔开。题库名以“知识”开头的，是知识卡（求职 → 准备 → 知识）。</div></details></div>`;
   },
   mount(){
     const f = $("#impFile");
-    f && f.addEventListener("change", () => {
-      const file = f.files && f.files[0]; if (!file) return;
-      const rd = new FileReader();
-      rd.onload = () => { const ta = $("#impText"); if (ta){ ta.value = String(rd.result || ""); ACT["imp-preview"](); } };
-      rd.onerror = () => toast("文件读不出来，换成复制粘贴试试");
-      rd.readAsText(file);
+    f && f.addEventListener("change", async () => {
+      const files = Array.from(f.files || []); if (!files.length) return;
+      const read = file => new Promise(res => { const rd = new FileReader(); rd.onload = () => res({name:file.name, text:String(rd.result || "")}); rd.onerror = () => res(null); rd.readAsText(file); });
+      const got = (await Promise.all(files.map(read))).filter(Boolean);
+      if (got.length < files.length) toast("有的文件读不出来，换成复制粘贴试试");
+      for (const g of got){ const i = IMP_SRC.findIndex(x => x.name === g.name); if (i >= 0) IMP_SRC[i] = g; else IMP_SRC.push(g); }
+      f.value = ""; const b = $("#impFiles"); if (b) b.innerHTML = impFilesHTML();
+      ACT["imp-preview"]();
     });
   }
 };
+/* 每一份的内容一句话说清楚 */
+function impSum(r){ const parts = [], c = k => (r[k] || []).length;
+  const words = r.cards.filter(x => x.t === "w").length, know = r.questions.filter(q => /^知识/.test(q.deck || "")).length;
+  if (r.cards.length) parts.push(`卡片 ${r.cards.length}${words ? `（单词 ${words}）` : ""}`); if (r.questions.length) parts.push(`题目 ${r.questions.length}${know ? `（知识卡 ${know}）` : ""}`);
+  for (const [k, l] of [["apps", "投递"], ["explains", "讲解"], ["zhs", "中文意思"], ["checks", "待确认"], ["real", "真题"], ["plan", "计划"], ["articles", "文章"], ["slang", "俚语"]]) if (c(k)) parts.push(`${l} ${c(k)}`);
+  return parts.join("，") || "没读到能导入的内容"; }
 ACT["imp-preview"] = () => {
-  const t = ($("#impText")||{}).value || ""; if (!t.trim()){ toast("先把导入码贴进来，或者选文件"); return; }
-  const r = K.parseImport(t);
+  const texts = $$(".imp-text").map(x => x.value || "").filter(x => x.trim());
+  const srcs = IMP_SRC.map(x => ({name:x.name, text:x.text})).concat(texts.map((t, i) => ({name: texts.length > 1 ? `粘贴的第 ${i + 1} 段` : "粘贴的内容", text:t})));
+  if (!srcs.length){ toast("先把导入码贴进来，或者选文件"); return; }
+  const parsed = srcs.map(x => ({name:x.name, r:K.parseImport(x.text)}));
+  const r = K.mergeImports(parsed);
+  const srcSum = parsed.length > 1 ? `<li>一共 ${parsed.length} 份：${parsed.map(x => `<br>· ${esc(x.name)}：${esc(impSum(x.r))}`).join("")}</li>` : "";
   const known = new Set(Object.keys(QBY).concat(r.questions.map(q => q.id)));
   r.answers = r.answers.filter(a => { if (known.has(a.qid)) return true; r.bad.push("答 " + a.qid); return false; });
   r.keys = r.keys.filter(a => { if (known.has(a.qid)) return true; r.bad.push("要点 " + a.qid); return false; });
   r.follow = r.follow.filter(a => { if (known.has(a.qid)) return true; r.bad.push("追问 " + a.qid); return false; });
   r.alts = r.alts.filter(a => { if (CAT.byId[a.id]) return true; r.bad.push("也对 " + a.id); return false; });
   /* v1.70.0：题目的标签、待确认、真题只认已经有的题号 */
-  for (const k of ["qtags", "checks", "real", "explains"]) r[k] = (r[k] || []).filter(a => { if (known.has(a.qid)) return true; r.bad.push({qtags:"标签", checks:"待确认", real:"真题", explains:"讲解"}[k] + " " + a.qid); return false; });
+  for (const k of ["qtags", "checks", "real", "explains", "zhs"]) r[k] = (r[k] || []).filter(a => { if (known.has(a.qid)) return true; r.bad.push({qtags:"标签", checks:"待确认", real:"真题", explains:"讲解", zhs:"译"}[k] + " " + a.qid); return false; });
   IMP = r;
   const by = t => r.cards.filter(c => c.t === t).length; const dup = r.cards.filter(c => S.custom.some(x => x.id === c.id)).length;
   const decks = Array.from(new Set(r.cards.map(c => c.deck).concat(r.questions.map(q => q.deck))));
-  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length + (r.apps || []).length + (r.qtags || []).length + (r.checks || []).length + (r.real || []).length + (r.explains || []).length;
+  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length + (r.apps || []).length + (r.qtags || []).length + (r.checks || []).length + (r.real || []).length + (r.explains || []).length + (r.zhs || []).length;
   const appNew = (r.apps || []).filter(a => !jobFindApp(a)).length;
   const who = r.meta.who[0];
+  const badTxt = r.bad.every(b => typeof b === "number") ? `第 ${r.bad.join("、")} 行` : r.bad.map(b => typeof b === "number" ? `第 ${b} 行` : b).join("、");
   $("#impOut").innerHTML = `<div class="panel" style="margin-top:12px"><h3>读到了</h3><ul class="issues">
-    ${decks.length ? `<li>题库：${decks.map(esc).join("，")}</li>` : ""}
+    ${srcSum}${decks.length ? `<li>题库：${decks.map(esc).join("，")}</li>` : ""}
     <li>卡片 ${r.cards.length} 张（反射卡 ${by("r")}，找错 ${by("f")}，听力 ${by("l")}）${dup ? `，其中 ${dup} 张已经有了，会更新` : ""}</li>
     ${r.questions.length ? `<li>面试题 ${r.questions.length} 道，追问 ${r.follow.length} 个</li>` : ""}${r.plan.length ? `<li>计划 ${r.plan.length} 项${r.planReplace ? "（会替换所有没做完的计划）" : r.planReplaceGrow ? "（会替换没做完的求职、生活计划，英语的不动）" : ""}</li>` : ""}${(r.growGoals || []).length ? `<li>成长目标 ${r.growGoals.length} 项</li>` : ""}${(r.growActs || []).length ? `<li>记一笔的选项 ${r.growActs.length} 项</li>` : ""}${(r.growSkills || []).length ? `<li>技能 ${r.growSkills.length} 个</li>` : ""}${r.alts.length ? `<li>确认算对的说法 ${r.alts.length} 条</li>` : ""}
-    <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.apps || []).length ? `<li>投递 ${r.apps.length} 份（新的 ${appNew}，已有的会更新）</li>` : ""}${(r.qtags || []).length ? `<li>题目标签 ${r.qtags.length} 条（优先级、方向）</li>` : ""}${(r.checks || []).length ? `<li>待确认 ${r.checks.length} 条（确认前，相关的题不算达标）</li>` : ""}${(r.real || []).length ? `<li>真题 ${r.real.length} 道</li>` : ""}${(r.explains || []).length ? `<li>讲解 ${r.explains.length} 条（知识卡翻过来能看到）</li>` : ""}${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
+    <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.apps || []).length ? `<li>投递 ${r.apps.length} 份（新的 ${appNew}，已有的会更新）</li>` : ""}${(r.qtags || []).length ? `<li>题目标签 ${r.qtags.length} 条（优先级、方向）</li>` : ""}${(r.checks || []).length ? `<li>待确认 ${r.checks.length} 条（确认前，相关的题不算达标）</li>` : ""}${(r.real || []).length ? `<li>真题 ${r.real.length} 道</li>` : ""}${(r.explains || []).length ? `<li>讲解 ${r.explains.length} 条（知识卡翻过来能看到）</li>` : ""}${(r.zhs || []).length ? `<li>中文意思 ${r.zhs.length} 条（看不懂英文回答时可以对照）</li>` : ""}${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
     ${r.meta.date ? `<li>面试日期：${esc(r.meta.date)}</li>` : ""}${who ? `<li>面试官：${esc(who.name)}${who.company ? "，" + esc(who.company) : ""}</li>` : ""}
-    ${r.bad.length ? `<li>看不懂、会跳过的：第 ${r.bad.join("、")} 行</li>` : ""}</ul>
+    ${r.bad.length ? `<li>看不懂、会跳过的：${esc(badTxt)}</li>` : ""}</ul>
     ${n ? `<button class="btn primary block" style="margin-top:12px" data-act="imp-apply">确认导入</button>` : `<p class="note">没有能导入的内容，检查一下格式。</p>`}</div>`;
 };
 ACT["imp-apply"] = () => {
@@ -6281,7 +6347,9 @@ ACT["imp-apply"] = () => {
   if ((r.errStats || []).length){ S.errStats = S.errStats || {}; for (const e of r.errStats){ const x = S.errStats[e.c] = S.errStats[e.c] || {seed:0, hits:[]}; x.seed = Math.max(x.seed || 0, e.n); if (e.pri) x.pri = true; } }   /* 错误档案的起点；“优先”的排在清单前面 */
   rebuildCatalog(); save(true); IMP = null;
   const dk = Array.from(new Set(r.cards.map(c => c.deck).concat(r.questions.map(q => q.deck))))[0];
-  toast(`导入好了：卡片 ${r.cards.length}，面试题 ${r.questions.length}` + (dk ? (r.cards.some(c => (c.deck || "我的卡片") === dk) ? `。首页可以选“${dk}”单独练` : `。在对话练习里选“${dk}”`) : "")); UI.back();
+  IMP_SRC = [];
+  const jobish = (r.apps || []).length || r.questions.length;
+  toast(`导入好了：卡片 ${r.cards.length}，题目 ${r.questions.length}${(r.apps || []).length ? `，投递 ${r.apps.length}` : ""}` + (jobish ? "。在求职页能看到" : dk ? `。英语页可以选“${dk}”单独练` : "")); UI.back();
 };
 VIEWS.custom = {
   tab:"me",
@@ -16502,7 +16570,7 @@ VIEWS.grow = {
     const review = rw && g.rv !== rw ? `<section class="panel gr-review"><b>本周复盘</b><div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="nav" data-v="greview" data-wk="${rw}">开始复盘</button></div></section>` : "";
     const banners = `${installBanner()}${STORAGE_OK ? "" : `<div class="banner"><span>存储空间不够，进度没存上。先备份，再清理旧录音。</span><button class="btn sm primary" data-act="nav" data-v="storage">去看看</button></div>`}${typeof backupBanner === "function" ? backupBanner() : ""}${typeof nextIvBanner === "function" ? nextIvBanner() : ""}${resumeBanner()}`;
     return `<div class="wrap gr">
-      <div class="gr-top"><div><div class="gr-date">${esc(fmtDate(d))}</div><div class="small muted gr-lvline">${g.name ? esc(g.name) + "　" : ""}Lv ${lv.lv}，再 ${lv.left} 升级</div></div>${grAvatarHTML(false)}</div>
+      <div class="gr-top"><div><div class="gr-date">${esc(fmtDate(d))}</div><div class="small muted gr-lvline">${g.name ? esc(g.name) + "　" : ""}Lv ${lv.lv}，再 ${lv.left} 升级</div></div><div class="gr-topr"><button class="icon-btn" data-act="imp-open" aria-label="导入新内容">${ICON.imp}</button>${grAvatarHTML(false)}</div></div>
       ${banners}${review}${now1}${typeof jobGrowHTML === "function" ? jobGrowHTML() : ""}
       <section class="panel gr-week"><div class="gr-h"><b>本周经验值</b><span class="small muted">周一清零 · <button class="linkbtn small" data-act="gr-weeks">以前几周</button></span></div><div class="gr-bars">${GR_A.map(bar).join("")}</div></section>
       ${tiles}${mRow}${moodRow}${fold}${cal}
@@ -16523,6 +16591,7 @@ ACT["gr-log"] = async el => {
   if (!a){ a = await choose("记一笔", "", [["career", "Career（求职）"], ["english", "English（英语）"], ["life", "Life（生活）"], ["", "取消"]]); if (!a) return; if (a === "english") return ACT["gr-en"](); }
   const acts = grActsOf(a); if (!acts.length){ toast("这一栏还没有选项，在“角色和设置”里加"); return; }
   const k = await choose(`记一笔：${GR_L[a]}`, "", acts.map(x => [x.id, grActLabel(x)]).concat([["", "取消"]])); if (!k) return;
+  if (typeof jobGrowRoute === "function" && (await jobGrowRoute(k)) !== "count") return;
   const n = await grQty(grAct(k)); if (!n) return;
   growLog(k, n); UI.render();
 };
@@ -16539,7 +16608,7 @@ ACT["gr-done"] = el => growDone(el.dataset.id);
 function grJustHTML(){ return GR_JUST && Date.now() - GR_JUST.t < 30000 ? `<p class="small gr-just">刚记了：${esc(GR_JUST.txt)}<button class="linkbtn small" data-act="gr-just-undo">撤销</button></p>` : ""; }
 ACT["gr-just-undo"] = () => { if (!GR_JUST) return; for (const id of GR_JUST.ids) growUndo(id); GR_JUST = null; toast("撤销了"); UI.render(); };
 /* 快速记：点一下记一次（份数就是 1），不弹任何东西 */
-ACT["gr-tap"] = el => { growLog(el.dataset.v, 1); UI.render(); };
+ACT["gr-tap"] = async el => { const k = el.dataset.v; if (typeof jobGrowRoute === "function" && (await jobGrowRoute(k)) !== "count") return; growLog(k, 1); UI.render(); };
 /* 补记昨天：漏了一天也没关系 */
 ACT["gr-back"] = async () => {
   const yd = nstr(dnum(today()) - 1);
@@ -16551,7 +16620,7 @@ ACT["gr-back"] = async () => {
 /* v1.69.5：从成长页直接打开“以前几周”“记一笔的选项” */
 ACT["gr-weeks"] = () => { GR_OPEN.weeks = true; UI.nav("gchar"); setTimeout(() => { const d = document.querySelector('details.gr-det[data-k="weeks"]'); if (d){ d.open = true; d.scrollIntoView({block:"start", behavior:"smooth"}); } }, 80); };
 ACT["gr-pins-edit"] = () => { GR_OPEN.acts = true; UI.nav("gchar"); setTimeout(() => { const d = document.querySelector('details.gr-det[data-k="acts"]'); if (d){ d.open = true; d.scrollIntoView({block:"start", behavior:"smooth"}); } }, 80); };
-ACT["gr-quick"] = el => { growLog(el.dataset.v, 1); UI.render(); };
+ACT["gr-quick"] = async el => { const k = el.dataset.v; if (typeof jobGrowRoute === "function" && (await jobGrowRoute(k)) !== "count") return; growLog(k, 1); UI.render(); };
 ACT["gr-mood"] = el => { const g = G(); g.mood[today()] = +el.dataset.v; save(); toast("记下了"); UI.render(); };
 ACT["gr-low"] = async () => {
   const cm = grActsOf("career").find(a => a.min), lm = grActsOf("life").find(a => a.min), strip = a => a.name.replace(/^最小的一步[:：]\s*/, "");
@@ -16660,7 +16729,7 @@ VIEWS.greview = {
         <button class="btn sm" style="margin-top:8px" data-act="gr-goal-apply" data-c="${sug.career}" data-e="${sug.english}" data-l="${sug.life}">用这个当下周目标</button></div>
       <label class="fld"><span>用英语写两三句这周的事</span><textarea id="grEn" rows="3" data-chg="gr-en-draft" placeholder="This week I went to the library three times...">${esc(L.grEnDraft || "")}</textarea></label>
       <div class="row-gap" style="margin-top:12px"><button class="btn primary" data-act="gr-review-copy" data-wk="${wk}">复制给 AI</button><button class="btn" data-act="gr-friend" data-wk="${wk}">发给朋友</button></div>
-      <p class="small" style="margin-top:12px"><button class="linkbtn small" data-act="nav" data-v="import">导入 AI 给的导入码</button></p></div>`;
+      <p class="small" style="margin-top:12px"><button class="linkbtn small" data-act="imp-open">导入 AI 给的导入码</button></p></div>`;
   }
 };
 CHG["gr-en-draft"] = el => { L.grEnDraft = el.value; saveLocal(); };
@@ -17043,21 +17112,38 @@ function growApplyImport(r){
 "use strict";
 
 /* ---------- 基础数据 ---------- */
-const JOB_TRACKS = [["cs", "控制"], ["rd", "测试 / R&D"], ["me", "机械"], ["golf", "高尔夫"], ["other", "其他"]];
-const JOB_TL = {cs:"控制", rd:"测试 / R&D", me:"机械", golf:"高尔夫", other:"其他", all:"通用"};
+/* 方向：内置的通用几种 + 自己加的（JB().tracks）。行业（ind）和渠道（ch）是另外两栏，统计时分开看 */
+const JOB_TRACKS_DEF = [["me", "机械"], ["cs", "控制 / 自动化"], ["rd", "测试 / 研发"], ["ee", "电气 / 硬件"], ["sw", "软件 / 嵌入式"], ["mfg", "制造 / 工艺"], ["qa", "质量"], ["data", "数据"], ["other", "其他"]];
+function jobTracks(){ return JOB_TRACKS_DEF.concat(((S.job || {}).tracks || []).map(t => [t.id, t.name])); }
+function jobTL(id){ if (id === "all") return "通用"; if (id === "golf") return "测试 / 研发"; const t = jobTracks().find(x => x[0] === id); return t ? t[1] : "其他"; }
+const JOB_TL = new Proxy({}, {get:(_, k) => typeof k === "string" ? jobTL(k) : undefined});
+const JOB_CH = [["web", "网申"], ["ref", "内推"], ["fair", "招聘会"], ["rec", "recruiter 联系"], ["school", "学校平台"], ["other", "其他"]];
+const JOB_CHL = Object.fromEntries(JOB_CH);
+function jobTrackByName(name, create){
+  const nm = String(name || "").trim(); if (!nm) return "";
+  const hit = jobTracks().find(([id, l]) => l === nm || jobNorm(l) === jobNorm(nm) || jobNorm(l.split("/")[0]) === jobNorm(nm)); if (hit) return hit[0];
+  if (!create) return ""; const j = JB(); j.tracks = j.tracks || []; const id = "u" + jobRid(); j.tracks.push({id, name:nm.slice(0, 12)}); return id;
+}
+/* 导入时的方向：内置的用 id；认不出的按名字建一个自己的方向；旧数据里的“高尔夫”改成 测试 / 研发 + 行业：高尔夫 */
+function jobResolveTrack(key, raw){ if (key === "golf") return {track:"rd", ind:"高尔夫"}; if (key) return {track:key}; return {track: jobTrackByName(raw, true)}; }
 const JOB_ST = [["draft", "准备投"], ["applied", "已投"], ["screen", "电话初筛"], ["interview", "面试中"], ["offer", "offer"], ["rejected", "被拒"], ["failed", "面试没过"], ["dropped", "不投了"]];
 const JOB_SL = Object.fromEntries(JOB_ST);
 const JOB_STALE = 28;   /* 投了 4 周还没动静：归到“没回音”（自己定的规则，不是研究结论） */
 const JOB_GROUPS = [["live", "面试中"], ["wait", "等待回音"], ["stale", "没回音"], ["draft", "准备投"], ["ended", "已结束"]];
 const JOB_QUICK = [["screen", "约了电话初筛"], ["interview", "进了下一轮"], ["offer", "拿到 offer"], ["rejected", "被拒"], ["failed", "面试没过"], ["dropped", "不投了"]];
 /* 约到面试后 72 小时内要做的事（总纲【十一】） */
-const JOB_CHK = ["问清形式：多长时间、和谁面、要不要讲项目或做题", "JD 逐条配一个证据、故事或缺口答法", "看官网的产品和新闻、面试官的 LinkedIn", "选 2–3 个最对口的项目，准备讲解", "补这家公司要的领域知识", "定 3 个反问；过一遍签证、薪资、到岗的说法", "用无痕窗口打开作品集链接，确认能看、是对应的版本"];
+const JOB_CHK = ["问清形式：多长时间、和谁面、要不要讲项目或做题", "JD 逐条配一个证据、故事或缺口答法", "看官网的产品和新闻、面试官的 LinkedIn", "选 2–3 个最对口的项目，准备讲解", "补这家公司要的领域知识", "定 3 个反问；过一遍薪资、到岗时间的说法（需要签证担保的话也过一遍）", "有作品集或项目链接的话，用无痕窗口打开一遍，确认能看、是对应的版本"];
 const JOB_ROUNDS = [["screen", "电话初筛"], ["hm", "招聘经理"], ["tech", "技术面"], ["onsite", "现场面"], ["other", "其他"]];
 const JOB_SKIP_DECK = /coffee|chat|社交|闲聊|networking|实验室|组会/i;
 
 function JB(){
   const j = S.job || (S.job = {});
   if (!Array.isArray(j.apps)) j.apps = [];
+  if (!(j.v >= 2)){   /* v1.70.1：方向变成通用的一组；高尔夫改成行业；渠道按来源猜 */
+    j.v = 2;
+    for (const a of j.apps){ if (a.track === "golf"){ a.track = "rd"; if (!a.ind) a.ind = "高尔夫"; } if (!a.ch) a.ch = K.jobGuessCh(a.src, a.note); }
+    for (const m of Object.values(S.qmeta || {})) if (m && m.track === "golf") m.track = "rd";
+  }
   if (!Array.isArray(j.debriefs)) j.debriefs = [];
   if (!j.ivSec || typeof j.ivSec !== "object" || Array.isArray(j.ivSec)) j.ivSec = {};
   return j;
@@ -17093,22 +17179,26 @@ function jobSetStatus(a, st, note, quiet){
 /* ---------- 导入 ---------- */
 function jobApplyImport(r){
   const j = JB(); let nNew = 0, nUp = 0;
-  for (const a of (r.apps || [])){
+  for (const a0 of (r.apps || [])){
+    const a = Object.assign({}, a0), rt = jobResolveTrack(a.track, a.trackRaw); a.track = rt.track; if (rt.ind && !a.ind) a.ind = rt.ind;
+    const chG = a.chGuess; delete a.trackRaw; delete a.chGuess;
     const x = jobFindApp(a);
     if (x){
-      for (const k of ["track", "tier", "src", "res"]) if (a[k]) x[k] = a[k];
+      for (const k of ["track", "tier", "src", "res", "ind", "ch"]) if (a[k]) x[k] = a[k];
+      if (!x.ch) x.ch = chG || "web";
       if (a.d){ x.d = a.d; x.dApprox = !!a.dApprox; }
       if (a.note && !(x.note || "").includes(a.note)) x.note = x.note ? x.note + "\n" + a.note : a.note;
       if (a.st && a.st !== x.st) jobSetStatus(x, a.st, "导入", true);
       nUp++;
     } else {
-      const y = Object.assign({id:"a" + jobRid(), ts:Date.now(), hist:[{d:today(), st:a.st, note:"导入"}]}, a);
+      const y = Object.assign({id:"a" + jobRid(), ts:Date.now(), hist:[{d:today(), st:a.st, note:"导入"}]}, a); if (!y.ch) y.ch = chG || "web";
       if (["screen", "interview", "offer", "failed"].includes(a.st)) y.ivEver = true;
       j.apps.push(y); nNew++;
     }
   }
   S.qmeta = S.qmeta || {};
-  for (const t of (r.qtags || [])){ const m = S.qmeta[t.qid] = S.qmeta[t.qid] || {}; m.pri = t.pri; if (t.track) m.track = t.track; if (t.co) m.co = t.co; }
+  for (const t of (r.qtags || [])){ const m = S.qmeta[t.qid] = S.qmeta[t.qid] || {}; m.pri = t.pri; const rt = jobResolveTrack(t.track, t.trackRaw); if (rt.track) m.track = rt.track; if (t.co) m.co = t.co; }
+  for (const x of (r.zhs || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.zhA = x.text; }
   for (const c of (r.checks || [])){ const m = S.qmeta[c.qid] = S.qmeta[c.qid] || {}; m.chk = m.chk || []; if (!m.chk.some(x => x.t === c.text)) m.chk.push({t:c.text, ok:false}); }
   for (const x of (r.real || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.real = {co:x.co, d:x.d}; }
   for (const x of (r.explains || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.ex = x.text; }
@@ -17119,7 +17209,10 @@ function jobApplyImport(r){
 const jobQM = q => (S.qmeta || {})[q.id] || {};
 function jobCoDeck(deck){ const d = jobNorm(deck); if (!d) return null; return JB().apps.find(a => a.co && jobNorm(a.co).length >= 3 && d.includes(jobNorm(a.co))) || null; }
 function jobPri(q){ const m = jobQM(q); if (m.pri) return m.pri; if (q.deck && jobCoDeck(q.deck)) return "P3"; return ["first", "screen", "ask"].includes(qRole(q)) ? "P0" : "P1"; }
-function jobTrackOf(q){ const m = jobQM(q); if (m.track) return m.track; const d = String(q.deck || ""); if (/控制|自动化|controls?/i.test(d)) return "cs"; if (/测试|R&D|研发/i.test(d)) return "rd"; if (/机械|mechanical/i.test(d)) return "me"; return "all"; }
+const JOB_DECK_TRACK = [[/控制|自动化|controls?/i, "cs"], [/测试|R&D|研发|验证/i, "rd"], [/机械|mechanical/i, "me"], [/电气|硬件|electrical|hardware/i, "ee"], [/软件|嵌入式|software|embedded|firmware/i, "sw"], [/制造|工艺|manufactur/i, "mfg"], [/质量|quality/i, "qa"], [/数据|\bdata\b/i, "data"]];
+function jobTrackOf(q){ const m = jobQM(q); if (m.track) return m.track; const d = String(q.deck || "");
+  for (const t of ((S.job || {}).tracks || [])) if (t.name && d.includes(t.name)) return t.id;
+  for (const [re, k] of JOB_DECK_TRACK) if (re.test(d)) return k; return "all"; }
 function jobCoOf(q){ const m = jobQM(q); if (m.co) return m.co; const a = q.deck ? jobCoDeck(q.deck) : null; return a ? a.co : ""; }
 const jobChecksOpen = q => (jobQM(q).chk || []).filter(x => !x.ok);
 const jobUsable = q => !!q && !JOB_SKIP_DECK.test(q.deck || "") && !!(refFor(q) || written(q));
@@ -17168,9 +17261,9 @@ function jobAppOptionsHTML(sel){
 /* ---------- 每天的面试练习怎么排（总纲【一】：出现频率 × 现在的差距 × 离面试多远） ---------- */
 /* 每个方向在“面试中 + 等待回音”的投递里占多少 */
 function jobShares(){
-  const n = {cs:0, rd:0, me:0};
-  for (const a of JB().apps){ if (!["live", "wait"].includes(jobGroup(a))) continue; const t = jobTrackMap(a.track); if (n[t] != null) n[t]++; }
-  const tot = n.cs + n.rd + n.me; const out = {}; for (const k of Object.keys(n)) out[k] = tot ? n[k] / tot : 1 / 3; return out;
+  const n = {}; let tot = 0;
+  for (const a of JB().apps){ if (!["live", "wait"].includes(jobGroup(a))) continue; const t = jobTrackMap(a.track || "other"); if (t === "other") continue; n[t] = (n[t] || 0) + 1; tot++; }
+  const out = {}; for (const k of Object.keys(n)) out[k] = n[k] / tot; return out;
 }
 const jobEst = q => Math.min(240, (q.sec || 60) + 40);   /* 听题、回答、看回放打分，一道题大约多久（秒） */
 function jobScore(q, sh){
@@ -17264,7 +17357,7 @@ function jobGrowHTML(){
   const kq = jobKnowCards().length ? jobKnowQueue().length : 0;
   return `<section class="panel job-grow"><div class="job-row"><b>今天的面试练习</b><span class="small muted">${p.items.length} 道，约 ${Math.max(1, Math.round(p.sec / 60))} 分钟${kq ? `；知识复习 ${kq} 张` : ""}</span></div>
     ${n && left <= 14 ? `<p class="small muted" style="margin-top:4px">${esc(n.name)}：${left === 0 ? "就是今天" : left === 1 ? "明天" : `还有 ${left} 天`}</p>` : ""}
-    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-go">开始</button><button class="btn sm" data-act="job-go" data-v="5">只做 5 分钟</button></div></section>`;
+    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-go">开始</button><button class="btn sm" data-act="job-go" data-v="5">只做 5 分钟</button><button class="btn sm ghost" data-act="nav" data-v="jbulk">记投递</button></div></section>`;
 }
 function jobWeekLine(wk){
   const apps = JB().apps; const a0 = dnum(wk); let ivMin = 0;
@@ -17287,7 +17380,7 @@ VIEWS.iv = {
     const sub = nx ? `下一场：${esc(ivLeftText(nx))}` : apps.length ? `等待回音 ${apps.filter(a => jobGroup(a) === "wait").length} 份` : "";
     const tabs = [["today", "今天"], ["apps", sent ? `投递 ${sent}` : "投递"], ["prep", "准备"], ["rev", "复盘"]];
     const body = seg === "today" ? jobTodaySeg() : seg === "apps" ? jobAppsSeg() : seg === "prep" ? jobPrepSeg() : jobRevSeg();
-    return `<div class="wrap job"><div class="top"><h2 style="font-size:26px">求职</h2><span class="muted small">${sub}</span></div>
+    return `<div class="wrap job"><div class="top"><h2 style="font-size:26px">求职</h2><div class="top-end"><span class="muted small job-sub">${sub}</span><button class="icon-btn" data-act="imp-open" aria-label="导入新内容">${ICON.imp}</button></div></div>
       <div class="seg job-seg" role="tablist" aria-label="求职">${tabs.map(([k, l]) => `<button role="tab" data-act="job-seg" data-v="${k}" aria-pressed="${seg === k}" aria-selected="${seg === k}">${esc(l)}</button>`).join("")}</div>
       ${body}</div>`;
   }
@@ -17304,6 +17397,7 @@ ACT["job-f"] = el => { L.jobF = el.dataset.v; saveLocal(); UI.render(); };
 function jobTodaySeg(){
   const out = [], up = jobUpcoming();
   if (up.length) out.push(jobNextIvHTML(up[0]));
+  out.push(jobFollowHTML());
   out.push(jobPracticeHTML());
   out.push(jobKnowTodayHTML());
   out.push(jobPipeSumHTML());
@@ -17359,10 +17453,13 @@ function jobPipeSumHTML(){
   const wk = K.growWeekStart ? K.growWeekStart(today()) : today();
   const thisWk = apps.filter(a => a.d && !a.dApprox && dnum(a.d) >= dnum(wk) && jobSent(a)).length;
   const old = apps.filter(a => jobGroup(a) === "wait" && a.d).sort((a, b) => dnum(a.d) - dnum(b.d)).slice(0, 2);
-  return `<section class="panel job-pipe"><div class="job-row"><b>投递</b><span class="small muted">本周投了 ${thisWk} 份</span></div>
+  const goal = +JB().weekGoal || 0, gp = goal ? Math.min(100, Math.round(thisWk / goal * 100)) : 0;
+  return `<section class="panel job-pipe"><div class="job-row"><b>投递</b><span class="small muted">本周投了 ${thisWk} 份${goal ? ` / 目标 ${goal}` : ""}</span></div>
+    ${goal ? `<div class="rbar job-goal${thisWk >= goal ? " ok" : ""}" style="margin-top:8px"><i style="width:${gp}%"></i></div>` : ""}
     <div class="job-counts">${[["live", "面试中"], ["wait", "等待回音"], ["stale", "没回音"], ["ended", "已结束"]].map(([k, l]) => `<button class="job-count${k === "live" && g[k] ? " on" : ""}" data-act="job-seg" data-v="apps" data-f="${k}"><b class="num">${g[k] || 0}</b><span>${l}</span></button>`).join("")}</div>
     ${old.length ? `<p class="small muted" style="margin-top:8px">等得最久：${old.map(a => `${esc(a.co)} ${jobDays(a)} 天`).join("，")}</p>` : ""}
-    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-new">记一份投递</button><button class="btn sm ghost" data-act="job-seg" data-v="apps" data-f="all">看全部</button></div></section>`;
+    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-new">记一份投递</button><button class="btn sm" data-act="nav" data-v="jbulk">一次记好几份</button><button class="btn sm ghost" data-act="job-seg" data-v="apps" data-f="all">看全部</button></div>
+    ${goal ? "" : `<p class="small muted" style="margin-top:8px">定一个每周目标，比只说“多投点”更容易坚持：<button class="linkbtn small" data-act="job-seg" data-v="apps" data-to="jobGoal">去定</button></p>`}</section>`;
 }
 
 /* ---------- 投递 ---------- */
@@ -17376,7 +17473,9 @@ function jobAppRowHTML(a){
 function jobAppsSeg(){
   const apps = JB().apps, f = JOB_GROUPS.some(x => x[0] === L.jobF) ? L.jobF : "all";
   const g = {}; for (const a of apps) (g[jobGroup(a)] = g[jobGroup(a)] || []).push(a);
-  const top = `<div class="row-gap" style="margin:2px 0 4px"><button class="btn primary" style="flex:1" data-act="job-new">记一份投递</button></div>`;
+  const goal = +JB().weekGoal || 0;
+  const top = `<div class="row-gap" style="margin:2px 0 4px"><button class="btn primary" style="flex:1" data-act="job-new">记一份投递</button><button class="btn" style="flex:1" data-act="nav" data-v="jbulk">一次记好几份</button></div>
+    <label class="fld job-goalset" id="jobGoal"><span>每周目标：投几份</span><select data-chg="job-goal">${[0, 3, 5, 8, 10, 15, 20].map(v => `<option value="${v}"${v === goal ? " selected" : ""}>${v ? v + " 份" : "不定"}</option>`).join("")}</select></label>`;
   if (!apps.length) return top + `<p class="panel small muted" style="margin-top:10px">还没有投递记录。点上面“记一份投递”，或者把 AI 给的投递导入码导进来（我的 → 导入新内容）。</p>` + jobIvsHTML();
   const chips = `<div class="chips job-filter">${[["all", "全部", apps.length], ...JOB_GROUPS.map(([k, l]) => [k, l, (g[k] || []).length])].filter(x => x[0] === "all" || x[2]).map(([k, l, n]) => `<button class="chip${f === k ? " on" : ""}" data-act="job-f" data-v="${k}" aria-pressed="${f === k}">${l} ${n}</button>`).join("")}</div>`;
   const lists = JOB_GROUPS.filter(([k]) => (g[k] || []).length && (f === "all" || f === k)).map(([k, l]) => `<div class="sec-title">${l} ${g[k].length}${k === "stale" ? `<span class="job-sec-note">投了 4 周以上还没动静</span>` : ""}</div><div class="list">${g[k].slice().sort(jobSortIn(k)).map(jobAppRowHTML).join("")}</div>`).join("");
@@ -17386,7 +17485,7 @@ function jobIvsHTML(){ return `<div id="jobIvs" style="height:16px"></div>${inte
 function jobStatsRows(key){
   const rows = {};
   for (const a of JB().apps){ if (!jobSent(a)) continue;
-    const k = key === "track" ? (JOB_TL[a.track] || "没定方向") : key === "tier" ? (a.tier ? a.tier + " 档" : "没标档位") : ((a.res || "").trim() || "没写版本");
+    const k = key === "track" ? (a.track ? JOB_TL[a.track] : "没定方向") : key === "tier" ? (a.tier ? a.tier + " 档" : "没标档位") : key === "ind" ? ((a.ind || "").trim() || "没写行业") : key === "ch" ? (JOB_CHL[a.ch] || "网申") : ((a.res || "").trim() || "没写版本");
     const r = rows[k] = rows[k] || {sent:0, rej:0, iv:0, wait:0}; r.sent++; if (jobHadIv(a)) r.iv++; if (a.st === "rejected") r.rej++; if (["wait", "stale"].includes(jobGroup(a))) r.wait++; }
   return Object.entries(rows).sort((a, b) => b[1].sent - a[1].sent);
 }
@@ -17395,7 +17494,8 @@ function jobStatsHTML(){
   const tbl = (title, key) => { const rs = jobStatsRows(key); return rs.length ? `<div class="job-tbl"><div class="job-tr th"><span>${title}</span><span>投出</span><span>被拒</span><span>面试</span><span>等待</span></div>${rs.map(([k, r]) => `<div class="job-tr"><span>${esc(jobShort(k, 18))}</span><span class="num">${r.sent}</span><span class="num">${r.rej}</span><span class="num">${r.iv}</span><span class="num">${r.wait}</span></div>`).join("")}</div>` : ""; };
   return `<details class="panel job-stats" style="margin-top:16px"><summary><b>统计</b>　投出 ${sent} 份，进面试 ${ivN} 次</summary>
     ${ivN < 5 ? `<p class="note">面试还不到 5 次，下面各行之间的差别基本是噪声：先只看数字，别下结论。</p>` : ""}
-    ${tbl("方向", "track")}${tbl("档位", "tier")}${tbl("简历版本", "res")}
+    ${tbl("方向", "track")}${tbl("档位", "tier")}${JB().apps.some(a => (a.ind || "").trim()) ? tbl("行业", "ind") : ""}${new Set(JB().apps.filter(jobSent).map(a => a.ch || "web")).size > 1 ? tbl("渠道", "ch") : ""}${tbl("简历版本", "res")}
+    ${jobTrackMgrHTML()}
     <p class="small muted" style="margin-top:8px">“面试”从电话初筛算起；“等待”包括投了 4 周以上没回音的。</p></details>`;
 }
 function jobAppsToolsHTML(){
@@ -17421,11 +17521,13 @@ VIEWS.japp = {
       <div class="panel"${a ? ` style="margin-top:12px"` : ""}>
         <label class="fld" style="margin-top:0"><span>公司</span><input type="text" id="jaCo" value="${esc(x.co)}" placeholder="比如：Acme Robotics"></label>
         <label class="fld"><span>职位</span><input type="text" id="jaRole" value="${esc(x.role)}"></label>
-        <div class="job-2col"><label class="fld"><span>方向</span>${sel("jaTrack", [["", "没定"], ...JOB_TRACKS], x.track)}</label><label class="fld"><span>档位</span>${sel("jaTier", [["", "没定"], ["A", "A：很想去、高度对口"], ["B", "B：对口"], ["C", "C：碰运气"]], x.tier)}</label></div>
+        <div class="job-2col"><label class="fld"><span>方向</span><select id="jaTrack" data-chg="ja-track">${[["", "没定"], ...jobTracks(), ["__new", "+ 新方向…"]].map(([k, l]) => `<option value="${k}"${k === (x.track || "") ? " selected" : ""}>${esc(l)}</option>`).join("")}</select></label><label class="fld"><span>档位</span>${sel("jaTier", [["", "没定"], ["A", "A：很想去、高度对口"], ["B", "B：对口"], ["C", "C：碰运气"]], x.tier)}</label></div>
+        <label class="fld hide" id="jaTrackNewF"><span>新方向叫什么</span><input type="text" id="jaTrackNew" maxlength="12" placeholder="比如：机器人、生物医学、销售工程"></label>
+        <div class="job-2col"><label class="fld"><span>行业（可选）</span><input type="text" id="jaInd" list="jaIndList" value="${esc(x.ind || "")}" placeholder="比如：半导体"><datalist id="jaIndList">${[...new Set(JB().apps.map(a => (a.ind || "").trim()).filter(Boolean))].map(v => `<option value="${esc(v)}">`).join("")}</datalist></label><label class="fld"><span>渠道</span>${sel("jaCh", JOB_CH, x.ch || "web")}</label></div>
         <div class="job-2col"><label class="fld"><span>投递日期</span><input type="date" id="jaD" value="${esc(x.d || "")}"></label><label class="fld"><span>状态</span>${sel("jaSt", JOB_ST, x.st)}</label></div>
         <label class="fld"><span>平台、来源</span><input type="text" id="jaSrc" value="${esc(x.src || "")}" placeholder="比如：Workday、内推、招聘会"></label>
         <label class="fld"><span>用的简历版本</span><input type="text" id="jaRes" value="${esc(x.res || "")}" placeholder="比如：海投_ME"></label>
-        <label class="fld"><span>签证信息</span><input type="text" id="jaVisa" value="${esc(x.visa || "")}" placeholder="原帖怎么写、有没有 H-1B 记录、E-Verify"></label>
+        <label class="fld"><span>签证信息（需要担保的话）</span><input type="text" id="jaVisa" value="${esc(x.visa || "")}" placeholder="原帖怎么写、有没有 H-1B 记录、E-Verify"></label>
         <div class="job-2col"><label class="fld"><span>下一步</span><input type="text" id="jaNext" value="${esc(x.next || "")}" placeholder="比如：周五前回复"></label><label class="fld"><span>日期</span><input type="date" id="jaNextD" value="${esc(x.nextD || "")}"></label></div>
         <label class="fld"><span>备注</span><textarea id="jaNote" rows="3">${esc(x.note || "")}</textarea></label>
         <details style="margin-top:12px"${(x.jd || "").trim() ? " open" : ""}><summary class="small">JD 原文（可选，统计高频要求时用）</summary><textarea id="jaJD" rows="6" style="margin-top:8px">${esc(x.jd || "")}</textarea></details>
@@ -17437,7 +17539,8 @@ ACT["job-save"] = () => {
   const v = id => (($("#" + id) || {}).value || "").trim();
   const co = v("jaCo"); if (!co){ toast("写一下公司名"); return; }
   const id = ($('[data-act="job-save"]') || {dataset:{}}).dataset.id;
-  const data = {co, role:v("jaRole"), track:v("jaTrack"), tier:v("jaTier"), src:v("jaSrc"), res:v("jaRes"), visa:v("jaVisa"), next:v("jaNext"), nextD:v("jaNextD"), note:v("jaNote"), jd:v("jaJD").slice(0, 8000)};
+  let track = v("jaTrack"); if (track === "__new"){ const nm = v("jaTrackNew"); if (!nm){ toast("写一下新方向叫什么"); return; } track = jobTrackByName(nm, true); }
+  const data = {co, role:v("jaRole"), track, tier:v("jaTier"), ind:v("jaInd"), ch:v("jaCh") || "web", src:v("jaSrc"), res:v("jaRes"), visa:v("jaVisa"), next:v("jaNext"), nextD:v("jaNextD"), note:v("jaNote"), jd:v("jaJD").slice(0, 8000)};
   const d = v("jaD"), st = v("jaSt") || "applied";
   if (id){
     const a = jobApp(id); if (!a) return;
@@ -17448,7 +17551,7 @@ ACT["job-save"] = () => {
     const a = Object.assign({id:"a" + jobRid(), d, dApprox:false, st, hist:[{d:today(), st, note:"记下来"}], ts:Date.now()}, data);
     JB().apps.push(a);
     let msg = "记好了";
-    if (jobSent(a) && typeof growLog === "function" && d === today()){ growLog("apply", 1, {quiet:true}); msg = "记好了，成长页也记了一笔"; }
+    if (jobSent(a) && d === today()) msg = jobLogGrow("apply", 1) ? "记好了，成长页也记了一笔" : "记好了（成长页已经记过这一份，不重复加）";
     save(); toast(msg);
   }
   UI.back();
@@ -17475,20 +17578,20 @@ ACT["job-iv-new"] = el => {
 };
 function jobExportText(){
   const by = {}; for (const a of JB().apps) (by[jobGroup(a)] = by[jobGroup(a)] || []).push(a);
-  const meta = a => [a.d ? (a.dApprox ? a.d.slice(0, 7) : a.d.slice(5).replace("-", "/")) : "", a.src, [a.tier, a.track ? JOB_TL[a.track] : ""].filter(Boolean).join(" / ")].filter(Boolean).join("，");
+  const meta = a => [a.d ? (a.dApprox ? a.d.slice(0, 7) : a.d.slice(5).replace("-", "/")) : "", a.src, a.ch && a.ch !== "web" ? JOB_CHL[a.ch] : "", [a.tier, a.track ? JOB_TL[a.track] : "", a.ind].filter(Boolean).join(" / ")].filter(Boolean).join("，");
   const line = (a, k) => `  - ${a.co}${a.role ? " " + a.role : ""}${meta(a) ? `（${meta(a)}）` : ""}${k === "ended" ? "：" + JOB_SL[a.st] : ""}${a.note ? "；" + a.note.split("\n")[0] : ""}`;
   const parts = [["live", "面试中"], ["wait", "等待中"], ["stale", "没回音（投了 4 周以上）"], ["draft", "准备投"], ["ended", "已结束"]].filter(([k]) => by[k]).map(([k, l]) => `- ${l}：\n` + by[k].slice().sort(jobSortIn(k)).map(a => line(a, k)).join("\n"));
-  return [`【十、投递记录（截至 ${today()}，从脱口导出）】`, ...parts].join("\n");
+  return [`投递记录（截至 ${today()}，从脱口导出）`, ...parts].join("\n");
 }
-ACT["job-export"] = async () => { const ok = await copyText(jobExportText()); toast(ok ? "复制好了：贴进状态文件的【十】" : "复制没成功，再点一次"); };
+ACT["job-export"] = async () => { const ok = await copyText(jobExportText()); toast(ok ? "复制好了：可以贴进你的求职记录或状态文件" : "复制没成功，再点一次"); };
 ACT["job-jd-ai"] = () => {
   const list = JB().apps.filter(a => (a.jd || "").trim().length > 80);
   if (list.length < 3){ toast(`还差 ${3 - list.length} 份：在投递里点开一份，把 JD 原文贴进“JD 原文”`); return; }
   sendToClaude(`下面是我投的 ${list.length} 个职位的 JD 原文。请：
 1. 统计反复出现的要求（技能、工具、知识点），按出现的职位数从多到少排，标出每条在哪几家出现。
-2. 按我的状态文件标出：有证据的、只有课程或自学的、完全没有的。
+2. 按我的简历（有状态文件的话也参考）标出：有证据的、只有课程或自学的、完全没有的。
 3. 列出最该先准备的 10 个知识点，每个给一句面试版的英文回答（每句尽量 13 个词以内，最长不超过 20 个词）。
-4. 做成脱口的导入码：题库 | 面试·高频知识；问 | 题号 | 英文问法 | 中文 | 30 | 概念 | 提示；答 | 题号 | 回答；要点 | 题号 | 开口第一句；标签 | 题号 | P1 | 方向（控制 / 测试 / 机械）。
+4. 做成脱口的导入码：题库 | 面试·高频知识；问 | 题号 | 英文问法 | 中文 | 30 | 概念 | 提示；答 | 题号 | 回答；要点 | 题号 | 开口第一句；标签 | 题号 | P1 | 方向（${jobTracks().filter(t => t[0] !== "other").map(t => t[1]).join(" / ")}）。
 
 ` + list.map((a, i) => `【${i + 1}】${a.co}，${a.role || ""}（${JOB_TL[a.track] || "方向没定"}）\n${a.jd.trim().slice(0, 5000)}`).join("\n\n"));
 };
@@ -17496,11 +17599,10 @@ ACT["job-jd-ai"] = () => {
 /* ---------- 准备 ---------- */
 function jobReadyGroups(){
   const pool = jobPool().filter(q => !jobIsKnow(q)), notP = q => !["P0", "P3"].includes(jobPri(q));
-  const defs = [["P0", "每场都会问", q => jobPri(q) === "P0"],
-    ["story", "经历和故事", q => notP(q) && qRole(q) === "core" && jobTrackOf(q) === "all"],
-    ["cs", "控制", q => notP(q) && jobTrackOf(q) === "cs"], ["rd", "测试 / R&D", q => notP(q) && ["rd", "golf"].includes(jobTrackOf(q))], ["me", "机械", q => notP(q) && jobTrackOf(q) === "me"],
-    ["tech", "其他技术题", q => notP(q) && ["all", "other"].includes(jobTrackOf(q)) && qRole(q) !== "core"],
-    ["co", "公司专属", q => jobPri(q) === "P3"]];
+  const gen = q => ["all", "other"].includes(jobTrackOf(q));
+  const defs = [["P0", "每场都会问", q => jobPri(q) === "P0"], ["story", "经历和故事", q => notP(q) && qRole(q) === "core" && gen(q)]];
+  for (const [id, name] of jobTracks()) if (id !== "other") defs.push([id, name, q => notP(q) && jobTrackMap(jobTrackOf(q)) === id]);
+  defs.push(["tech", "其他技术题", q => notP(q) && gen(q) && qRole(q) !== "core"], ["co", "公司专属", q => jobPri(q) === "P3"]);
   return defs.map(([k, l, f]) => { const qs = pool.filter(f); return {k, l, qs, ready:qs.filter(jobIsReady).length, total:qs.length}; }).filter(g => g.total);
 }
 function jobPrepSeg(){
@@ -17512,7 +17614,8 @@ function jobPrepSeg(){
   const j = JB(), b = +j.budget || 0, auto = Math.round(jobAutoBudget() / 60);
   const set = `<div class="sec-title">练习设置</div><div class="panel"><label class="switch" style="border-top:0;padding-top:0"><span>卡住 5 秒时提示第一句</span><input type="checkbox" data-chg="set" data-key="ivStuck" ${S.settings.ivStuck !== false ? "checked" : ""}></label>
     <label class="fld"><span>每天的面试练习：自动是按你过去两周实际练的时间多加两成</span><select data-chg="job-budget">${[[0, `自动（现在约 ${auto} 分钟）`], [10, "10 分钟"], [15, "15 分钟"], [20, "20 分钟"], [30, "30 分钟"]].map(([v, l]) => `<option value="${v}"${b === v ? " selected" : ""}>${l}</option>`).join("")}</select></label></div>`;
-  return ready + jobKnowPrepHTML() + chk + jobModsHTML() + set;
+  const imp = `<p class="small muted" style="margin:2px 2px 0">AI 给的面试题、知识卡：<button class="linkbtn small" data-act="imp-open">导入</button></p>`;
+  return imp + ready + jobKnowPrepHTML() + chk + jobModsHTML() + set;
 }
 CHG["job-budget"] = el => { JB().budget = +el.value || 0; save(); UI.refresh(); };
 ACT["job-chk-ok"] = el => { const m = (S.qmeta || {})[el.dataset.q]; const c = m && (m.chk || [])[+el.dataset.i]; if (!c) return; c.ok = true; save(); toast("确认了"); UI.render(); };
@@ -17557,6 +17660,7 @@ function jobRevSeg(){
   const db = JB().debriefs.slice().sort((a, b) => String(b.d || "").localeCompare(String(a.d || "")) || (b.ts || 0) - (a.ts || 0));
   const calls = (S.calls || []).filter(c => c.segs);
   return `<div class="row-gap" style="margin:2px 0 4px"><button class="btn primary" style="flex:1" data-act="nav" data-v="jdeb">记一次真实面试</button></div>
+    <p class="small muted" style="margin:8px 2px 0">AI 回复的复盘导入码：<button class="linkbtn small" data-act="imp-open">在这里导入</button></p>
     <div class="sec-title">真实面试 ${db.length}</div>${db.length ? `<div class="list">${db.map(jobDebRowHTML).join("")}</div>` : `<p class="panel small">面完 24 小时内记一下：被问了什么、哪里卡住、对方说的下一步。发给 AI 以后，拿回这一场的导入码、感谢信草稿和给状态文件的更新。<span class="muted">复盘的研究里，针对一次具体经历、再加上外部反馈的复盘，平均能让之后的表现提高两成左右。</span></p>`}
     <div class="sec-title">模拟面试</div><div class="list"><button class="li" data-act="nav" data-v="calls"><div class="grow"><b>模拟面试的复盘记录</b><span>${calls.length} 次：听录音、看参考回答、给每题打分</span></div><span class="job-go-arrow" aria-hidden="true">${ICON.chev}</span></button></div>
     ${jobMetTrendHTML()}`;
@@ -17601,7 +17705,7 @@ function jobDebSave(id){
   if (x) Object.assign(x, data, {ts:Date.now()});
   else {
     x = Object.assign({id:"d" + jobRid(), ts:Date.now()}, data); j.debriefs.push(x);
-    if (typeof growLog === "function"){ growLog("iv", 1, {quiet:true}); x.grew = true; }
+    x.grew = jobLogGrow("iv", 1) > 0;
   }
   const a = x.app ? jobApp(x.app) : null;
   if (a && ["draft", "applied"].includes(a.st)) jobSetStatus(a, x.round === "screen" ? "screen" : "interview", "面试复盘");
@@ -17626,10 +17730,11 @@ function jobDebText(x){
     "   - 真题 | 题号 | 公司 | 日期",
     "   - 拿不准的事实：待确认 | 题号 | 要确认的事",
     "   - 我说错的英文：改 | 原句 | 正确说法 | 类型 | 提示",
-    "   - 要补的知识：问（角色写 概念）+ 答 + 标签 | 题号 | P1 | 方向",
+    `   - 要补的知识：题库 | 知识·（方向）；问（角色写 概念）+ 答 + 讲解 | 题号 | 中文讲解 + 标签 | 题号 | P1 | 方向（${jobTracks().filter(t => t[0] !== "other").map(t => t[1]).join(" / ")}）`,
+    "   - 每道题的参考回答再给一行：译 | 题号 | 回答的中文意思（我英语一般，看不懂时对照）",
     "   - 计划：今天发感谢信；对方说的时间线过后约一周还没消息就跟进（计划 | 日期 | 什么时候 | 做什么 | 求职）",
     "2. 一封感谢信草稿（24 小时内发）。",
-    "3. 一段贴进状态文件【十】【十五】的更新：日期｜公司和轮次｜面试官｜被问到的题｜我的回答要点｜答得好的｜要改的｜要补的知识｜跟进事项。"
+    "3. 一段贴进状态文件（或我的求职记录）的更新：日期｜公司和轮次｜面试官｜被问到的题｜我的回答要点｜答得好的｜要改的｜要补的知识｜跟进事项。"
   ].filter(s => s !== "").join("\n");
 }
 
@@ -17659,8 +17764,11 @@ function jobKnowQueue(extraNew){
   const due = cards.filter(q => K0[q.id] && K0[q.id].due <= tn).sort((a, b) => K0[a.id].due - K0[b.id].due);
   const left = extraNew != null ? extraNew : Math.max(0, (+JB().knowNew || 5) - JB().knowNewDay.n);
   const order = new Map((S.customQ || []).map((q, i) => [q.id, i]));
-  const w = q => { const t = jobTrackMap(jobTrackOf(q)); return sh[t] != null ? 0.3 + sh[t] : 0.6; };
-  const fresh = cards.filter(q => !K0[q.id]).sort((a, b) => w(b) - w(a) || order.get(a.id) - order.get(b.id)).slice(0, left);
+  const w = q => { const t = jobTrackMap(jobTrackOf(q)); return ["all", "other"].includes(t) ? 0.6 : 0.3 + (sh[t] || 0); };
+  /* 新卡按方向的比例分到各组（最高商数法：权重 ÷ 已分到的张数 + 1），所以每天的新卡来自好几组，又偏向投得多的方向 */
+  const byDeck = new Map(); for (const q of cards.filter(q => !K0[q.id]).sort((a, b) => order.get(a.id) - order.get(b.id))){ if (!byDeck.has(q.deck)) byDeck.set(q.deck, []); byDeck.get(q.deck).push(q); }
+  const fresh = [], got = new Map();
+  while (fresh.length < left){ let best = null, bs = -1; for (const [d, arr] of byDeck){ if (!arr.length) continue; const sc = w(arr[0]) / ((got.get(d) || 0) + 1); if (sc > bs){ bs = sc; best = d; } } if (!best) break; fresh.push(byDeck.get(best).shift()); got.set(best, (got.get(best) || 0) + 1); }
   return jobInterleave(extraNew != null ? fresh : due.concat(fresh));
 }
 function jobKnowRate(qid, r){
@@ -17725,17 +17833,18 @@ VIEWS.jknow = {
         <div class="row-gap" style="margin-top:16px">${left ? `<button class="btn" data-act="jk-go">接着复习 ${left} 张</button>` : `<button class="btn" data-act="jk-more">再学 5 张新的</button>`}<button class="btn primary" data-act="back">完成</button></div></div>`;
     }
     const q = QBY[st.ids[st.i]]; if (!q){ st.i++; return this.render(); }
-    const k = jobKnowState(q), isNew = !k, ex = ((S.qmeta || {})[q.id] || {}).ex || "", ref = refFor(q);
+    const k = jobKnowState(q), isNew = !k, ex = ((S.qmeta || {})[q.id] || {}).ex || "", zhA = ((S.qmeta || {})[q.id] || {}).zhA || "", ref = refFor(q);
     const head = `<div class="jk-top"><button class="back" data-act="back">${ICON.chev}退出</button><span class="num muted">${st.i + 1}/${n}</span></div>
       <div class="runbar"><div class="track"><i style="width:${Math.round(st.i / n * 100)}%"></i></div></div>`;
     const front = `<div class="kind"><span class="chip k">${isNew ? "新的" : st.re[q.id] ? "再来一次" : "复习"}</span><span class="chip">${esc(jobKnowDeckName(q.deck))}</span></div>
-      <h3 class="jk-q">${esc(q.zh || q.id)}</h3><div class="en sm jk-en">${esc((q.v || [])[0] || "")}</div>`;
+      <h3 class="jk-q">${esc(q.zh || q.id)}</h3><div class="en sm jk-en">${wordsHTML((q.v || [])[0] || "")}</div>`;
     if (!st.flip) return `<div class="wrap jk">${head}<div class="card jk-card">${front}
       ${TTS.ok ? `<button class="btn sm ghost" style="margin-top:6px" data-act="jk-say" data-v="q">${ICON.speak}听英文问法</button>` : ""}
       <p class="small muted" style="margin-top:14px">${isNew ? "没学过也先猜一下，再看答案：先猜后学，记得更牢。" : "先自己说出来，中文英文都行，再看答案。"}</p>
       <button class="btn primary block big" style="margin-top:16px" data-act="jk-flip">看答案</button></div></div>`;
     return `<div class="wrap jk">${head}<div class="card jk-card">${front}
-      <div class="jk-ans"><div class="small muted">面试里可以这样说</div><div class="en sm" style="margin-top:4px;line-height:1.65">${esc(ref)}</div>${TTS.ok ? `<button class="btn sm ghost" style="margin-top:6px" data-act="jk-say" data-v="a">${ICON.speak}听一遍</button>` : ""}</div>
+      <div class="jk-ans"><div class="small muted">面试里可以这样说</div><div class="en sm" style="margin-top:4px;line-height:1.65">${wordsHTML(ref)}</div>${TTS.ok ? `<button class="btn sm ghost" style="margin-top:6px" data-act="jk-say" data-v="a">${ICON.speak}听一遍</button>` : ""}
+        ${zhA ? `<details class="jk-zh"><summary class="small">看中文意思</summary><p class="small" style="margin-top:6px;line-height:1.7">${esc(zhA)}</p></details>` : ""}${jobVocabHTML(ref)}</div>
       ${ex ? `<div class="jk-ex"><div class="small muted">讲解</div><p style="margin-top:4px">${esc(ex)}</p></div>` : ""}
       <div class="small muted" style="margin-top:14px">刚才你想起来多少？</div>
       <div class="jk-rate"><button class="btn" data-act="jk-rate" data-r="again">没想起来</button><button class="btn" data-act="jk-rate" data-r="hard">想起一部分</button><button class="btn primary" data-act="jk-rate" data-r="good">想起来了</button></div></div></div>`;
@@ -17750,6 +17859,122 @@ ACT["jk-rate"] = el => {
   if (r === "again" && !st.re[qid]){ st.re[qid] = 1; st.ids.push(qid); }   /* 这一轮里先学到能想起来一次 */
   st.i++; st.flip = false; try { TTS.cancel(); } catch (e) {} UI.render(); window.scrollTo(0, 0);
 };
+
+/* ---------- v1.70.1：方向管理、每周目标、该跟进的、一次记好几份 ---------- */
+CHG["ja-track"] = el => { const f = $("#jaTrackNewF"); if (f) f.classList.toggle("hide", el.value !== "__new"); if (el.value === "__new"){ const i = $("#jaTrackNew"); if (i) i.focus(); } };
+CHG["job-goal"] = el => { JB().weekGoal = +el.value || 0; save(); toast(+el.value ? `每周目标：${el.value} 份` : "不定每周目标"); UI.render(); };
+function jobTrackMgrHTML(){
+  const own = (JB().tracks || []); if (!own.length) return "";
+  const used = id => JB().apps.filter(a => a.track === id).length + Object.values(S.qmeta || {}).filter(m => m && m.track === id).length;
+  return `<div class="small" style="margin-top:12px"><b>自己加的方向</b>：${own.map(t => `<span class="chip" style="margin:4px 4px 0 0">${esc(t.name)}${used(t.id) ? `（${used(t.id)}）` : `<button class="linkbtn small" style="margin-left:6px" data-act="job-trk-del" data-id="${t.id}">删</button>`}</span>`).join("")}</div>`;
+}
+ACT["job-trk-del"] = el => { const j = JB(); j.tracks = (j.tracks || []).filter(t => t.id !== el.dataset.id); save(); UI.render(); };
+/* 今天：下一步日期到了的投递（自己在投递里写的“下一步”） */
+function jobFollowHTML(){
+  const d = today(), list = JB().apps.filter(a => a.nextD && a.nextD <= d && jobGroup(a) !== "ended").sort((a, b) => a.nextD < b.nextD ? -1 : 1);
+  if (!list.length) return "";
+  return `<section class="panel job-fu"><div class="job-row"><b>该跟进的 ${list.length} 件</b><span class="small muted">下一步日期到了</span></div>
+    ${list.slice(0, 4).map(a => `<div class="job-fu-row"><button class="linkbtn" data-act="nav" data-v="japp" data-id="${a.id}">${esc(a.co)}</button><span class="small">${esc(a.next || "跟进一下")}${a.nextD < d ? `<span class="muted">（${a.nextD.slice(5).replace("-", "/")}）</span>` : ""}</span><button class="btn sm" data-act="job-fu-done" data-id="${a.id}">做完了</button></div>`).join("")}</section>`;
+}
+ACT["job-fu-done"] = el => { const a = jobApp(el.dataset.id); if (!a) return; a.hist = a.hist || []; a.hist.push({d:today(), st:a.st, note:"跟进：" + (a.next || "做完了")}); a.next = ""; a.nextD = ""; save(); toast("记下了"); UI.render(); };
+/* 一次记好几份：自己一行一份快速记（按职位名猜方向），或者把乱贴的内容发给 AI，让它整理成导入码 */
+function jobBulkParse(text){
+  const out = [];
+  for (const raw of String(text || "").split(/\r?\n/)){
+    const line = raw.trim(); if (!line || line.startsWith("#")) continue;
+    let co = "", role = "", tr = "";
+    const at = line.match(/^(.+?)\s+(?:at|@)\s+(.+)$/i);
+    let parts = line.split(/\s*(?:[|｜\t]|\s[-–—]\s|，|,)\s*/).map(x => x.trim()).filter(Boolean);
+    if (parts.length >= 2){ co = parts[0]; role = parts[1]; tr = parts[2] || ""; }
+    else if (at){ role = at[1].trim(); co = at[2].trim(); }
+    else co = line;
+    const key = tr ? (K.jobTrackKey(tr) || jobTrackByName(tr, false)) : "";
+    out.push({co:co.slice(0, 60), role:role.slice(0, 120), track: key && key !== "golf" ? key : K.jobGuessTrack(role), trackNew: tr && !key ? tr : ""});
+  }
+  return out;
+}
+VIEWS.jbulk = {
+  tab:"iv", noRefresh:true,
+  render(){
+    const m = L.jbMode === "ai" ? "ai" : "quick";
+    const head = `<div class="wrap">${backBtn()}<h2>一次记好几份</h2><p class="small muted" style="margin:4px 0 12px">投了一天累了，就用这里：自己一行写一份，或者把乱贴的内容交给 AI 整理。</p>
+      <div class="seg"><button data-act="jb-mode" data-v="quick" aria-pressed="${m === "quick"}">自己快速记</button><button data-act="jb-mode" data-v="ai" aria-pressed="${m === "ai"}">发给 AI 整理</button></div>`;
+    if (m === "ai") return head + `<div class="panel"><label class="fld" style="margin-top:0"><span>把今天投的职位随便贴进来：职位页面复制的文字、链接、自己的备注都行</span><textarea id="jbAI" rows="9" placeholder="比如：\nAcme Robotics, Test Engineer，内推，地点 Boston\nhttps://jobs.example.com/12345\n还有一个 Formless 的机械岗"></textarea></label>
+      <label class="fld"><span>投递日期</span><input type="date" id="jbAID" value="${today()}"></label>
+      <button class="btn primary block" style="margin-top:12px" data-act="jb-ai">复制给 AI，让它整理成导入码</button>
+      <p class="small muted" style="margin-top:8px">AI 回复以后，把它给的导入码贴进导入页：<button class="linkbtn small" data-act="imp-open">打开导入页</button></p></div></div>`;
+    return head + `<div class="panel"><label class="fld" style="margin-top:0"><span>一行一份：公司 | 职位（后面可以再加 | 方向）</span><textarea id="jbText" rows="7" data-chg="jb-prev" placeholder="Acme Robotics | Test Engineer\nBeta Motion | Controls Engineer I\nGamma Labs, Mechanical Engineer"></textarea></label>
+      <div class="job-2col"><label class="fld"><span>投递日期</span><input type="date" id="jbD" value="${today()}"></label><label class="fld"><span>渠道</span><select id="jbCh">${JOB_CH.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label></div>
+      <button class="btn sm" style="margin-top:10px" data-act="jb-prev">看看会记成什么样</button><div id="jbOut" style="margin-top:10px"></div></div></div>`;
+  }
+};
+ACT["jb-mode"] = el => { L.jbMode = el.dataset.v; saveLocal(); UI.render(); };
+function jbPrevHTML(rows){
+  if (!rows.length) return `<p class="small muted">还没写内容。</p>`;
+  const dup = r => !!jobFindApp(r);
+  return `<div class="list">${rows.map(r => `<div class="li"><div class="grow"><b>${esc(r.co)}</b><span>${esc(r.role || "职位没写")}　${esc(r.trackNew || JOB_TL[r.track])}${r.trackNew ? "（新方向）" : "（按职位名猜的）"}</span></div>${dup(r) ? `<span class="end">已经记过</span>` : ""}</div>`).join("")}</div>
+    <p class="small muted" style="margin-top:6px">方向猜错了，记完以后点开那一份改。状态都是“已投”。</p>
+    <button class="btn primary block" style="margin-top:10px" data-act="jb-save">记下这 ${rows.filter(r => !dup(r)).length} 份</button>`;
+}
+ACT["jb-prev"] = () => { const o = $("#jbOut"); if (o) o.innerHTML = jbPrevHTML(jobBulkParse(($("#jbText") || {}).value)); };
+CHG["jb-prev"] = () => ACT["jb-prev"]();
+ACT["jb-save"] = () => {
+  const rows = jobBulkParse(($("#jbText") || {}).value).filter(r => !jobFindApp(r)); if (!rows.length){ toast("没有新的要记"); return; }
+  const d = ($("#jbD") || {}).value || today(), ch = ($("#jbCh") || {}).value || "web";
+  for (const r of rows){ const track = r.trackNew ? jobTrackByName(r.trackNew, true) : r.track;
+    JB().apps.push({id:"a" + jobRid(), co:r.co, role:r.role, track, tier:"", d, dApprox:false, st:"applied", ch, src:"", res:"", note:"", hist:[{d:today(), st:"applied", note:"一次记好几份"}], ts:Date.now()}); }
+  let msg = `记好了 ${rows.length} 份`;
+  if (d === today()){ const added = jobLogGrow("apply", rows.length); msg += added === rows.length ? "，成长页也记了" : added ? `，成长页补记了 ${added} 份（另外 ${rows.length - added} 份之前只记了数）` : "（成长页之前已经记过数，不重复加）"; }
+  save(); toast(msg); L.jobSeg = "apps"; saveLocal(); UI.back();
+};
+ACT["jb-ai"] = async () => {
+  const t = (($("#jbAI") || {}).value || "").trim(); if (!t){ toast("先把内容贴进来"); return; }
+  const d = ($("#jbAID") || {}).value || today(), tracks = jobTracks().filter(x => x[0] !== "other").map(x => x[1]).join(" / ");
+  await sendToClaude(`下面是我投的职位（日期 ${d}），内容可能很乱：复制的网页、链接、我的备注。请整理成脱口的投递导入码，每个职位一行，只输出导入码，不要别的话：
+投递 | 公司 | 职位 | 方向 | 档位 | 日期 | 状态 | 来源 | 简历版本 | 备注 | 行业 | 渠道
+- 方向从这几个里选：${tracks}；都不合适就写一个简短的新方向名
+- 档位：A（很想去、高度对口）、B（对口）、C（碰运气）；看不出来就空着
+- 日期：${d}（我写了别的日期就用我写的）；状态：已投
+- 来源：投递平台（Workday、公司官网、LinkedIn……）；渠道：网申、内推、招聘会、recruiter、学校平台、其他
+- 简历版本、备注按我写的填；备注里写要紧的信息，比如签证担保、地点、截止日期
+- 行业：两三个字（比如 半导体、医疗器械、机器人），看不出来就空着
+- 不要编：看不出来的格子就空着；链接打不开就只按链接里能看出来的写
+
+${t}`);
+};
+/* 这张卡里有哪些词在“单词”卡里（英语练习里导入的技术词汇）：点一下听 */
+function jobVocabHTML(text){
+  const words = (S.custom || []).filter(c => c.t === "w" && c.word); if (!words.length || !text) return "";
+  const low = " " + String(text).toLowerCase().replace(/[^a-z0-9'\- ]+/g, " ").replace(/\s+/g, " ") + " ";
+  const has = w => { w = String(w).toLowerCase().trim(); if (w.length < 3) return false; return [w, w + "s", w + "es", w + "ed", w + "d", w + "ing", w.replace(/e$/, "") + "ing"].some(x => low.includes(" " + x + " ")); };
+  const hit = words.filter(c => has(c.word)).slice(0, 8); if (!hit.length) return "";
+  return `<div class="jk-vocab"><div class="small muted">这张卡里的词（点一下听）</div><div class="chips" style="margin-top:6px">${hit.map(c => `<button class="chip" data-act="jk-vw" data-w="${esc(c.word)}">${esc(c.word)}<span class="muted">　${esc(c.mean || "")}</span></button>`).join("")}</div></div>`;
+}
+ACT["jk-vw"] = el => { try { TTS.speak(el.dataset.w, {rate:0.9}); } catch (e) {} };
+
+/* ---------- v1.70.2：成长页和求职页：一个地方记，另一个地方跟着 ----------
+   求职页是“记细节”的地方（公司、职位、复盘），记了就自动给成长页加经验值。成长页上“投申请”“一次真实的面试”
+   点了先问：记到求职页（推荐），还是只记数。只记了数、后来又在求职页补上同一天的，不会重复加经验值。 */
+async function jobGrowRoute(k){
+  if (k === "apply"){
+    const r = await choose("投了一份申请", `<p class="small muted">记到投递里，以后能看出哪个方向、哪份简历回音多。累了也可以先只记数，以后再补，经验值不会重复加。</p>`, [["rec", "记到投递里（写公司和职位）"], ["count", "只记数"], ["", "取消"]]);
+    if (r === "rec"){ UI.nav("jbulk"); return "nav"; } return r || "cancel";
+  }
+  if (k === "iv"){
+    const r = await choose("一次真实的面试", `<p class="small muted">写复盘能拿回这一场的导入码、感谢信草稿和给状态文件的更新。</p>`, [["deb", "写这次面试的复盘"], ["count", "只记一次"], ["", "取消"]]);
+    if (r === "deb"){ UI.nav("jdeb"); return "nav"; } return r || "cancel";
+  }
+  return "count";
+}
+/* 求职页给成长页记一笔：今天在成长页“只记了数”的，先抵掉，剩下的才新记（返回新记了几份） */
+function jobLogGrow(k, n){
+  if (typeof growLog !== "function" || !(n > 0)) return 0;
+  const d = today(), j = JB(); if (!j.gcred || j.gcred.d !== d) j.gcred = {d, apply:0, iv:0};
+  const free = G().log.filter(e => e.d === d && e.k === k && e.pid !== "job").reduce((s, e) => s + (e.n || 1), 0) - (j.gcred[k] || 0);
+  const use = Math.max(0, Math.min(n, free)); j.gcred[k] = (j.gcred[k] || 0) + use;
+  const rest = n - use; if (rest > 0) growLog(k, rest, {quiet:true, pid:"job"});
+  save(); return rest;
+}
 
 </script>
 </body>
