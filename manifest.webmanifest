@@ -6,6 +6,15 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
+  "share_target": {
+    "action": "./",
+    "method": "GET",
+    "params": {
+      "title": "st",
+      "text": "sx",
+      "url": "su"
+    }
+  },
   "background_color": "#ECEFF3",
   "theme_color": "#16202B",
   "icons": [

@@ -493,7 +493,7 @@ html,body{overscroll-behavior-y:contain}
 .g-weak{color:var(--muted,#566274)}
 .bt-ghost.monster .bt-face{transform:none;filter:none}
 .bt-mon{overflow:visible}
-.bt-pop{position:absolute;font-weight:800;font-size:.95rem;white-space:nowrap;pointer-events:none;z-index:6;color:#fff;text-shadow:0 0 3px #1A2B6B,0 2px 0 #1A2B6B}
+.bt-pop{position:absolute;font-weight:800;font-size:.95rem;white-space:nowrap;pointer-events:none;z-index:95;color:#fff;text-shadow:0 0 3px #1A2B6B,0 2px 0 #1A2B6B}
 .bt-pop.combo{color:#FFE08A}
 .bt-pop.weak{color:#FF9FC2}
 
@@ -1075,6 +1075,27 @@ html[lang="en"] .job-count span{font-size:11.5px}
 @keyframes gcRing{from{opacity:.9;transform:translateX(-50%) scale(.6)}to{opacity:0;transform:translateX(-50%) scale(1.25)}}
 @media (prefers-reduced-motion: reduce){.gc-lab-mon::after,.gc-lab-led,.gc-lab-ring{animation:none}}
 
+/* v1.74.0：<details> 里的内容在 Chromium 里继承不到 box-sizing（内容放在浏览器自带的 slot 里），输入框多出内边距，撑出卡片 */
+details > *, details > * *{box-sizing:border-box}
+.fld input, .fld select, .fld textarea{box-sizing:border-box;max-width:100%}
+.job-2col > *{min-width:0}
+.jr-paste{margin-bottom:12px}
+.job-pend{background:var(--amber-soft);border-color:transparent}
+.jn-row{margin-top:8px}
+.jn-row input{width:100%;box-sizing:border-box}
+.jd-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.jd-row:first-child{border-top:0;padding-top:2px}
+.jd-l{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.jd-bar{display:flex;height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.jd-bar i{display:block;height:100%}
+.jd-bar i.req{background:var(--purple)}
+.jd-bar i.pref{background:color-mix(in srgb, var(--purple) 45%, var(--surface2))}
+.jd-bar i.oth{background:color-mix(in srgb, var(--ink2) 25%, var(--surface2))}
+.jd-ev{flex:none;min-width:64px;padding:6px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);color:var(--ink2);font-size:12.5px;cursor:pointer}
+.jd-ev.ev-y{background:color-mix(in srgb, var(--green) 18%, var(--surface));border-color:transparent;color:var(--ink)}
+.jd-ev.ev-s{background:var(--amber-soft);border-color:transparent;color:var(--ink)}
+.jd-ev.ev-n{background:color-mix(in srgb, var(--red) 14%, var(--surface));border-color:transparent;color:var(--ink)}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -1095,7 +1116,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.73.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.74.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2629,10 +2650,21 @@ function mergeImports(list){
   return out;
 }
 function parseImport(text){
-  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], apps:[], qtags:[], checks:[], real:[], explains:[], zhs:[], debriefs:[], meta:{date:"", who:[], replace:[]}, bad:[]};
+  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], apps:[], qtags:[], checks:[], real:[], explains:[], zhs:[], debriefs:[], jds:[], skills:[], meta:{date:"", who:[], replace:[]}, bad:[]};
   const ROLE = {"开场":"first","核心":"core","初筛":"screen","提问":"ask","基本":"core","行为":"core","电话":"screen","技术":"tech","概念":"concept","first":"first","core":"core","screen":"screen","ask":"ask","tech":"tech","concept":"concept"};
   let deck = "我的卡片", curDeb = null;
-  String(text||"").split(/\r?\n/).forEach((line, i) => {
+  /* v1.74.0：JD 原文块。“JD | 公司 | 职位 | 链接（可选）”开头，到“JD 结束”那一行为止；中间的行原样当 JD 原文，不当导入行解析（行号照旧，方便报错） */
+  const rawLines = String(text||"").split(/\r?\n/), keep = [];
+  for (let k = 0; k < rawLines.length; k++){
+    const m = rawLines[k].trim().match(/^JD\s*[|｜]\s*(.+)$/i);
+    if (!m){ keep.push(rawLines[k]); continue; }
+    const p = m[1].split(/\s*[|｜]\s*/), body = []; let k2 = k + 1;
+    for (; k2 < rawLines.length; k2++){ if (/^\s*(?:JD\s*结束|【\s*JD\s*结束\s*】|END\s*JD)\s*$/i.test(rawLines[k2])) break; body.push(rawLines[k2]); }
+    res.jds.push({co:(p[0]||"").trim().slice(0, 80), role:(p[1]||"").trim().slice(0, 160), url:((p.slice(2).join(" ").match(/https?:\/\/\S+/) || [""])[0]).slice(0, 400), text:body.join("\n").trim().slice(0, 20000)});
+    for (let z = k; z <= k2 && z < rawLines.length; z++) keep.push("");
+    k = k2;
+  }
+  keep.forEach((line, i) => {
     const s = line.trim();
     if (!s || s.startsWith("#")) return;
     const p = s.split(/\s*[|｜]\s*/);
@@ -2681,6 +2713,8 @@ function parseImport(text){
     else if (kind==="下一步" && curDeb && (p[1]||"").trim()){ curDeb.next = p.slice(1).join(" | ").trim().slice(0, 300); }
     /* 真题 | 题号 | 公司 | 日期 */
     else if ((kind==="真题"||kind==="REAL") && p[1]){ res.real.push({qid:p[1].toUpperCase(), co:(p[2]||"").trim().slice(0, 60), d:jobDateKey(p[3]).d}); }
+    /* 技能 | 名称 | 有证据 / 学过 / 没有（JD 高频要求里，你在每一项上有没有证据） */
+    else if ((kind==="技能"||kind==="SKILL") && p[1] && (p[2]||"").trim()){ const v = p[2].trim(); res.skills.push({name:p[1].trim().slice(0, 60), ev:/^(有证据|有|做过|y(es)?)$/i.test(v) ? "y" : /^(学过|课程|自学|学了|some|s)$/i.test(v) ? "s" : /^(没有|没|无|no?|n)$/i.test(v) ? "n" : ""}); }
     else res.bad.push(i+1);
   });
   for (const c of res.cards) c.id = "c" + hash(c.t + "|" + tokens(c.en).join(" "));
@@ -6391,7 +6425,7 @@ ACT["imp-preview"] = () => {
   IMP = r;
   const by = t => r.cards.filter(c => c.t === t).length; const dup = r.cards.filter(c => S.custom.some(x => x.id === c.id)).length;
   const decks = Array.from(new Set(r.cards.map(c => c.deck).concat(r.questions.map(q => q.deck))));
-  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length + (r.apps || []).length + (r.qtags || []).length + (r.checks || []).length + (r.real || []).length + (r.explains || []).length + (r.zhs || []).length + (r.debriefs || []).length;
+  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length + (r.apps || []).length + (r.qtags || []).length + (r.checks || []).length + (r.real || []).length + (r.explains || []).length + (r.zhs || []).length + (r.jds || []).length + (r.skills || []).length + (r.debriefs || []).length;
   const appNew = (r.apps || []).filter(a => !jobFindApp(a) && !jobFindAppLoose(a)).length;
   const who = r.meta.who[0];
   const badTxt = r.bad.every(b => typeof b === "number") ? `第 ${r.bad.join("、")} 行` : r.bad.map(b => typeof b === "number" ? `第 ${b} 行` : b).join("、");
@@ -6399,7 +6433,7 @@ ACT["imp-preview"] = () => {
     ${srcSum}${decks.length ? `<li>题库：${decks.map(esc).join("，")}</li>` : ""}
     <li>卡片 ${r.cards.length} 张（反射卡 ${by("r")}，找错 ${by("f")}，听力 ${by("l")}）${dup ? `，其中 ${dup} 张已经有了，会更新` : ""}</li>
     ${r.questions.length ? `<li>面试题 ${r.questions.length} 道，追问 ${r.follow.length} 个</li>` : ""}${r.plan.length ? `<li>计划 ${r.plan.length} 项${r.planReplace ? "（会替换所有没做完的计划）" : r.planReplaceGrow ? "（会替换没做完的求职、生活计划，英语的不动）" : ""}</li>` : ""}${(r.growGoals || []).length ? `<li>成长目标 ${r.growGoals.length} 项</li>` : ""}${(r.growActs || []).length ? `<li>记一笔的选项 ${r.growActs.length} 项</li>` : ""}${(r.growSkills || []).length ? `<li>技能 ${r.growSkills.length} 个</li>` : ""}${r.alts.length ? `<li>确认算对的说法 ${r.alts.length} 条</li>` : ""}
-    <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.apps || []).length ? `<li>投递 ${r.apps.length} 份（新的 ${appNew}，已有的会更新）</li>` : ""}${(r.qtags || []).length ? `<li>题目标签 ${r.qtags.length} 条（优先级、方向）</li>` : ""}${(r.checks || []).length ? `<li>待确认 ${r.checks.length} 条（确认前，相关的题不算达标）</li>` : ""}${(r.real || []).length ? `<li>真题 ${r.real.length} 道</li>` : ""}${(r.explains || []).length ? `<li>讲解 ${r.explains.length} 条（知识卡翻过来能看到）</li>` : ""}${(r.zhs || []).length ? `<li>中文意思 ${r.zhs.length} 条（看不懂英文回答时可以对照）</li>` : ""}${(r.debriefs || []).length ? `<li>真实面试复盘 ${r.debriefs.length} 场（被问到的题 ${r.debriefs.reduce((n, d) => n + d.qs.length, 0)} 道）</li>` : ""}${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
+    <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.apps || []).length ? `<li>投递 ${r.apps.length} 份（新的 ${appNew}，已有的会更新）</li>` : ""}${(r.qtags || []).length ? `<li>题目标签 ${r.qtags.length} 条（优先级、方向）</li>` : ""}${(r.checks || []).length ? `<li>待确认 ${r.checks.length} 条（确认前，相关的题不算达标）</li>` : ""}${(r.real || []).length ? `<li>真题 ${r.real.length} 道</li>` : ""}${(r.explains || []).length ? `<li>讲解 ${r.explains.length} 条（知识卡翻过来能看到）</li>` : ""}${(r.zhs || []).length ? `<li>中文意思 ${r.zhs.length} 条（看不懂英文回答时可以对照）</li>` : ""}${(r.jds || []).length ? `<li>JD 原文 ${r.jds.length} 份（对上投递 ${r.jds.filter(x => jobMatchApp(x.co, x.role)).length} 份；对不上的会跳过）</li>` : ""}${(r.skills || []).length ? `<li>技能证据 ${r.skills.length} 项（JD 高频要求里用）</li>` : ""}${(r.debriefs || []).length ? `<li>真实面试复盘 ${r.debriefs.length} 场（被问到的题 ${r.debriefs.reduce((n, d) => n + d.qs.length, 0)} 道）</li>` : ""}${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
     ${r.meta.date ? `<li>面试日期：${esc(r.meta.date)}</li>` : ""}${who ? `<li>面试官：${esc(who.name)}${who.company ? "，" + esc(who.company) : ""}</li>` : ""}
     ${r.bad.length ? `<li>看不懂、会跳过的：${esc(badTxt)}</li>` : ""}</ul>
     ${n ? `<button class="btn primary block" style="margin-top:12px" data-act="imp-apply">确认导入</button>` : `<p class="note">没有能导入的内容，检查一下格式。</p>`}</div>`;
@@ -6641,7 +6675,7 @@ const ABOUT_QA = [
   ["练完一句下面的语法提示是怎么来的？", "按一组常见错误规则检查你说的句子（比如时态、复数、语序、being 用多了），只用那些不容易误判的规则，所以没提示不代表一定没错；拿不准就存起来问 AI。"],
   ["不知道为什么要这样说（比如 written 不是 wrote）怎么办？", "结果页点“为什么这样说”：讲这一句用到的语法点（规则、这句里的例子、常见的错误），你说错的排最前面，一次最多讲 3 个。没有常见的语法点时，可以复制问题问 AI。在刚用到的时候讲一两个点，比集中背语法更有效。"],
   ["标点、撇号会影响判断吗？", "不会。比较前会先去掉标点；you're 和 you are 都算对，master's 和 masters 读音一样也算对。但如果你说成了 master（少了 's），会提示“这里是所有格：master's（……的）”。"],
-  ["每天最多几道新题是固定的吗？练得多要不要自动加？", "固定的：不管今天练几轮（包括自由练习），新题加起来不超过设置里的数。不自动加，因为每张新卡之后一个月里大约还要复习 5 次（2、4、7、15、30 天），新题一多，几天后复习就会堆起来、正确率下降；今天多练几轮，主要是把已经学过的练得更熟。要不要调，看两件事：最近复习大多第一遍就能说对、每天的复习也练得完，可以从 12 调到 20；复习常常做不完或者老是忘，就调回 6。"],
+  ["每天最多几道新题是固定的吗？练得多要不要自动加？", "默认是固定的：不管今天练几轮（包括自由练习），新题加起来不超过设置里的数。每张新卡之后一个月里大约还要复习 5 次（1、2、4、7、15 天），新题一多，几天后复习就会堆起来、正确率下降。设置里可以打开“智能调整新题”：按你最近 7 天每天练的张数 ÷ 10 定每天的新题，最多不超过你设的数。"],
   ["题库怎么选？", "首页“练哪个题库”可以只练通用、日常生活，或者你导入的题库（比如某家公司的面试准备），可以多选，按组折叠。"]]],
  ["游戏和对战", [
   ["游戏模式怎么玩？", "每张卡说对就打出伤害：一口气说完还有暴击；只要开口说了，至少也能擦伤对手。每次第一次就说对攒一格能量，攒满 5 格，下一张是大招卡，说对了就放大招。"],
@@ -6670,7 +6704,7 @@ const ABOUT_QA = [
  ["计划和时间", [
   ["昨天的计划没做完，今天要补吗？", "不用硬补。研究发现，漏掉一次对养成习惯没有实质影响，真正伤习惯的是长期不规律。该复习的卡片 app 会自动排进今天，不会丢；其他项先做今天的，有精力再挑一项最重要的补。"],
   ["“学音标”这个单独的计划怎么用？", "在“计划”页点“＋ 学音标（单独的计划）”，选每天、隔一天或者一周三次，再选什么时候做。它和推荐计划分开：重新生成推荐计划、清除推荐计划、导入计划时选“替换”都不会动它；改它、关掉它也不会动别的计划，关掉时只删还没做的“学音标”。内容跟着你的进度：没学完就写“学第几课”（有到期的复习顺便复习）；学完以后只在有复习的日子出现。点它直接打开“发音 → 音标”，学完一课或者复习完自动打勾。"],
-  ["为什么要复习这么多？", "每张新卡不是学一次就完：要在第 1、2、4、7、15、30 天……反复出现，答得卡、答错了还会更早再来。算下来，每天每多学 1 张新卡，过一阵子每天就要多复习约 10 张。所以每天复习十几张，只够每天学 1–2 张新卡；默认的每天 12 张，要每天复习约 120 张。计划页会按你最近每天练的量给出合适的新卡数，可以点“按这个来”。"],
+  ["为什么要复习这么多？", "每张新卡不是学一次就完：要在第 1、2、4、7、15、30 天……反复出现，答得卡、答错了还会更早再来。算下来，每天每多学 1 张新卡，过一阵子每天就要多复习约 10 张。所以每天复习十几张，只够每天学 1–2 张新卡；默认的每天 12 张，要每天复习约 120 张。计划页会按你最近每天练的量给出合适的新卡数，也可以在设置里打开“智能调整新题”。"],
   ["为什么有时候今天只学 2 张新卡？", "今天到期的复习超过一轮的量（普通练习 16 张、深度练习 30 张）时，先清复习，新卡每天只学 2 张：复习没清完又加很多新卡，欠的会越来越多；一张新的都不学，又看不到进步。计划页写着照你最近每天练的量约几天清完，可以点“快速复习”只练到期的，也可以点“今天照常学新卡”。复习清到一轮以内，新卡自动恢复。"],
   ["错误专练是什么？", "从你的错误档案里找出最常犯的那一类（比如时态、冠词），直接练这一类的卡，开始时告诉你这一类这周和上周各错了几次。光看错误统计没什么用，针对最常犯的错集中练、再看到它在减少，才有效果。错误档案里每一类旁边也有“练这一类”。计划里的反射训练开始时也可以选“练最弱的一类”。"],
   ["“只做 3 分钟”是什么？", "没精神时保底：先选普通练习或游戏，练完 3 分钟，今天剩下的计划标成跳过，算“保底完成”。"],
@@ -11446,7 +11480,7 @@ const BT = (() => {
     A.slideCode = slideCode;
     /* 换对手之前，先把代码怪物收掉 */
     A.dropCode = () => { if (A.cm){ try { A.cm.destroy(); } catch (e) {} A.cm = null; } A.cmDX = 0; ghost.hidden = false; ghost.classList.remove("codemon"); };
-    A.setEnemyCode = m => {
+    A.setEnemyCode = m => { A.camK = 1; A._refitN = 0; A.monRel = 0; setTimeout(() => { try { if (A.camFit === true) layout(); } catch (e) {} }, 80);   /* 换对手：重新算镜头，出场后整个舞台再排一次（量怪的外框） */
       A.dropCode(); ghost.getAnimations().forEach(a => a.cancel());
       ghost.hidden = true; ghost.monster = m; ghost.rig = null; ghost.poseImgs = null; ghost.classList.add("monster", "codemon"); ghost.classList.remove("still", "hover", "landed");
       A.shields = 0; paintShields();
@@ -13495,7 +13529,8 @@ const BT = (() => {
       let sizeNow = Math.min(A.giant ? 0.78 : 9, Math.max(A.charSize, sc.minSize || 0, (m.readyM * m.pxPerM * m.depth * (1 - feetAt)) / sc.footY));
       /* v1.72.1：普通大小时镜头往后退，让最高的那个（主角或怪）头顶离画面上边留出距离（9%）。人物和背景一起缩小（winH = R ÷ sizeNow），和背景里东西的比例不变；
          背景图上下不够时，在 4%–35% 之间挪地面的位置，找能放下的、离原来最近的那个 */
-      if (!A.giant && A.camFit !== false){
+      const size0 = sizeNow;
+      if (!A.giant && A.camFit === true){   /* v1.73.1：只在游戏舞台（实验室、预览不用） */
         const R = m.readyM * m.pxPerM * m.depth, rel = Math.max((A.khNow || 1) * 1.05, A.monRel || 0), MARGIN = 0.09;   /* 怪的外框（角、碎片）比身高略高，留 9% */
         const lo = f => Math.max((1 - f) * R / sc.footY, f * R / Math.max(1, sc.h - sc.footY)), cap = f => ((1 - f) - MARGIN) / rel;
         if (sizeNow > cap(feetAt)){
@@ -13504,7 +13539,10 @@ const BT = (() => {
           if (best){ feetAt = best.f; sizeNow = Math.min(sizeNow, cap(best.f)); }
           else { let f0 = feetAt, g = -9; for (let f = 0.04; f <= 0.35; f += 0.01){ if (cap(f) - lo(f) > g){ g = cap(f) - lo(f); f0 = f; } } feetAt = f0; sizeNow = Math.max(lo(f0), Math.min(sizeNow, cap(f0))); }
         }
+        /* 怪左右超出画面（尾巴、翅膀）：camK 再往后退一点（最多到 55%），背景一起缩小 */
+        if (A.camK && A.camK < 1) sizeNow = Math.max(lo(feetAt), sizeNow * A.camK);
       }
+      if (!isFinite(sizeNow) || sizeNow <= 0){ sizeNow = size0; }   /* 保险：算出来不是有效的数就照旧 */
       A.sizeNow = sizeNow;
       const winH = Math.min((m.readyM * m.pxPerM * m.depth) / sizeNow, sc.footY / (1 - feetAt));
       const k = S0.height / winH, dispH = k * sc.h, dispW = (dispH * sc.w) / sc.h;
@@ -13523,7 +13561,11 @@ const BT = (() => {
       if (sceneChanged) relight();
       placeFighters(); if (A.cm) A.cm.layout();
       /* 怪的高度（按“比例 1 的角色”的倍数）：变了就再排一次（第一次排的时候怪还没量过） */
-      if (A.cm && !A.giant){ try { const b = A.cm.box(), r2 = b && b.h ? b.h / (A.sizeNow * S0.height) : 0; if (r2 && Math.abs(r2 - (A.monRel || 0)) > 0.02){ A.monRel = r2; if (!A._refit){ A._refit = true; requestAnimationFrame(() => { A._refit = false; layout(); }); } } } catch (e) {} }
+      if (A.cm && !A.giant && A.camFit === true){ try { const b = A.cm.box(), r2 = b && b.h ? b.h / (A.sizeNow * S0.height) : 0; let again = false;
+          if (r2 && Math.abs(r2 - (A.monRel || 0)) > 0.02){ A.monRel = r2; again = true; }
+          const W = S0.width, mg = W * 0.03, over = b ? Math.max(mg - b.x, b.x + b.w - (W - mg), 0) : 0;   /* 左右超出多少 */
+          if (over > 2 && (A.camK || 1) > 0.55){ A.camK = Math.max(0.55, (A.camK || 1) * Math.max(0.85, 1 - over / Math.max(1, b.w))); again = true; }
+          if (again && !A._refit && (A._refitN || 0) < 8){ A._refit = true; A._refitN = (A._refitN || 0) + 1; requestAnimationFrame(() => { A._refit = false; layout(); }); } } catch (e) {} }
       else if (!A.cm) A.monRel = 0;
     }
     function placeFighters(){
@@ -13868,6 +13910,7 @@ const GAME = {
     const place = r0 && r0.place ? r0.place : BT.rollPlace(giant);
     const A = BT.makeArena(el); A.setOpt({charSize:0.62, bgShift:0, spots:[0.22, 0.78], showNum:true, giant, place});
     A.onBeforeHit = () => GAME.stampHp();   /* v1.72.1：回放时血条跟着动 */
+    A.camFit = true;   /* v1.73.1：镜头退后只在游戏舞台 */
     batLoadChar().then(c => { if (GAME.st && GAME.st.A === A){ const e = GAME.st.enemy; A.setChar(c ? BT.rebuild(c) : null, BT.metaOf(c, giant)); if (e){ A.setEnemy(e); A.setHP(e.hp, true, e.max); } } });
     A.setChar(BAT_CHAR ? BT.rebuild(BAT_CHAR) : null, BT.metaOf(BAT_CHAR, giant));
     S.game = S.game || {}; if (!S.game.boss){ S.game.boss = {tag:GAME.weakTag(), hp:80, img:GAME.bossImg()}; save(); }
@@ -14192,7 +14235,16 @@ async function batJudge(said, alts){
   let best = said ? K.compareSaid(e.en, e.alt || [], said) : null;
   for (const a of alts || []){ const c = K.compareSaid(e.en, e.alt || [], a); if (c && (!best || ({off:0, meaning:1, close:2, exact:3})[c.level] > ({off:0, meaning:1, close:2, exact:3})[best.level])) best = c; }
   const ok = best && (best.level === "exact" || best.level === "close");
-  if (ok){
+  if (ok){ await batSpecialFire(e); return; }
+  R.tries++; R.lastSaid = said;
+  const MIS = said ? `<button class="btn sm" data-act="bt-sp-mis">我说对了，是识别错了</button>` : "";   /* v1.73.1：以前没有这个按钮，识别错了大招就放不出来 */
+  if (R.tries < 2){ batSpecialPanel(`${said ? `我听到的是：“${esc(said)}”。` : "没听清。"}差一点，再说一次。${MIS ? `<div class="row-gap" style="margin-top:6px">${MIS}</div>` : ""}`); return; }
+  batPanel(`<div class="panel bt-sp"><p class="small">这次没放出来。正确的说法是：</p><div class="bt-en">${esc(e.en)}</div><div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="bt-listen">听一遍</button>${MIS}</div></div>`);
+}
+ACT["bt-sp-mis"] = async () => { const R = BAT_RUN; if (!R || !R.pick || R.special) return; RUN.batMis = (RUN.batMis || 0) + 1; await batSpecialFire(R.pick); };
+async function batSpecialFire(e){
+  const R = BAT_RUN; if (!R || R.special) return;
+  {
     batPanel(`<p class="small">说对了：${esc(e.en)}</p>`);
     const sp = K.battleSpecial(R.card); R.special = sp; R.day.dmg += sp; save();
     const st = $("#btStatus"); if (st) st.textContent = `大招：-${sp}`;
@@ -14204,9 +14256,6 @@ async function batJudge(said, alts){
     }
     batFinish(); return;
   }
-  R.tries++;
-  if (R.tries < 2){ batSpecialPanel(`${said ? `我听到的是：“${esc(said)}”。` : "没听清。"}差一点，再说一次。`); return; }
-  batPanel(`<div class="panel bt-sp"><p class="small">这次没放出来。正确的说法是：</p><div class="bt-en">${esc(e.en)}</div><div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="bt-listen">听一遍</button></div></div>`);
   batFinish(true);
 }
 ACT["bt-listen"] = () => { const R = BAT_RUN; if (R && R.pick) TTS.speak(R.pick.en, {rate: L.rate || 1}); };
@@ -17061,8 +17110,7 @@ async function grArena(el){
   const rec = await grStageRec(); if (!el || !el.isConnected || typeof BT === "undefined") return null;
   const A = BT.makeArena(el); A.setOpt({charSize:0.64, spots:[0.1, 0.5], place:"street", giant:false});
   el.insertAdjacentHTML("afterbegin", `<div class="gc-labbg" aria-hidden="true" style='background-image:${GR_LAB}'></div>`);   /* 舞台自己会改背景，实验室画在最底下单独一层 */
-  await A.setChar(rec ? BT.rebuild(rec) : null, BT.metaOf(rec || null, false)); if (A.setNight) A.setNight(false);
-  [250, 1200].forEach(ms => setTimeout(() => { try { if (el.isConnected && A.layout) A.layout(); } catch (e) {} }, ms));   /* 图片解码慢时再排一次版 */
+  A.setChar(rec ? BT.rebuild(rec) : null, BT.metaOf(rec || null, false)); if (A.setNight) A.setNight(false);   /* v1.73.1：撤回 1.72.1 的 await 和补排版 */
   try { A.setNames("", ""); A.setScore(""); } catch (e) {}
   return A;
 }
@@ -17373,6 +17421,8 @@ function jobApplyImport(r){
   S.qmeta = S.qmeta || {};
   for (const t of (r.qtags || [])){ const m = S.qmeta[t.qid] = S.qmeta[t.qid] || {}; m.pri = t.pri; const rt = jobResolveTrack(t.track, t.trackRaw); if (rt.track) m.track = rt.track; if (t.co) m.co = t.co; }
   for (const x of (r.zhs || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.zhA = x.text; }
+  for (const x of (r.jds || [])){ const a = jobMatchApp(x.co, x.role); if (!a) continue; a.jd = x.text.slice(0, 20000); if (x.url) a.url = x.url; }
+  for (const x of (r.skills || [])){ const sk = jobSkillByName(x.name); if (sk && x.ev) jobSkillEv()[sk[0]] = x.ev; }
   for (const x of (r.debriefs || [])){
     const app = j.apps.find(a => jobNorm(a.co) && jobNorm(a.co) === jobNorm(x.co));
     const key = d => (d.d || "") + "|" + jobNorm(d.co || ((jobApp(d.app) || {}).co)) + "|" + d.round;
@@ -17581,6 +17631,7 @@ function jobTodaySeg(){
   const out = [], up = jobUpcoming();
   if (up.length) out.push(jobNextIvHTML(up[0]));
   out.push(jobFollowHTML());
+  out.push(jobPendingHTML());
   out.push(jobPracticeHTML());
   out.push(jobKnowTodayHTML());
   out.push(jobPipeSumHTML());
@@ -17686,8 +17737,8 @@ function jobStatsHTML(){
 }
 function jobAppsToolsHTML(){
   const nJD = JB().apps.filter(a => (a.jd || "").trim().length > 80).length;
-  return `<div class="row-gap" style="margin-top:12px"><button class="btn sm" data-act="job-export">导出给状态文件</button><button class="btn sm" data-act="job-jd-ai">统计 JD 高频要求</button></div>
-    <p class="small muted" style="margin-top:6px">统计高频要求要用 JD 原文：在投递里存够 3 份（现在 ${nJD} 份），一起发给 AI。</p>`;
+  return `<div class="row-gap" style="margin-top:12px"><button class="btn sm" data-act="job-export">导出给状态文件</button><button class="btn sm" data-act="nav" data-v="jdstat">统计 JD 高频要求</button></div>
+    <p class="small muted" style="margin-top:6px">在本机直接统计存了 JD 原文的投递（现在 ${nJD} 份）：每项要求出现在几份 JD 里、是必须还是加分。</p>`;
 }
 ACT["job-new"] = () => UI.nav("jbulk");   /* v1.72.0：记一份、记好几份都在“记投递”里 */
 VIEWS.japp = {
@@ -18128,6 +18179,9 @@ VIEWS.jbulk = {
   render(){
     const dr = jrecDraft(), n = dr.items.length, filled = dr.items.filter(it => !jrecEmpty(it)).length;
     return `<div class="wrap">${backBtn()}<h2>记投递</h2><p class="small muted" style="margin:4px 0 12px">一份或好几份都在这里记：点每一条标题上的箭头收起或展开。没点确认就离开，草稿也会留着。</p>
+      <div class="panel jr-paste"><label class="fld" style="margin-top:0"><span>粘贴职位链接、标题或整页文字，自动认出公司和职位</span><textarea id="jrPaste" rows="3" placeholder="比如：https://job-boards.greenhouse.io/acme/jobs/123&#10;或者：Test Engineer at Acme Robotics&#10;或者：在职位页面全选、复制，整页贴进来（JD 原文一起存下）"></textarea></label>
+        <button class="btn sm primary" style="margin-top:8px" data-act="jr-paste">识别，加一条</button></div>
+      ${jobPendingHintHTML()}
       <div id="jrecList">${dr.items.map((it, i) => jrecItemHTML(it, i, n)).join("")}</div>
       <button class="btn block" style="margin-top:10px" data-act="jrec-add">＋ 添加一条</button>
       <button class="btn primary block big" style="margin-top:12px" data-act="jrec-save">确认，记下 ${Math.max(filled, 1)} 份</button>
@@ -18172,7 +18226,7 @@ ACT["jrec-save"] = () => {
     const a = Object.assign({id:"a" + jobRid(), d, dApprox:false, st, hist:[{d:today(), st, note:"记投递"}], ts:Date.now()}, base,
       {track, tier:it.tier || "", ch:it.ch || "web", src:String(it.src || "").trim(), res:String(it.res || "").trim(), visa:String(it.visa || "").trim(), ind:String(it.ind || "").trim(), next:String(it.next || "").trim(), nextD:it.nextD || "", note:String(it.note || "").trim(), jd:String(it.jd || "").slice(0, 8000)});
     if (["screen", "interview", "offer", "failed"].includes(st)) a.ivEver = true;
-    JB().apps.push(a); added++; if (jobSent(a) && d === today()) todayN++;
+    JB().apps.push(a); added++; if (jobSent(a) && d === today()) todayN++; else if (jobSent(a) && d) jobGcUse("apply", d, 1);
   }
   let msg = added ? `记好了 ${added} 份` : "都已经记过了";
   if (dup && added) msg += `（${dup} 份以前记过，跳过了）`;
@@ -18238,7 +18292,9 @@ ACT["jk-vw"] = el => { try { TTS.speak(el.dataset.w, {rate:0.9}); } catch (e) {}
 async function jobGrowRoute(k){
   if (k === "apply"){
     const r = await choose("投了一份申请", `<p class="small muted">记到投递里，以后能看出哪个方向、哪份简历回音多。累了也可以先只记数，以后再补，经验值不会重复加。</p>`, [["rec", "记到投递里（写公司和职位）"], ["count", "只记数"], ["", "取消"]]);
-    if (r === "rec"){ UI.nav("jbulk"); return "nav"; } return r || "cancel";
+    if (r === "rec"){ UI.nav("jbulk"); return "nav"; }
+    if (r === "count") JOB_ASKN = true;
+    return r || "cancel";
   }
   if (k === "iv"){
     const r = await choose("一次真实的面试", `<p class="small muted">写复盘能拿回这一场的导入码、感谢信草稿和给状态文件的更新。</p>`, [["deb", "写这次面试的复盘"], ["count", "只记一次"], ["", "取消"]]);
@@ -18249,9 +18305,8 @@ async function jobGrowRoute(k){
 /* 求职页给成长页记一笔：今天在成长页“只记了数”的，先抵掉，剩下的才新记（返回新记了几份） */
 function jobLogGrow(k, n){
   if (typeof growLog !== "function" || !(n > 0)) return 0;
-  const d = today(), j = JB(); if (!j.gcred || j.gcred.d !== d) j.gcred = {d, apply:0, iv:0};
-  const free = G().log.filter(e => e.d === d && e.k === k && e.pid !== "job").reduce((s, e) => s + (e.n || 1), 0) - (j.gcred[k] || 0);
-  const use = Math.max(0, Math.min(n, free)); j.gcred[k] = (j.gcred[k] || 0) + use;
+  const d = today(), c = jobGc(d);
+  const use = Math.max(0, Math.min(n, jobUnlinked(k, d))); c[k] = (c[k] || 0) + use;
   const rest = n - use; if (rest > 0) growLog(k, rest, {quiet:true, pid:"job"});
   save(); return rest;
 }
@@ -18340,6 +18395,296 @@ function plPast(){
   for (let i = 1; i <= 14; i++){ const d = nstr(tn - i), sec = (+((S.days || {})[d] || {}).sec || 0) + (+((S.job || {}).ivSec || {})[d] || 0) + (+((S.job || {}).knowSec || {})[d] || 0); if (sec > 60){ tot += sec; n++; } }
   return n ? `过去两周你练了 ${n} 天，那几天平均每天约 ${Math.round(tot / n / 60)} 分钟。按实际做得到的选，比按理想选更容易坚持。<br>` : "";
 }
+
+/* =================== v1.74.0：JD 原文、JD 高频要求、记投递更省事 =================== */
+
+/* ---------- 投递对得上：同公司同职位 → 公司名前缀 → 同公司里职位最像的那一份 ---------- */
+const JOB_ROLE_STOP = new Set(["the", "and", "of", "for", "a", "an", "to", "in", "at", "i", "ii", "iii", "1", "2", "new", "grad", "level", "early", "career", "full", "time"]);
+const jobTok = s => String(s || "").toLowerCase().replace(/[^a-z0-9&]+/g, " ").split(" ").filter(w => w.length >= 2 && !JOB_ROLE_STOP.has(w));
+function jobSameCo(a, b){ const x = jobNorm(a), y = jobNorm(b); return !!x && !!y && (x === y || (Math.min(x.length, y.length) >= 3 && (x.startsWith(y) || y.startsWith(x)))); }
+function jobMatchApp(co, role){
+  const exact = jobFindApp({co, role}); if (exact) return exact;
+  const loose = jobFindAppLoose({co, role}); if (loose) return loose;
+  const same = JB().apps.filter(a => jobSameCo(a.co, co)); if (!same.length) return null;
+  if (same.length === 1 && !jobTok(role).length) return same[0];
+  const t = new Set(jobTok(role)); let best = null, bs = 0, second = 0;
+  for (const a of same){ const u = new Set(jobTok(a.role)); const inter = [...t].filter(w => u.has(w)).length, uni = new Set([...t, ...u]).size || 1; const sc = inter / uni; if (sc > bs){ second = bs; bs = sc; best = a; } else if (sc > second) second = sc; }
+  return bs >= 0.34 && bs > second ? best : (same.length === 1 && bs > 0 ? same[0] : null);
+}
+
+/* ---------- JD 高频要求：本机统计 ----------
+   做法：每份 JD 按小标题分成“必须”（Requirements / Qualifications / What you bring…）、“加分”（Preferred / Nice to have / a plus…）、
+   “职责”（Responsibilities / What you'll do…）三段；每一项技能在一份 JD 里只算一次（看的是“几份 JD 要它”，不是出现了几次），
+   取这份 JD 里最强的那一段（必须 > 加分 > 职责 > 其他）。 */
+const JOB_SKILL_GROUP = {cs:"控制", rd:"测试", me:"机械", sw:"软件", ee:"电气", gen:"通用"};
+const JOB_SKILLS = [
+ ["plc", "PLC", "cs", /\bplcs?\b|programmable logic controller/i],
+ ["ab", "Allen-Bradley / Rockwell", "cs", /allen[- ]?bradley|rockwell|studio ?5000|rslogix|controllogix|compactlogix|factorytalk/i],
+ ["siemens", "Siemens / TIA Portal", "cs", /\bsiemens\b(?! healthineers)|tia portal|step ?7\b|\bs7-?1[25]00\b/i],
+ ["ladder", "Ladder logic", "cs", /ladder (?:logic|diagram)/i],
+ ["hmi", "HMI / SCADA", "cs", /\bhmis?\b|\bscada\b|wonderware|wincc|ignition scada/i],
+ ["vfd", "VFD / motor drives", "cs", /\bvfds?\b|variable frequency drive|motor drives?\b|servo drives?/i],
+ ["motion", "Motion control / servo", "cs", /motion control|servo (?:motors?|systems?)|stepper motors?/i],
+ ["network", "Industrial networks (EtherNet/IP, Modbus…)", "cs", /ethernet\/ip|profinet|profibus|modbus|ethercat|devicenet|industrial (?:networks?|communications?)/i],
+ ["schem", "Electrical schematics / wiring", "cs", /electrical (?:schematics?|drawings?|prints?)|wiring diagrams?|\bschematics?\b|eplan|autocad electrical/i],
+ ["panel", "Control panels", "cs", /control panels?|panel (?:design|build|layout)|ul ?508a/i],
+ ["safety", "Machine safety", "cs", /machine safety|safety (?:relays?|plcs?|circuits?|systems?)|iso ?13849|nfpa ?79|lockout|\bloto\b/i],
+ ["commission", "Commissioning / field support", "cs", /commissioning|start-?up support|field (?:service|support)|\bfat\b|\bsat\b|site acceptance|factory acceptance/i],
+ ["robot", "Robotics", "cs", /\brobots?\b|robotic/i],
+ ["pneu", "Pneumatics / hydraulics", "me", /pneumatic|hydraulic/i],
+ ["testplan", "Test plans / procedures", "rd", /test (?:plans?|procedures?|protocols?|cases?|methods?|strateg(?:y|ies))|test development|develop(?:ing)? tests/i],
+ ["vv", "Verification & validation", "rd", /verification|validation|\bv&v\b|\b[edp]vt\b/i],
+ ["daq", "Data acquisition (DAQ)", "rd", /data acquisition|\bdaq\b|national instruments|teststand/i],
+ ["labview", "LabVIEW", "rd", /labview/i],
+ ["sensors", "Sensors / transducers", "rd", /\bsensors?\b|transducers?|load cells?|thermocouples?|strain gauges?|accelerometers?|encoders?/i],
+ ["calib", "Calibration", "rd", /calibrat/i],
+ ["instr", "Lab instruments (scope, DMM…)", "rd", /oscilloscope|multimeter|\bdmm\b|function generator|test equipment|instrumentation/i],
+ ["data", "Data analysis / statistics", "rd", /data analysis|analy[sz](?:e|ing) (?:test )?data|statistic|\bjmp\b|minitab|\bspc\b/i],
+ ["doe", "Design of experiments", "rd", /design of experiments|\bdoe\b/i],
+ ["rca", "Troubleshooting / root cause", "rd", /root[- ]cause|failure analysis|troubleshoot|debug/i],
+ ["fmea", "FMEA / risk analysis", "rd", /\bfmea\b|risk analysis|hazard analysis/i],
+ ["report", "Technical documentation / reports", "gen", /technical (?:reports?|documentation|writing)|test reports?|document(?:ation|ing)? (?:of )?(?:results|findings|designs?)/i],
+ ["hands", "Hands-on / lab work", "gen", /hands-on|laboratory|\blab\b|bench(?:top)? (?:testing|work)/i],
+ ["cad", "3D CAD", "me", /\bcad\b|3d model/i],
+ ["sw", "SolidWorks", "me", /solidworks/i],
+ ["othercad", "Creo / NX / CATIA / Onshape / Fusion", "me", /\bcreo\b|\bnx\b|siemens nx|catia|onshape|fusion ?360|autodesk inventor/i],
+ ["gdt", "GD&T", "me", /gd&t|geometric dimensioning|asme y14/i],
+ ["tol", "Tolerance analysis", "me", /tolerance (?:stack|analysis|analyses)|tolerancing|stack-?ups?/i],
+ ["drawing", "Engineering drawings / BOM", "me", /engineering drawings?|2d drawings?|detail(?:ed)? drawings?|drafting|bills? of materials?|\bbom\b/i],
+ ["fea", "FEA / simulation", "me", /\bfea\b|finite element|ansys|abaqus|structural analysis/i],
+ ["cfd", "CFD / thermal-fluid", "me", /\bcfd\b|computational fluid|fluent|heat transfer|thermal (?:analysis|management|design)/i],
+ ["dfm", "DFM / DFA", "me", /\bdfm\b|\bdfa\b|design for (?:manufactur|assembl)/i],
+ ["molding", "Injection molding / casting", "me", /injection mold|plastic parts?|die[- ]cast|molded parts?/i],
+ ["machining", "Machining / CNC", "me", /machining|\bcnc\b|machine shop|lathes?\b|milling/i],
+ ["proto", "Prototyping / 3D printing", "me", /prototyp|3d print|additive manufactur/i],
+ ["sheet", "Sheet metal", "me", /sheet metal/i],
+ ["mechdesign", "Mechanical design / mechanisms", "me", /mechanical design|mechanisms?\b|actuators?|end[- ]effectors?|grippers?|fixtures?|jigs?\b/i],
+ ["materials", "Materials selection", "me", /material (?:selection|properties)|materials (?:science|selection)|composites?/i],
+ ["assembly", "Assembly / build", "me", /\bassembl(?:y|e|ies|ing)\b|build and test/i],
+ ["python", "Python", "sw", /\bpython\b/i],
+ ["matlab", "MATLAB / Simulink", "sw", /matlab|simulink/i],
+ ["cpp", "C / C++", "sw", /c\+\+|\bc\/c\+\+|\bc (?:and|or) (?:c\+\+|python)|\bembedded c\b|\bc programming/i],
+ ["embedded", "Embedded / firmware", "sw", /embedded|firmware|microcontrollers?|arduino|stm32|raspberry pi/i],
+ ["linux", "Linux", "sw", /\blinux\b|\bunix\b/i],
+ ["ros", "ROS", "sw", /\bros ?2?\b|robot operating system/i],
+ ["cv", "Computer / machine vision", "sw", /computer vision|opencv|machine vision|image processing/i],
+ ["ml", "Machine learning / AI", "sw", /machine learning|deep learning|reinforcement learning|neural net|\bai\b|artificial intelligence/i],
+ ["git", "Git / version control", "sw", /\bgit\b|github|version control/i],
+ ["pcb", "PCB / electronics", "ee", /\bpcbs?\b|circuit boards?|altium|kicad|board (?:layout|design)|electronics?\b|circuit (?:design|analysis)|analog circuits?/i],
+ ["power", "Power / high voltage", "ee", /power electronics|high voltage|power distribution|power supplies/i],
+ ["vacuum", "Vacuum / gas systems", "ee", /\bvacuum\b|gas (?:handling|delivery|systems?)|plasma/i],
+ ["semi", "Semiconductor equipment", "ee", /semiconductor|wafer|\bfab\b|cleanroom/i],
+ ["med", "Medical device / regulated", "gen", /medical devices?|\bfda\b|iso ?13485|iec ?60601|regulated/i],
+ ["quality", "Quality systems (ISO, Six Sigma, Lean)", "gen", /iso ?9001|six sigma|\blean\b|quality (?:systems?|management)|\bcapa\b/i],
+ ["comm", "Communication", "gen", /communicat/i],
+ ["team", "Teamwork / cross-functional", "gen", /cross-functional|collaborat|teamwork|team player/i],
+ ["project", "Project management", "gen", /project management|manag(?:e|ing) (?:multiple )?projects|own(?:ing)? projects/i],
+ ["travel", "Travel", "gen", /\btravel\b/i],
+ ["onsite", "On-site / in person", "gen", /on-?site|in-?person|in the office/i]
+];
+function jobSkillByName(n){ const t = jobNorm(n); return JOB_SKILLS.find(([id, label]) => jobNorm(id) === t || jobNorm(label) === t || jobNorm(label.split("/")[0]) === t) || null; }
+function jobSkillEv(){ const j = JB(); if (!j.skillEv || typeof j.skillEv !== "object") j.skillEv = {}; return j.skillEv; }
+const JOB_SEC_REQ = /^(minimum|basic|required|requirements?|must[- ]haves?|qualifications?|what (?:you|we)(?:'|’)?(?:ll| will| are)? ?(?:need|bring|look(?:ing)? for)|you (?:have|bring|are|should have)|who you are|about you|skills|experience|education|your background)/i;
+const JOB_SEC_PREF = /^(preferred|nice[- ]to[- ]haves?|bonus|desired|additional|plus\b|ideal|it would be great|extra credit|good to have|we'?d love)/i;
+const JOB_SEC_RESP = /^(responsibilit|what you(?:'|’)?ll do|what you will do|the role|about the role|role overview|job (?:summary|description)|your (?:impact|role)|duties|day[- ]to[- ]day|in this role|key responsibilities)/i;
+const JOB_PREF_CUE = /\b(preferred|a plus|is a plus|nice to have|bonus|desired|desirable|ideally)\b/i;
+function jobJdLines(text){
+  const out = []; let sec = "other";
+  for (const raw of String(text || "").split(/\r?\n/)){
+    const l = raw.trim().replace(/^(?:[-–•*·●▪]+|\d{1,2}[.)])\s*/, ""); if (!l) continue;   /* 只去掉项目符号和“1.”这种编号，不吃掉“3+ years”开头的数字 */
+    const head = l.length <= 70 && !/[.。;；:：]$/.test(l) && !/\d/.test(l.slice(0, 3));
+    if (head && JOB_SEC_PREF.test(l)) sec = "pref"; else if (head && JOB_SEC_REQ.test(l) && l.split(/\s+/).length <= 6) sec = "req"; else if (head && JOB_SEC_RESP.test(l)) sec = "resp";
+    /* 括号里写的“(X preferred)”只算括号里的那部分是加分，这一行别的还是按所在的段算 */
+    const paren = [], main = l.replace(/\(([^)]*)\)/g, (all, inner) => { if (JOB_PREF_CUE.test(inner)){ paren.push(inner); return " "; } return all; });
+    out.push({l:main, cls: JOB_PREF_CUE.test(main) ? "pref" : sec});
+    for (const p of paren) out.push({l:p, cls:"pref"});
+  }
+  return out;
+}
+const JOB_CLS_RANK = {req:3, pref:2, resp:1, other:0};
+const JOB_NEG = /u\.?s\.? (?:citizen|person)|citizenship (?:is )?required|green card|permanent resident|security clearance|\bitar\b|export[- ]control|(?:not|unable to|cannot|won'?t) (?:able to )?sponsor|without (?:visa )?sponsorship|no (?:visa )?sponsorship|sponsorship (?:is )?not (?:available|offered)/i;
+const JOB_POS = /visa sponsorship (?:is )?available|will sponsor|sponsorship (?:is )?available|open to sponsor|\bstem opt\b|\bopt\b|h-?1b (?:sponsorship|transfer)/i;
+function jobJdAnalyze(apps){
+  const rows = {}; const years = []; const neg = [], pos = [];
+  for (const a of apps){
+    const lines = jobJdLines(a.jd), best = {};
+    for (const {l, cls} of lines) for (const [id, , , re] of JOB_SKILLS) if (re.test(l) && (best[id] == null || JOB_CLS_RANK[cls] > JOB_CLS_RANK[best[id]])) best[id] = cls;
+    for (const [id, cls] of Object.entries(best)){ const r = rows[id] = rows[id] || {req:0, pref:0, resp:0, other:0, cos:[]}; r[cls]++; r.cos.push(a.co); }
+    let minY = null; for (const {l, cls} of lines){ if (cls === "pref" || !/experience|years/i.test(l)) continue; const m = l.match(/(\d{1,2})\s*\+?\s*(?:[-–]|to)?\s*(\d{1,2})?\s*\+?\s*years?/i); if (m){ const y = +m[1]; if (y <= 20 && (minY == null || y < minY)) minY = y; } }
+    years.push({co:a.co, y:minY});
+    const all = String(a.jd || ""); if (JOB_NEG.test(all)) neg.push(a.co); else if (JOB_POS.test(all)) pos.push(a.co);
+  }
+  const list = JOB_SKILLS.map(([id, label, g]) => { const r = rows[id] || {req:0, pref:0, resp:0, other:0, cos:[]}; return {id, label, g, ...r, df:r.req + r.pref + r.resp + r.other, score:2 * r.req + r.pref + 0.5 * r.resp + 0.25 * r.other}; }).filter(r => r.df).sort((x, y) => y.df - x.df || y.score - x.score);
+  return {n:apps.length, list, years, neg, pos};
+}
+function jobJdApps(){ const f = L.jdF || "all"; return JB().apps.filter(a => (a.jd || "").trim().length > 80 && (f === "all" || (f === "A" ? a.tier === "A" : jobTrackMap(a.track) === f))); }
+const JOB_EV_L = {y:"有证据", s:"学过", n:"没有"};
+VIEWS.jdstat = {
+  tab:"iv",
+  render(){
+    const all = JB().apps.filter(a => (a.jd || "").trim().length > 80), apps = jobJdApps(), R = jobJdAnalyze(apps), ev = jobSkillEv(), f = L.jdF || "all";
+    const cnt = t => all.filter(a => jobTrackMap(a.track) === t).length;
+    const chips = [["all", `全部 ${all.length}`], ["cs", `控制 ${cnt("cs")}`], ["rd", `测试 ${cnt("rd")}`], ["me", `机械 ${cnt("me")}`], ["A", `A 档 ${all.filter(a => a.tier === "A").length}`]];
+    const head = `<div class="wrap">${backBtn()}<h2>JD 高频要求</h2><p class="small muted" style="margin:4px 0 10px">在本机统计你投的 JD：每一项出现在几份 JD 里，写在“必须”里还是“加分”里。点右边标一下你有没有证据，就能看出最该补的。</p>`;
+    if (all.length < 3) return head + `<p class="panel small">至少要 3 份存了 JD 原文的投递（现在 ${all.length} 份）。办法：在“记投递”里把职位页面整页贴进来，或者导入 AI 整理的 JD 原文导入码（JD | 公司 | 职位 …… JD 结束）。</p></div>`;
+    const evBtn = r => `<button class="jd-ev ev-${ev[r.id] || "u"}" data-act="jd-ev" data-v="${r.id}">${esc(JOB_EV_L[ev[r.id]] || "标一下")}</button>`;
+    const bar = r => `<span class="jd-bar"><i class="req" style="width:${Math.round(r.req / R.n * 100)}%"></i><i class="pref" style="width:${Math.round(r.pref / R.n * 100)}%"></i><i class="oth" style="width:${Math.round((r.resp + r.other) / R.n * 100)}%"></i></span>`;
+    const row = r => `<div class="jd-row"><div class="jd-l"><b>${esc(r.label)}</b><span class="small muted">${r.df}/${R.n} 份${r.req ? `，必须 ${r.req}` : ""}${r.pref ? `，加分 ${r.pref}` : ""}</span>${bar(r)}</div>${evBtn(r)}</div>`;
+    /* 沟通、团队、动手、出差这类通用的不算缺口（做个项目也证明不了），单独列一行 */
+    const tech = R.list.filter(r => r.g !== "gen"), soft = R.list.filter(r => r.g === "gen");
+    const gaps = tech.filter(r => r.req + r.pref > 0 && ev[r.id] !== "y").sort((x, y) => y.score - x.score).slice(0, 8);
+    const unknownTop = tech.slice(0, 20).filter(r => !ev[r.id]).length;
+    const yrs = R.years.filter(x => x.y != null), b = [[0, 1], [2, 3], [4, 99]].map(([lo, hi]) => yrs.filter(x => x.y >= lo && x.y <= hi).length);
+    const haveKw = R.list.filter(r => ev[r.id] === "y").slice(0, 12);
+    const showAll = !!(L.jobFold || {}).jdall, shown = showAll ? tech : tech.slice(0, 25);
+    return head + `<div class="chips job-filter">${chips.map(([k, l]) => `<button class="chip${f === k ? " on" : ""}" data-act="jd-f" data-v="${k}" aria-pressed="${f === k}">${esc(l)}</button>`).join("")}</div>
+      ${R.n < 5 ? `<p class="note">这一类只有 ${R.n} 份 JD，排名靠前的几项可以参考，后面的差一两份就会变。</p>` : ""}
+      <div class="sec-title">最该补的${unknownTop ? `<span class="job-sec-note">前 20 项里还有 ${unknownTop} 项没标</span>` : ""}</div>
+      <div class="panel">${gaps.length ? gaps.map(row).join("") : `<p class="small muted">前面的要求都标了“有证据”。</p>`}
+        <p class="small muted" style="margin-top:8px">排法：写在“必须”里算 2、“加分”里算 1、只在职责里提到算 0.5，你标了“有证据”的不算。</p>
+        <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-jd-ai">发给 AI：核对证据，补知识卡</button></div></div>
+      <div class="sec-title">硬条件</div>
+      <div class="panel small"><div>要求的工作年限：0–1 年 ${b[0]} 份，2–3 年 ${b[1]} 份，4 年以上 ${b[2]} 份，没写 ${R.years.length - yrs.length} 份。</div>
+        ${R.neg.length ? `<div style="margin-top:6px">写了身份限制（公民、安全许可、出口管制、不担保）：<b>${esc(R.neg.join("、"))}</b></div>` : `<div style="margin-top:6px">没有 JD 写身份限制。</div>`}
+        ${R.pos.length ? `<div style="margin-top:6px">写了可以担保或接受 OPT：<b>${esc(R.pos.join("、"))}</b></div>` : ""}</div>
+      ${haveKw.length ? `<div class="sec-title">简历关键词</div><div class="panel small">你有证据、JD 又常写的：<b>${esc(haveKw.map(r => r.label).join("、"))}</b>。简历和求职信里用 JD 里的原词写这些。</div>` : ""}
+      <div class="sec-title">技术要求 ${tech.length}</div><div class="panel">${shown.map(row).join("")}
+        ${tech.length > 25 ? `<button class="btn sm ghost" style="margin-top:8px" data-act="jd-all">${showAll ? "收起" : `全部 ${tech.length} 项`}</button>` : ""}</div>
+      ${soft.length ? `<div class="sec-title">通用能力</div><div class="panel small">${soft.map(r => `${esc(r.label)} ${r.df}`).join("　")}<p class="small muted" style="margin-top:6px">这些几乎每份都写，靠故事证明（故事库里的 STAR），不算缺口。</p></div>` : ""}
+      <details class="panel" style="margin-top:12px"><summary class="small">怎么算的</summary><p class="small muted" style="margin-top:6px;line-height:1.7">每份 JD 按小标题分成“必须”（Requirements、Qualifications、What you bring…）、“加分”（Preferred、Nice to have、a plus…）和“职责”三段。每一项在一份 JD 里只算一次，看的是“几份 JD 要它”，不是出现了几次；同一份里出现在好几段，按最强的算。认得的说法在一张固定的词表里（PLC、SolidWorks、GD&T、test plan……），所以结果每次都一样、可以核对；没在词表里的要求，发给 AI 时它会补。</p></details></div>`;
+  }
+};
+ACT["jd-f"] = el => { L.jdF = el.dataset.v; saveLocal(); UI.render(); };
+ACT["jd-all"] = () => { L.jobFold = Object.assign({}, L.jobFold, {jdall:!(L.jobFold || {}).jdall}); saveLocal(); UI.render(); };
+ACT["jd-ev"] = el => { const ev = jobSkillEv(), k = el.dataset.v, order = ["", "y", "s", "n"]; const nx = order[(order.indexOf(ev[k] || "") + 1) % order.length]; if (nx) ev[k] = nx; else delete ev[k]; save();
+  el.className = `jd-ev ev-${nx || "u"}`; el.textContent = JOB_EV_L[nx] || "标一下"; };
+/* 发给 AI：只发统计结果（已经数过了），让它按状态文件核对证据、补知识卡、给简历写法 */
+ACT["job-jd-ai"] = () => {
+  const apps = jobJdApps(); if (apps.length < 3){ toast(`至少要 3 份存了 JD 原文的投递（现在 ${apps.length} 份）`); return; }
+  const R = jobJdAnalyze(apps), ev = jobSkillEv();
+  const lines = R.list.slice(0, 40).map((r, i) => `${i + 1}. ${r.label}：${r.df}/${R.n} 份（必须 ${r.req}，加分 ${r.pref}，职责里 ${r.resp + r.other}）${ev[r.id] ? `；我标的：${JOB_EV_L[ev[r.id]]}` : ""}；出现在：${[...new Set(r.cos)].slice(0, 8).join("、")}`);
+  sendToClaude(`下面是我投的 ${R.n} 个职位里，app 统计出来的高频要求（每项按“几份 JD 要它”算；“必须”是写在要求里，“加分”是写在加分项里）：
+${lines.join("\n")}
+
+硬条件：要求工作年限 0–1 年 ${R.years.filter(x => x.y != null && x.y <= 1).length} 份、2–3 年 ${R.years.filter(x => x.y >= 2 && x.y <= 3).length} 份、4 年以上 ${R.years.filter(x => x.y >= 4).length} 份；写了身份限制的：${R.neg.join("、") || "没有"}。
+
+请：
+1. 按我的状态文件，核对上面每一项：有证据 / 学过（课程或自学）/ 没有。每项一行写成：技能 | 名称（照上面列表里的写法）| 有证据 或 学过 或 没有。
+2. 词表可能漏掉的高频要求（上面没列、但你看 JD 能看出来的），也列出来。
+3. 对“没有”和“学过”里排在前面的 8 项：各做一张知识卡，再给一句面试里的诚实说法（没做过就说没做过、会怎么补），做成只因的导入码：题库 | 知识·高频要求；问 | 题号 | 英文问法 | 中文 | 30 | 概念 |；答 | 题号 | 英文回答（每句尽量 13 个词以内）；讲解 | 题号 | 中文讲解；译 | 题号 | 中文意思；标签 | 题号 | P1 | 方向（${jobTracks().filter(t => t[0] !== "other").map(t => t[1]).join(" / ")}）。
+4. 对“有证据”里排在前面的项：简历和求职信该怎么用 JD 的原词写。
+5. 有没有一个一两周能做完、能放进作品集的小项目，正好补上最大的缺口。`);
+};
+
+/* ---------- 记投递：粘贴就能认出公司和职位 ---------- */
+const JOB_ROLE_WORD = /engineer|intern|co-?op|technician|scientist|developer|designer|specialist|analyst|manager|associate|researcher|lead|architect|operator/i;
+const jobPretty = slug => String(slug || "").replace(/[-_]+/g, " ").replace(/\b(llc|inc|corp|operating)\b/gi, "").replace(/\s+/g, " ").trim().replace(/\b\w/g, c => c.toUpperCase());
+function jobGuessFromText(text){
+  const t = String(text || "").trim(); if (!t) return null;
+  const url = (t.match(/https?:\/\/[^\s<>"']+/) || [""])[0];
+  const lines = t.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+  let co = "", role = "", m, coUrl = "";
+  /* 链接里的公司名（招聘系统的网址里常带公司代号）只在文字里认不出公司时才用 */
+  if (url){
+    if ((m = url.match(/greenhouse\.io\/(?:embed\/job_app\?for=)?([^\/?&#]+)/i))) coUrl = jobPretty(m[1]);
+    else if ((m = url.match(/jobs\.lever\.co\/([^\/?#]+)/i))) coUrl = jobPretty(m[1]);
+    else if ((m = url.match(/jobs\.ashbyhq\.com\/([^\/?#]+)/i))) coUrl = jobPretty(m[1]);
+    else if ((m = url.match(/\/\/([a-z0-9-]+)\.wd\d+\.myworkdayjobs\.com/i))) coUrl = jobPretty(m[1]);
+    else if ((m = url.match(/jobs\.smartrecruiters\.com\/([^\/?#]+)/i))) coUrl = jobPretty(m[1]);
+    else if ((m = url.match(/careers-([a-z0-9-]+)\.icims\.com/i))) coUrl = jobPretty(m[1]);
+  }
+  const text1 = lines.filter(l => !/^https?:\/\//i.test(l)).slice(0, 6).join("\n");
+  if ((m = text1.match(/job at (.+?):\s*(.+?)(?:\s+https?:|\n|$)/i))){ co = co || m[1]; role = m[2]; }
+  else if ((m = text1.match(/^job application for (.+?) at (.+?)(?:\s*[|\-–]|\n|$)/im))){ role = m[1]; co = co || m[2]; }
+  else if ((m = text1.match(/^(.+?) hiring (.+?)(?: in .+?)?(?:\s*\|\s*linkedin)?$/im))){ co = co || m[1]; role = m[2]; }
+  else if ((m = text1.match(/^(.+?)\s+at\s+(.+?)(?:\s*[|\-–]\s*.*)?$/im)) && JOB_ROLE_WORD.test(m[1])){ role = m[1]; co = co || m[2]; }
+  else if ((m = text1.match(/^(.+?)\s+[-–|]\s+(.+?)(?:\s+[-–|]\s+.*)?$/m))){ if (JOB_ROLE_WORD.test(m[1]) && !JOB_ROLE_WORD.test(m[2])){ role = m[1]; co = co || m[2]; } else if (JOB_ROLE_WORD.test(m[2])){ role = m[2]; co = co || m[1]; } }
+  if (!role){ const r1 = lines.find(l => !/^https?:/i.test(l) && l.length <= 90 && JOB_ROLE_WORD.test(l)); if (r1) role = r1; }
+  if (!co && role){ const i = lines.indexOf(role); const nx = lines[i + 1] || ""; const cm = nx.match(/^([^·•|,]{2,60})\s*[·•|,]/); if (cm && !JOB_ROLE_WORD.test(cm[1])) co = cm[1]; }
+  role = role.replace(/\s*\|\s*linkedin.*$/i, "").replace(/\s*[-–|]\s*indeed.*$/i, "").trim(); co = (co || coUrl).replace(/\s*\|\s*linkedin.*$/i, "").trim();
+  return {co:co.slice(0, 60), role:role.slice(0, 120), url, jd: t.length > 400 ? t.slice(0, 20000) : ""};
+}
+ACT["jr-paste"] = () => {
+  const box = $("#jrPaste"), t = ((box || {}).value || "").trim(); if (!t){ toast("先粘贴链接、标题或整页文字"); return; }
+  const dr = jrecSync();
+  /* 几行短的、每行像一个职位 → 一行一条；否则整段当一条（长的当 JD 原文） */
+  const ls = t.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+  const many = ls.length > 1 && t.length < 2000 && ls.every(l => l.length < 220 && (/https?:\/\//.test(l) || /\s(?:at|[-–|])\s/.test(l)));
+  const got = (many ? ls : [t]).map(jobGuessFromText).filter(Boolean);
+  let filled = 0;
+  for (const g of got){
+    const last = dr.items[dr.items.length - 1], slot = last && jrecEmpty(last) ? last : null;
+    const it = slot || jrecBlank(last); if (!slot) dr.items.push(it);
+    Object.assign(it, {open:true, co:g.co || it.co, role:g.role || it.role, track:it.track || (g.role ? K.jobGuessTrack(g.role) : ""), src:it.src || (g.url ? g.url.replace(/^https?:\/\/(www\.)?/, "").split("/")[0] : ""), note:g.url && !String(it.note || "").includes(g.url) ? [it.note, g.url].filter(Boolean).join("\n") : it.note, jd:g.jd || it.jd});
+    if (g.co || g.role) filled++;
+  }
+  dr.items.forEach((it, i) => { if (i < dr.items.length - got.length) it.open = false; });
+  if (box) box.value = ""; saveLocal(); UI.render();
+  toast(filled ? `认出来 ${filled} 条，看一眼对不对` : "没认出公司和职位，已经加了一条，自己填一下");
+};
+/* Android 上装好的 app：在职位页面点“分享 → 只因”，就会打开记投递，填好一条（iPhone 不支持网页 app 接收分享，用复制粘贴） */
+function jobShareIn(){
+  try {
+    const q = new URLSearchParams(location.search); const st = q.get("st") || "", sx = q.get("sx") || "", su = q.get("su") || "";
+    if (!st && !sx && !su) return;
+    history.replaceState(null, "", location.pathname);
+    const g = jobGuessFromText([st, sx, su].filter(Boolean).join("\n")) || {}, dr = jrecDraft(), last = dr.items[dr.items.length - 1], slot = last && jrecEmpty(last) ? last : null;
+    const it = slot || jrecBlank(last); if (!slot) dr.items.push(it);
+    dr.items.forEach(x => { x.open = x === it; });
+    Object.assign(it, {co:g.co || "", role:g.role || st.slice(0, 120), track:g.role ? K.jobGuessTrack(g.role) : "", note:[it.note, su || g.url].filter(Boolean).join("\n"), jd:g.jd || ""});
+    saveLocal(); UI.tab ? UI.tab("iv") : UI.nav("iv"); setTimeout(() => UI.nav("jbulk"), 50);
+    toast(g.co || g.role ? "从分享收到一个职位，看一眼对不对" : "从分享收到一个链接，补一下公司和职位");
+  } catch (e) { console.error(e); }
+}
+window.addEventListener("load", () => setTimeout(jobShareIn, 400));
+
+/* ---------- “只记数”的：按天记已经补上的份数；问是哪几家；提醒补上 ---------- */
+let JOB_ASKN = false;
+function jobGc(d){ const j = JB(); if (!j.gc || typeof j.gc !== "object") j.gc = {}; if (j.gcred && j.gcred.d){ j.gc[j.gcred.d] = {apply:+j.gcred.apply || 0, iv:+j.gcred.iv || 0}; delete j.gcred; } return j.gc[d] || (j.gc[d] = {apply:0, iv:0}); }
+function jobUnlinked(k, d){ const n = (typeof G === "function" ? G().log : []).filter(e => e.d === d && e.k === k && e.pid !== "job").reduce((s, e) => s + (e.n || 1), 0); return Math.max(0, n - (jobGc(d)[k] || 0)); }
+function jobGcUse(k, d, n){ const use = Math.min(n, jobUnlinked(k, d)); if (use > 0){ jobGc(d)[k] += use; save(); } return use; }
+function jobNamesSheet(n){
+  return new Promise(res => {
+    const bg = document.createElement("div"); bg.className = "sheet-bg";
+    bg.innerHTML = `<div class="sheet" role="dialog" aria-modal="true"><h3>顺手写下是哪几家？</h3><p class="small muted" style="margin-top:4px">只写公司名就行，职位可以空着。明天补详情时，就不会想不起来投了什么。</p>
+      ${Array.from({length:Math.min(n, 8)}, (_, i) => `<div class="job-2col jn-row"><input type="text" class="jn-co" placeholder="公司${n > 1 ? " " + (i + 1) : ""}"><input type="text" class="jn-role" placeholder="职位（可以不写）"></div>`).join("")}
+      <div class="row-gap" style="margin-top:14px"><button class="btn" data-x="0">先不写</button><button class="btn primary" data-x="1">记下</button></div></div>`;
+    bg.addEventListener("click", e => { const b = e.target.closest("[data-x]"); if (!b && e.target !== bg) return;
+      const rows = b && b.dataset.x === "1" ? [...bg.querySelectorAll(".jn-row")].map(r => ({co:r.querySelector(".jn-co").value.trim(), role:r.querySelector(".jn-role").value.trim()})).filter(x => x.co) : [];
+      bg.remove(); res(rows); });
+    document.body.appendChild(bg); setTimeout(() => { const f = bg.querySelector(".jn-co"); if (f) f.focus(); }, 60);
+  });
+}
+async function jobAskNames(n){
+  const rows = await jobNamesSheet(n); if (!rows.length) return;
+  const d = today(); let made = 0;
+  for (const r of rows){ if (jobFindApp(r)) continue; JB().apps.push({id:"a" + jobRid(), co:r.co.slice(0, 60), role:r.role.slice(0, 120), track:r.role ? K.jobGuessTrack(r.role) : "", tier:"", d, dApprox:false, st:"applied", ch:"web", src:"", res:"", note:"成长页只记了数，详情待补", hist:[{d, st:"applied", note:"成长页只记了数"}], ts:Date.now()}); made++; }
+  jobGcUse("apply", d, made); save(); toast(made ? `记下了 ${made} 家：在求职页补详情` : "这几家以前记过了"); UI.render();
+}
+{ const gl = growLog; growLog = function(k, n, opt){ const r = gl.apply(this, arguments); if (k === "apply" && !(opt && opt.pid === "job") && JOB_ASKN){ JOB_ASKN = false; setTimeout(() => jobAskNames(+n || 1), 150); } return r; }; }
+/* 最近 7 天“只记了数”还没写是哪家的份数；只写了公司、还没补职位的 */
+function jobPendingInfo(){
+  const tn = dnum(today()), days = [];
+  for (let i = 0; i < 7; i++){ const d = nstr(tn - i), u = jobUnlinked("apply", d); if (u) days.push([d, u]); }
+  const todo = JB().apps.filter(a => /详情待补/.test(a.note || "") && !String(a.role || "").trim() && jobGroup(a) !== "ended");
+  return {days, n:days.reduce((s, x) => s + x[1], 0), todo};
+}
+const JOB_WHERE = "想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、NUworks 的 Applications；浏览器的历史记录。";
+function jobPendingHTML(){
+  const p = jobPendingInfo(); if (!p.n && !p.todo.length) return "";
+  return `<section class="panel job-pend"><div class="job-row"><b>${p.n ? `${p.n} 份只记了数` : `${p.todo.length} 份还没补职位`}</b><span class="small muted">趁还记得补上</span></div>
+    ${p.n ? `<p class="small" style="margin-top:4px">这几天在成长页只记了数，还没写是哪家。</p>` : ""}
+    ${p.todo.length ? `<p class="small" style="margin-top:4px"><span>只写了公司：</span>${p.todo.slice(0, 5).map(a => `<button class="linkbtn" data-act="nav" data-v="japp" data-id="${a.id}">${esc(a.co)}</button>`).join("、")}</p>` : ""}
+    <p class="small muted" style="margin-top:6px">${esc(JOB_WHERE)}</p>
+    ${p.n ? `<div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-fill-unlinked">补上 ${p.n} 份</button></div>` : ""}</section>`;
+}
+function jobPendingHintHTML(){ const p = jobPendingInfo(); return p.n ? `<p class="note">还有 ${p.n} 份只记了数。${esc(JOB_WHERE)}</p>` : ""; }
+ACT["job-fill-unlinked"] = () => {
+  const p = jobPendingInfo(); if (!p.n) return; const dr = jrecDraft();
+  dr.items = dr.items.filter(it => !jrecEmpty(it)); dr.items.forEach(it => { it.open = false; });
+  for (const [d, u] of p.days) for (let i = 0; i < u; i++) dr.items.push(Object.assign(jrecBlank(), {d, open:dr.items.length === 0}));
+  saveLocal(); UI.nav("jbulk");
+};
 
 /* 只因 · 界面语言（v1.71.0）：我的 → 界面语言选 English 时，把界面上固定的文字换成英文。
    练习内容（题目、卡片、参考回答、中文意思、讲解）一律不动：只换词典里有的整句（数字可以变），对不上的保持中文。
@@ -18728,6 +19073,424 @@ const I18N_EN = {
   "重新开始": "Restart",
   "预览的时间": "Preview time",
   "游戏里会遇到的对手。点一张卡片，在上面看它的动作。": "Opponents you'll meet in the game. Tap a card to see its moves above.",
+  /* v1.73.2：展开 / 收起、计划的选项（学音标、看错误档案、单题彩排）、“再 N XP 升级”（大写 XP）、“N 项”、计划页和角色页的说明 */
+  "全部展开": "Expand all",
+  "收起": "Collapse",
+  "收起小抄": "Hide notes",
+  "看错误档案": "Error log",
+  "单题彩排：时间越压越短": "Rehearsal: shorter each time",
+  "学音标": "IPA lessons",
+  "学音标（单独的计划）": "IPA (separate plan)",
+  "学音标：多久一次？": "IPA: how often?",
+  "加上了：接下来两周的“学音标”": "Added: IPA for the next two weeks",
+  "关掉了：没做的“学音标”删了，别的计划没动": "Turned off: unfinished IPA items removed, other plans untouched",
+  "{n} 项": "{n} items",
+  "{n} 项推荐计划？": "{n} suggested items?",
+  "{n} 项到今天": "{n} items to today",
+  "再 {n} XP 升级": "{n} XP to next level",
+  "再{n} XP 升级": "{n} XP to next level",
+  "再 {n} xp 升级": "{n} XP to next level",
+  "再{n} xp 升级": "{n} XP to next level",
+  "because 和 so、although 和 but：只留一个。": "because / so, although / but: keep only one of each pair.",
+  "人": "people",
+  "份": "apps",
+  "改": "Edit",
+  "写一下要做什么": "Write what to do",
+  "技能：第 {n} 级 {n} 次，第 {n} 级 {n} 次，第 {n} 级 {n} 次。口语、听力、写作、模拟面试自动算。": "Skills: level {n} at {n}×, level {n} at {n}×, level {n} at {n}×. Speaking, listening, writing and mock interviews count automatically.",
+  "每一项写成“什么时候 → 做什么”，比只写日期更容易做到。写了具体时间（比如 {n}:{n}）的，点“提醒我”可以加到本机日历、Google 日历，或者复制下来放进任何提醒 app。": "Write each item as “when → what”; it's easier to follow than a date alone. Items with a time (e.g. {n}:{n}) can go to your phone calendar or Google Calendar with “Remind me”, or be copied into any reminder app.",
+  "经验值只给你能控制的行动。English 按每天在只因里练的时间自动算：每 {n} 分钟 {n} 点，每天最多 {n} 点。真实的英语对话两栏都加。": "XP is only for actions you control. English counts your practice time in Cluck: every {n} minutes gives {n} points, up to {n} a day. Real English conversations count in both columns.",
+  "计划多了、重复了，就复制给 AI。它会给你一段第一行写着“计划 | 替换”的导入码：导入以后，所有没做完的计划都换成新的，做完的记录留着。": "Too many or repeated plans? Copy them for AI. It gives you an import code starting with “计划 | 替换”: importing it replaces all unfinished plans and keeps finished ones.",
+  /* v1.73.3：写作、发音课、回答编辑、情景对话、设备检测、自由练习、耳机模式、阅读、接话、开始页、日记、跟读、电话初筛、俚语、安装、录音转文字、求职等页面 */
+  "先用中文列关键词（可以不填）": "List keywords in Chinese first (optional)",
+  "写什么": "What to write",
+  "写邮件": "Email",
+  "回复消息": "Reply",
+  "回应：对方说的事（比如“那太酷了”）": "Respond: what they said (e.g. “That's so cool”)",
+  "回答：对方问的（比如问你周末干嘛）": "Answer: what they asked (e.g. your weekend)",
+  "存起来问 AI": "Save to ask AI",
+  "对方的来信": "Their message",
+  "把笔友的来信粘贴进来": "Paste your pen pal's message",
+  "换一封练习信": "Another practice letter",
+  "提问：你想问对方的": "Ask: what you want to ask them",
+  "现在检查的清单：（还没有统计）": "Checklist: (no stats yet)",
+  "直接用英文写，一句只讲一件事，先别改": "Write in English, one idea per sentence, don't fix yet",
+  "笔友、朋友的消息：先用中文列几个关键词，再直接用英文写、先别改；写完点“检查”，只标出你常犯的错，你自己改。": "Messages to pen pals and friends: list a few keywords in Chinese, then write straight in English without fixing; tap “Check” to mark your usual mistakes, and fix them yourself.",
+  "聊天语块（点一下插进去）": "Chat chunks (tap to insert)",
+  "表态、接话": "React and respond",
+  "说近况": "What I've been up to",
+  "转话题": "Change topic",
+  "晚回道歉": "Sorry for the late reply",
+  "祝福": "Wishes",
+  "结尾": "Sign-off",
+  "问回对方": "Ask back",
+  "{n}. i 和 ɪ（sheep / ship）": "{n}. i and ɪ (sheep / ship)",
+  "{n}. r 化元音 ɝ、ɚ（work / walk）": "{n}. R-coloured vowels ɝ, ɚ (work / walk)",
+  "{n}. æ 和 ɛ（bad / bed）": "{n}. æ and ɛ (bad / bed)",
+  "{n}. ʊ 和 u（full / fool）": "{n}. ʊ and u (full / fool)",
+  "{n}. ʌ 和 ɑ（cut / cot）": "{n}. ʌ and ɑ (cut / cot)",
+  "{n}. θ 和 ð（think / this）": "{n}. θ and ð (think / this)",
+  "{n}. 单元音（一）": "{n}. Vowels (1)",
+  "{n}. 单元音（二）和弱读": "{n}. Vowels (2) and weak forms",
+  "{n}. 双元音": "{n}. Diphthongs",
+  "{n}. 双元音 eɪ、oʊ（pain / pen）": "{n}. Diphthongs eɪ, oʊ (pain / pen)",
+  "{n}. 词尾 n / ŋ 和清浊（thin / thing）": "{n}. Final n / ŋ and voicing (thin / thing)",
+  "{n}. 重音 ˈ 和弱读 ə": "{n}. Stress ˈ and weak ə",
+  "{n}. 长得特别的辅音": "{n}. Special consonants",
+  "{n}. 音标怎么看 + 和字母一样的辅音": "{n}. Reading IPA + letter-like consonants",
+  "n（no）　ŋ（sing）　词尾辅音": "n (no)　ŋ (sing)　final consonants",
+  "ˈ 重音（about /əˈbaʊt/）　ə 弱读": "ˈ stress (about /əˈbaʊt/)　ə weak",
+  "听辨": "Listening",
+  "学了 {n}/{n} 课": "{n}/{n} lessons done",
+  "没学": "Not yet",
+  "第一印象": "First impression",
+  "重音和节奏": "Stress & rhythm",
+  "难词本": "Hard words",
+  "音标": "IPA",
+  "音标入门": "IPA basics",
+  "Q{n}　开场": "Q{n}　Opener",
+  "一点儿": "a bit",
+  "介绍一下你自己": "Tell me about yourself",
+  "做（项目），在做": "do (a project), doing",
+  "写完自查": "Self-check",
+  "原速": "Normal",
+  "参考结构": "Suggested structure",
+  "带我过一遍、给我讲讲": "walk me through, tell me about",
+  "慢速": "Slow",
+  "我的回答（英文）": "My answer (English)",
+  "找": "Find",
+  "按规则查一遍": "Check by rules",
+  "放进回答框": "Put in the answer box",
+  "有一个具体例子或数字": "Has a concrete example or number",
+  "现在 → 过去 → 未来，{n}–{n} 秒。第一句直接说你是谁；讲经历用过去式；最后落到为什么是这个职位。": "Present → past → future, {n}–{n} s. Say who you are first; tell experience in the past tense; end with why this role.",
+  "第一句直接回答问题": "Answer the question in the first sentence",
+  "要点小抄：一行一个，来电模拟里能看": "Cheat sheet: one point per line, visible in mock calls",
+  "讲经历用过去式，多用 I，少用 we": "Past tense for experience; more I, less we",
+  "跟读我的回答": "Shadow my answer",
+  "这种场合美国人最自然的说法": "What Americans most naturally say here",
+  "面试官可能接着追问": "Likely follow-ups",
+  "面试官可能这样问，点喇叭听": "How interviewers may ask it; tap the speaker",
+  "{n} 句": "{n} lines",
+  "几位、饮料、点餐、几分熟、买单": "Party size, drinks, ordering, doneness, the check",
+  "大小、牛奶、外带、名字、付款": "Size, milk, to go, name, paying",
+  "夸一句、聊球龄、给建议": "A compliment, years playing, tips",
+  "对方先说一句（先只听，不看文字），你开口回答，再看可以怎么回。不打分，练的是听懂、接得上话。": "They speak first (listen only, no text), you answer, then see good replies. No score; it trains understanding and keeping up.",
+  "开会提问": "Questions in a meeting",
+  "开户、证件、地址证明、月费、借记卡": "Opening an account, ID, proof of address, fees, debit card",
+  "打电话问租房": "Calling about a rental",
+  "提问、确认时间、找对的人、答应跟进": "Ask, confirm timing, find the right person, agree to follow up",
+  "新同事闲聊": "Small talk with a new coworker",
+  "有没有空、几点、带什么、停车": "Free?, what time, what to bring, parking",
+  "约朋友吃饭": "Dinner with a friend",
+  "练习场搭话": "Chatting at the driving range",
+  "自我介绍、适应得怎样、爱好、约打球": "Intro, settling in, hobbies, a round of golf",
+  "要报价、车型、驾龄、免赔额、发邮件": "Quote, car model, years driving, deductible, email",
+  "说需求、试驾、问价、问其他费用": "Needs, test drive, price, other fees",
+  "车行看车": "At the car dealer",
+  "车险报价电话": "Car insurance quote call",
+  "还在不在、房租、水电、车位、约看房": "Still available?, rent, utilities, parking, a viewing",
+  "银行开户": "Opening a bank account",
+  "餐厅吃饭": "Eating out",
+  "再听一遍": "Listen again",
+  "听完开口回答": "Listen, then answer",
+  "咖啡店点单": "Ordering coffee",
+  "回答": "Answer",
+  "对照": "Compare",
+  "我说完了，看看可以怎么回": "Done, show possible replies",
+  "或用键盘语音输入、打字": "Or use keyboard voice input or type",
+  "答题方式": "How to answer",
+  "中文朗读（耳机模式用）": "Chinese voice (for headphone mode)",
+  "听到了": "Heard it",
+  "录 {n} 秒试试": "Record {n} s",
+  "录音": "Recording",
+  "找到 {n} 个英文语音": "{n} English voices found",
+  "检查能不能离线识别": "Check offline recognition",
+  "没声音": "No sound",
+  "没找到中文语音": "No Chinese voice found",
+  "测一遍，app 会按结果调整练法。": "Run the checks; the app adapts to the results.",
+  "测试": "Test",
+  "浏览器里的独立网页": "Standalone page in the browser",
+  "点测试，然后说：It's a little windy today.": "Tap Test, then say: It's a little windy today.",
+  "点这里，用键盘的麦克风说一句": "Tap here and say a line with the keyboard mic",
+  "自动语音识别": "Speech recognition",
+  "英文朗读": "English voice",
+  "试听": "Play",
+  "试试键盘语音输入": "Try keyboard voice input",
+  "运行环境": "Environment",
+  "还没测": "Not tested",
+  "键盘语音输入（没网时用）": "Keyboard voice input (when offline)",
+  "介词": "Prepositions",
+  "全部类型混着练": "All types mixed",
+  "地道说法": "Natural phrases",
+  "复数 -s": "Plural -s",
+  "多余的 to": "Extra “to”",
+  "成对词": "Word pairs",
+  "扩句": "Expand",
+  "找错：你写过的原句": "Fix: your own sentences",
+  "按类型挑着练。结果一样计入复习安排。": "Pick by type. Results still count toward reviews.",
+  "提问": "Questions",
+  "救急句": "Rescue lines",
+  "时态": "Tense",
+  "时态快反": "Quick tense",
+  "聊天": "Chat",
+  "语序": "Word order",
+  "面试语块": "Interview chunks",
+  "{n} 秒": "{n} s",
+  "上一句": "Previous",
+  "下一句": "Next",
+  "今天练过的（没说出来的先放）（{n} 句）": "Practised today (missed ones first) ({n})",
+  "只听：日常生活（{n} 句）": "Listen only: Daily life ({n})",
+  "只听：通用（{n} 句）": "Listen only: General ({n})",
+  "听哪些": "What to listen to",
+  "戴上耳机，点开始。听到中文先自己说，灯全灭后听标准说法，再跟着说一遍。": "Put on headphones and tap Start. Say it yourself when you hear the Chinese, listen to the model when the lights go out, then repeat.",
+  "每句的思考时间": "Thinking time per line",
+  "跟首页选的题库一样（{n} 句）": "Same decks as the home page ({n})",
+  "这台设备没有中文朗读：中文只显示在屏幕上，开始时会响一声。屏幕会保持常亮，锁屏后会停下。这里的练习不改变复习安排，但计入练习时间。": "No Chinese voice on this device: Chinese shows on screen with a beep. The screen stays on; locking stops it. This practice doesn't change reviews but counts as practice time.",
+  "BBC 的学英语网站：新闻词汇、{n} 分钟英语": "BBC Learning English: news vocabulary, {n}-minute English",
+  "你要面试的公司官网的新闻、产品页": "News and product pages of the company you're interviewing with",
+  "去哪找文章": "Where to find articles",
+  "同一条新闻分 {n} 个难度": "The same news at {n} levels",
+  "同一条新闻分好几个难度，挑一个读着不费劲的": "The same news at several levels; pick an easy read",
+  "工程新闻，原版、难一些，挑你懂的技术话题": "Engineering news, authentic and harder; pick topics you know",
+  "开始读": "Start reading",
+  "把文章粘贴到这里": "Paste the article here",
+  "标题（可以不填）": "Title (optional)",
+  "美国之音给外语学习者的版本：新闻用简单、慢速的英语写，大多有音频，没有广告": "VOA Learning English: news in simple, slow English, mostly with audio, no ads",
+  "贴一篇进来": "Paste one in",
+  "面试和 coffee chat 时正好用得上": "Handy for interviews and coffee chats",
+  "分享看法": "Opinions",
+  "反应之后加一句追问：What happened? / How was it? / Where are you guys going?": "After reacting, add a follow-up: What happened? / How was it? / Where are you guys going?",
+  "听一句，马上接：先给反应（好消息、坏消息、吃惊……），再追问一句。母语者聊天时句子很短，接得很快。": "Hear a line and respond right away: react first (good news, bad news, surprise…), then ask a follow-up. Native speakers keep it short and quick.",
+  "坏消息": "Bad news",
+  "好消息": "Good news",
+  "好笑的事": "Something funny",
+  "常用的反应": "Common reactions",
+  "想不起词": "Can't find the word",
+  "接话": "Reactions",
+  "练 {n} 句": "Practise {n}",
+  "让人吃惊": "Surprising",
+  "邀请、提议": "Invitations, suggestions",
+  "app 按你说得怎么样，安排下次什么时候再练": "The app schedules the next review based on how you did",
+  "先测一下手机能不能朗读和识别": "First check that your phone can speak and recognise",
+  "对答案，给自己打分": "Check the answer and rate yourself",
+  "把“知道”的英语，练成“脱口而出”。": "Turn the English you know into English that flows.",
+  "每天什么时候练？选一个每天都会碰到的时刻": "When will you practise? Pick a moment you hit every day",
+  "每道题这样练": "How each card works",
+  "灯灭，马上开口说英文": "Lights out: speak English right away",
+  "电话面试是哪天？可以先空着": "When is your phone interview? You can leave it blank",
+  "看中文提示": "Read the Chinese prompt",
+  "跳过，直接开始": "Skip, start now",
+  "今天和谁聊天了？聊了什么？": "Who did you talk to today? About what?",
+  "今天的题目": "Today's topic",
+  "保存今天的日记": "Save today's journal",
+  "开始录音": "Start recording",
+  "换个题目": "New topic",
+  "检查过去式": "Check past tense",
+  "用键盘语音输入再说一遍，或者打字": "Say it again with keyboard voice input, or type",
+  "睡前用英文说 {n} 分钟今天的事。讲做过的事用过去式，描述用 It was、I was。": "Before bed, talk about your day in English for {n} minutes. Past tense for what you did; It was / I was for descriptions.",
+  "一句一句": "Line by line",
+  "听一句，停下来你跟着说一遍。适合新的回答：先把句子记住。": "Hear a line, pause, repeat it. Good for new answers: learn the sentences first.",
+  "跟读": "Shadowing",
+  "这题还没有参考回答。": "No model answer yet.",
+  "连贯跟读": "Continuous shadowing",
+  "隐藏文字，只听着跟": "Hide text, follow by ear",
+  "顺序：先“一句一句”跟两遍，把句子记住；再“连贯跟读”；最后去单题彩排，用自己的话说。面试时不要背稿，记住结构和关键句就行。": "Order: “Line by line” twice to learn the sentences, then “Continuous”, then a single-question rehearsal in your own words. Don't memorise a script; remember the structure and key lines.",
+  "你什么时候能入职": "When can you start",
+  "你愿意搬家 / 到现场上班吗": "Are you open to relocating / working on-site",
+  "你有什么想问我的吗": "Do you have any questions for me",
+  "你有在美国合法工作的身份吗": "Are you authorized to work in the US",
+  "你现在或以后需要公司办工作签证吗": "Will you now or later need visa sponsorship",
+  "你的期望薪资是多少": "What are your salary expectations",
+  "你为什么对这个职位 / 公司感兴趣": "Why this role / company",
+  "你对我们公司了解多少": "What do you know about us",
+  "电话初筛准备度": "Phone screen readiness",
+  "练还没达标的题（{n} 题）": "Practise the ones not ready yet ({n})",
+  "当地人聊天里的俚语和脏话：不是为了说，是为了听懂，分清是在开玩笑、夸奖还是真的生气。每句会告诉你有多冲、自己能不能用。": "Slang and swearing in everyday talk: to understand, not to say. Tell joking, praise and real anger apart; each line shows how strong it is and whether you can use it.",
+  "怎么分清是不是开玩笑": "How to tell if it's a joke",
+  "还没练　一共 {n} 句": "Not practised yet　{n} in total",
+  "更新": "Update",
+  "有新版本时，把新文件传到原来的地方覆盖。app 联网打开时会在后台更新，下次打开就是新版。": "For a new version, upload the new files over the old ones. The app updates in the background when opened online; the next launch is the new version.",
+  "没有安装按钮的话：点 Chrome 右上角的菜单，选“安装应用”或“添加到主屏幕”。": "No install button? Open Chrome's menu (top right) and choose “Install app” or “Add to Home screen”.",
+  "还没装到桌面。离线缓存还没准备好：联网打开一次，过几秒再刷新。": "Not installed yet. Offline cache isn't ready: open once online, wait a few seconds, then refresh.",
+  "在手机上识别英文录音，比如实验室开会、面试的录音。识别在后台进行，转写的时候你可以去练别的，转好了会提醒你。": "Transcribe English recordings on your phone, like lab meetings or interviews. It runs in the background; practise something else and you'll be told when it's done.",
+  "转出来的文字可能会把口误和小的语法错“修好”，找语法错时，最好对着录音再听一遍。": "Transcripts may “fix” slips and small grammar errors; when looking for grammar mistakes, check against the recording.",
+  "很长的录音（比如一小时）在手机上会很慢，也可能内存不够，最好先剪成 {n} 分钟以内的几段，或者在电脑浏览器里打开 app 转。": "Long recordings (like an hour) are slow on phones and may run out of memory; split them into parts under {n} minutes, or transcribe in a computer browser.",
+  "Recruiter 来电……": "Recruiter calling…",
+  "拒绝": "Decline",
+  "接听": "Answer",
+  "把投过的职位记下来，过一阵就能看出哪个方向回音多、哪份简历管用。": "Log the jobs you applied to; over time you'll see which directions get replies and which résumé works.",
+  "把投的职位随便贴进来：职位页面复制的文字、链接、自己的备注都行": "Paste the jobs you applied to: copied job text, links or your own notes",
+  "比如：机器人、生物医学": "e.g. robotics, biomedical",
+  "去导入": "Go to import",
+  "还没有导入过。和 AI 练完后，让它给你一段导入码。": "Nothing imported yet. After practising with AI, ask it for an import code.",
+  "今天练过的": "Practised today",
+  "今天还没练。": "No practice yet today.",
+  "每一场自动保存，每答完一回合就存。最多留最近 {n} 场，三个月以前的自动删掉。": "Each session saves after every round. Keeps the latest {n}; older than three months are deleted.",
+  "还没有记录。": "No records yet.",
+  "结束": "End",
+  "找不到这次记录。": "Record not found.",
+  "没网或拿不准的时候存在这里。联网后一键复制，发到和 AI 的对话里。AI 会逐条告诉你对不对，再给你导入码：说对的会加进答案，以后直接算对；说错的会变成找错卡。": "Saved here when offline or unsure. Copy them to your AI chat when online. AI checks each one and gives an import code: right ones join the answers; wrong ones become fix cards.",
+  "没有在进行的对话首领战。": "No dialogue boss battle in progress.",
+  "还没有统计。导入“错误统计”，或者在“写作”里写一次，就会有了。": "No stats yet. Import error stats or write once in Writing.",
+  "没有在复习。": "Not reviewing.",
+  "前两句各推三分之一，最后一句推二分之一；伤害按交点最后停在哪里算。": "The first two lines push a third each, the last a half; damage depends on where the clash point stops.",
+  "原创小人的身材是固定的。导入自己的角色以后，可以在这里调身高和起手式高度。": "The original figure's size is fixed. Import your own character to adjust height and stance here.",
+  "暴击时间缩短到 {n}%，连击加成 {n} 倍，你一个字不说时对手回 {n} 点血。说错照样不挨打。练熟了再开。": "Crit time shrinks to {n}%, combo bonus ×{n}, and the opponent heals {n} when you say nothing. Wrong answers still aren't punished. Turn on once you're fluent.",
+  "用发光部位.json，app 会按姿势图的大小自动对上是哪个角色。只存在这台手机上。": "Use 发光部位.json; the app matches each character by pose sheet size. Stored only on this phone.",
+  "选你的角色和对手，看两边的技能撞在一起是什么样。颜色按两边技能各自的颜色。": "Pick your character and an opponent to see your skills clash, each in its own colour.",
+  "首页的“开始”是学习模式，没有游戏；“游戏”里每说完一句马上出招。今天还没玩过游戏。": "Start on the home page is study mode with no game; in Game each line triggers a move. No game played today.",
+  /* v1.73.4：关于页的分类名和问题、各页零散的说明 */
+  "Whisper 是什么？": "What is Whisper?",
+  "“只做 {n} 分钟”是什么？": "What is “Just {n} minutes”?",
+  "“学音标”这个单独的计划怎么用？": "How does the separate IPA plan work?",
+  "“没说出来”“有卡顿/有错误”“秒出”怎么选？下次什么时候再见？": "Which rating should I pick, and when will the card come back?",
+  "“灯灭就开口”和用时是什么意思？": "What do “speak when the lights go out” and the timer mean?",
+  "“问 AI”页面有什么？": "What's on the Ask AI page?",
+  "不知道为什么要这样说（比如 written 不是 wrote）怎么办？": "Not sure why it's said this way (e.g. written, not wrote)?",
+  "为什么有时会提示“注意用上……”？": "Why do I sometimes see “Remember to use…”?",
+  "为什么有时候今天只学 {n} 张新卡？": "Why only {n} new cards today sometimes?",
+  "为什么要先说，再看答案？": "Why speak before seeing the answer?",
+  "从记忆里把句子说出来（回忆练习），比看十遍记得牢。所以几乎每道题都要你开口。": "Saying a sentence from memory (retrieval practice) sticks better than reading it ten times, so almost every card asks you to speak.",
+  "写作怎么检查？": "How is writing checked?",
+  "双方同时放技能，两道光线在中间对撞，你说得越好越能推过去。": "Both sides fire skills at once and the beams clash in the middle; the better you speak, the further you push.",
+  "发光的范围不对怎么办？": "Glow areas look wrong?",
+  "发音练习练什么？": "What does pronunciation practice cover?",
+  "只因是什么？": "What is Cluck?",
+  "听力快练练什么？": "What does quick listening train?",
+  "听懂俚语练什么？": "What does the slang drill train?",
+  "听辨容易混的音、第一印象测试、重音和节奏、难词本。": "Confusable sounds, first-impression checks, stress and rhythm, and hard words.",
+  "大招没说出来会怎样？": "What if I miss the special?",
+  "太久没开口会怎样？": "What if I don't speak for a while?",
+  "对手为什么会反击？": "Why does the opponent hit back?",
+  "对波是什么？": "What is a beam clash?",
+  "对话首领战是什么？": "What is a dialogue boss battle?",
+  "导入和 AI": "Import & AI",
+  "导入码是什么？": "What is an import code?",
+  "开始使用": "Getting started",
+  "怎么更新 app？": "How do I update the app?",
+  "怎么用自己的角色？": "How do I use my own character?",
+  "怎么让 AI 帮我做导入码？": "How do I get AI to make import codes?",
+  "情景对话怎么判断我说得对不对？": "How are scenario replies judged?",
+  "我录的当地人对话怎么用？": "How do I use my recordings of local conversations?",
+  "我的数据存在哪？会丢吗？": "Where is my data? Can it be lost?",
+  "我的说法也对，怎么加进去？": "My version is also right; how do I add it?",
+  "我说对了，是识别错了，怎么办？": "I said it right but it misheard me?",
+  "拿不准自己说得对不对，三个按钮选哪个？": "Not sure I said it right: which button?",
+  "按错误类型统计你写作、练习里出的错，最常犯的排前面，还附上你写过的例子。": "Your mistakes in writing and practice by type, most common first, with your own examples.",
+  "接话练习、想不起词怎么练？": "How do reactions and word-finding drills work?",
+  "推荐计划是怎么来的？": "Where does the suggested plan come from?",
+  "提示会影响练习效果吗？": "Do hints affect learning?",
+  "搜索：比如 拿不准、大招、补练、导入码": "Search: e.g. unsure, special, drill, import code",
+  "数据和设置": "Data & settings",
+  "时间到了以后怎么选？": "What to choose when time's up?",
+  "昨天的计划没做完，今天要补吗？": "Should I make up yesterday's unfinished plan?",
+  "更准的语音识别，在设置里填 key 后使用；没填就用手机自带的识别。": "More accurate speech recognition once you add a key in settings; otherwise the phone's built-in recognition is used.",
+  "来电模拟是什么？": "What is the mock call?",
+  "标点、撇号会影响判断吗？": "Do punctuation and apostrophes affect the check?",
+  "每天怎么用最好？": "What's the best daily routine?",
+  "每天最多几道新题是固定的吗？练得多要不要自动加？": "Is the daily new-card limit fixed? Should it grow if I practise more?",
+  "没找到，换个词试试": "Nothing found, try another word",
+  "游戏和对战": "Game & battles",
+  "游戏模式怎么玩？": "How does game mode work?",
+  "用时从灯灭算到你说完。用时越短，越接近脱口而出；某句刷新最快纪录时会变成紫色。": "Timed from lights-out until you finish. Shorter means more fluent; a new best for a line turns purple.",
+  "看到一个词不知道怎么读怎么办？": "Don't know how to say a word?",
+  "练习卡片": "Practice cards",
+  "练完一句下面的语法提示是怎么来的？": "Where do the grammar tips under a line come from?",
+  "要不要学音标？音标入门怎么学？": "Should I learn IPA? How do the basics work?",
+  "计划和时间": "Plans & time",
+  "语音日记、耳机模式是什么？": "What are the voice journal and headphone mode?",
+  "说错以后的补练是什么？说对了还要补练吗？": "What's the drill after a miss? Is it needed when I got it right?",
+  "这一轮练习安排的总题数（今天该复习的加上新学的），{n} 是练到第几题。": "Total cards in this round (today's reviews plus new); {n} is where you are.",
+  "错误专练是什么？": "What is the error drill?",
+  "错误档案是什么？": "What is the error log?",
+  "阅读怎么用？": "How does reading work?",
+  "面试官念题、你开口答，屏幕上不显示问题，和电话面试一样。": "The interviewer reads questions aloud and you answer, with nothing on screen, like a phone interview.",
+  "题库怎么选？": "How do I choose decks?",
+  "首页最上面的进度（比如 {n}/{n}）是什么？": "What is the progress at the top of the home page (e.g. {n}/{n})?",
+  "为什么是 {n} 次、而且要分开：研究发现，在 {n} 次分开的练习里各想起来一次，比在一次练习里连说 {n} 遍记得牢得多。所以今晚、明早、明晚各练一次，正好够。": "Why {n} times, and spread out: recalling it once in each of {n} separate sessions sticks far better than saying it {n} times in one go. Tonight, tomorrow morning and tomorrow night is just right.",
+  "介绍一下你自己、你有什么想问我的吗、你现在或以后需要公司办工作签证吗 等": "Tell me about yourself, Do you have questions for me, Will you need visa sponsorship, etc.",
+  "讲一个你做过的项目、讲一次你解决技术难题的经历、讲一次团队合作 / 和队友意见…": "A project you did, a hard technical problem you solved, teamwork / disagreeing with a teammate…",
+  "只换按钮、标题这些界面文字；练习内容（题目、卡片、回答、翻译）不变。 · Only the interface changes; practice content stays the same.": "Only the interface changes; practice content (questions, cards, answers, translations) stays the same.",
+  "在任意输入框里点键盘上的麦克风就能说。想没网也能用：打开 Gboard 设置，进“语音输入”，打开离线识别并下载“英语（美国）”。不同手机的菜单名字可能略有不同。": "Tap the keyboard's mic in any text box to speak. To use it offline: open Gboard settings → Voice typing, turn on offline recognition and download English (US). Menu names vary by phone.",
+  "在当地录下来的聊天，语音转文字以后贴在这里。说话人可能标错、内容有识别错误都没关系，AI 会按意思看：挑出值得学的说法，解释俚语和脏话（什么意思、是不是开玩笑、有多冲、你能不能用），再给你导入码。": "Paste transcripts of local conversations here. Wrong speaker labels or recognition errors are fine; AI reads for meaning, picks phrases worth learning, explains slang and swearing (meaning, joking or not, how strong, whether you can use it) and gives you an import code.",
+  "复制前先打开浏览器的“简化视图”或“阅读模式”（Chrome：设置 → 无障碍 → 简化视图），广告和导航就不会混进来；贴进来以后，像广告、导航的行也会自动去掉。": "Before copying, turn on the browser's simplified or reading view (Chrome: Settings → Accessibility → Simplified view) to keep ads and navigation out; ad-like lines are also removed after pasting.",
+  "挑读着不费劲的：一段里不认识的词最好不超过一两个（大约认识 {n}%–{n}% 的词）。大部分时候读这种；偶尔读一篇难一点的，只精读一两段。话题挑你感兴趣、面试和 coffee chat 用得上的。": "Pick easy reads: no more than one or two unknown words per paragraph (knowing about {n}%–{n}% of the words). Read these most of the time; now and then read a harder one closely for a paragraph or two. Choose topics you like and can use in interviews and coffee chats.",
+  "每一类错误出现了多少次：起点是导入的统计（比如以前的写作分析），之后在“写作”里每写一次，第一次检查查出来的都记进来。排在最前面的 {n} 类，就是写作时（回复消息、写邮件）自动检查的清单；某一类觉得改掉了，可以移出清单，换下一类进来。": "How often each error type appears: starting from imported stats (like an earlier writing analysis), then whatever the first check finds each time you write. The top {n} types are the checklist used automatically in Writing (replies, emails); once you've fixed a type, remove it and the next one moves up.",
+  "点单词时选“加到要学的词”，就会出现在这里。发给 AI，换成单词卡：卡片会考你“看中文说英文”，还要你用这个词说一句话。光点开看一眼记不牢，自己想起来、用出来才记得住。": "Words you add with “Add to words to learn” appear here. Send them to AI to turn into word cards that ask you to say the English from Chinese and use the word in a sentence. Just looking doesn't stick; recalling and using it does.",
+  "看三样：说的时候在不在笑；是不是好朋友之间（越熟越常互相开骂）；是对着人说，还是只是加强语气（fucking、hell 放在句子中间多半只是语气）。": "Check three things: are they smiling; are they close friends (the closer, the more they swear at each other); is it aimed at a person or just emphasis (fucking or hell mid-sentence is usually just emphasis).",
+  "美式音标。目标是看到音标能读出来，不用背规则、不用自己写。先学 {n}–{n} 课认符号（每个符号配一个熟悉的词），再学重音，最后练容易混的音。每天一课，每课约 {n} 分钟。点任何英文单词也能看它的音标。": "American IPA. The goal is to read IPA aloud, not memorise rules or write it. Lessons {n}–{n} teach the symbols (each with a familiar word), then stress, then confusable sounds. One lesson a day, about {n} minutes. Tap any English word to see its IPA.",
+  "自己用：俚语里标“可以用”的随便用；“朋友之间可以”的只跟熟人说；“听懂就行”的别说，尤其是面试和 coffee chat。": "Using it yourself: “OK to use” is fine anywhere; “Among friends” only with people you know well; “Just understand” don't say, especially in interviews and coffee chats.",
+  "达标 {n}/{n} 题。这 {n} 题是电话初筛最可能问的。每次练完给自己打分；同一题要在 {n} 次不同时间的练习里都打“还行”才算达标（间隔 {n} 小时以上）。还没达标的排在前面。": "{n}/{n} ready. These {n} are the most likely phone screen questions. Rate yourself after each try; a question is ready after “OK” in {n} separate sessions ({n}+ hours apart). Not-ready ones come first.",
+  "这台手机现在能用 {n} 个英文声音。想换男声、女声：手机设置里搜“文字转语音”，首选引擎选“Google 语音识别和语音合成”，点它旁边的齿轮 → 安装语音数据 → 英语（美国），列表里有好几个声音，点一下能试听，选一个就行。没有齿轮的话，在手机的应用列表里找到“Google 语音识别和语音合成”（Speech Services by Google），打开它的设置。换完回来点“试听英文”听听。": "This phone has {n} English voices. To change the voice: search “Text-to-speech” in settings, choose “Speech Services by Google” as the engine, tap its gear → Install voice data → English (US), tap to preview and pick one. No gear? Find Speech Services by Google in your app list and open its settings. Then come back and tap Play.",
+  "（Whisper base.en，约 {n} MB，推荐，还没下载，第一次转写时会先下载）": "(Whisper base.en, about {n} MB, recommended; not downloaded yet, downloads on first use)",
+  /* v1.73.5：关于页的长回答（44 段）；第 17、28 段的中文先改成和智能调整新题一致 */
+  "“我的 → 对战角色”导入姿势表（绿底，{n}、{n}、{n} 个姿势），在“招式”里选模板（比如迪迦型、红奈型、梦比优斯型），再导入发光部位.json 让眼睛和胸口的灯发光。“地点”里可以选预览的时间（白天、夜晚）看效果。": "In Me → Battle characters, import a pose sheet (green background, {n}, {n} or {n} poses), pick a template under Moves (e.g. Tiga, Nexus or Mebius type), then import 发光部位.json so the eyes and chest light glow. Under Place you can preview day or night.",
+  "“计划”页点“生成推荐计划”，选目标（面试、Coffee chat、日常聊天、写作）和每天多少分钟，app 按目标排好一周。你改过的项不会被重新生成覆盖。": "On the Plan page tap “Suggest a plan”, pick a goal (interviews, coffee chats, daily talk, writing) and minutes a day; the app lays out a week. Items you edited aren't overwritten when you regenerate.",
+  "一个字没说（主动放弃），对手加一层护盾，还会反击你：小兵打得轻，首领打得最重。重练时说对就能打碎护盾。": "If you say nothing (give up), the opponent gains a shield and hits back: minions lightly, bosses hardest. Get it right on the retry to break the shield.",
+  "一个练英语口语的 app：看中文，用英文说出来。它按你的记忆安排复习，记得牢的少出现，记不住的很快再来；还有游戏、对话首领战、情景对话、写作、阅读、发音这些练法。": "An app for speaking English: see Chinese, say it in English. Reviews follow your memory: what you know comes back less, what you forget returns soon. There are also games, dialogue bosses, scenarios, writing, reading and pronunciation.",
+  "一行一条的文字，比如“卡 | 中文 | 英文 | 类型 | 提示”。在“导入”页面粘贴就能变成卡片、正确说法、面试题、文章、俚语等。": "One line per entry, like “卡 | 中文 | 英文 | 类型 | 提示”. Paste them on the Import page to make cards, accepted answers, interview questions, articles, slang and more.",
+  "不会。比较前会先去掉标点；you're 和 you are 都算对，master's 和 masters 读音一样也算对。但如果你说成了 master（少了 's），会提示“这里是所有格：master's（……的）”。": "No. Punctuation is removed first; you're and you are both count, and master's / masters sound the same so both count. If you say master (missing 's), you'll be told it's a possessive: master's.",
+  "不用硬补。研究发现，漏掉一次对养成习惯没有实质影响，真正伤习惯的是长期不规律。该复习的卡片 app 会自动排进今天，不会丢；其他项先做今天的，有精力再挑一项最重要的补。": "No need to force it. Research finds one missed day barely affects habit building; long-term irregularity is what hurts. Due cards move into today automatically and aren't lost; do today's items first and make up the most important one if you have energy.",
+  "人物照常蓄力，发射时短路、被反噬（不扣血），能量降到 {n} 格，再说对 {n} 次又能放。": "Your character charges as usual but short-circuits on firing (no damage); energy drops to {n} bars, and {n} more correct answers let you fire again.",
+  "今天到期的复习超过一轮的量（普通练习 {n} 张、深度练习 {n} 张）时，先清复习，新卡每天只学 {n} 张：复习没清完又加很多新卡，欠的会越来越多；一张新的都不学，又看不到进步。计划页写着照你最近每天练的量约几天清完，可以点“快速复习”只练到期的，也可以点“今天照常学新卡”。复习清到一轮以内，新卡自动恢复。": "When today's due reviews exceed one round ({n} for standard, {n} for deep), reviews come first and only {n} new cards a day: adding many new cards before clearing reviews grows the backlog, while learning none hides your progress. The Plan page shows about how many days to catch up at your recent pace; tap “Quick review” for due cards only, or “Learn new cards today anyway”. Once reviews fit in one round, new cards return to normal.",
+  "从你的错误档案里找出最常犯的那一类（比如时态、冠词），直接练这一类的卡，开始时告诉你这一类这周和上周各错了几次。光看错误统计没什么用，针对最常犯的错集中练、再看到它在减少，才有效果。错误档案里每一类旁边也有“练这一类”。计划里的反射训练开始时也可以选“练最弱的一类”。": "It finds your most common error type in the error log (e.g. tense, articles) and practises cards of that type right away, showing how often you made it this week and last. Stats alone don't help; focused practice on your most frequent error, and seeing it shrink, does. Each type in the error log has “Practise this”, and the plan's reflex drill can start with your weakest type.",
+  "会有一点：提示越多，回忆越省力，记得也就没那么牢。所以最好先自己试着说，真的卡住了再看提示；提示也会随着你说对逐渐撤掉（完整的词 → 开头字母 → 不给）。": "A little: the more hints, the easier the recall and the weaker the memory. Try on your own first and use a hint only when really stuck; hints fade as you get it right (full word → first letters → none).",
+  "值得学，目标是“看到音标能读出来”，不用背规则、不用自己写。英语的拼写和读音对不上（though、through、tough、cough），音标一个符号只对一个音，还能告诉你重音。在“发音 → 音标”里有 {n} 课：先 {n} 课认符号（每个符号配一个熟悉的词，比如 æ = cat 里的 a，先把符号和声音对上），再 {n} 课重音，最后 {n} 课练中文母语者最容易混的音（换不同的美式声音和词、每题告诉对错，这是研究里证据最强的听辨练法）；每课最后看音标读词：读出来并录下来，听自己的录音和标准读音对比，再自己判断（单个词的识别不可靠，不用识别）。每天一课，每课约 {n} 分钟。学过的会按 {n}、{n}、{n}、{n}、{n}、{n} 天提醒复习。": "Worth it: the goal is to read IPA aloud, not memorise rules or write it. English spelling doesn't match sound (though, through, tough, cough), while each IPA symbol is one sound and shows stress. Pronunciation → IPA has {n} lessons: first {n} on the symbols (each with a familiar word, e.g. æ = the a in cat), then {n} on stress, then {n} on the sounds Chinese speakers mix up most (different American voices and words, feedback on every item: the best-supported listening training in research). Each lesson ends with reading words from IPA: say and record them, compare with the model, and judge yourself (single-word recognition isn't reliable, so none is used). One lesson a day, about {n} minutes. Reviews come after {n}, {n}, {n}, {n}, {n} and {n} days.",
+  "像真的面试或 Coffee chat 一样一问一答：对方提问，你开口回答，按回答到没有、具体不具体、长短、有没有结果这些打分；面试模式里用了朋友之间的说法会提醒你。": "Question and answer like a real interview or coffee chat: they ask, you answer aloud, scored on whether you answered, how specific, length and results; in interview mode, casual phrases are flagged.",
+  "先写、不改，写完按你的错误清单检查；改过的句子会自动变成改错卡。你写过的都留在“我写过的”里，可以存起来问 AI。": "Write first without fixing, then check against your error list; sentences you fix become fix cards. Everything you write stays in “What I've written” and can be saved to ask AI.",
+  "卡片出现 {n} 秒还没开口，对手轻击你一下；再过 {n} 秒，重击；之后每 {n} 秒轻击，一张卡最多 {n} 下。长句子会多给时间。按麦克风或者打字就停。": "If you haven't spoken {n} s after a card appears, the opponent lands a light hit; {n} s later a heavy hit; then a light hit every {n} s, up to {n} per card. Long sentences get more time. Pressing the mic or typing stops it.",
+  "可以结束，也可以“再练 {n} 分钟”（从点下去的那一刻算），或者“不限时，练完剩下的题”。停在提示页的时间不算练习时间。": "End, “Practise {n} more minutes” (from the tap), or “No limit, finish the rest”. Time on the time-up page doesn't count.",
+  "听懂面试官、日常的问法：新句子先选意思；复习时不看文字，整句说出来，练的是把连读的声音听成一个个词。": "Understand how interviewers and people ask things: new lines start with choosing the meaning; in reviews you say the whole line without text, learning to hear linked speech as words.",
+  "默认是固定的：不管今天练几轮（包括自由练习），新题加起来不超过设置里的数。每张新卡之后一个月里大约还要复习 {n} 次（{n}、{n}、{n}、{n}、{n} 天），新题一多，几天后复习就会堆起来、正确率下降。设置里可以打开“智能调整新题”：按你最近 {n} 天每天练的张数 ÷ {n} 定每天的新题，最多不超过你设的数。": "Fixed by default: however many rounds you do (including free practice), new cards stay within the setting. Each new card needs about {n} more reviews in the next month ({n}, {n}, {n}, {n}, {n} days), so too many new cards pile up reviews days later and accuracy drops. In settings you can turn on “Smart new cards”: new cards a day follow your last {n} days (cards practised a day ÷ {n}), never more than your setting.",
+  "在“计划”页点“＋ 学音标（单独的计划）”，选每天、隔一天或者一周三次，再选什么时候做。它和推荐计划分开：重新生成推荐计划、清除推荐计划、导入计划时选“替换”都不会动它；改它、关掉它也不会动别的计划，关掉时只删还没做的“学音标”。内容跟着你的进度：没学完就写“学第几课”（有到期的复习顺便复习）；学完以后只在有复习的日子出现。点它直接打开“发音 → 音标”，学完一课或者复习完自动打勾。": "On the Plan page tap “+ IPA (separate plan)”, choose daily, every other day or three times a week, and a time. It's separate from the suggested plan: regenerating, clearing or importing with “替换” won't touch it, and changing or turning it off won't touch other plans (turning off removes only unfinished IPA items). It follows your progress: “Lesson N” until done (plus due reviews), then only on review days. Tapping it opens Pronunciation → IPA; finishing a lesson or review ticks it.",
+  "存在这台设备的浏览器里（claude.ai 版会同步到你的 claude.ai 账号）。清浏览器数据会丢，所以每两周在“我的 → 备份与恢复”备份一次。": "In this device's browser (the claude.ai version syncs to your claude.ai account). Clearing browser data loses it, so back up every two weeks in Me → Backup.",
+  "导入或粘贴一篇文章，一句一句听，点词听读音、加到要学的词，读完用 {n} 句话复述。": "Import or paste an article, listen line by line, tap words to hear them or add them to learn, then retell it in {n} sentences.",
+  "当地人聊天里的俚语和脏话：不是为了说，是为了听懂，分清是在开玩笑、夸奖还是真的生气。每句告诉你有多冲、自己能不能用。": "Slang and swearing in everyday talk: to understand, not to say. Tell joking, praise and real anger apart; each line shows how strong it is and whether you can use it.",
+  "把“给AI的说明书.txt”发给任何一个 AI 聊天（它写清了所有导入码的格式），再把你想练的内容、拿不准的说法发给它，它就能给你正确的导入码。": "Send “给AI的说明书.txt” to any AI chat (it lists every import format), then send what you want to practise or your unsure answers; it will give you correct import codes.",
+  "把新的 index.html 和 sw.js 传到 GitHub，打开两次，看“我的”页面底部的版本号。": "Upload the new index.html and sw.js to GitHub, open the app twice, and check the version at the bottom of Me.",
+  "拿不准的说法、要学的词、对话首领战的回答、真实对话转写：每一块都能一键复制给 AI，配好了说明。": "Unsure answers, words to learn, dialogue boss answers and real conversation transcripts: each copies to AI in one tap, with instructions.",
+  "按一组常见错误规则检查你说的句子（比如时态、复数、语序、being 用多了），只用那些不容易误判的规则，所以没提示不代表一定没错；拿不准就存起来问 AI。": "Your sentence is checked with common error rules (tense, plurals, word order, overused being…), only ones that rarely misfire, so no tip doesn't guarantee it's right; if unsure, save it to ask AI.",
+  "接话：听一句，先给反应（好消息、坏消息、吃惊……），再追问一句。想不起词：不说出东西的名字，用 It's the thing you use to… / It's like… 把它描述出来。": "Reactions: hear a line, react (good news, bad news, surprise…), then ask a follow-up. Word-finding: don't name it; describe it with It's the thing you use to… / It's like….",
+  "每张卡说对就打出伤害：一口气说完还有暴击；只要开口说了，至少也能擦伤对手。每次第一次就说对攒一格能量，攒满 {n} 格，下一张是大招卡，说对了就放大招。": "Every correct card deals damage, with a crit if you say it in one go; just speaking at least grazes the opponent. Each first-try correct answer adds an energy bar; at {n} bars the next card is a special card, and saying it right fires your special.",
+  "每张新卡不是学一次就完：要在第 {n}、{n}、{n}、{n}、{n}、{n} 天……反复出现，答得卡、答错了还会更早再来。算下来，每天每多学 {n} 张新卡，过一阵子每天就要多复习约 {n} 张。所以每天复习十几张，只够每天学 {n}–{n} 张新卡；默认的每天 {n} 张，要每天复习约 {n} 张。计划页会按你最近每天练的量给出合适的新卡数，也可以在设置里打开“智能调整新题”。": "A new card isn't done after one go: it returns on days {n}, {n}, {n}, {n}, {n}, {n}…, and sooner if you hesitate or miss. Every {n} extra new card a day adds about {n} reviews a day later. So a dozen or so reviews a day supports only {n}–{n} new cards a day; the default {n} a day needs about {n} reviews a day. The Plan page suggests a fitting number from your recent practice, or turn on “Smart new cards” in settings.",
+  "没精神时保底：先选普通练习或游戏，练完 {n} 分钟，今天剩下的计划标成跳过，算“保底完成”。": "A fallback for low-energy days: pick normal practice or the game, practise {n} minutes, and today's remaining plan items are marked skipped, counting as minimum done.",
+  "没说出来的句子会先听正确的、跟着说，这一轮隔几题再考一次（最多 {n} 次），剩下的交给明天。说对了不用补练：同一轮里马上多说几遍，好处很快就消失，隔开复习更有效。": "A missed line plays the right version for you to repeat, then comes back a few cards later this round (up to {n} times); the rest waits for tomorrow. No drill after a correct answer: repeating right away fades fast; spaced reviews work better.",
+  "没说出来：这一轮隔几题再考一次，明天再练。有卡顿/有错误：只是慢了、卡了（说对了），这次的间隔减半；有错误（看了提示才说对、或者最后还有错）会退一档、更早再见，而且这一轮里隔几题再考你一次，这次不给提示（练到自己说对一次，再间隔复习）。秒出：又快又对，隔得更久。第一遍明显说错、看了提示才说对的，就算点秒出也按“有卡顿/有错误”记——有提示的回忆不等于自己想起来；第一遍只是差一两个词（常常是手机听漏了小词）不限制，你自己判断。说之前就给的“注意用上……”不算看了提示。每说对一次，下次就隔得更久；忘了就重新从明天开始。": "Missed: retested a few cards later this round, then tomorrow. Hesitant / error: if just slow or halting (but right), the interval halves; an error (right only after the hint, or still wrong at the end) steps back a level, returns sooner, and is retested once this round without hints (get it right on your own once, then space it out). Instant: fast and right, longer gap. If your first try was clearly wrong and you got it after the hint, it's recorded as hesitant / error even if you tap Instant: recall with a hint isn't recalling it yourself. If the first try was only a word or two off (often the phone missing small words), there's no cap; you decide. A “Remember to use…” shown before you speak isn't a hint. Each correct answer makes the next gap longer; forgetting restarts from tomorrow.",
+  "点“我说对了，是识别错了”，和识别对了完全一样。如果你直接点了“秒出”，app 也会当成识别错了，只删掉这一次的记录（以前真的说错的照样留着）；点“有卡顿/有错误”说明可能真的有错，这一次照常记成说错。": "Tap “I said it right, it misheard me” and it's treated exactly as if recognised correctly. If you tapped Instant directly, the app also treats it as a misrecognition and only removes this attempt (earlier real mistakes stay); tapping hesitant / error means there may be a real error, so this attempt counts as a miss.",
+  "点“拿不准，存起来问 AI”就行：存好以后会自动按“有卡顿/有错误”记，下次早点再见，不用你再选。之后在“问 AI”页面复制给 AI，它会告诉你对不对，并给你导入码：对的导入“也对”，以后这样说也算对；错的导入“改”，变成改错卡。": "Just tap “Not sure, save to ask AI”: it's saved and rated hesitant / error automatically, so it returns sooner. Later copy it to AI from the Ask AI page; AI tells you if it's right and gives an import code: right ones import as “也对” and count from then on; wrong ones import as “改” and become fix cards.",
+  "点一下这个词：会读给你听，还会显示美式音标和重音在第几个音节（要联网查，查过的存在手机里，没网也能看）。音标里 ˈ 标在重读音节的开头。": "Tap the word: it's read aloud, with American IPA and which syllable is stressed (looked up online, then saved for offline). In IPA, ˈ marks the start of the stressed syllable.",
+  "用“发光范围工具”（单独的网页文件）：导入姿势表和发光部位.json，用画笔、橡皮改范围，导出新的发光部位.json，再在“对战角色”里导入。": "Use the glow area tool (a separate web page): import the pose sheet and 发光部位.json, adjust the areas with brush and eraser, export a new 发光部位.json, and import it in Battle characters.",
+  "看你有没有回答到对方的问题、说法对不对、语法有没有问题，不看内容是不是和参考一样。比如点单时点什么都行，参考说法只是例子。": "It checks whether you answered their question, whether the phrasing and grammar are right, not whether the content matches the example. When ordering, anything goes; the reference is just an example.",
+  "确定意思对、语法也对，就点“我确定这样也对”，以后这样说也算对。拿不准就点“拿不准，存起来问 AI”。": "If you're sure the meaning and grammar are right, tap “I'm sure this is right too” and it counts from then on. If unsure, tap “Not sure, save to ask AI”.",
+  "结果页点“为什么这样说”：讲这一句用到的语法点（规则、这句里的例子、常见的错误），你说错的排最前面，一次最多讲 {n} 个。没有常见的语法点时，可以复制问题问 AI。在刚用到的时候讲一两个点，比集中背语法更有效。": "On the result page tap “Why this way?”: it explains the grammar points in this sentence (rule, example, common mistake), your mistake first, at most {n} at a time. With no common point, copy the question for AI. One or two points right when you need them beat memorising grammar in bulk.",
+  "语音日记：睡前用英文说 {n} 分钟今天的事（多用过去式）。耳机模式：走路、坐车时听着练，不用看屏幕。": "Voice journal: before bed, talk about your day in English for {n} minutes (mostly past tense). Headphone mode: practise by ear while walking or commuting, no screen needed.",
+  "语音转文字以后，贴进“问 AI”页面的“真实对话转写”，复制给 AI：它会挑出值得学的说法、解释俚语和脏话，并给导入码。": "Transcribe it, paste it into Real conversation transcripts on the Ask AI page and copy it to AI: it picks phrases worth learning, explains slang and swearing, and gives import codes.",
+  "这是“顽固错句”：最近两次都漏了同样的关键词。说之前先提示正确的词（不显示你的错句，免得再加深印象）；说对一次，下次只给开头字母；再说对，就不给了。研究发现，同一个错误一遍遍说出来会越来越顺嘴，所以对这种句子先让你说对。": "This is a stubborn mistake: the same key word was missing twice in a row. Before you speak, the right word is shown (not your mistake, so it doesn't sink in deeper); after one correct try only the first letters; after another, nothing. Research finds that repeating a mistake makes it more automatic, so these lines get you saying it right first.",
+  "首页“现在做”点“开始”，按今天的计划练；没有计划就点“练习”，{n} 分钟。没精神就点“只做 {n} 分钟”，保住连续天数。碎片时间用耳机模式，睡前说 {n} 分钟语音日记。": "On the home page, tap Start under “Now” to follow today's plan; with no plan, tap Practice ({n} minutes). Low energy? Tap “Just {n} minutes” to keep your streak. Use headphone mode in spare moments and do a {n}-minute voice journal before bed.",
+  "首页“练哪个题库”可以只练通用、日常生活，或者你导入的题库（比如某家公司的面试准备），可以多选，按组折叠。": "“Decks to practise” on the home page can be just General, Daily life, or your imported decks (e.g. one company's interview prep); pick several, folded by group.",
+  /* v1.73.5：学习方法（发音的长说明） */
+  "a、the、to、for、of、and、can 在句子里读得很轻，元音含糊成“呃”。每个字都读得一样重，听起来就像机器人。": "a, the, to, for, of, and, can are said lightly in a sentence, with the vowel reduced to “uh”. Stressing every word equally sounds robotic.",
+  "th：舌尖轻放在上下牙之间送气。v：上齿轻碰下唇再出声。r：舌尖不碰上颚，嘴唇稍微撮圆。l：舌尖顶住上牙后面。thin 和 thing、sheep 和 ship（ee 嘴角向两边拉开，读得长；i 放松，读得短）、cat 的 a 嘴要张大。": "th: tongue tip lightly between the teeth, push air. v: upper teeth lightly on the lower lip, then voice. r: tongue tip doesn't touch the roof of the mouth, lips slightly rounded. l: tongue tip behind the upper teeth. thin vs thing, sheep vs ship (ee: spread lips, long; i: relaxed, short); the a in cat needs a wide-open mouth.",
+  "① 顺不顺：有没有长停顿、很多 um。② 语法：时态、-s、be 动词。③ 听不听得清：词尾有没有吞掉，重音对不对。④ 结构：第一句有没有直接回答。⑤ 用词：有没有想不起来的词。每次只抓一两件，先练最常出问题的那件。模拟面试的复盘里勾出来，app 会给你对应的练法。": "① Fluency: long pauses, lots of um? ② Grammar: tense, -s, be. ③ Clarity: swallowed endings, right stress? ④ Structure: does the first sentence answer directly? ⑤ Words: any you couldn't find? Focus on one or two at a time, starting with the most frequent. Tick them in a mock interview review and the app gives matching practice.",
+  "中文母语者强调一个词时，常用“更大声”；美国人是把这个词拉长，音调先抬起来再落下。一句话里，名词、动词、形容词、否定词重；其余的轻。": "Chinese speakers often stress a word by saying it louder; Americans lengthen it and let the pitch rise then fall. In a sentence, nouns, verbs, adjectives and negatives are stressed; the rest is light.",
+  "中文每个字有声调；英语的音高变化是落在整句上的。陈述句和 what、where、how 开头的问句，句尾往下降；能用 yes / no 回答的问句，句尾往上扬。": "Chinese has a tone on every syllable; English pitch moves over the whole sentence. Statements and what / where / how questions fall at the end; yes / no questions rise.",
+  "中文音节很少以辅音结尾，所以很容易把 -t、-d、-s、-ks、-sts 吞掉，或者在后面加个“特、斯”。要发出来，但要短、要干净。": "Chinese syllables rarely end in consonants, so -t, -d, -s, -ks, -sts get swallowed or an extra vowel is added. Say them, but short and clean.",
+  "停在逗号、so / but / because 前面、长句里的介词短语前面；一个意群里面不要停。停对了地方，美国人会觉得你说得更流利、更好懂。打开“断句”就能看到斜杠。": "Pause at commas, before so / but / because, and before prepositional phrases in long sentences; don't pause inside a thought group. Pausing in the right places sounds more fluent and clearer to Americans. Turn on phrasing to see the slashes.",
+  "先抓三件事：重音、语调、断句": "Focus on three things first: stress, intonation, phrasing",
+  "关于“肌肉、舌位、胸腔发声”": "About “muscles, tongue position, chest voice”",
+  "几个难发的音": "A few hard sounds",
+  "前一个词的结尾辅音，接后一个词的开头元音，连起来读。一个词一个词地往外蹦，听起来会很生硬。": "Link a word's final consonant to the next word's first vowel. Saying one word at a time sounds stiff.",
+  "听自己的录音：听这五件事": "Listening to your recording: five things",
+  "固定搭配：整体记、整体说": "Collocations: learn and say them whole",
+  "很多英语不是一个词一个词拼起来的，而是现成的词组，比如 job hunting、send out applications、look forward to。研究发现，学会留意并使用这些固定搭配的学习者，口语被评得更好。练习时，黄色底的就是固定搭配：点一下能整体听、看意思，也能单独听其中一个词。": "Much of English isn't built word by word but from ready-made phrases, like job hunting, send out applications, look forward to. Research finds learners who notice and use these collocations are rated better speakers. In practice, yellow highlights are collocations: tap to hear the whole phrase and see its meaning, or hear one word.",
+  "断句：在意群之间停": "Phrasing: pause between thought groups",
+  "研究发现，听的人觉得最影响理解的，是单词重音、句子重音和语调。发音不完美没关系，这三样对了，对方就容易听懂。": "Research finds listeners' understanding depends most on word stress, sentence stress and intonation. Imperfect sounds are fine; get these three right and you're easy to understand.",
+  "练的时候，每句话下面也会提示一条最相关的。": "While practising, the most relevant one is shown under each sentence.",
+  "网上很多“美式发音要用胸腔、舌头往后缩”的说法，研究证据很有限。与其琢磨肌肉怎么用力，不如照着上面几条：先听慢速、再跟正常速度，录下来和标准读音对比。": "Online claims like “use your chest” or “pull your tongue back” for an American accent have little research support. Rather than thinking about muscles, follow the tips above: listen slow, shadow at normal speed, record yourself and compare with the model.",
+  "词尾辅音：要发出来，不加元音": "Final consonants: say them, no extra vowel",
+  "语调：落在整句上": "Intonation: over the whole sentence",
+  "轻读：小词又轻又短": "Weak forms: small words light and short",
+  "连读：词和词连成一串": "Linking: words run together",
+  "重音：拉长、音调起伏，不是喊大声": "Stress: lengthen and move the pitch, don't shout",
 };
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
@@ -18778,6 +19541,75 @@ Object.assign(I18N_EN, {
   "求职：面试练习、知识复习、投递": "Job search: interview practice, knowledge review, applications", "面试（只排练习）": "Interviews (practice only)",
   "今天的面试练习": "Today's interview practice", "面试练习 5 分钟": "Interview practice, 5 min", "知识复习": "Knowledge review", "看看该跟进的投递": "Check follow-ups", "面试前 72 小时清单": "72-hour checklist", "写面试复盘": "Write a debrief"
 });
+/* v1.74.0：JD 高频要求、记投递的粘贴识别、只记数的提醒 */
+Object.assign(I18N_EN, {
+ "学过": "Studied",
+ "有证据": "Have evidence",
+ "没有": "None",
+ "标一下": "Mark it",
+ "{n}/{n} 份，必须 {n}，加分 {n}": "{n}/{n} JDs: required {n}, plus {n}",
+ "{n}/{n} 份，必须 {n}": "{n}/{n} JDs: required {n}",
+ "{n}/{n} 份，加分 {n}": "{n}/{n} JDs: plus {n}",
+ "{n}/{n} 份": "{n}/{n} JDs",
+ "{n} 份只记了数": "{n} logged without details",
+ "趁还记得补上": "Fill them in while you remember",
+ "这几天在成长页只记了数，还没写是哪家。": "You logged these on the Grow page without saying which companies.",
+ "想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、NUworks 的 Applications；浏览器的历史记录。": "Can't remember where you applied? Search your email for 'application' or 'thank you for applying' (most portals send a confirmation); LinkedIn → My jobs → Applied; Handshake or NUworks → Applications; your browser history.",
+ "还有 {n} 份只记了数。想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、NUworks 的 Applications；浏览器的历史记录。": "{n} still logged without details. Can't remember where you applied? Search your email for 'application' or 'thank you for applying' (most portals send a confirmation); LinkedIn → My jobs → Applied; Handshake or NUworks → Applications; your browser history.",
+ "补上 {n} 份": "Fill in {n}",
+ "{n} 份还没补职位": "{n} still missing a role",
+ "只写了公司：": "Company only: ",
+ "JD 高频要求": "Top JD requirements",
+ "统计 JD 高频要求": "Top JD requirements",
+ "在本机统计你投的 JD：每一项出现在几份 JD 里，写在“必须”里还是“加分”里。点右边标一下你有没有证据，就能看出最该补的。": "Counted on this device from your JDs: how many JDs ask for each item, as required or as a plus. Mark on the right whether you have evidence, and the biggest gaps show up.",
+ "控制 {n}": "Controls {n}",
+ "测试 {n}": "Testing {n}",
+ "机械 {n}": "Mechanical {n}",
+ "A 档 {n}": "Tier A {n}",
+ "全部 {n}": "All {n}",
+ "最该补的": "Biggest gaps",
+ "前 {n} 项里还有 {n} 项没标": "Top {n}: {n} not marked yet",
+ "排法：写在“必须”里算 2、“加分”里算 1、只在职责里提到算 0.5，你标了“有证据”的不算。": "Ranking: required = 2, a plus = 1, only in responsibilities = 0.5. Skills you marked 'Have evidence' are left out.",
+ "发给 AI：核对证据，补知识卡": "Send to AI: check evidence, make cards",
+ "硬条件": "Hard requirements",
+ "要求的工作年限：{n}–{n} 年 {n} 份，{n}–{n} 年 {n} 份，{n} 年以上 {n} 份，没写 {n} 份。": "Years of experience asked: {n}–{n} yrs {n}, {n}–{n} yrs {n}, {n}+ yrs {n}, not stated {n}.",
+ "没有 JD 写身份限制。": "No JD lists citizenship, clearance or no-sponsorship limits.",
+ "写了身份限制（公民、安全许可、出口管制、不担保）：": "Citizenship, clearance, export-control or no-sponsorship limits: ",
+ "写了可以担保或接受 OPT：": "Says it sponsors or accepts OPT: ",
+ "简历关键词": "Resume keywords",
+ "你有证据、JD 又常写的：": "Skills you have evidence for that JDs often ask for: ",
+ "。简历和求职信里用 JD 里的原词写这些。": ". Use the JD's exact words for these in your resume and cover letters.",
+ "技术要求 {n}": "Technical requirements {n}",
+ "全部 {n} 项": "All {n}",
+ "通用能力": "General skills",
+ "这些几乎每份都写，靠故事证明（故事库里的 STAR），不算缺口。": "Almost every JD lists these. Prove them with stories (STAR, in your story bank); they don't count as gaps.",
+ "怎么算的": "How it's counted",
+ "每份 JD 按小标题分成“必须”（Requirements、Qualifications、What you bring…）、“加分”（Preferred、Nice to have、a plus…）和“职责”三段。每一项在一份 JD 里只算一次，看的是“几份 JD 要它”，不是出现了几次；同一份里出现在好几段，按最强的算。认得的说法在一张固定的词表里（PLC、SolidWorks、GD&T、test plan……），所以结果每次都一样、可以核对；没在词表里的要求，发给 AI 时它会补。": "Each JD is split by its headings into required (Requirements, Qualifications, What you bring…), a plus (Preferred, Nice to have, a plus…) and responsibilities. Each item counts once per JD, so it shows how many JDs ask for it, not how often it's repeated; if it appears in several parts, the strongest one counts. The terms come from a fixed list (PLC, SolidWorks, GD&T, test plan…), so the result is the same every time and you can check it. Anything not on the list, the AI adds when you send it.",
+ "这一类只有 {n} 份 JD，排名靠前的几项可以参考，后面的差一两份就会变。": "Only {n} JDs in this group: the top items are useful, the rest can change with one or two more.",
+ "前面的要求都标了“有证据”。": "All the top requirements are marked 'Have evidence'.",
+ "粘贴职位链接、标题或整页文字，自动认出公司和职位": "Paste a job link, title or the whole page to fill in the company and role",
+ "识别，加一条": "Recognize and add",
+ "比如：https://job-boards.greenhouse.io/acme/jobs/123\n或者：Test Engineer at Acme Robotics\n或者：在职位页面全选、复制，整页贴进来（JD 原文一起存下）": "e.g. https://job-boards.greenhouse.io/acme/jobs/123\nor: Test Engineer at Acme Robotics\nor: select all on the job page, copy, and paste it here (the JD is saved too)",
+ "顺手写下是哪几家？": "Which companies were they?",
+ "只写公司名就行，职位可以空着。明天补详情时，就不会想不起来投了什么。": "The company is enough; the role can wait. Tomorrow you'll know what to fill in.",
+ "先不写": "Skip",
+ "记下": "Save",
+ "公司 {n}": "Company {n}",
+ "公司": "Company",
+ "职位（可以不写）": "Role (optional)",
+ "记下了 {n} 家：在求职页补详情": "Saved {n}: add the details on the Jobs page",
+ "这几家以前记过了": "Already logged",
+ "认出来 {n} 条，看一眼对不对": "Recognized {n}: check they're right",
+ "没认出公司和职位，已经加了一条，自己填一下": "Couldn't find the company and role; added an entry for you to fill in",
+ "先粘贴链接、标题或整页文字": "Paste a link, title or page first",
+ "从分享收到一个职位，看一眼对不对": "Got a job from Share: check it's right",
+ "从分享收到一个链接，补一下公司和职位": "Got a link from Share: add the company and role",
+ "至少要 {n} 份存了 JD 原文的投递（现在 {n} 份）": "Need at least {n} applications with JD text (now {n})",
+ "JD 原文 {n} 份（对上投递 {n} 份；对不上的会跳过）": "JD text: {n} (matched {n} applications; the rest are skipped)",
+ "技能证据 {n} 项（JD 高频要求里用）": "Skill evidence: {n} (used in Top JD requirements)",
+ "在本机直接统计存了 JD 原文的投递（现在 {n} 份）：每项要求出现在几份 JD 里、是必须还是加分。": "Counted on this device from applications with JD text (now {n}): how many JDs ask for each item, as required or as a plus."
+});
+Object.assign(I18N_EN, {"比如：\nAcme Robotics, Test Engineer，内推，地点 Boston\nhttps://jobs.example.com/12345": "e.g.\nAcme Robotics, Test Engineer, referral, Boston\nhttps://jobs.example.com/12345"});
 const I18N_MON = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], I18N_WK = {一:"Mon", 二:"Tue", 三:"Wed", 四:"Thu", 五:"Fri", 六:"Sat", 日:"Sun"};
 const I18N_ROUND = {电话初筛:"phone screen", 招聘经理:"hiring manager", 技术面:"technical", 现场面:"on-site", 其他:"other"};
 /* 整句对不上时，再试这些片段规则（日期、“还有 N 天”、带公司名的几种句式） */
