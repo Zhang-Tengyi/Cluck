@@ -1048,6 +1048,33 @@ html[lang="en"] .job-count span{font-size:11.5px}
 .jrec-more{margin-top:12px}
 .jrec-more>summary{cursor:pointer;color:var(--ink2)}
 
+/* v1.72.1：大招的总伤害 */
+.bt-dmg.big{font-size:2.1em;font-weight:900;color:#FFE28A;text-shadow:0 2px 0 #7A3B00,0 0 10px rgba(255,170,40,.75);z-index:6}
+
+/* v1.72.1：实验室的实时面板 */
+.gc-stagewrap .gc-stagebtn{position:relative}
+.gc-lab-hud{position:absolute;inset:0;pointer-events:none;z-index:3;font:600 10px/1.25 system-ui,sans-serif;color:#cfe9ff}
+.gc-lab-mon,.gc-lab-stat{position:absolute;top:9%;border:1px solid rgba(120,200,255,.5);border-radius:7px;background:rgba(8,18,38,.72);box-shadow:inset 0 0 12px rgba(80,180,255,.28),0 0 10px rgba(80,180,255,.22);overflow:hidden}
+.gc-lab-mon{left:4%;width:31%;height:38%;padding:5px 6px}
+.gc-lab-mon::after{content:"";position:absolute;left:0;right:0;height:30%;top:-30%;background:linear-gradient(180deg,transparent,rgba(130,210,255,.16),transparent);animation:gcScan 3.6s linear infinite}
+@keyframes gcScan{to{top:100%}}
+.gc-lab-mont{opacity:.8;letter-spacing:.06em;margin-bottom:3px}
+.gc-lab-bars{display:flex;align-items:flex-end;gap:3px;height:calc(100% - 26px)}
+.gc-lab-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.gc-lab-bar i{display:block;width:100%;border-radius:2px 2px 0 0;background:linear-gradient(180deg,#7fd4ff,#4a7dff);box-shadow:0 0 6px rgba(110,190,255,.55)}
+.gc-lab-bar.on i{background:linear-gradient(180deg,#ffe28a,#ff9d3c);box-shadow:0 0 8px rgba(255,190,80,.8)}
+.gc-lab-bar.fu i{opacity:.25}
+.gc-lab-bar span{font-size:8px;opacity:.7;margin-top:2px}
+.gc-lab-stat{right:4%;width:33%;padding:5px 7px;display:flex;flex-direction:column;gap:3px}
+.gc-lab-stat small{display:block;font-size:8px;opacity:.7;margin:0 0 1px 11px}
+.gc-lab-led{display:inline-block;width:6px;height:6px;border-radius:50%;background:#5dffb0;box-shadow:0 0 6px #5dffb0;margin-right:5px;vertical-align:1px;animation:gcLed 2.4s ease-in-out infinite}
+.gc-lab-stat div:nth-child(2) .gc-lab-led{animation-delay:.6s}.gc-lab-stat div:nth-child(3) .gc-lab-led{animation-delay:1.2s}.gc-lab-stat div:nth-child(4) .gc-lab-led{animation-delay:1.8s}
+.gc-lab-led.warn{background:#ffb347;box-shadow:0 0 6px #ffb347}
+@keyframes gcLed{50%{opacity:.35}}
+.gc-lab-ring{position:absolute;left:50%;bottom:6%;width:34%;height:7%;transform:translateX(-50%);border:1px solid rgba(160,120,255,.6);border-radius:50%;animation:gcRing 2.8s ease-out infinite}
+@keyframes gcRing{from{opacity:.9;transform:translateX(-50%) scale(.6)}to{opacity:0;transform:translateX(-50%) scale(1.25)}}
+@media (prefers-reduced-motion: reduce){.gc-lab-mon::after,.gc-lab-led,.gc-lab-ring{animation:none}}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -1068,7 +1095,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.72.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.72.3"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2863,6 +2890,11 @@ function buildSession(kind, ctx){
     const fresh = core.filter(isNew).map((c,i)=>({c, s:weak(c.tag)+(c.custom?0.3:0)-i*0.0004})).sort((a,b)=>b.s-a.s).map(x=>x.c);
     main = main.concat(take(diversify(fresh), cfg.core-main.length, true));
   }
+  /* v1.72.1：复习堆积时（ctx.forceNew），到期的排满一轮以后也带上今天剩下的几张新卡（最多 forceNew 张），不然一直学不到新的 */
+  if (ctx.forceNew > 0 && main.length >= cfg.core){
+    const fresh = core.filter(isNew).map((c,i)=>({c, s:weak(c.tag)+(c.custom?0.3:0)-i*0.0004})).sort((a,b)=>b.s-a.s).map(x=>x.c);
+    main = main.concat(take(diversify(fresh), ctx.forceNew, true));
+  }
   const minCore = ctx.fillAhead ? cfg.core : Math.min(cfg.core, 6);
   if (main.length < minCore){
     const ahead = core.filter(c=>!isNew(c)&&!isDue(c)).sort((a,b)=>prog[a.id].due-prog[b.id].due);
@@ -3986,7 +4018,31 @@ function wordsTile(){
   const w = wordStats(); if (!w.total) return "";
   return `<button class="mod" data-act="words-go">${ICON.bolt}<b>单词</b><span>${w.learned ? `已学 ${w.learned} 个，该复习 ${w.due} 个` : `${w.total} 个，每次学 2–3 个`}</span></button>`;
 }
-ACT["words-go"] = () => startSession("words", {filter: c => c.t === "w"}, "单词");
+/* v1.72.1：点“单词”先看写入了哪些词（到期的、新的、学过的），再选练习（以前一点就直接开始练） */
+let WL_ALL = false;
+VIEWS.words = { tab:"home",
+  render(){
+    const tn = dnum(today()), ws = CAT.cards.filter(c => c.t === "w"), st = wordStats();
+    const stOf = c => { const p = S.cards[c.id]; if (!p) return {k:1, lab:"新词", cls:""}; if (p.due <= tn) return {k:0, lab:"到期", cls:"amber"}; return {k:2, lab:`${p.due - tn} 天后`, cls:"muted"}; };
+    const list = ws.map(c => ({c, s:stOf(c)})).sort((a, b) => a.s.k - b.s.k || (((S.cards[a.c.id] || {}).due || 0) - ((S.cards[b.c.id] || {}).due || 0)) || String(a.c.word || "").localeCompare(String(b.c.word || "")));
+    const row = ({c, s}, i) => `<div class="li wl-row" data-k="${esc(((c.word || "") + " " + (c.mean || "") + " " + (c.en || "")).toLowerCase())}" style="align-items:flex-start${!WL_ALL && i >= 30 ? ";display:none" : ""}" ${!WL_ALL && i >= 30 ? "data-more=\"1\"" : ""}>
+      <div class="grow"><div><button class="linkbtn" data-act="word" data-w="${esc(c.word || "")}"><b class="en">${esc(c.word || "")}</b></button>　<span class="small">${esc(c.mean || "")}</span></div>${c.en ? `<div class="small muted en" style="margin-top:2px">${esc(c.en)}</div>` : ""}</div>
+      <span class="chip ${s.cls}" style="white-space:nowrap">${s.lab}</span></div>`;
+    return `<div class="wrap">${backBtn()}<h2>单词</h2><p class="small muted">${st.total} 个 · 已学 ${st.learned} · 该复习 ${st.due}</p>
+      <div class="row-gap" style="margin:10px 0"><button class="btn primary" data-act="words-start">开始练</button>${st.due ? `<button class="btn" data-act="words-due">只复习到期的</button>` : ""}</div>
+      ${ws.length ? `<input id="wlQ" type="search" placeholder="搜单词或意思" style="width:100%;margin:4px 0 6px" autocomplete="off"><p class="small muted hidden" id="wlNone">没有对上的</p>
+      <div class="list">${list.map(row).join("")}</div>${!WL_ALL && list.length > 30 ? `<button class="btn block ghost" data-act="wl-all" id="wlAll" style="margin-top:8px">显示全部（${list.length}）</button>` : ""}` : `<p class="small muted">还没有单词。</p>`}
+      <p class="small muted" style="margin-top:10px">加单词：导入“词 | 单词 | 中文意思 | 例句 | 例句的中文 |”</p></div>`;
+  },
+  mount(){ const box = document.getElementById("wlQ"); if (!box) return;
+    box.addEventListener("input", () => { const q = box.value.trim().toLowerCase(); let n = 0;
+      document.querySelectorAll(".wl-row").forEach(r => { const hit = !q || r.dataset.k.includes(q); const vis = hit && (q || WL_ALL || !r.dataset.more); r.style.display = vis ? "" : "none"; if (hit) n++; });
+      const none = document.getElementById("wlNone"); if (none) none.classList.toggle("hidden", n > 0); const more = document.getElementById("wlAll"); if (more) more.style.display = q ? "none" : ""; }); }
+};
+ACT["words-go"] = () => { WL_ALL = false; UI.nav("words"); };
+ACT["words-start"] = () => startSession("words", {filter: c => c.t === "w"}, "单词");
+ACT["words-due"] = () => { const tn = dnum(today()); startSession("words", {filter: c => c.t === "w" && S.cards[c.id] && S.cards[c.id].due <= tn}, "单词：只复习到期的"); };
+ACT["wl-all"] = () => { WL_ALL = true; UI.render(); };
 function todayLine(){
   const h = (S.hist || {})[today()] || []; const n = new Set(h.map(e => e.id)).size;
   return n ? `<div class="meta"><button class="btn sm ghost" style="padding-left:0;min-height:32px" data-act="nav" data-v="today">今天练了 ${n} 句，看看练了什么</button></div>` : "";
@@ -4054,7 +4110,7 @@ ACT.start = async el => {
   startSession(S.settings.goal);
 };
 function sessionCtx(extra){
-  return Object.assign({cat:CAT, prog:S.cards, todayN:dnum(today()), newLimit: (typeof newPausedToday === "function" && newPausedToday()) ? 0 : S.settings.newPerDay, newUsed:newUsedToday(),
+  return Object.assign({cat:CAT, prog:S.cards, todayN:dnum(today()), newLimit: typeof newLimitToday === "function" ? newLimitToday() : S.settings.newPerDay, forceNew: (typeof newPausedToday === "function" && newPausedToday()) ? newLimitToday() : 0, newUsed:newUsedToday(),
     acc:K.tagAgg(S.tags, today(), 0, 14), mode:interviewMode(), questions:(typeof jobOwnsIv === "function" && jobOwnsIv()) ? [] : deckQuestions(curDeck()), filter:deckPred(curDeck()), answers:S.answers, ivDue:S.ivDue, today:dnum(today())}, extra || {});
 }
 /* 游戏模式只出“说英语”的卡：每张都能出招。面试长回答、听力题、新单词介绍留在学习模式 */
@@ -4095,7 +4151,7 @@ VIEWS.free = {
 };
 let FREE_OPTS = [];
 ACT["free-go"] = el => { const o = freeOpts().find(x => x[0] === el.dataset.v); if (!o) return; const f = o[2]; const dp = deckPred(curDeck());
-  startSession("free", {filter: c => dp(c) && f(c), fillAhead:true, /* v1.66.6：自由练习也守每天的新题上限（以前每轮重新给最多 15 道，多开几轮一天的新题就没有上限） */ newLimit: ["due","hard"].includes(el.dataset.v) || (typeof newPausedToday === "function" && newPausedToday()) ? 0 : S.settings.newPerDay, newUsed:newUsedToday()}, o[1]); };
+  startSession("free", {filter: c => dp(c) && f(c), fillAhead:true, /* v1.66.6：自由练习也守每天的新题上限（以前每轮重新给最多 15 道，多开几轮一天的新题就没有上限） */ newLimit: ["due","hard"].includes(el.dataset.v) ? 0 : (typeof newLimitToday === "function" ? newLimitToday() : S.settings.newPerDay), newUsed:newUsedToday()}, o[1]); };
 ACT["listen-go"] = () => startSession("listen", {}, "听力快练");
 
 /* ---------- 练习流程 ---------- */
@@ -6612,7 +6668,8 @@ const ABOUT_QA = [
  ["计划和时间", [
   ["昨天的计划没做完，今天要补吗？", "不用硬补。研究发现，漏掉一次对养成习惯没有实质影响，真正伤习惯的是长期不规律。该复习的卡片 app 会自动排进今天，不会丢；其他项先做今天的，有精力再挑一项最重要的补。"],
   ["“学音标”这个单独的计划怎么用？", "在“计划”页点“＋ 学音标（单独的计划）”，选每天、隔一天或者一周三次，再选什么时候做。它和推荐计划分开：重新生成推荐计划、清除推荐计划、导入计划时选“替换”都不会动它；改它、关掉它也不会动别的计划，关掉时只删还没做的“学音标”。内容跟着你的进度：没学完就写“学第几课”（有到期的复习顺便复习）；学完以后只在有复习的日子出现。点它直接打开“发音 → 音标”，学完一课或者复习完自动打勾。"],
-  ["为什么有时候今天不学新卡？", "今天到期的复习超过一轮的量（普通练习 16 张、深度练习 30 张）时，app 先暂停新卡，让你把复习清掉。复习没清完又加新卡，欠的复习会越来越多，过期越久越容易忘。计划页可以点“今天照常学新卡”改回来；复习清到一轮以内，新卡自动恢复。"],
+  ["为什么要复习这么多？", "每张新卡不是学一次就完：要在第 1、2、4、7、15、30 天……反复出现，答得卡、答错了还会更早再来。算下来，每天每多学 1 张新卡，过一阵子每天就要多复习约 10 张。所以每天复习十几张，只够每天学 1–2 张新卡；默认的每天 12 张，要每天复习约 120 张。计划页会按你最近每天练的量给出合适的新卡数，可以点“按这个来”。"],
+  ["为什么有时候今天只学 2 张新卡？", "今天到期的复习超过一轮的量（普通练习 16 张、深度练习 30 张）时，先清复习，新卡每天只学 2 张：复习没清完又加很多新卡，欠的会越来越多；一张新的都不学，又看不到进步。计划页写着照你最近每天练的量约几天清完，可以点“快速复习”只练到期的，也可以点“今天照常学新卡”。复习清到一轮以内，新卡自动恢复。"],
   ["错误专练是什么？", "从你的错误档案里找出最常犯的那一类（比如时态、冠词），直接练这一类的卡，开始时告诉你这一类这周和上周各错了几次。光看错误统计没什么用，针对最常犯的错集中练、再看到它在减少，才有效果。错误档案里每一类旁边也有“练这一类”。计划里的反射训练开始时也可以选“练最弱的一类”。"],
   ["“只做 3 分钟”是什么？", "没精神时保底：先选普通练习或游戏，练完 3 分钟，今天剩下的计划标成跳过，算“保底完成”。"],
   ["时间到了以后怎么选？", "可以结束，也可以“再练 5 分钟”（从点下去的那一刻算），或者“不限时，练完剩下的题”。停在提示页的时间不算练习时间。"]]],
@@ -7070,7 +7127,7 @@ VIEWS.plan = {
       <div class="row-gap" style="margin-top:8px"><button class="btn sm primary" data-act="iv-due-go">现在练</button><button class="btn sm ghost" data-act="iv-due-later">明天再说</button></div></div>` + body;
     const nGen = (S.plan || []).filter(x => x.gen && !x.done).length, grouped = ["next", "late", "done"].includes(tab) && body.includes("pl-day");
     return `<div class="wrap">${backBtn()}<h2>我的计划</h2>
-      <div class="row-gap" style="margin-top:6px"><button class="btn sm primary" data-act="pl-open-top">＋ 添加一项</button>${typeof newPausedToday === "function" && newPausedToday() ? `<div class="panel" style="margin:6px 0;width:100%"><span class="small">今天到期的复习有 ${dueTodayN()} 张，比一轮多：先清复习，今天暂停新卡。</span> <button class="btn sm ghost" data-act="new-override">今天照常学新卡</button></div>` : ""}<button class="btn sm" data-act="pl-gen">生成推荐计划</button>${typeof ipaPlanBtn === "function" ? ipaPlanBtn() : ""}${nGen ? `<button class="btn sm ghost" data-act="pl-gen-clear">清除推荐计划（${nGen}）</button>` : ""}</div>
+      <div class="row-gap" style="margin-top:6px"><button class="btn sm primary" data-act="pl-open-top">＋ 添加一项</button>${typeof newPausedToday === "function" && newPausedToday() ? (bi => `<div class="panel" style="margin:6px 0;width:100%"><span class="small">到期 ${bi.due} 张，比一轮多：先清复习，今天只学 ${bi.trickle} 张新卡。照最近每天 ${bi.per} 张，约 ${bi.days} 天清完。</span><div class="row-gap" style="margin-top:6px"><button class="btn sm primary" data-act="free-go" data-v="due">快速复习（只练到期的）</button><button class="btn sm ghost" data-act="new-override">今天照常学新卡</button></div></div>`)(backlogInfo()) : ""}${typeof newFitHTML === "function" ? newFitHTML() : ""}<button class="btn sm" data-act="pl-gen">生成推荐计划</button>${typeof ipaPlanBtn === "function" ? ipaPlanBtn() : ""}${nGen ? `<button class="btn sm ghost" data-act="pl-gen-clear">清除推荐计划（${nGen}）</button>` : ""}</div>
       ${grouped ? `<div class="row-gap" style="margin-top:8px"><button class="linkbtn small" data-act="pl-fold-all" data-v="open">全部展开</button><button class="linkbtn small" data-act="pl-fold-all" data-v="close">全部收起</button></div>` : ""}
       <div class="seg" style="margin-top:10px">${tabs.map(([k, l]) => `<button data-act="pl-tab" data-v="${k}" aria-pressed="${tab === k}">${l}${G[k].length ? `<span class="seg-n">${G[k].length}</span>` : ""}</button>`).join("")}</div>
       <div style="margin-top:12px">${body}</div>
@@ -11478,9 +11535,9 @@ const BT = (() => {
         removeAfter(d.animate([{transform:`translate(${Math.cos(ang) * r}px, ${Math.sin(ang) * r}px) scale(.6)`, opacity:0}, {opacity:1, offset:0.3}, {transform:"translate(0, 0) scale(1)", opacity:0}], {duration:dur * (0.7 + Math.random() * 0.3), delay:Math.random() * dur * 0.25, easing:"ease-in", fill:"both"}), d);
       }
     }
-    function damageNumber(x, y, n){
-      if (!(n > 0)) return;
-      const t = document.createElement("div"); t.className = "bt-dmg"; t.textContent = "-" + n; t.style.left = x + "px"; t.style.top = y + "px"; fx.appendChild(t);
+    function damageNumber(x, y, n, big){
+      if (!(n > 0)) return; if (!big) A._dmgN = (A._dmgN || 0) + 1;
+      const t = document.createElement("div"); t.className = "bt-dmg" + (big ? " big" : ""); t.textContent = "-" + n; t.style.left = x + "px"; t.style.top = y + "px"; fx.appendChild(t);
       removeAfter(t.animate([{transform:"translateY(0) scale(.8)", opacity:0}, {transform:"translateY(-8px) scale(1.1)", opacity:1, offset:0.2}, {transform:"translateY(-34px) scale(1)", opacity:0}], {duration:720, easing:"ease-out"}), t);
     }
     function sparkles(f){
@@ -11512,7 +11569,7 @@ const BT = (() => {
     /* 扣血：打的是对手就扣对手的血；打的是你，交给 A.onYouHit（以后掉血用） */
     function dealt(def, d){
       /* 首领被连续扣血（光线这种持续攻击）：每扣一次快速受击一下（只做受击开头那一小段）；最后一次之后 0.3 秒完整播一次受击（被打死的话，倒下排在它后面） */
-      if (def === ghost && A.cm && !A._noFlinch && A.cm.flinch && d > 0){ A.cm.flinch(); clearTimeout(A._cmFinal); const tk = A.token; A._cmFinal = setTimeout(() => { if (tk === A.token && A.cm) A.cm.play("hit"); }, 300); } if (!(d > 0)) return; if (A._replay) return;   /* 回放：只放动画，不扣血 */ A.lastDmg += d; if (def === ghost) A.setHP(A.hp - d); else if (A.onYouHit) A.onYouHit(d); }
+      if (def === ghost && A.cm && !A._noFlinch && A.cm.flinch && d > 0){ A.cm.flinch(); clearTimeout(A._cmFinal); const tk = A.token; A._cmFinal = setTimeout(() => { if (tk === A.token && A.cm) A.cm.play("hit"); }, 300); } if (!(d > 0)) return; A.lastDmg += d; if (def === ghost) A.setHP(A.hp - d); else if (A.onYouHit) A.onYouHit(d); }
     function hurt(def, dir, dmg, big, pt){
       if (def === ghost && A.cm){ A.cm.play("hit"); A._noFlinch = true; dealt(def, dmg); A._noFlinch = false; codeRecoil(big); return; }   /* 近身一下：完整受击一次（扣血那一下不再另外快速受击） */
       const face = faceOf(def);
@@ -13364,6 +13421,8 @@ const BT = (() => {
 
     /* 你出招：kind = light（轻击）/ heavy（重击）/ skill（技能），按这个角色的招式 */
     A.move = async (kind, dmg, o) => {
+      try { if (A.onBeforeHit && !A._replay) A.onBeforeHit(kind, dmg); } catch (e) {}   /* v1.72.1：给这一招记下打之前的血量（回放用） */
+      A._dmgN = 0;
       const lo = A.loadout || TEMPLATES.brawler; A.lastDmg = 0; if (kind === "skill") A.lastSpecial = 0;
       return (MOVES[lo[kind]] || MOVES.punch)(you, ghost, -1, dmg, o || {});
     };
@@ -13386,7 +13445,8 @@ const BT = (() => {
     };
     /* 以前的叫法：出拳 = 轻击，大招 = 技能 */
     A.strike = (dmg, o) => A.move("light", dmg, o);
-    A.special = total => A.move("skill", total);
+    /* v1.72.1：大招打很多下时，打完再显示一个大的总伤害（血条扣到 0 就停，数字照样是全部的伤害） */
+    A.special = async total => { const r = await A.move("skill", total); try { if ((A._dmgN || 0) > 1 && total > 0){ const b = box(bodyOf(ghost)); damageNumber(b.x + b.w / 2 - 22, b.y + b.h * 0.18, total, true); } } catch (e) {} return r; };
     /* 结束：赢的一方跳两下，输的一方跪下（有“输”的姿势就用它） */
     /* 倒下：自带红灯（倒下那格有红色的灯）的角色只稍微压暗，不然红灯看不见；别的整个变灰 */
     const loseFilter = f => "grayscale(1) brightness(.7)";   /* 输了都变灰：迪迦这种有红色指示灯的也一样（发光部位是另外画在上面一层的，红灯照样亮） */
@@ -13430,7 +13490,20 @@ const BT = (() => {
       let feetAt = sc.feetAt || FEET_AT;
       if (A.giant && A.rNow > 0.86) feetAt -= Math.min(0.08, (A.rNow - 0.86) * 0.6);
       /* 巨人最多占舞台的 78%：背景图的天空就那么高，镜头拉到底以后，再高的巨人也不再变大，不会大出画面 */
-      const sizeNow = Math.min(A.giant ? 0.78 : 9, Math.max(A.charSize, sc.minSize || 0, (m.readyM * m.pxPerM * m.depth * (1 - feetAt)) / sc.footY)); A.sizeNow = sizeNow;
+      let sizeNow = Math.min(A.giant ? 0.78 : 9, Math.max(A.charSize, sc.minSize || 0, (m.readyM * m.pxPerM * m.depth * (1 - feetAt)) / sc.footY));
+      /* v1.72.1：普通大小时镜头往后退，让最高的那个（主角或怪）头顶离画面上边留出距离（9%）。人物和背景一起缩小（winH = R ÷ sizeNow），和背景里东西的比例不变；
+         背景图上下不够时，在 4%–35% 之间挪地面的位置，找能放下的、离原来最近的那个 */
+      if (!A.giant && A.camFit !== false){
+        const R = m.readyM * m.pxPerM * m.depth, rel = Math.max((A.khNow || 1) * 1.05, A.monRel || 0), MARGIN = 0.09;   /* 怪的外框（角、碎片）比身高略高，留 9% */
+        const lo = f => Math.max((1 - f) * R / sc.footY, f * R / Math.max(1, sc.h - sc.footY)), cap = f => ((1 - f) - MARGIN) / rel;
+        if (sizeNow > cap(feetAt)){
+          let best = null;
+          for (let d = 0; d <= 0.31; d += 0.01) for (const f of [feetAt - d, feetAt + d]){ if (f < 0.04 || f > 0.35) continue; if (cap(f) >= lo(f) && (!best || d < best.d)) best = {f, d}; }
+          if (best){ feetAt = best.f; sizeNow = Math.min(sizeNow, cap(best.f)); }
+          else { let f0 = feetAt, g = -9; for (let f = 0.04; f <= 0.35; f += 0.01){ if (cap(f) - lo(f) > g){ g = cap(f) - lo(f); f0 = f; } } feetAt = f0; sizeNow = Math.max(lo(f0), Math.min(sizeNow, cap(f0))); }
+        }
+      }
+      A.sizeNow = sizeNow;
       const winH = Math.min((m.readyM * m.pxPerM * m.depth) / sizeNow, sc.footY / (1 - feetAt));
       const k = S0.height / winH, dispH = k * sc.h, dispW = (dispH * sc.w) / sc.h;
       const bottomY = Math.min(sc.h, sc.footY + feetAt * winH);
@@ -13447,6 +13520,9 @@ const BT = (() => {
       stage.style.setProperty("--bt-size", sizeNow * 100 + "%"); const sceneChanged = A.scene !== key; A.scene = key;
       if (sceneChanged) relight();
       placeFighters(); if (A.cm) A.cm.layout();
+      /* 怪的高度（按“比例 1 的角色”的倍数）：变了就再排一次（第一次排的时候怪还没量过） */
+      if (A.cm && !A.giant){ try { const b = A.cm.box(), r2 = b && b.h ? b.h / (A.sizeNow * S0.height) : 0; if (r2 && Math.abs(r2 - (A.monRel || 0)) > 0.02){ A.monRel = r2; if (!A._refit){ A._refit = true; requestAnimationFrame(() => { A._refit = false; layout(); }); } } } catch (e) {} }
+      else if (!A.cm) A.monRel = 0;
     }
     function placeFighters(){
       const W = stage.clientWidth;
@@ -13789,6 +13865,7 @@ const GAME = {
     const r0 = RUN.gameResume || null; const giant = r0 && r0.giant != null ? !!r0.giant : BT.rollGiant(BAT_CHAR);
     const place = r0 && r0.place ? r0.place : BT.rollPlace(giant);
     const A = BT.makeArena(el); A.setOpt({charSize:0.62, bgShift:0, spots:[0.22, 0.78], showNum:true, giant, place});
+    A.onBeforeHit = () => GAME.stampHp();   /* v1.72.1：回放时血条跟着动 */
     batLoadChar().then(c => { if (GAME.st && GAME.st.A === A){ const e = GAME.st.enemy; A.setChar(c ? BT.rebuild(c) : null, BT.metaOf(c, giant)); if (e){ A.setEnemy(e); A.setHP(e.hp, true, e.max); } } });
     A.setChar(BAT_CHAR ? BT.rebuild(BAT_CHAR) : null, BT.metaOf(BAT_CHAR, giant));
     S.game = S.game || {}; if (!S.game.boss){ S.game.boss = {tag:GAME.weakTag(), hp:80, img:GAME.bossImg()}; save(); }
@@ -13901,6 +13978,7 @@ const GAME = {
     await st.A.move("heavy", dmg, {breaks: shield ? 1 : 0}); await GAME.afterHit();
   }).catch(() => {}); },
   say(t){ const el = document.getElementById("gSay"); if (el) el.textContent = t; },
+  stampHp(){ const st = GAME.st; if (!st || !st.A) return; const x = (st.last || []).find(y => y.hp0 == null && (y.kind === "hit" || y.kind === "special")); if (x) x.hp0 = st.A.hp; },
   async afterHit(){
     const st = GAME.st; if (!st) return; const A = st.A, e = st.enemy;
     e.hp = A.hp; if (e.boss && S.game.boss){ S.game.boss.hp = Math.max(0, Math.round(e.hp)); save(); }
@@ -14021,15 +14099,16 @@ const GAME = {
     st.chain = st.chain.then(async () => {
       const A = st.A; if (!A.root.isConnected) return;
       if (st.pendingNext || (A.isDown && A.isDown())) A.revive();
-      A._replay = true;   /* 回放只放动画：不改血、不再打倒（v1.69.4） */
+      const hpEnd = A.hp; A._replay = true;   /* v1.72.1：回放时血条跟着动——每一招先放回打之前的血量再扣，放完回到现在的血量（不会先跳到比原来还高） */
       try { for (const x of steps){
         if (x.kind === "ko"){ await A.knockout(); A.cheer(); continue; }
         if (x.kind === "counter"){ GAME.say("回放：" + x.label); const keep = A.onYouHit; A.onYouHit = null; await A.enemyMove(x.mv, 0); A.onYouHit = keep; continue; }
         GAME.say("回放：" + x.label);
         if (x.kind === "shield"){ A.pop("护盾 +1", "shield"); await new Promise(r => setTimeout(r, 500)); continue; }
+        if (x.hp0 != null) A.setHP(x.hp0, true);
         (x.pops || []).forEach(([t, c]) => A.pop(t, c));
         if (x.kind === "special") await A.special(x.dmg); else await A.move(x.mv || "light", x.dmg);
-      } } finally { A._replay = false; }
+      } } finally { A._replay = false; A.setHP(hpEnd, true); }
     }).catch(() => {}).then(() => { st.replaying = false; btns().forEach(b => b.disabled = false); });
   },
   stop(){ if (GAME.st){ GAME.st.A.clear(); GAME.st = null; } }
@@ -14524,13 +14603,25 @@ ACT["pl-ipa"] = async () => {
 /* 今天计划里早上那一项：复习堆积时写明“先清复习，今天不学新卡” */
 function planBacklogSync(){ const t = today(), m = (S.plan || []).find(x => x.gen && x.date === t && !x.done && (x.act === "std" || x.act === "deep")); if (!m || typeof newPausedToday !== "function") return;
   const base = m.textBase || m.text; if (!m.textBase) m.textBase = base;
-  const tx = newPausedToday() ? `复习到期的卡：今天到期 ${dueTodayN()} 张，比一轮多——先清复习，今天不学新卡` : base; if (m.text !== tx){ m.text = tx; save(); } }
+  const bi = newPausedToday() ? backlogInfo() : null;
+  const tx = bi ? `复习到期的卡：今天到期 ${bi.due} 张，比一轮多——先清复习，今天只学 ${bi.trickle} 张新卡（照最近每天 ${bi.per} 张，约 ${bi.days} 天清完）` : base; if (m.text !== tx){ m.text = tx; save(); } }
 
 /* ---------- v1.68.2：复习堆积时今天暂停新卡（SRS 的常见做法：复习没清完又加新卡，欠的复习越来越多、过期越久越容易忘）。
    堆积 = 今天到期的超过一轮的量（今天计划里早上那一项是深度练习就按 30，否则按 16）；“今天照常学新卡”可以改回来 ---------- */
 function dueTodayN(){ const tn = dnum(today()); return CAT.cards.filter(c => c.t !== "l" && S.cards[c.id] && S.cards[c.id].due <= tn).length; }
 function roundSize(){ const m = (S.plan || []).find(x => x.gen && x.date === today() && (x.act === "std" || x.act === "deep")); return (K.SESSION_CFG || SESSION_CFG)[m ? m.act : "std"].core; }
 function newPausedToday(){ if (L.newOverride === today()) return false; return dueTodayN() > roundSize(); }
+/* v1.72.1：复习堆积时不再完全停新卡，每天留 2 张（完全学不到新的，最容易放弃；2 张只多出很少的复习），同时给出“照最近每天练的量，约几天清完” */
+const NEW_TRICKLE = 2;
+function avgCards7(){ let n = 0; for (let k = 1; k <= 7; k++){ const d = new Date(Date.now() - k * 864e5), key = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); n += ((S.days || {})[key] || {}).cards || 0; } return n / 7; }
+/* v1.72.2：每天每多学 1 张新卡，稳定以后每天要多复习约 10 张（按 app 的间隔和一般的答对率模拟出来的，和间隔复习软件的经验一致），
+   所以“刚好跟得上”的新卡数 ≈ 最近每天练的张数 ÷ 10（至少 1）。堆积时留的新卡也不超过它 */
+function backlogInfo(){ const due = dueTodayN(), round = roundSize(), avg = Math.round(avgCards7()), per = Math.max(round, avg), fit = Math.max(1, Math.round(avg / 10));
+  return {due, round, per, avg, fit, days:Math.max(1, Math.ceil(due / per)), trickle:Math.max(Math.min(1, S.settings.newPerDay || 0), Math.min(NEW_TRICKLE, fit, S.settings.newPerDay || 0))}; }
+function newLimitToday(){ const n = S.settings.newPerDay; return newPausedToday() ? backlogInfo().trickle : n; }
+function newFitHTML(){ const b = backlogInfo(), n = S.settings.newPerDay || 0; if (!b.avg || n <= b.fit * 1.5) return "";
+  return `<div class="panel" style="margin:6px 0;width:100%"><span class="small">你最近每天练 ${b.avg} 张：每天学 ${b.fit} 张新卡刚好跟得上（现在设的是 ${n} 张）。每多 1 张新卡，以后每天要多复习约 10 张。</span><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="new-fit">按这个来</button></div></div>`; }
+ACT["new-fit"] = () => { const b = backlogInfo(); S.settings.newPerDay = b.fit; save(); toast(`每天新卡改成 ${b.fit} 张`); UI.render(); };
 ACT["new-override"] = () => { L.newOverride = today(); saveLocal(); toast("今天照常学新卡"); UI.render(); };
 /* ---------- v1.68.2：最弱的一类、错误专练 ---------- */
 const ERR_TAG = {A2:"时态", B4:"时态", B5:"时态", B6:"时态", B1:"be 动词", B15:"be 动词", B3:"主谓一致", B7:"情态动词", B8:"复数", B9:"冠词", B10:"介词", B11:"地道说法", A1:"地道说法", B12:"-ed / -ing", B13:"比较级", B14:"语序", A5:"提问"};
@@ -16938,21 +17029,36 @@ function grHoloHTML(){
   const inner = g.av.mode === "img" && src ? `<img src="${src}" style="${grFitCss(grFitOf(grFitKey()))}" alt="">` : `<span class="num">Lv ${lv}</span>`;
   return `<div class="gc-holo"><div class="gc-holo-face">${inner}</div><div class="gc-holo-beam"></div></div>`;
 }
+/* v1.72.1：实验室的屏幕和面板显示真实的数据（以前的折线只是背景图里的装饰）：这周每天记了几笔 / 练了几次；等级、今天到期、今天练了、连续几天 */
+function grLabData(){
+  const g = G(), tn = dnum(today()), wk = K.growWeekStart(today()), a = dnum(wk), WD = "一二三四五六日";
+  const dayN = d => g.log.filter(e => e.d === d).reduce((s, e) => s + (e.n || 1), 0) + (((S.days || {})[d] || {}).cards ? 1 : 0);
+  const bars = Array.from({length:7}, (_, i) => { const d = nstr(a + i); return {w:WD[i], n:a + i <= tn ? dayN(d) : 0, today:a + i === tn, future:a + i > tn}; });
+  let streak = 0; for (let k = 0; k < 400; k++){ const d = nstr(tn - k); if (dayN(d) > 0) streak++; else if (k > 0) break; }
+  const lv = K.growLevel(growTotal().all), due = typeof dueTodayN === "function" ? dueTodayN() : 0, cards = ((S.days || {})[today()] || {}).cards || 0;
+  return {bars, max:Math.max(1, ...bars.map(b => b.n)), lv:lv.lv, left:lv.left, due, cards, streak, heavy: typeof newPausedToday === "function" && newPausedToday()};
+}
+function grLabHUD(){ const D = grLabData();
+  const bars = D.bars.map(b => `<div class="gc-lab-bar${b.today ? " on" : ""}${b.future ? " fu" : ""}"><i style="height:${Math.max(b.n ? 8 : 2, Math.round(b.n / D.max * 100))}%"></i><span>${b.w}</span></div>`).join("");
+  return `<div class="gc-lab-hud" aria-hidden="true"><div class="gc-lab-mon"><div class="gc-lab-mont">这周每天</div><div class="gc-lab-bars">${bars}</div></div>
+    <div class="gc-lab-stat"><div><b class="gc-lab-led"></b>Lv ${D.lv}<small>再 ${D.left} 升级</small></div><div><b class="gc-lab-led${D.heavy ? " warn" : ""}"></b>到期 ${D.due} 张</div><div><b class="gc-lab-led"></b>今天练 ${D.cards} 张</div><div><b class="gc-lab-led"></b>连续 ${D.streak} 天</div></div><div class="gc-lab-ring"></div></div>`; }
 function grStageHTML(){
   const g = G(), arena = g.av.mode === "char" && typeof BT !== "undefined";
-  return `<div class="gc-stagewrap"><button class="gc-stagebtn" data-act="gr-cheer" aria-label="播一遍庆祝的动作">${arena ? `<div class="gc-stage" id="gcStage" style='background-image:${GR_LAB}'></div>` : `<div class="gc-stage gc-holostage" id="gcHolo" style='background-image:${GR_LAB}'>${grHoloHTML()}</div>`}</button>
+  return `<div class="gc-stagewrap"><button class="gc-stagebtn" data-act="gr-cheer" aria-label="播一遍庆祝的动作">${arena ? `<div class="gc-stage" id="gcStage" style='background-image:${GR_LAB}'></div>${grLabHUD()}` : `<div class="gc-stage gc-holostage" id="gcHolo" style='background-image:${GR_LAB}'>${grHoloHTML()}</div>`}</button>
     <p class="small muted gc-stagecap">点一下看庆祝的动作</p></div>`;
 }
 let GR_REC = {};
 async function grStageRec(){
   const g = G(), id = g.av.char || L.batActive || "rig"; if (id === "rig") return null; if (id in GR_REC) return GR_REC[id];
-  let rec = null; try { if (typeof BAT_READY !== "undefined") await BAT_READY; rec = (await IDB.get("battle:char:" + id)) || null; } catch (e) {} GR_REC[id] = rec; return rec;
+  let rec = null; try { if (typeof BAT_READY !== "undefined") await BAT_READY; rec = (await IDB.get("battle:char:" + id)) || null; } catch (e) {}
+  if (rec) GR_REC[id] = rec; return rec;   /* v1.72.1：读不到的时候不记下来（以前记了 null，之后一直没有角色，刷新才好） */
 }
 async function grArena(el){
   const rec = await grStageRec(); if (!el || !el.isConnected || typeof BT === "undefined") return null;
   const A = BT.makeArena(el); A.setOpt({charSize:0.64, spots:[0.1, 0.5], place:"street", giant:false});
   el.insertAdjacentHTML("afterbegin", `<div class="gc-labbg" aria-hidden="true" style='background-image:${GR_LAB}'></div>`);   /* 舞台自己会改背景，实验室画在最底下单独一层 */
-  A.setChar(rec ? BT.rebuild(rec) : null, BT.metaOf(rec || null, false)); if (A.setNight) A.setNight(false);
+  await A.setChar(rec ? BT.rebuild(rec) : null, BT.metaOf(rec || null, false)); if (A.setNight) A.setNight(false);
+  [250, 1200].forEach(ms => setTimeout(() => { try { if (el.isConnected && A.layout) A.layout(); } catch (e) {} }, ms));   /* 图片解码慢时再排一次版 */
   try { A.setNames("", ""); A.setScore(""); } catch (e) {}
   return A;
 }
@@ -17007,7 +17113,11 @@ ACT["gr-radar-tog"] = el => {
 ACT["gr-radar-all"] = () => { G().radar = null; save(); UI.render(); grRadarSheet(); };
 CHG["gr-cheer-on"] = el => { const g = G(); g.cheerOn = !!el.checked; save(); };
 ACT["gr-name-edit"] = () => { GR_NAME_EDIT = true; UI.render(); };
-CHG["gr-name"] = el => { const g = G(); g.name = String(el.value || "").trim().slice(0, 16); save(); };
+/* v1.72.2：改名字马上显示，但不整页重画——change 是在点别的按钮按下时触发的，立刻重画会把那个按钮换掉（点“关闭”点空了，弹窗关不掉）。
+   弹窗里：原地改页面上的名字；实验室标题里直接改：稍后再刷新；点“关闭”时先存名字 */
+function grNameShow(){ const g = G(); document.querySelectorAll(".gc-name").forEach(b => { const t = [...b.childNodes].find(n => n.nodeType === 3); if (t) t.textContent = g.name || "我的角色"; }); }
+CHG["gr-name"] = el => { const g = G(); const v = String(el.value || "").trim().slice(0, 16); if (g.name !== v){ g.name = v; save(); } grNameShow();
+  if (GR_NAME_EDIT && el.id === "grName"){ GR_NAME_EDIT = false; setTimeout(() => { if (!document.querySelector(".gc-sheet")) UI.render(); }, 300); } };
 ACT["gr-fit-reset"] = () => { const g = G(), key = grFitKey(); delete g.av.fits[key]; save(); grLookRefresh(); };
 ACT["gr-pin"] = el => { const g = G(), id = el.dataset.id; if (g.pins.includes(id)) g.pins = g.pins.filter(x => x !== id); else { if (g.pins.length >= 8){ toast("快速记最多放 8 个"); return; } g.pins.push(id); } save(); UI.render(); };
 /* 每天提醒：一个每天重复的日历日程（PWA 自己没法定时提醒） */
@@ -17030,7 +17140,7 @@ function grSheet(html){
   bg.addEventListener("click", e => { if (e.target === bg) grSheetClose(); }); document.body.appendChild(bg);
 }
 function grSheetClose(){ document.querySelectorAll(".gr-sheet-bg").forEach(x => x.remove()); GR_SHEET = null; }
-ACT["gr-sheet-close"] = () => grSheetClose();
+
 function grSkillSheet(id){
   const s = grSkill(id); if (!s) return; GR_SHEET = {t:"skill", id}; const g = G(), n = grSkillN(s), L2 = K.growSkillLevel(n);
   const src = g.acts.filter(a => a.sk === s.id).map(a => `<div class="li"><div class="grow"><b>${esc(a.short || a.name)}</b><span>${esc(s.name)} +${a.skn || 1}，经验值 +${(a.xp || 0) + (a.bx || 0)}</span></div><button class="btn sm" data-act="gr-sheet-log" data-v="${a.id}">记一次</button></div>`).join("");
@@ -17158,6 +17268,9 @@ function growApplyImport(r){
   if ((r.growGoals || []).length){ const o = {}; for (const x of r.growGoals) o[x.a] = x.n; growSetGoals(o); ch = true; }
   if (ch){ grUps(); save(); }
 }
+
+/* v1.72.2：关弹窗前先把输入框里的名字存下来（没来得及触发 change 也不丢） */
+ACT["gr-sheet-close"] = () => { const inp = document.querySelector('.gc-sheet [data-chg="gr-name"]'); if (inp) CHG["gr-name"](inp); grSheetClose(); };
 
 /* 脱口 · 求职（v1.70.0）：底部“面试”标签升级成“求职”，页内分四段：今天 / 投递 / 准备 / 复盘。
    规则和依据见 DEVNOTES “求职页（v1.70.0）”。打包时放在 grow.js 后面：要包一层 showSummary、startSession、ivRunQs、iv-solo */
@@ -18293,7 +18406,13 @@ const I18N_EN = {
   /* 我导入的内容 */
   "题库": "Deck", "看卡片": "View cards", "并到其他题库": "Merge into another deck", "{n} 张卡，{n} 道面试题": "{n} cards, {n} interview questions",
   /* 常见提示 */
-  "记好了": "Saved", "记好了，成长页也记了一笔": "Saved, and logged on the Grow page", "保存好了": "Saved", "写一下公司名": "Enter a company name", "复制好了：可以贴进你的求职记录或状态文件": "Copied: paste it into your job log or status file", "这份投递已经记过了": "Already logged", "今天没有到期要练的题": "Nothing due to practice today", "现在没有要复习的卡": "No cards to review now", "新卡都学过了": "All new cards learned", "先把导入码贴进来，或者选文件": "Paste an import code or choose a file first", "记好了（成长页已经记过这一份，不重复加）": "Saved (already counted on the Grow page)", "保存好了，成长页记了一次真实的面试": "Saved, and logged a real interview on the Grow page", "导入好了：卡片 {n}，题目 {n}": "Imported: {n} cards, {n} questions", "导入好了：卡片 {n}，题目 {n}。在求职页能看到": "Imported: {n} cards, {n} questions. See them on the Jobs page", "导入好了：卡片 {n}，题目 {n}，投递 {n}。在求职页能看到": "Imported: {n} cards, {n} questions, {n} applications. See them on the Jobs page", "被问过的题都有对应的了": "Every asked question has a match", "记下了": "Noted", "已复制。打开 AI 里这个项目的对话，粘贴发送": "Copied. Open this project's chat in AI, paste and send"
+  "记好了": "Saved", "记好了，成长页也记了一笔": "Saved, and logged on the Grow page", "保存好了": "Saved", "写一下公司名": "Enter a company name", "复制好了：可以贴进你的求职记录或状态文件": "Copied: paste it into your job log or status file", "这份投递已经记过了": "Already logged", "今天没有到期要练的题": "Nothing due to practice today", "现在没有要复习的卡": "No cards to review now", "新卡都学过了": "All new cards learned", "先把导入码贴进来，或者选文件": "Paste an import code or choose a file first", "记好了（成长页已经记过这一份，不重复加）": "Saved (already counted on the Grow page)", "保存好了，成长页记了一次真实的面试": "Saved, and logged a real interview on the Grow page", "导入好了：卡片 {n}，题目 {n}": "Imported: {n} cards, {n} questions", "导入好了：卡片 {n}，题目 {n}。在求职页能看到": "Imported: {n} cards, {n} questions. See them on the Jobs page", "导入好了：卡片 {n}，题目 {n}，投递 {n}。在求职页能看到": "Imported: {n} cards, {n} questions, {n} applications. See them on the Jobs page", "被问过的题都有对应的了": "Every asked question has a match", "记下了": "Noted", "已复制。打开 AI 里这个项目的对话，粘贴发送": "Copied. Open this project's chat in AI, paste and send",
+  /* v1.72.1：v1.69.4 以后加的界面文字 */
+  "为什么这样说": "Why this way?", "复制问题问 AI": "Copy question for AI", "你这里错了": "Your mistake", "问题复制好了": "Question copied", "这句没有常见的语法点。还想知道为什么，就复制问题问 AI。": "No common grammar point here. Copy the question to ask AI.", "没发现语法问题，这样说应该也对。拿不准就存起来问 AI。": "No grammar issues found, so this should be fine. Not sure? Save it to ask AI.", "今天照常学新卡": "Learn new cards today anyway", "错误专练": "Error drill", "正常（自己挑）": "Normal (pick myself)", "今天到期的复习有 20 张，比一轮多：先清复习，今天暂停新卡。": "20 reviews due today, more than one round. Clearing reviews first; no new cards today.", "我说对了，是识别错了": "I said it right, it misheard me", "打字输入：不按用时判断快慢，按你自己的感觉选": "Typed: speed isn't timed, rate it yourself", "对手换了，上一只的出招没法回放": "New opponent: can't replay the last one's moves", "选备份文件": "Choose backup file", "✓ 识别得很准，能用": "✓ Recognised accurately, works", "慢速跟说 → 正常速度跟说 → 自己说。想不起来点一下句子偷看。": "Slow along → normal along → on your own. Stuck? Tap the sentence to peek.",
+  "复习到期的卡：今天到期 40 张，比一轮多——先清复习，今天只学 2 张新卡（照最近每天 16 张，约 3 天清完）": "Due reviews: 40 due today, more than one round. Clear reviews first; only 2 new cards today (at your recent 16 a day, about 3 days to catch up)", "到期 40 张，比一轮多：先清复习，今天只学 2 张新卡。照最近每天 16 张，约 3 天清完。": "40 due, more than one round: clear reviews first, only 2 new cards today. At your recent 16 a day, about 3 days to catch up.", "快速复习（只练到期的）": "Quick review (due only)",
+  "单词": "Words", "开始练": "Start", "只复习到期的": "Due only", "搜单词或意思": "Search words or meanings", "没有对上的": "No matches", "新词": "New", "到期": "Due", "3 天后": "In 3 days", "显示全部（45）": "Show all (45)", "还没有单词。": "No words yet.", "3 个 · 已学 1 · 该复习 0": "3 words · learned 1 · due 0", "加单词：导入“词 | 单词 | 中文意思 | 例句 | 例句的中文 |”": "Add words: import “词 | word | meaning | example | example in Chinese |”", "单词：只复习到期的": "Words: due only",
+  "这周每天": "This week", "再 30 升级": "30 to next level", "到期 12 张": "12 due", "今天练 8 张": "8 practised today", "连续 3 天": "3-day streak",
+  "你最近每天练 15 张：每天学 2 张新卡刚好跟得上（现在设的是 12 张）。每多 1 张新卡，以后每天要多复习约 10 张。": "You've practised 15 a day lately: 2 new cards a day is about right (now set to 12). Each extra new card a day means about 10 more reviews a day later.", "按这个来": "Use this", "每天新卡改成 2 张": "New cards set to 2 a day", "为什么要复习这么多？": "Why so many reviews?",
 };
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
