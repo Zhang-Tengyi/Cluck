@@ -1055,7 +1055,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.71.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.71.1"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -17160,6 +17160,8 @@ const JOB_QUICK = [["screen", "约了电话初筛"], ["interview", "进了下一
 const JOB_CHK = ["问清形式：多长时间、和谁面、要不要讲项目或做题", "JD 逐条配一个证据、故事或缺口答法", "看官网的产品和新闻、面试官的 LinkedIn", "选 2–3 个最对口的项目，准备讲解", "补这家公司要的领域知识", "定 3 个反问；过一遍薪资、到岗时间的说法（需要签证担保的话也过一遍）", "有作品集或项目链接的话，用无痕窗口打开一遍，确认能看、是对应的版本"];
 const JOB_ROUNDS = [["screen", "电话初筛"], ["hm", "招聘经理"], ["tech", "技术面"], ["onsite", "现场面"], ["other", "其他"]];
 const JOB_RESULTS = [["", "不知道"], ["wait", "等消息"], ["next", "进了下一轮"], ["fail", "没过"], ["offer", "拿到 offer"]];
+/* 档位同时说明了材料做到什么程度：A 完整定制、B 底稿改几条、C 原样投（“精投”“海投”就是 A 和 C，不另记一栏） */
+const JOB_TIERS = [["", "没定"], ["A", "A：很想去、高度对口（完整定制）"], ["B", "B：对口（底稿改几条）"], ["C", "C：碰运气（原样投）"]];
 const JOB_SKIP_DECK = /coffee|chat|社交|闲聊|networking|实验室|组会/i;
 
 function JB(){
@@ -17489,7 +17491,9 @@ function jobPipeSumHTML(){
   const thisWk = apps.filter(a => a.d && !a.dApprox && dnum(a.d) >= dnum(wk) && jobSent(a)).length;
   const old = apps.filter(a => jobGroup(a) === "wait" && a.d).sort((a, b) => dnum(a.d) - dnum(b.d)).slice(0, 2);
   const goal = +JB().weekGoal || 0, gp = goal ? Math.min(100, Math.round(thisWk / goal * 100)) : 0;
+  const wkApps = apps.filter(a => a.d && !a.dApprox && dnum(a.d) >= dnum(wk) && jobSent(a)), mix = ["A", "B", "C"].map(t => [t, wkApps.filter(a => a.tier === t).length]).filter(x => x[1]);
   return `<section class="panel job-pipe"><div class="job-row"><b>投递</b><span class="small muted">本周投了 ${thisWk} 份${goal ? ` / 目标 ${goal}` : ""}</span></div>
+    ${mix.length ? `<p class="small muted job-mix" style="margin-top:2px">${mix.map(([t, n]) => `${t} ${n}`).join(", ")}</p>` : ""}
     ${goal ? `<div class="rbar job-goal${thisWk >= goal ? " ok" : ""}" style="margin-top:8px"><i style="width:${gp}%"></i></div>` : ""}
     <div class="job-counts">${[["live", "面试中"], ["wait", "等待回音"], ["stale", "没回音"], ["ended", "已结束"]].map(([k, l]) => `<button class="job-count${k === "live" && g[k] ? " on" : ""}" data-act="job-seg" data-v="apps" data-f="${k}"><b class="num">${g[k] || 0}</b><span>${l}</span></button>`).join("")}</div>
     ${old.length ? `<p class="small muted" style="margin-top:8px">等得最久：${old.map(a => `${esc(a.co)} ${jobDays(a)} 天`).join("，")}</p>` : ""}
@@ -17530,7 +17534,7 @@ function jobStatsHTML(){
   const tbl = (title, key) => { const rs = jobStatsRows(key); return rs.length ? `<div class="job-tbl"><div class="job-tr th"><span>${title}</span><span>投出</span><span>被拒</span><span>面试</span><span>等待</span></div>${rs.map(([k, r]) => `<div class="job-tr"><span>${esc(jobShort(k, 18))}</span><span class="num">${r.sent}</span><span class="num">${r.rej}</span><span class="num">${r.iv}</span><span class="num">${r.wait}</span></div>`).join("")}</div>` : ""; };
   return `<details class="panel job-stats" style="margin-top:16px"><summary><b>统计</b>　投出 ${sent} 份，进面试 ${ivN} 次</summary>
     ${ivN < 5 ? `<p class="note">面试还不到 5 次，下面各行之间的差别基本是噪声：先只看数字，别下结论。</p>` : ""}
-    ${tbl("方向", "track")}${tbl("档位", "tier")}${JB().apps.some(a => (a.ind || "").trim()) ? tbl("行业", "ind") : ""}${new Set(JB().apps.filter(jobSent).map(a => a.ch || "web")).size > 1 ? tbl("渠道", "ch") : ""}${tbl("简历版本", "res")}
+    ${tbl("方向", "track")}${tbl("档位", "tier")}${J_TIER_NOTE()}${JB().apps.some(a => (a.ind || "").trim()) ? tbl("行业", "ind") : ""}${new Set(JB().apps.filter(jobSent).map(a => a.ch || "web")).size > 1 ? tbl("渠道", "ch") : ""}${tbl("简历版本", "res")}
     ${jobTrackMgrHTML()}
     <p class="small muted" style="margin-top:8px">“面试”从电话初筛算起；“等待”包括投了 4 周以上没回音的。</p></details>`;
 }
@@ -17557,7 +17561,7 @@ VIEWS.japp = {
       <div class="panel"${a ? ` style="margin-top:12px"` : ""}>
         <label class="fld" style="margin-top:0"><span>公司</span><input type="text" id="jaCo" value="${esc(x.co)}" placeholder="比如：Acme Robotics"></label>
         <label class="fld"><span>职位</span><input type="text" id="jaRole" value="${esc(x.role)}"></label>
-        <div class="job-2col"><label class="fld"><span>方向</span><select id="jaTrack" data-chg="ja-track">${[["", "没定"], ...jobTracks(), ["__new", "+ 新方向…"]].map(([k, l]) => `<option value="${k}"${k === (x.track || "") ? " selected" : ""}>${esc(l)}</option>`).join("")}</select></label><label class="fld"><span>档位</span>${sel("jaTier", [["", "没定"], ["A", "A：很想去、高度对口"], ["B", "B：对口"], ["C", "C：碰运气"]], x.tier)}</label></div>
+        <div class="job-2col"><label class="fld"><span>方向</span><select id="jaTrack" data-chg="ja-track">${[["", "没定"], ...jobTracks(), ["__new", "+ 新方向…"]].map(([k, l]) => `<option value="${k}"${k === (x.track || "") ? " selected" : ""}>${esc(l)}</option>`).join("")}</select></label><label class="fld"><span>档位</span>${sel("jaTier", JOB_TIERS, x.tier)}</label></div>
         <label class="fld hide" id="jaTrackNewF"><span>新方向叫什么</span><input type="text" id="jaTrackNew" maxlength="12" placeholder="比如：机器人、生物医学、销售工程"></label>
         <div class="job-2col"><label class="fld"><span>行业（可选）</span><input type="text" id="jaInd" list="jaIndList" value="${esc(x.ind || "")}" placeholder="比如：半导体"><datalist id="jaIndList">${[...new Set(JB().apps.map(a => (a.ind || "").trim()).filter(Boolean))].map(v => `<option value="${esc(v)}">`).join("")}</datalist></label><label class="fld"><span>渠道</span>${sel("jaCh", JOB_CH, x.ch || "web")}</label></div>
         <div class="job-2col"><label class="fld"><span>投递日期</span><input type="date" id="jaD" value="${esc(x.d || "")}"></label><label class="fld"><span>状态</span>${sel("jaSt", JOB_ST, x.st)}</label></div>
@@ -17931,14 +17935,14 @@ function jobBulkParse(text){
   const out = [];
   for (const raw of String(text || "").split(/\r?\n/)){
     const line = raw.trim(); if (!line || line.startsWith("#")) continue;
-    let co = "", role = "", tr = "";
+    let co = "", role = "", tr = "", tier = "";
     const at = line.match(/^(.+?)\s+(?:at|@)\s+(.+)$/i);
     let parts = line.split(/\s*(?:[|｜\t]|\s[-–—]\s|，|,)\s*/).map(x => x.trim()).filter(Boolean);
-    if (parts.length >= 2){ co = parts[0]; role = parts[1]; tr = parts[2] || ""; }
+    if (parts.length >= 2){ co = parts[0]; role = parts[1]; tr = parts[2] || ""; tier = parts[3] || ""; if (/^[ABC]$/i.test(tr)){ tier = tr; tr = ""; } }
     else if (at){ role = at[1].trim(); co = at[2].trim(); }
     else co = line;
     const key = tr ? (K.jobTrackKey(tr) || jobTrackByName(tr, false)) : "";
-    out.push({co:co.slice(0, 60), role:role.slice(0, 120), track: key && key !== "golf" ? key : K.jobGuessTrack(role), trackNew: tr && !key ? tr : ""});
+    out.push({co:co.slice(0, 60), role:role.slice(0, 120), track: key && key !== "golf" ? key : K.jobGuessTrack(role), trackNew: tr && !key ? tr : "", tier: /^[ABC]$/i.test(tier.trim()) ? tier.trim().toUpperCase() : ""});
   }
   return out;
 }
@@ -17952,8 +17956,9 @@ VIEWS.jbulk = {
       <label class="fld"><span>投递日期</span><input type="date" id="jbAID" value="${today()}"></label>
       <button class="btn primary block" style="margin-top:12px" data-act="jb-ai">复制给 AI，让它整理成导入码</button>
       <p class="small muted" style="margin-top:8px">AI 回复以后，把它给的导入码贴进导入页：<button class="linkbtn small" data-act="imp-open">打开导入页</button></p></div></div>`;
-    return head + `<div class="panel"><label class="fld" style="margin-top:0"><span>一行一份：公司 | 职位（后面可以再加 | 方向）</span><textarea id="jbText" rows="7" data-chg="jb-prev" placeholder="Acme Robotics | Test Engineer\nBeta Motion | Controls Engineer I\nGamma Labs, Mechanical Engineer"></textarea></label>
+    return head + `<div class="panel"><label class="fld" style="margin-top:0"><span>一行一份：公司 | 职位（后面可以再加 | 方向 | 档位）</span><textarea id="jbText" rows="7" data-chg="jb-prev" placeholder="Acme Robotics | Test Engineer\nBeta Motion | Controls Engineer I\nGamma Labs, Mechanical Engineer"></textarea></label>
       <div class="job-2col"><label class="fld"><span>投递日期</span><input type="date" id="jbD" value="${today()}"></label><label class="fld"><span>渠道</span><select id="jbCh">${JOB_CH.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label></div>
+      <label class="fld"><span>档位（行里没写的都按这个）</span><select id="jbTier">${JOB_TIERS.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label>
       <button class="btn sm" style="margin-top:10px" data-act="jb-prev">看看会记成什么样</button><div id="jbOut" style="margin-top:10px"></div></div></div>`;
   }
 };
@@ -17961,7 +17966,7 @@ ACT["jb-mode"] = el => { L.jbMode = el.dataset.v; saveLocal(); UI.render(); };
 function jbPrevHTML(rows){
   if (!rows.length) return `<p class="small muted">还没写内容。</p>`;
   const dup = r => !!jobFindApp(r);
-  return `<div class="list">${rows.map(r => `<div class="li"><div class="grow"><b>${esc(r.co)}</b><span>${esc(r.role || "职位没写")}　${esc(r.trackNew || JOB_TL[r.track])}${r.trackNew ? "（新方向）" : "（按职位名猜的）"}</span></div>${dup(r) ? `<span class="end">已经记过</span>` : ""}</div>`).join("")}</div>
+  return `<div class="list">${rows.map(r => `<div class="li"><div class="grow"><b>${esc(r.co)}</b><span>${esc(r.role || "职位没写")}　${esc(r.trackNew || JOB_TL[r.track])}${r.trackNew ? "（新方向）" : "（按职位名猜的）"}${r.tier ? `　${r.tier} 档` : ""}</span></div>${dup(r) ? `<span class="end">已经记过</span>` : ""}</div>`).join("")}</div>
     <p class="small muted" style="margin-top:6px">方向猜错了，记完以后点开那一份改。状态都是“已投”。</p>
     <button class="btn primary block" style="margin-top:10px" data-act="jb-save">记下这 ${rows.filter(r => !dup(r)).length} 份</button>`;
 }
@@ -17969,9 +17974,9 @@ ACT["jb-prev"] = () => { const o = $("#jbOut"); if (o) o.innerHTML = jbPrevHTML(
 CHG["jb-prev"] = () => ACT["jb-prev"]();
 ACT["jb-save"] = () => {
   const rows = jobBulkParse(($("#jbText") || {}).value).filter(r => !jobFindApp(r)); if (!rows.length){ toast("没有新的要记"); return; }
-  const d = ($("#jbD") || {}).value || today(), ch = ($("#jbCh") || {}).value || "web";
+  const d = ($("#jbD") || {}).value || today(), ch = ($("#jbCh") || {}).value || "web", gTier = ($("#jbTier") || {}).value || "";
   for (const r of rows){ const track = r.trackNew ? jobTrackByName(r.trackNew, true) : r.track;
-    JB().apps.push({id:"a" + jobRid(), co:r.co, role:r.role, track, tier:"", d, dApprox:false, st:"applied", ch, src:"", res:"", note:"", hist:[{d:today(), st:"applied", note:"一次记好几份"}], ts:Date.now()}); }
+    JB().apps.push({id:"a" + jobRid(), co:r.co, role:r.role, track, tier:r.tier || gTier, d, dApprox:false, st:"applied", ch, src:"", res:"", note:"", hist:[{d:today(), st:"applied", note:"一次记好几份"}], ts:Date.now()}); }
   let msg = `记好了 ${rows.length} 份`;
   if (d === today()){ const added = jobLogGrow("apply", rows.length); msg += added === rows.length ? "，成长页也记了" : added ? `，成长页补记了 ${added} 份（另外 ${rows.length - added} 份之前只记了数）` : "（成长页之前已经记过数，不重复加）"; }
   save(); toast(msg); L.jobSeg = "apps"; saveLocal(); UI.back();
@@ -17982,7 +17987,7 @@ ACT["jb-ai"] = async () => {
   await sendToClaude(`下面是我投的职位（日期 ${d}），内容可能很乱：复制的网页、链接、我的备注。请整理成脱口的投递导入码，每个职位一行，只输出导入码，不要别的话：
 投递 | 公司 | 职位 | 方向 | 档位 | 日期 | 状态 | 来源 | 简历版本 | 备注 | 行业 | 渠道
 - 方向从这几个里选：${tracks}；都不合适就写一个简短的新方向名
-- 档位：A（很想去、高度对口）、B（对口）、C（碰运气）；看不出来就空着
+- 档位：A（很想去、高度对口，材料完整定制）、B（对口，用底稿改几条）、C（碰运气，原样投）；我写了“精投”就是 A，“海投”就是 C；看不出来就空着
 - 日期：${d}（我写了别的日期就用我写的）；状态：已投
 - 来源：投递平台（Workday、公司官网、LinkedIn……）；渠道：网申、内推、招聘会、recruiter、学校平台、其他
 - 简历版本、备注按我写的填；备注里写要紧的信息，比如签证担保、地点、截止日期
@@ -18082,6 +18087,12 @@ function jobDebQsHTML(x){
     return `<div class="li"><div class="grow"><b class="en" style="font-size:15px">${esc(m.t)}</b><span>${q ? `对上：${esc(q.zh || q.id)}` : "题库里还没有这一题"}</span></div>${q ? `<button class="btn sm" data-act="iv-solo" data-q="${q.id}">练</button>` : ""}</div>`; }).join("")}</div>
     ${x.stuck ? `<p class="small" style="margin-top:8px"><b>卡住的地方：</b>${esc(x.stuck).replace(/\n/g, "；")}</p>` : ""}${x.change ? `<p class="small" style="margin-top:4px"><b>下次要改：</b>${esc(x.change).replace(/\n/g, "；")}</p>` : ""}
     <div style="height:12px"></div>`;
+}
+
+/* v1.71.1：档位那张表下面的说明。A 档本来就挑的是更对口的，所以 A 档回音多，不能直接算成“定制有用” */
+function J_TIER_NOTE(){
+  const n = t => JB().apps.filter(a => jobSent(a) && a.tier === t).length, tagged = n("A") + n("B") + n("C");
+  return `<p class="small muted" style="margin-top:6px">${tagged ? "" : "还没有标档位的投递。"}A 档本来就是更对口、更想去的，所以 A 档回音多，不一定都是定制的功劳；面试攒到十来次以后再看各档的差别。</p>`;
 }
 
 /* 脱口 · 界面语言（v1.71.0）：我的 → 界面语言选 English 时，把界面上固定的文字换成英文。
@@ -18185,6 +18196,14 @@ Object.assign(I18N_EN, {
   "平均用时（秒）": "Average time (s)", "明天要复习 {n} 题。": "{n} to review tomorrow.", "再来一轮": "Another round",
   "接着练几道面试题？": "Practice a few interview questions?", "今天的面试练习还没做：先来 {n} 道，约 {n} 分钟。": "Today's interview practice isn't done yet: start with {n} questions, about {n} min.",
   "接着练面试 {n} 分钟": "Interview practice: {n} min", "看中文意思": "Show the Chinese meaning"
+});
+/* v1.71.1：档位的说明 */
+Object.assign(I18N_EN, {
+  "A：很想去、高度对口（完整定制）": "A: dream fit (fully tailored)", "B：对口（底稿改几条）": "B: good fit (base + a few edits)", "C：碰运气（原样投）": "C: long shot (sent as is)",
+  "一行一份：公司 | 职位（后面可以再加 | 方向 | 档位）": "One per line: Company | Role (optionally | Track | Tier)", "档位（行里没写的都按这个）": "Tier (for lines without one)",
+  "{n} 档": "Tier {n}",
+  "A 档本来就是更对口、更想去的，所以 A 档回音多，不一定都是定制的功劳；面试攒到十来次以后再看各档的差别。": "A-tier jobs are the best fits to begin with, so more replies there aren't all thanks to tailoring. Compare tiers after about ten interviews.",
+  "还没有标档位的投递。A 档本来就是更对口、更想去的，所以 A 档回音多，不一定都是定制的功劳；面试攒到十来次以后再看各档的差别。": "No applications have a tier yet. A-tier jobs are the best fits to begin with, so more replies there aren't all thanks to tailoring. Compare tiers after about ten interviews."
 });
 const I18N_MON = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], I18N_WK = {一:"Mon", 二:"Tue", 三:"Wed", 四:"Thu", 五:"Fri", 六:"Sat", 日:"Sun"};
 const I18N_ROUND = {电话初筛:"phone screen", 招聘经理:"hiring manager", 技术面:"technical", 现场面:"on-site", 其他:"other"};
