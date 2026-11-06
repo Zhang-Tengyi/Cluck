@@ -1020,6 +1020,21 @@ button.panel.job-chkcard{display:flex;align-items:center;gap:12px;width:100%;tex
 .jk-vocab{margin-top:10px}
 .jk-vocab .chip{cursor:pointer}
 
+/* v1.71.0：可以收起的列表 */
+.job-fold-t{padding:0}
+.job-fold-b{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:2px 0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.job-fold-l{flex:1;min-width:0}
+.job-chev{flex:none;display:inline-flex;transition:transform .15s}
+.job-chev svg{width:18px;height:18px;transform:rotate(-90deg);color:var(--muted)}
+.job-chev.open svg{transform:rotate(90deg)}
+.job-why2>summary{cursor:pointer}
+
+/* v1.71.0：界面是英文时，标签比中文长 */
+html[lang="en"] .job-pl{grid-template-columns:136px minmax(0,1fr)}
+html[lang="en"] .job-pl-k{white-space:normal}
+html[lang="en"] .job-count span{font-size:11.5px}
+.job-seg button{white-space:nowrap}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -1040,7 +1055,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.70.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.71.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2549,6 +2564,8 @@ function jobGuessCh(...xs){ const t = xs.map(x => String(x || "")).join(" "); fo
 const JOB_CH_NAMES = {网申:"web", 内推:"ref", 招聘会:"fair", recruiter:"rec", 猎头:"rec", 学校平台:"school", 学校:"school", 其他:"other"};
 const JOB_STATUS_KEYS = [[/^(准备|draft|没投|还没投)/i, "draft"], [/^(已投|投了|applied|submitted|v$|\?)/i, "applied"], [/^(初筛|电话|screen|recruiter)/i, "screen"], [/^(面试中|面试|interview|hm|onsite|技术面)/i, "interview"], [/^offer/i, "offer"], [/^(被拒|拒|reject)/i, "rejected"], [/^(没过|面试没过|not pass|failed)/i, "failed"], [/^(不投|不担保|撤回|放弃|dropped|withdrawn|no sponsorship)/i, "dropped"]];
 function jobStatusKey(v){ const t = String(v || "").trim(); if (!t) return ""; for (const [re, k] of JOB_STATUS_KEYS) if (re.test(t)) return k; return ""; }
+function jobRoundKey(v){ const t = String(v || "").trim(); if (/初筛|电话|screen|recruiter|phone/i.test(t)) return "screen"; if (/经理|主管|负责人|hiring|manager|\bhm\b/i.test(t)) return "hm"; if (/技术|tech/i.test(t)) return "tech"; if (/现场|终面|onsite|on-site|final/i.test(t)) return "onsite"; return "other"; }
+function jobResultKey(v){ const t = String(v || "").trim(); if (!t) return ""; if (/没过|被拒|拒|reject|fail/i.test(t)) return "fail"; if (/下一轮|进了|next|pass/i.test(t)) return "next"; if (/offer/i.test(t)) return "offer"; if (/等|wait|pending/i.test(t)) return "wait"; return ""; }
 function jobRealDate(t){ const [y, m, d] = String(t).split("-").map(Number); const x = new Date(Date.UTC(y, m - 1, d)); return x.getUTCFullYear() === y && x.getUTCMonth() === m - 1 && x.getUTCDate() === d; }
 /* 日期：2026-10-09；只记得月份就写 2026-10（按 15 号算，标成大概） */
 function jobDateKey(v){ const t = String(v || "").trim(); if (/^\d{4}-\d{2}-\d{2}$/.test(t) && jobRealDate(t)) return {d:t, approx:false}; const m = t.match(/^(\d{4})-(\d{1,2})$/); if (m && +m[2] >= 1 && +m[2] <= 12) return {d:m[1] + "-" + pad(+m[2]) + "-15", approx:true}; return {d:"", approx:false}; }
@@ -2572,9 +2589,9 @@ function mergeImports(list){
   return out;
 }
 function parseImport(text){
-  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], apps:[], qtags:[], checks:[], real:[], explains:[], zhs:[], meta:{date:"", who:[], replace:[]}, bad:[]};
+  const res = {cards:[], answers:[], keys:[], questions:[], follow:[], alts:[], plan:[], errStats:[], articles:[], slang:[], growGoals:[], growActs:[], growSkills:[], apps:[], qtags:[], checks:[], real:[], explains:[], zhs:[], debriefs:[], meta:{date:"", who:[], replace:[]}, bad:[]};
   const ROLE = {"开场":"first","核心":"core","初筛":"screen","提问":"ask","基本":"core","行为":"core","电话":"screen","技术":"tech","概念":"concept","first":"first","core":"core","screen":"screen","ask":"ask","tech":"tech","concept":"concept"};
-  let deck = "我的卡片";
+  let deck = "我的卡片", curDeb = null;
   String(text||"").split(/\r?\n/).forEach((line, i) => {
     const s = line.trim();
     if (!s || s.startsWith("#")) return;
@@ -2617,6 +2634,11 @@ function parseImport(text){
     else if ((kind==="待确认"||kind==="CHECK") && p[1] && (p[2]||"").trim()){ res.checks.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ").trim().slice(0, 300)}); }
     /* 讲解 | 题号 | 中文讲解（知识卡：为什么、怎么联系自己的经历、容易和什么混） */
     else if ((kind==="讲解"||kind==="EX") && p[1] && (p[2]||"").trim()){ res.explains.push({qid:p[1].toUpperCase(), text:p.slice(2).join(" | ").trim().slice(0, 1500)}); }
+    /* v1.71.0 真实面试复盘：复盘 | 日期 | 公司 | 轮次 | 面试官 | 结果 | 备注；后面跟着 被问 | 题号（可空） | 问题原文、卡住 | …、说得好 | …、要改 | …、要补 | …、下一步 | … */
+    else if (kind==="复盘"||kind==="DEBRIEF"){ const d = jobDateKey(p[1]); curDeb = {d:d.d, approx:d.approx, co:(p[2]||"").trim().slice(0, 60), round:jobRoundKey(p[3]), who:(p[4]||"").trim().slice(0, 80), result:jobResultKey(p[5]), note:p.slice(6).join(" | ").trim().slice(0, 600), qs:[], stuck:[], good:[], change:[], learn:[], next:""}; res.debriefs.push(curDeb); }
+    else if (kind==="被问" && curDeb && p.length >= 2){ const three = p.length >= 3, text = (three ? p.slice(2).join(" | ") : p[1]).trim(); if (text) curDeb.qs.push({qid: three && (p[1]||"").trim() ? p[1].trim().toUpperCase() : "", text:text.slice(0, 300)}); else res.bad.push(i+1); }
+    else if ((kind==="卡住"||kind==="说得好"||kind==="要改"||kind==="要补") && curDeb && (p[1]||"").trim()){ curDeb[{卡住:"stuck", 说得好:"good", 要改:"change", 要补:"learn"}[kind]].push(p.slice(1).join(" | ").trim().slice(0, 300)); }
+    else if (kind==="下一步" && curDeb && (p[1]||"").trim()){ curDeb.next = p.slice(1).join(" | ").trim().slice(0, 300); }
     /* 真题 | 题号 | 公司 | 日期 */
     else if ((kind==="真题"||kind==="REAL") && p[1]){ res.real.push({qid:p[1].toUpperCase(), co:(p[2]||"").trim().slice(0, 60), d:jobDateKey(p[3]).d}); }
     else res.bad.push(i+1);
@@ -2941,7 +2963,7 @@ function battlePickOrder(entries){
 
 const CORE = {wordDiff, nearMiss, soundSim, sndKey, battlePlan, battleFirst, battleSpecial, battleTicks, battleBeats, battleRef, battleOutcome, battlePickOrder, BAT_DMG,TAGS,TYPE_LABEL,TENSE_NOTE,tagKey,dstr,dnum,nstr,splitAlts,shuffle,hash,buildCatalog,INTERVALS,MASTERED_BOX,srsRate,
   tokens,lcsOps,compareSaid,meaningCheck,speechFlags,hasWord,wordsMatch,speakEN,thoughtGroups,pronTip,splitSentences,chunkLex,findChunks,sayVariants,chunkSentence,hintNotes,classifySub,pastOf,regPast,lev,parseImport,checkWriting,checkPast,dayDone,computeStreak,tagAgg,
-  buildSession,diversify,interleave,pickQuestions,IRR,SESSION_CFG,jobTrackKey,jobStatusKey,jobDateKey,jobRealDate,fillerCount,mergeImports,jobGuessTrack,jobGuessCh};
+  buildSession,diversify,interleave,pickQuestions,IRR,SESSION_CFG,jobTrackKey,jobStatusKey,jobDateKey,jobRealDate,fillerCount,mergeImports,jobGuessTrack,jobGuessCh,jobRoundKey,jobResultKey};
 
 
 /* 按词比：错了几个词（最长公共子序列以外的词，多的、少的取大的） */
@@ -4872,9 +4894,9 @@ class IvStage {
         ${(() => { const ref = refFor(q); const mine = a && a.text ? a.text.trim() : "";
           return `<div style="margin-top:10px">${slashBtn()}</div>` + ivRateHTML(q.id) + selfCheckHTML(q.id, "solo", 0, ((S.soloIssues || {})[q.id] || {}).k)
             + (ref ? `<details style="margin-top:10px" open><summary>参考回答</summary><div class="en sm" style="margin-top:6px;line-height:1.7">${wordsHTML(ref)}</div><button class="btn sm" style="margin-top:8px" data-act="nav" data-v="reader" data-q="${q.id}" data-src="ref">跟读参考回答</button></details>` : "")
-            + ((((S.qmeta || {})[q.id] || {}).zhA) ? `<details style="margin-top:10px"><summary>参考回答的中文意思</summary><p class="small" style="margin-top:6px;line-height:1.7">${esc(S.qmeta[q.id].zhA)}</p></details>` : "")
+            + ((((S.qmeta || {})[q.id] || {}).zhA) ? `<details style="margin-top:10px"><summary>参考回答的中文意思</summary><p class="small" style="margin-top:6px;line-height:1.7" data-noi18n>${esc(S.qmeta[q.id].zhA)}</p></details>` : "")
             + (ref && typeof jobVocabHTML === "function" ? jobVocabHTML(ref) : "")
-            + ((((S.qmeta || {})[q.id] || {}).ex) ? `<details style="margin-top:10px"><summary>讲解</summary><p class="small" style="margin-top:6px;line-height:1.7">${esc(S.qmeta[q.id].ex)}</p></details>` : "")
+            + ((((S.qmeta || {})[q.id] || {}).ex) ? `<details style="margin-top:10px"><summary>讲解</summary><p class="small" style="margin-top:6px;line-height:1.7" data-noi18n>${esc(S.qmeta[q.id].ex)}</p></details>` : "")
             + (mine && mine !== ref ? `<details style="margin-top:10px"><summary>我写好的回答</summary><div class="en sm" style="margin-top:6px">${esc(mine)}</div></details>` : "")
             + (!ref && !mine ? `<div class="note">${esc(q.tip)}</div>${q.tpl ? `<details style="margin-top:8px"><summary>参考结构</summary><div class="en sm" style="margin-top:6px">${esc(q.tpl)}</div></details>` : ""}` : ""); })()}
         <div class="row-gap" style="margin-top:16px"><button class="btn" data-act="iv-same">再说一遍</button>${nextT ? `<button class="btn" data-act="iv-redo">再答一次，压到 ${nextT} 秒</button>` : ""}<button class="btn primary" data-act="iv-done">完成</button></div></div>`;
@@ -6168,6 +6190,8 @@ VIEWS.me = {
     const s = S.settings; const enV = TTS.list("en"), zhV = TTS.list("zh");
     const opt = (list, cur) => `<option value="">自动选择</option>` + list.map(v => `<option value="${esc(v.name)}" ${v.name === cur ? "selected" : ""}>${esc(v.name)}（${esc(v.lang)}）</option>`).join("");
     return `<div class="wrap"><div class="top"><h2 style="font-size:26px">我的</h2></div>
+      <div class="panel" data-noi18n><label class="fld" style="margin-top:0"><span>界面语言 · Interface language</span><select data-chg="set" data-key="uiLang"><option value="zh" ${s.uiLang !== "en" ? "selected" : ""}>中文</option><option value="en" ${s.uiLang === "en" ? "selected" : ""}>English</option></select></label>
+        <p class="small muted" style="margin-top:6px">只换按钮、标题这些界面文字；练习内容（题目、卡片、回答、翻译）不变。 · Only the interface changes; practice content stays the same.</p></div>
       <div class="sec-title">练习</div><div class="panel">
         <label class="fld" style="margin-top:0"><span>每天最多几道新题</span><select data-chg="set" data-key="newPerDay" data-num="1">${[6,12,20].map(n => `<option value="${n}" ${s.newPerDay === n ? "selected" : ""}>${n} 道</option>`).join("")}</select></label>
         <label class="fld"><span>怎么检查你说的话</span><select data-chg="set" data-key="inputMode"><option value="auto" ${s.inputMode === "auto" ? "selected" : ""}>点麦克风自动识别${!SR.ok ? "（这个浏览器不支持）" : SR.broken ? "（这台手机现在用不了）" : ""}</option><option value="keyboard" ${s.inputMode === "keyboard" ? "selected" : ""}>只用键盘语音输入或打字</option></select></label>
@@ -6276,7 +6300,7 @@ VIEWS.import = {
 function impSum(r){ const parts = [], c = k => (r[k] || []).length;
   const words = r.cards.filter(x => x.t === "w").length, know = r.questions.filter(q => /^知识/.test(q.deck || "")).length;
   if (r.cards.length) parts.push(`卡片 ${r.cards.length}${words ? `（单词 ${words}）` : ""}`); if (r.questions.length) parts.push(`题目 ${r.questions.length}${know ? `（知识卡 ${know}）` : ""}`);
-  for (const [k, l] of [["apps", "投递"], ["explains", "讲解"], ["zhs", "中文意思"], ["checks", "待确认"], ["real", "真题"], ["plan", "计划"], ["articles", "文章"], ["slang", "俚语"]]) if (c(k)) parts.push(`${l} ${c(k)}`);
+  for (const [k, l] of [["apps", "投递"], ["debriefs", "真实面试复盘"], ["explains", "讲解"], ["zhs", "中文意思"], ["checks", "待确认"], ["real", "真题"], ["plan", "计划"], ["articles", "文章"], ["slang", "俚语"]]) if (c(k)) parts.push(`${l} ${c(k)}`);
   return parts.join("，") || "没读到能导入的内容"; }
 ACT["imp-preview"] = () => {
   const texts = $$(".imp-text").map(x => x.value || "").filter(x => x.trim());
@@ -6291,11 +6315,12 @@ ACT["imp-preview"] = () => {
   r.follow = r.follow.filter(a => { if (known.has(a.qid)) return true; r.bad.push("追问 " + a.qid); return false; });
   r.alts = r.alts.filter(a => { if (CAT.byId[a.id]) return true; r.bad.push("也对 " + a.id); return false; });
   /* v1.70.0：题目的标签、待确认、真题只认已经有的题号 */
+  for (const d of (r.debriefs || [])) for (const q of d.qs) if (q.qid && !known.has(q.qid)) q.qid = "";   /* 复盘里对不上的题号就只留原文 */
   for (const k of ["qtags", "checks", "real", "explains", "zhs"]) r[k] = (r[k] || []).filter(a => { if (known.has(a.qid)) return true; r.bad.push({qtags:"标签", checks:"待确认", real:"真题", explains:"讲解", zhs:"译"}[k] + " " + a.qid); return false; });
   IMP = r;
   const by = t => r.cards.filter(c => c.t === t).length; const dup = r.cards.filter(c => S.custom.some(x => x.id === c.id)).length;
   const decks = Array.from(new Set(r.cards.map(c => c.deck).concat(r.questions.map(q => q.deck))));
-  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length + (r.apps || []).length + (r.qtags || []).length + (r.checks || []).length + (r.real || []).length + (r.explains || []).length + (r.zhs || []).length;
+  const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length + (r.apps || []).length + (r.qtags || []).length + (r.checks || []).length + (r.real || []).length + (r.explains || []).length + (r.zhs || []).length + (r.debriefs || []).length;
   const appNew = (r.apps || []).filter(a => !jobFindApp(a)).length;
   const who = r.meta.who[0];
   const badTxt = r.bad.every(b => typeof b === "number") ? `第 ${r.bad.join("、")} 行` : r.bad.map(b => typeof b === "number" ? `第 ${b} 行` : b).join("、");
@@ -6303,7 +6328,7 @@ ACT["imp-preview"] = () => {
     ${srcSum}${decks.length ? `<li>题库：${decks.map(esc).join("，")}</li>` : ""}
     <li>卡片 ${r.cards.length} 张（反射卡 ${by("r")}，找错 ${by("f")}，听力 ${by("l")}）${dup ? `，其中 ${dup} 张已经有了，会更新` : ""}</li>
     ${r.questions.length ? `<li>面试题 ${r.questions.length} 道，追问 ${r.follow.length} 个</li>` : ""}${r.plan.length ? `<li>计划 ${r.plan.length} 项${r.planReplace ? "（会替换所有没做完的计划）" : r.planReplaceGrow ? "（会替换没做完的求职、生活计划，英语的不动）" : ""}</li>` : ""}${(r.growGoals || []).length ? `<li>成长目标 ${r.growGoals.length} 项</li>` : ""}${(r.growActs || []).length ? `<li>记一笔的选项 ${r.growActs.length} 项</li>` : ""}${(r.growSkills || []).length ? `<li>技能 ${r.growSkills.length} 个</li>` : ""}${r.alts.length ? `<li>确认算对的说法 ${r.alts.length} 条</li>` : ""}
-    <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.apps || []).length ? `<li>投递 ${r.apps.length} 份（新的 ${appNew}，已有的会更新）</li>` : ""}${(r.qtags || []).length ? `<li>题目标签 ${r.qtags.length} 条（优先级、方向）</li>` : ""}${(r.checks || []).length ? `<li>待确认 ${r.checks.length} 条（确认前，相关的题不算达标）</li>` : ""}${(r.real || []).length ? `<li>真题 ${r.real.length} 道</li>` : ""}${(r.explains || []).length ? `<li>讲解 ${r.explains.length} 条（知识卡翻过来能看到）</li>` : ""}${(r.zhs || []).length ? `<li>中文意思 ${r.zhs.length} 条（看不懂英文回答时可以对照）</li>` : ""}${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
+    <li>面试回答 ${r.answers.length} 条，要点 ${r.keys.length} 条</li>${(r.apps || []).length ? `<li>投递 ${r.apps.length} 份（新的 ${appNew}，已有的会更新）</li>` : ""}${(r.qtags || []).length ? `<li>题目标签 ${r.qtags.length} 条（优先级、方向）</li>` : ""}${(r.checks || []).length ? `<li>待确认 ${r.checks.length} 条（确认前，相关的题不算达标）</li>` : ""}${(r.real || []).length ? `<li>真题 ${r.real.length} 道</li>` : ""}${(r.explains || []).length ? `<li>讲解 ${r.explains.length} 条（知识卡翻过来能看到）</li>` : ""}${(r.zhs || []).length ? `<li>中文意思 ${r.zhs.length} 条（看不懂英文回答时可以对照）</li>` : ""}${(r.debriefs || []).length ? `<li>真实面试复盘 ${r.debriefs.length} 场（被问到的题 ${r.debriefs.reduce((n, d) => n + d.qs.length, 0)} 道）</li>` : ""}${(r.errStats || []).length ? `<li>错误统计 ${r.errStats.length} 类（记进错误档案）</li>` : ""}${(r.articles || []).length ? `<li>文章 ${r.articles.length} 篇（在“阅读”里）</li>` : ""}${(r.slang || []).length ? `<li>俚语 ${r.slang.length} 句（在“听懂俚语”里）</li>` : ""}${r.cards.some(c => c.t === "w") ? `<li>其中单词 ${r.cards.filter(c => c.t === "w").length} 个</li>` : ""}${(r.meta.replace || []).length ? `<li>会替换旧版：${esc(r.meta.replace.join("、"))}（新版里没有的旧卡片会删掉；没改过的句子，练习记录保留）</li>` : ""}
     ${r.meta.date ? `<li>面试日期：${esc(r.meta.date)}</li>` : ""}${who ? `<li>面试官：${esc(who.name)}${who.company ? "，" + esc(who.company) : ""}</li>` : ""}
     ${r.bad.length ? `<li>看不懂、会跳过的：${esc(badTxt)}</li>` : ""}</ul>
     ${n ? `<button class="btn primary block" style="margin-top:12px" data-act="imp-apply">确认导入</button>` : `<p class="note">没有能导入的内容，检查一下格式。</p>`}</div>`;
@@ -17134,6 +17159,7 @@ const JOB_QUICK = [["screen", "约了电话初筛"], ["interview", "进了下一
 /* 约到面试后 72 小时内要做的事（总纲【十一】） */
 const JOB_CHK = ["问清形式：多长时间、和谁面、要不要讲项目或做题", "JD 逐条配一个证据、故事或缺口答法", "看官网的产品和新闻、面试官的 LinkedIn", "选 2–3 个最对口的项目，准备讲解", "补这家公司要的领域知识", "定 3 个反问；过一遍薪资、到岗时间的说法（需要签证担保的话也过一遍）", "有作品集或项目链接的话，用无痕窗口打开一遍，确认能看、是对应的版本"];
 const JOB_ROUNDS = [["screen", "电话初筛"], ["hm", "招聘经理"], ["tech", "技术面"], ["onsite", "现场面"], ["other", "其他"]];
+const JOB_RESULTS = [["", "不知道"], ["wait", "等消息"], ["next", "进了下一轮"], ["fail", "没过"], ["offer", "拿到 offer"]];
 const JOB_SKIP_DECK = /coffee|chat|社交|闲聊|networking|实验室|组会/i;
 
 function JB(){
@@ -17199,6 +17225,15 @@ function jobApplyImport(r){
   S.qmeta = S.qmeta || {};
   for (const t of (r.qtags || [])){ const m = S.qmeta[t.qid] = S.qmeta[t.qid] || {}; m.pri = t.pri; const rt = jobResolveTrack(t.track, t.trackRaw); if (rt.track) m.track = rt.track; if (t.co) m.co = t.co; }
   for (const x of (r.zhs || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.zhA = x.text; }
+  for (const x of (r.debriefs || [])){
+    const app = j.apps.find(a => jobNorm(a.co) && jobNorm(a.co) === jobNorm(x.co));
+    const key = d => (d.d || "") + "|" + jobNorm(d.co || ((jobApp(d.app) || {}).co)) + "|" + d.round;
+    const data = {app: app ? app.id : "", co:x.co, round:x.round, d:x.d, dApprox:!!x.approx, who:x.who, result:x.result, note:x.note, src:"import",
+      qs:x.qs.map(q => q.text).join("\n"), qmap:x.qs.map(q => ({t:q.text, q:q.qid || jobMatchQ(q.text)})), stuck:x.stuck.join("\n"), good:x.good.join("\n"), change:x.change.join("\n"), learn:x.learn.join("\n"), next:x.next};
+    const y = j.debriefs.find(d => key(d) === key(data));
+    if (y) Object.assign(y, data); else j.debriefs.push(Object.assign({id:"d" + jobRid(), ts:Date.now()}, data));
+    jobMarkReal(data);
+  }
   for (const c of (r.checks || [])){ const m = S.qmeta[c.qid] = S.qmeta[c.qid] || {}; m.chk = m.chk || []; if (!m.chk.some(x => x.t === c.text)) m.chk.push({t:c.text, ok:false}); }
   for (const x of (r.real || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.real = {co:x.co, d:x.d}; }
   for (const x of (r.explains || [])){ const m = S.qmeta[x.qid] = S.qmeta[x.qid] || {}; m.ex = x.text; }
@@ -17478,7 +17513,8 @@ function jobAppsSeg(){
     <label class="fld job-goalset" id="jobGoal"><span>每周目标：投几份</span><select data-chg="job-goal">${[0, 3, 5, 8, 10, 15, 20].map(v => `<option value="${v}"${v === goal ? " selected" : ""}>${v ? v + " 份" : "不定"}</option>`).join("")}</select></label>`;
   if (!apps.length) return top + `<p class="panel small muted" style="margin-top:10px">还没有投递记录。点上面“记一份投递”，或者把 AI 给的投递导入码导进来（我的 → 导入新内容）。</p>` + jobIvsHTML();
   const chips = `<div class="chips job-filter">${[["all", "全部", apps.length], ...JOB_GROUPS.map(([k, l]) => [k, l, (g[k] || []).length])].filter(x => x[0] === "all" || x[2]).map(([k, l, n]) => `<button class="chip${f === k ? " on" : ""}" data-act="job-f" data-v="${k}" aria-pressed="${f === k}">${l} ${n}</button>`).join("")}</div>`;
-  const lists = JOB_GROUPS.filter(([k]) => (g[k] || []).length && (f === "all" || f === k)).map(([k, l]) => `<div class="sec-title">${l} ${g[k].length}${k === "stale" ? `<span class="job-sec-note">投了 4 周以上还没动静</span>` : ""}</div><div class="list">${g[k].slice().sort(jobSortIn(k)).map(jobAppRowHTML).join("")}</div>`).join("");
+  const lists = JOB_GROUPS.filter(([k]) => (g[k] || []).length && (f === "all" || f === k)).map(([k, l]) => { const def = f === k || !(["stale", "ended"].includes(k) && g[k].length > 3);
+    return jobFoldHead("g:" + k, `${l} ${g[k].length}${k === "stale" ? `<span class="job-sec-note">投了 4 周以上还没动静</span>` : ""}`, def) + (jobFoldOpen("g:" + k, def) ? `<div class="list">${g[k].slice().sort(jobSortIn(k)).map(jobAppRowHTML).join("")}</div>` : ""); }).join("");
   return top + chips + lists + jobStatsHTML() + jobAppsToolsHTML() + jobIvsHTML();
 }
 function jobIvsHTML(){ return `<div id="jobIvs" style="height:16px"></div>${interviewsPanelHTML()}`; }
@@ -17632,7 +17668,7 @@ function jobModsHTML(){
     <p class="small muted" style="margin:6px 0 12px">每个模块都是一通模拟面试：面试官念题、你开口答、全程录音，结束后逐题回放、看参考说法。</p>
     ${cards}
     <div class="row-gap" style="margin:10px 0 6px"><button class="btn sm" data-act="iv-listen">听面试官怎么问</button><button class="btn sm ghost" data-act="nav" data-v="callsetup">自己挑题数的来电模拟</button></div>
-    <div class="sec-title">${esc(curName)}：${curQs.length} 题</div>${curQs.length ? `<div class="list">${curQs.map(row).join("")}</div>` : `<p class="small muted">这一类还没有题目。把 AI 给你的面试题库导入码导进来，这里就有了。</p>`}
+    ${jobFoldHead("mods", `${esc(curName)}：${curQs.length} 题`, false, "jobModList")}${jobFoldOpen("mods", false) ? (curQs.length ? `<div class="list">${curQs.map(row).join("")}</div><button class="btn sm ghost block" style="margin-top:8px" data-act="job-fold" data-k="mods" data-to="jobModList">收起题目</button>` : `<p class="small muted">这一类还没有题目。把 AI 给你的面试题库导入码导进来，这里就有了。</p>`) : ""}
     <button class="btn block" style="margin-top:16px" data-act="iv-copyall">把写好的回答一起复制给 AI</button>`;
 }
 VIEWS.jready = {
@@ -17654,14 +17690,22 @@ ACT["job-ready-go"] = el => { const g = jobReadyGroups().find(x => x.k === el.da
 function jobDebRowHTML(x){
   const a = x.app ? jobApp(x.app) : null, rd = (JOB_ROUNDS.find(r => r[0] === x.round) || [])[1] || "";
   const nq = String(x.qs || "").split(/\n/).filter(s => s.trim()).length;
-  return `<button class="li" data-act="nav" data-v="jdeb" data-id="${x.id}"><div class="grow"><b>${esc(a ? a.co : x.co || "没选投递")}${rd ? "，" + esc(rd) : ""}</b><span>${esc(x.d || "")}${nq ? `　记了 ${nq} 道题` : ""}</span></div><span class="end">${x.sent ? "发给 AI 了" : "还没发"}</span></button>`;
+  const res = (JOB_RESULTS.find(r => r[0] === x.result) || [])[1];
+  return `<button class="li" data-act="nav" data-v="jdeb" data-id="${x.id}"><div class="grow"><b>${esc(a ? a.co : x.co || "没选投递")}${rd ? "，" + esc(rd) : ""}</b><span>${esc(x.d ? (x.dApprox ? x.d.slice(0, 7) : x.d) : "日期没记")}${nq ? `　问了 ${nq} 道题` : ""}</span></div><span class="end">${x.result ? `<span class="job-st st-${x.result === "fail" ? "failed" : x.result === "offer" ? "offer" : x.result === "next" ? "interview" : "applied"}">${esc(res || "")}</span>` : x.sent ? "发给 AI 了" : x.src === "import" ? "导入的" : "还没发"}</span></button>`;
 }
 function jobRevSeg(){
   const db = JB().debriefs.slice().sort((a, b) => String(b.d || "").localeCompare(String(a.d || "")) || (b.ts || 0) - (a.ts || 0));
   const calls = (S.calls || []).filter(c => c.segs);
+  const why = `<details class="panel job-why2"${db.length ? "" : " open"}><summary><b>记下来有什么用</b></summary><ol class="small" style="margin:8px 0 0 18px;line-height:1.8">
+      <li>下次面同一家、同一轮之前，翻出来看上次问了什么、哪里卡住。</li>
+      <li>被问过的题会标成真题，每天的面试练习里多排；没有对应题的，可以一次发给 AI 做成题。</li>
+      <li>点“发给 AI”，拿回这一场的导入码（真题、改好的回答、改错卡）、感谢信草稿和给状态文件的更新。</li>
+      <li>投递的状态跟着改（约了面试、面试没过），成长页记一次真实的面试。</li></ol>
+      <p class="small muted" style="margin-top:6px">复盘的研究里，针对一次具体经历、再加上外部反馈的复盘，平均能让之后的表现提高两成左右。</p></details>`;
+  const list = db.length ? jobFoldHead("debs", `真实面试 ${db.length}`, db.length <= 6) + (jobFoldOpen("debs", db.length <= 6) ? `<div class="list">${db.map(jobDebRowHTML).join("")}</div>` : "") : `<div class="sec-title">真实面试 0</div><p class="panel small muted">还没有记录。面完 24 小时内记一下最有用；以前的面试，也可以让 AI 按转写整理成复盘导入码导进来。</p>`;
   return `<div class="row-gap" style="margin:2px 0 4px"><button class="btn primary" style="flex:1" data-act="nav" data-v="jdeb">记一次真实面试</button></div>
-    <p class="small muted" style="margin:8px 2px 0">AI 回复的复盘导入码：<button class="linkbtn small" data-act="imp-open">在这里导入</button></p>
-    <div class="sec-title">真实面试 ${db.length}</div>${db.length ? `<div class="list">${db.map(jobDebRowHTML).join("")}</div>` : `<p class="panel small">面完 24 小时内记一下：被问了什么、哪里卡住、对方说的下一步。发给 AI 以后，拿回这一场的导入码、感谢信草稿和给状态文件的更新。<span class="muted">复盘的研究里，针对一次具体经历、再加上外部反馈的复盘，平均能让之后的表现提高两成左右。</span></p>`}
+    <p class="small muted" style="margin:8px 2px 10px">AI 回复的复盘导入码：<button class="linkbtn small" data-act="imp-open">在这里导入</button></p>
+    ${why}${list}${jobAskedHTML()}
     <div class="sec-title">模拟面试</div><div class="list"><button class="li" data-act="nav" data-v="calls"><div class="grow"><b>模拟面试的复盘记录</b><span>${calls.length} 次：听录音、看参考回答、给每题打分</span></div><span class="job-go-arrow" aria-hidden="true">${ICON.chev}</span></button></div>
     ${jobMetTrendHTML()}`;
 }
@@ -17683,10 +17727,12 @@ VIEWS.jdeb = {
     const y = x || {app:(p && p.app) || "", round:"screen", d:today(), who:"", qs:"", stuck:"", good:"", change:"", learn:"", next:""};
     const ta = (id, label, ph, v, rows) => `<label class="fld"><span>${label}</span><textarea id="${id}" rows="${rows || 3}" placeholder="${esc(ph)}">${esc(v || "")}</textarea></label>`;
     return `<div class="wrap">${backBtn()}<h2>${x ? "面试复盘" : "记一次真实面试"}</h2><p class="small muted" style="margin:4px 0 12px">趁记得清楚，尽量写原话。写得乱没关系，AI 会帮你理。</p>
+      ${x ? jobDebQsHTML(x) : ""}
       <div class="panel">
         <label class="fld" style="margin-top:0"><span>哪一份投递</span><select id="jdApp"><option value="">没在投递里</option>${jobAppOptionsHTML(y.app)}</select></label>
         <div class="job-2col"><label class="fld"><span>哪一轮</span><select id="jdRound">${JOB_ROUNDS.map(([k, l]) => `<option value="${k}"${k === y.round ? " selected" : ""}>${l}</option>`).join("")}</select></label><label class="fld"><span>日期</span><input type="date" id="jdD" value="${esc(y.d || "")}"></label></div>
-        <label class="fld"><span>面试官</span><input type="text" id="jdWho" value="${esc(y.who || "")}" placeholder="名字和职位，比如：Cody，recruiter"></label>
+        <div class="job-2col"><label class="fld"><span>面试官</span><input type="text" id="jdWho" value="${esc(y.who || "")}" placeholder="名字和职位"></label><label class="fld"><span>结果</span><select id="jdRes">${JOB_RESULTS.map(([k, l]) => `<option value="${k}"${k === (y.result || "") ? " selected" : ""}>${l}</option>`).join("")}</select></label></div>
+        ${!y.app && y.co ? `<p class="small muted" style="margin-top:6px">公司：${esc(y.co)}（不在投递记录里）</p>` : ""}
         ${ta("jdQs", "被问到的问题（一行一题，尽量写原话）", "Tell me about yourself.\nHave you calibrated sensors before?", y.qs, 5)}
         ${ta("jdStuck", "哪里卡住或停顿了", "比如：传感器标定那题停了很久", y.stuck)}
         ${ta("jdGood", "哪里说得好", "", y.good)}
@@ -17699,7 +17745,8 @@ VIEWS.jdeb = {
 };
 function jobDebSave(id){
   const v = k => (($("#" + k) || {}).value || "").trim();
-  const data = {app:v("jdApp"), round:v("jdRound") || "screen", d:v("jdD") || today(), who:v("jdWho"), qs:v("jdQs"), stuck:v("jdStuck"), good:v("jdGood"), change:v("jdChange"), learn:v("jdLearn"), next:v("jdNext")};
+  const data = {app:v("jdApp"), round:v("jdRound") || "screen", d:v("jdD") || today(), who:v("jdWho"), result:v("jdRes"), qs:v("jdQs"), stuck:v("jdStuck"), good:v("jdGood"), change:v("jdChange"), learn:v("jdLearn"), next:v("jdNext")};
+  data.qmap = jobQMap(data.qs, id ? (JB().debriefs.find(d => d.id === id) || {}).qmap : null);
   if (!data.app && !data.qs){ toast("至少选一份投递，或者写下被问到的问题"); return null; }
   const j = JB(); let x = id ? j.debriefs.find(d => d.id === id) : null;
   if (x) Object.assign(x, data, {ts:Date.now()});
@@ -17707,8 +17754,10 @@ function jobDebSave(id){
     x = Object.assign({id:"d" + jobRid(), ts:Date.now()}, data); j.debriefs.push(x);
     x.grew = jobLogGrow("iv", 1) > 0;
   }
+  jobMarkReal(x);
   const a = x.app ? jobApp(x.app) : null;
-  if (a && ["draft", "applied"].includes(a.st)) jobSetStatus(a, x.round === "screen" ? "screen" : "interview", "面试复盘");
+  if (a && x.result === "fail" && ["applied", "screen", "interview"].includes(a.st)) jobSetStatus(a, "failed", "面试复盘");
+  else if (a && ["draft", "applied"].includes(a.st)) jobSetStatus(a, x.round === "screen" ? "screen" : "interview", "面试复盘");
   else if (a && a.st === "screen" && x.round !== "screen") jobSetStatus(a, "interview", "面试复盘");
   save(); return x;
 }
@@ -17719,7 +17768,7 @@ function jobDebText(x){
   const a = x.app ? jobApp(x.app) : null, rd = (JOB_ROUNDS.find(r => r[0] === x.round) || [])[1] || "";
   const f = (l, v) => v ? `${l}：\n${v}` : "";
   return [`这是我刚面完的一场面试的复盘，请按我的状态文件核对事实（状态文件里没有、拿不准的先问我，不要替我编经历）。`, "",
-    `公司和职位：${a ? `${a.co}${a.role ? "，" + a.role : ""}` : "（没在投递里）"}；轮次：${rd}；日期：${x.d}${x.who ? `；面试官：${x.who}` : ""}`,
+    `公司和职位：${a ? `${a.co}${a.role ? "，" + a.role : ""}` : x.co || "（没在投递里）"}；轮次：${rd}；日期：${x.d}${x.who ? `；面试官：${x.who}` : ""}${x.result ? `；结果：${(JOB_RESULTS.find(r => r[0] === x.result) || [])[1]}` : ""}`,
     f("被问到的问题", x.qs), f("卡住或停顿的地方", x.stuck), f("说得好的", x.good), f("下次想改成怎么说", x.change), f("要补的知识", x.learn), x.next ? `对方说的下一步：${x.next}` : "",
     "", "请给我三样：",
     "1. 脱口的导入码：",
@@ -17844,8 +17893,8 @@ VIEWS.jknow = {
       <button class="btn primary block big" style="margin-top:16px" data-act="jk-flip">看答案</button></div></div>`;
     return `<div class="wrap jk">${head}<div class="card jk-card">${front}
       <div class="jk-ans"><div class="small muted">面试里可以这样说</div><div class="en sm" style="margin-top:4px;line-height:1.65">${wordsHTML(ref)}</div>${TTS.ok ? `<button class="btn sm ghost" style="margin-top:6px" data-act="jk-say" data-v="a">${ICON.speak}听一遍</button>` : ""}
-        ${zhA ? `<details class="jk-zh"><summary class="small">看中文意思</summary><p class="small" style="margin-top:6px;line-height:1.7">${esc(zhA)}</p></details>` : ""}${jobVocabHTML(ref)}</div>
-      ${ex ? `<div class="jk-ex"><div class="small muted">讲解</div><p style="margin-top:4px">${esc(ex)}</p></div>` : ""}
+        ${zhA ? `<details class="jk-zh"><summary class="small">看中文意思</summary><p class="small" style="margin-top:6px;line-height:1.7" data-noi18n>${esc(zhA)}</p></details>` : ""}${jobVocabHTML(ref)}</div>
+      ${ex ? `<div class="jk-ex"><div class="small muted">讲解</div><p style="margin-top:4px" data-noi18n>${esc(ex)}</p></div>` : ""}
       <div class="small muted" style="margin-top:14px">刚才你想起来多少？</div>
       <div class="jk-rate"><button class="btn" data-act="jk-rate" data-r="again">没想起来</button><button class="btn" data-act="jk-rate" data-r="hard">想起一部分</button><button class="btn primary" data-act="jk-rate" data-r="good">想起来了</button></div></div></div>`;
   },
@@ -17975,6 +18024,213 @@ function jobLogGrow(k, n){
   const rest = n - use; if (rest > 0) growLog(k, rest, {quiet:true, pid:"job"});
   save(); return rest;
 }
+
+/* ---------- v1.71.0：可以收起的列表 ---------- */
+function jobFoldOpen(k, def){ const f = L.jobFold || {}; return f[k] == null ? !!def : !!f[k]; }
+function jobFoldHead(k, labelHTML, def, id){ const open = jobFoldOpen(k, def);
+  return `<div class="sec-title job-fold-t"${id ? ` id="${id}"` : ""}><button class="job-fold-b" data-act="job-fold" data-k="${esc(k)}" aria-expanded="${open}"><span class="job-fold-l">${labelHTML}</span><span class="job-chev${open ? " open" : ""}" aria-hidden="true">${ICON.chev}</span></button></div>`; }
+ACT["job-fold"] = el => { const k = el.dataset.k, f = L.jobFold = Object.assign({}, L.jobFold);
+  f[k] = el.closest(".job-fold-t") ? el.getAttribute("aria-expanded") !== "true" : false; saveLocal(); UI.render();
+  if (el.dataset.to) setTimeout(() => { const t = document.getElementById(el.dataset.to); if (t && t.scrollIntoView) t.scrollIntoView({block:"start"}); }, 30); };
+{ const ml = ACT["mod-list"]; ACT["mod-list"] = el => { L.jobFold = Object.assign({}, L.jobFold, {mods:true}); ml(el); setTimeout(() => { const t = document.getElementById("jobModList"); if (t && t.scrollIntoView) t.scrollIntoView({behavior:"smooth", block:"start"}); }, 40); }; }
+
+/* ---------- v1.71.0：复盘——被问过的题对上题库里的题 ---------- */
+const JOB_STOP = new Set("a an the to of in on for and or you your me my i is are do did does have has had what how why when where which who about any can could would will tell time that this with it be was were us we our they them there here so if as at by from into than then just like give some more most very really also anything something walk us".split(" "));
+function jobToks(t){ return String(t || "").toLowerCase().replace(/[^a-z0-9 ]+/g, " ").split(/\s+/).filter(w => w.length > 2 && !JOB_STOP.has(w)).map(w => w.replace(/ies$/, "y").replace(/(ing|ed|es|s)$/, "")); }
+/* 问题原文和哪道题最像（看英文问法里的实词有多少重合，六成以上才算对上） */
+function jobMatchQ(text){
+  const A = new Set(jobToks(text)); if (!A.size) return "";
+  const scan = list => { let best = "", bs = 0;
+    for (const q of list){ if (JOB_SKIP_DECK.test(q.deck || "")) continue;
+      for (const v of (q.v || [])){ const B = new Set(jobToks(v)); if (!B.size) continue; let o = 0; for (const w of A) if (B.has(w)) o++; const sc = o / Math.max(A.size, B.size); if (sc > bs){ bs = sc; best = q.id; } } }
+    return bs >= 0.6 ? best : ""; };
+  /* 先在自己导入的题里找（那里有你的参考回答），找不到再看 app 自带的通用题 */
+  return scan(S.customQ || []) || scan(CONTENT.QUESTIONS || []);
+}
+function jobQMap(qs, old){ const prev = new Map((old || []).map(m => [m.t, m.q])); return String(qs || "").split(/\n/).map(t => t.trim()).filter(Boolean).map(t => ({t, q: prev.has(t) && prev.get(t) ? prev.get(t) : jobMatchQ(t)})); }
+function jobMarkReal(x){ S.qmeta = S.qmeta || {}; const co = x.co || ((jobApp(x.app) || {}).co) || ""; for (const m of (x.qmap || [])) if (m.q && QBY[m.q]){ const qm = S.qmeta[m.q] = S.qmeta[m.q] || {}; if (!qm.real) qm.real = {co, d:x.d || ""}; } }
+/* 所有复盘里被问过的题：对上了的按次数排；没对上的单独列出来，可以一起发给 AI 做成题 */
+function jobAsked(){
+  const hit = new Map(), miss = new Map();
+  for (const x of JB().debriefs){ const co = x.co || ((jobApp(x.app) || {}).co) || "";
+    for (const m of (x.qmap || jobQMap(x.qs))){ if (m.q && QBY[m.q]){ const h = hit.get(m.q) || {q:QBY[m.q], n:0, cos:new Set()}; h.n++; if (co) h.cos.add(co); hit.set(m.q, h); } else { const k = jobNorm(m.t); if (!miss.has(k)) miss.set(k, {t:m.t, cos:new Set()}); if (co) miss.get(k).cos.add(co); } } }
+  return {hit:[...hit.values()].sort((a, b) => b.n - a.n || String(a.q.zh).localeCompare(String(b.q.zh))), miss:[...miss.values()]};
+}
+function jobAskedHTML(){
+  const {hit, miss} = jobAsked(); if (!hit.length && !miss.length) return "";
+  const rows = hit.map(h => `<div class="li"><div class="grow"><b>${esc(h.q.zh || h.q.id)}</b><span>问过 ${h.n} 次${h.cos.size ? "：" + esc([...h.cos].join("、")) : ""}</span></div><button class="btn sm" data-act="iv-solo" data-q="${h.q.id}">练</button></div>`).join("");
+  return jobFoldHead("asked", `被问过的题 ${hit.length}${miss.length ? ` + ${miss.length}` : ""}`, hit.length <= 8) + (jobFoldOpen("asked", true) ? `${hit.length ? `<div class="list">${rows}</div>` : ""}
+    ${miss.length ? `<details class="panel" style="margin-top:10px"><summary><b>还没有对应题的 ${miss.length} 道</b></summary><ul class="small" style="margin:8px 0 0 18px;line-height:1.7">${miss.map(m => `<li>${esc(m.t)}${m.cos.size ? `<span class="muted">（${esc([...m.cos].join("、"))}）</span>` : ""}</li>`).join("")}</ul>
+      <button class="btn sm" style="margin-top:10px" data-act="job-asked-ai">发给 AI 做成题</button></details>` : ""}
+    <p class="small muted" style="margin-top:6px">被问过的题会标成真题，每天的面试练习里多排。</p>` : "");
+}
+ACT["job-asked-ai"] = () => { const {miss} = jobAsked(); if (!miss.length){ toast("被问过的题都有对应的了"); return; }
+  sendToClaude(`下面是我在真实面试里被问到、但题库里还没有的题（括号里是哪家问的）。请按我的状态文件核对事实（拿不准的先问我，不要替我编经历），做成脱口的导入码：
+题库 | 面试·真题
+问 | 题号 | 英文问法 // 其他问法 | 中文 | 秒数 | 角色（开场 / 初筛 / 核心 / 技术 / 概念 / 提问） | 提示
+答 | 题号 | 按我真实经历写的参考回答（每句尽量 13 个词以内，最长不超过 20 个词）
+要点 | 题号 | 开口第一句；后面每句的开头
+译 | 题号 | 回答的中文意思
+标签 | 题号 | P0–P2 | 方向
+真题 | 题号 | 公司 |
+
+${miss.map(m => `- ${m.t}${m.cos.size ? `（${[...m.cos].join("、")}）` : ""}`).join("\n")}`); };
+/* 复盘表上面：这场被问到的题，对上了的可以直接练 */
+function jobDebQsHTML(x){
+  const qm = x.qmap || jobQMap(x.qs); if (!qm.length) return "";
+  return `<div class="sec-title" style="margin-top:0">这场被问到的 ${qm.length} 道题</div><div class="list">${qm.map(m => { const q = m.q && QBY[m.q];
+    return `<div class="li"><div class="grow"><b class="en" style="font-size:15px">${esc(m.t)}</b><span>${q ? `对上：${esc(q.zh || q.id)}` : "题库里还没有这一题"}</span></div>${q ? `<button class="btn sm" data-act="iv-solo" data-q="${q.id}">练</button>` : ""}</div>`; }).join("")}</div>
+    ${x.stuck ? `<p class="small" style="margin-top:8px"><b>卡住的地方：</b>${esc(x.stuck).replace(/\n/g, "；")}</p>` : ""}${x.change ? `<p class="small" style="margin-top:4px"><b>下次要改：</b>${esc(x.change).replace(/\n/g, "；")}</p>` : ""}
+    <div style="height:12px"></div>`;
+}
+
+/* 脱口 · 界面语言（v1.71.0）：我的 → 界面语言选 English 时，把界面上固定的文字换成英文。
+   练习内容（题目、卡片、参考回答、中文意思、讲解）一律不动：只换词典里有的整句（数字可以变），对不上的保持中文。
+   做法：页面画出来以后（MutationObserver 看到新节点）逐个文本节点查词典；切回中文时把换过的还原，再重画一次。
+   打包时放在最后（要包一层 CHG.set）。词典是用 test 里的爬页面脚本把各主要页面的中文收集出来以后逐条翻的；没收进来的长说明暂时保持中文。 */
+"use strict";
+const I18N_EN = {
+  /* 底部标签、通用按钮 */
+  "成长": "Grow", "英语": "English", "求职": "Jobs", "我的": "Me", "返回": "Back", "退出": "Exit", "完成": "Done", "开始": "Start", "保存": "Save", "删除": "Delete", "取消": "Cancel", "确定": "OK", "编辑": "Edit", "导入": "Import", "预览": "Preview", "关闭": "Close", "知道了": "Got it", "主菜单": "Main menu", "导入新内容": "Import",
+  /* 成长 */
+  "运动": "Exercise", "角色": "Character", "练英语": "English practice", "记一笔": "Log", "记投递": "Log applications", "快速记": "Quick log", "投申请": "Apply", "发消息": "Message", "去学校": "Campus", "以前几周": "Past weeks", "今天心情": "Today's mood", "今天的心情": "Today's mood", "加一项计划": "Add a plan item", "本周经验值": "XP this week", "周一清零 ·": "Resets Monday ·", "心情 {n}": "Mood {n}", "今天还没有计划": "No plan for today yet", "只做最小的一步": "Just the smallest step", "现在做": "Do now",
+  "Lv {n}，再 {n} 升级": "Lv {n}, {n} XP to go", "角色：Lv {n}，再 {n} 经验值升级": "Character: Lv {n}, {n} XP to next level",
+  /* 英语首页 */
+  "天": "days", "学": "Learn", "脱口": "Tuokou", "连续": "Streak", "默认": "Default", "通用": "General", "练习": "Practice", "游戏": "Game", "写作": "Writing", "发音": "Pronunciation", "阅读": "Reading", "进度": "Progress", "去准备": "Prepare", "开口说": "Speaking", "听和写": "Listening & writing", "没精神？": "Low energy?", "全部题库": "All decks", "日常生活": "Daily life", "天后面试": "days to interview",
+  "反射训练": "Reflex drills", "情景对话": "Role-play dialogues", "语音日记": "Voice journal", "耳机模式": "Headphone mode", "接话练习": "Quick responses", "听力快练": "Quick listening", "听懂俚语": "Slang", "常用语块": "Useful chunks", "说话技巧": "Speaking tips", "语法要点": "Grammar points", "选择题库": "Choose decks", "全部收起": "Collapse all", "练习时长": "Practice time", "复习到期的卡": "Review due cards", "{n} 分钟": "{n} min", "按类型挑着练": "Practice by type", "开始今天的练习": "Start today's practice", "听懂面试官的问法": "Understand interview questions", "只做 {n} 分钟": "Just {n} min", "添加/修改练习计划": "Add or edit practice plan", "睡前 {n} 分钟": "{n} min before bed",
+  "走路、坐车时听着练": "Listen while walking or commuting", "听辨、第一印象、重音": "Sound discrimination, first impressions, stress", "练哪些题库（可以多选）": "Which decks (pick several)", "点餐、闲聊、打电话办事": "Ordering, small talk, phone calls", "聊天、写邮件现成的说法": "Ready-made phrases for chat and email", "重音、语调、断句、连读": "Stress, intonation, pausing, linking", "有 AI 给的导入码？": "Have an import code from AI?", "时态、-s、-ed、语序": "Tense, -s, -ed, word order", "现在不方便说话（打字回答）": "Can't talk now (type answers)", "边听边读，挑有用的词和短语": "Read along and pick useful words", "听一句马上接；想不起词怎么说": "Reply right away; what to say when a word slips", "看中文，灯灭开口，把句子练成反射": "See Chinese, speak when the light goes out, make it automatic", "俚语、脏话：什么意思、是不是开玩笑": "Slang and swearing: what it means, if it's a joke", "回复消息、写邮件，按你的错误清单检查": "Reply and write emails, checked against your error list",
+  "先说“I + 动词”，细节一块一块往后加。": "Start with \"I + verb\", then add details one chunk at a time.", "到期复习 {n} 题，今天还有 {n} 道新题": "{n} due for review, {n} new today", "面试官念题、你开口答，屏幕上不显示问题，和电话面试一样": "The interviewer reads, you answer out loud, no text on screen, like a phone interview",
+  /* 求职：通用 */
+  "今天": "Today", "投递": "Applications", "准备": "Prep", "复盘": "Review", "投递 {n}": "Apps {n}", "等待回音 {n} 份": "{n} waiting", "下一场：还有 {n} 天": "Next: in {n} days", "下一场：就是今天": "Next: today", "下一场：明天": "Next: tomorrow",
+  /* 求职：今天 */
+  "分钟": "min", "做完了": "Done", "面试中": "Interviewing", "没回音": "No reply", "已结束": "Closed", "看全部": "See all", "知识复习": "Knowledge review", "等待回音": "Waiting", "技术和快答": "Technical & quick", "看各组的进度": "Progress by group", "今天的面试练习": "Today's interview practice", "下一步日期到了": "Next step is due", "{n} 道，约": "{n} questions, about", "还有 {n} 天": "in {n} days", "就是今天": "Today", "明天": "Tomorrow", "{n} 小时清单": "{n}-hour checklist", "练这一场要用的题": "Practice for this interview", "这些题是怎么挑的": "How these were picked", "待确认 {n} 条": "{n} to confirm", "该跟进的 {n} 件": "{n} follow-ups due", "跟进一下": "Follow up",
+  "补这家公司要的领域知识": "Brush up on the domain knowledge this company needs", "确认前，相关的题不算达标": "Until confirmed, related questions don't count as ready", "{n} 张，约 {n} 分钟": "{n} cards, about {n} min", "JD 逐条配一个证据、故事或缺口答法": "Match each JD line with evidence, a story, or a gap answer", "本周投了 {n} 份 / 目标 {n}": "{n} this week / goal {n}", "本周投了 {n} 份": "{n} this week", "选 {n}–{n} 个最对口的项目，准备讲解": "Pick {n}–{n} of your most relevant projects to walk through", "问清形式：多长时间、和谁面、要不要讲项目或做题": "Ask about the format: length, who you'll meet, any project talk or test", "看官网的产品和新闻、面试官的 LinkedIn": "Check the company's products, news, and the interviewer's LinkedIn",
+  "有作品集或项目链接的话，用无痕窗口打开一遍，确认能看、是对应的版本": "If you have a portfolio or project link, open it in a private window to check it works and is the right version", "定 {n} 个反问；过一遍薪资、到岗时间的说法（需要签证担保的话也过一遍）": "Prepare {n} questions to ask; review your salary and start-date answers (and visa, if you need sponsorship)",
+  "每场都会问": "Asked every time", "经历和故事": "Stories", "这家公司": "This company", "只做 5 分钟": "Just 5 min", "再练 {n} 分钟": "{n} more min", "今天的面试练习做完了": "Today's interview practice is done", "今天没有到期的题": "Nothing due today", "练了 {n} 分钟": "{n} min practiced", "明天会按今天的打分重新排。想多练，就再来一轮。": "Tomorrow's set uses today's ratings. Want more? Do another round.", "达标的题要隔几天再复习，这样记得更牢。": "Ready questions wait a few days before review, so they stick better.",
+  "每场都会问的题天天轮；方向题按你“等待回音”的投递里各方向的比例分；公司的题约到那家才出现。没达标的题一天最多练一次，同一题在 {n} 次不同时间都说得还行才算达标，之后隔一周复习。每天的量按你过去两周实际练的时间多加两成，可以在“准备”里改。": "Questions asked in every interview rotate daily; track questions follow the mix of tracks in your waiting applications; company questions appear only once you have an interview there. A question that isn't ready comes up at most once a day, and it's ready after you say it well at {n} separate times; then it's reviewed weekly. The daily amount is your actual time over the past two weeks plus 20%, and you can change it under Prep.",
+  "到期复习 {n} 张，新学 {n} 张。先自己想，再看答案，最后按想起来多少打分。": "{n} due, {n} new. Think first, then check the answer, then rate how much you recalled.", "新学 {n} 张。先自己想，再看答案，最后按想起来多少打分。": "{n} new. Think first, then check the answer, then rate how much you recalled.", "到期复习 {n} 张。先自己想，再看答案，最后按想起来多少打分。": "{n} due. Think first, then check the answer, then rate how much you recalled.", "今天的做完了": "Done for today", "掌握 {n}/{n} 张。想多学，可以再学 {n} 张新的。": "Mastered {n}/{n}. Want more? Learn {n} new ones.",
+  "定一个每周目标，比只说“多投点”更容易坚持：": "A weekly goal is easier to stick to than \"apply more\":", "去定": "Set one", "{n} 道，约 {n} 分钟；知识复习 {n} 张": "{n} questions, about {n} min; {n} review cards", "{n} 道，约 {n} 分钟": "{n} questions, about {n} min",
+  /* 求职：投递 */
+  "不定": "None", "已投": "Applied", "被拒": "Rejected", "统计": "Stats", "方向": "Track", "投出": "Sent", "面试": "Interviews", "等待": "Waiting", "档位": "Tier", "行业": "Industry", "A 档": "Tier A", "B 档": "Tier B", "C 档": "Tier C", "不投了": "Withdrawn", "提醒我": "Remind me", "面试安排": "Interviews", "面试没过": "Didn't pass", "没标档位": "No tier", "没写行业": "No industry", "简历版本": "Resume version", "没写版本": "No version", "没定方向": "No track", "记一份投递": "Log an application", "{n} 份": "{n}", "{n} 天": "{n} d", "一次记好几份": "Log several", "全部 {n}": "All {n}", "＋ 添加面试": "+ Add interview", "没回音 {n}": "No reply {n}", "已结束 {n}": "Closed {n}", "面试中 {n}": "Interviewing {n}", "准备投 {n}": "Drafts {n}", "等待回音 {n}": "Waiting {n}",
+  "导出给状态文件": "Export for status file", "每周目标：投几份": "Weekly goal: applications", "统计 JD 高频要求": "Common JD requirements", "投了 {n} 周以上还没动静": "No response in {n}+ weeks", "投出 {n} 份，进面试 {n} 次": "{n} sent, {n} interviews", "职位没写": "No role", "约 {n} 天": "about {n} d",
+  "“面试”从电话初筛算起；“等待”包括投了 {n} 周以上没回音的。": "\"Interviews\" counts from the phone screen on; \"Waiting\" includes those with no reply after {n}+ weeks.", "面试还不到 {n} 次，下面各行之间的差别基本是噪声：先只看数字，别下结论。": "Fewer than {n} interviews so far, so differences between rows are mostly noise. Look at the numbers, but don't draw conclusions yet.", "最近一场：还有 {n} 天。面试前 {n} 周内，每天的练习会多放面试内容。": "Next interview in {n} days. In the {n} weeks before an interview, daily practice adds more interview content.", "还没有安排。添加以后，面试前 {n} 周内每天的练习会多放面试内容。": "Nothing scheduled. Once you add one, daily practice adds more interview content in the {n} weeks before it.", "统计高频要求要用 JD 原文：在投递里存够 {n} 份（现在 {n} 份），一起发给 AI。": "This needs JD text: save at least {n} in your applications (now {n}), then send them to AI together.", "自己加的方向": "Your tracks",
+  "名称": "Name", "时间（可选）": "Time (optional)", "用哪个题库准备（可选）": "Deck to prepare with (optional)", "是哪一份投递（可选）": "Which application (optional)", "不指定": "None", "比如：某公司招聘经理面试": "e.g., Acme hiring manager interview",
+  /* 方向、状态、渠道、轮次、结果 */
+  "机械": "Mechanical", "控制 / 自动化": "Controls / automation", "测试 / 研发": "Test / R&D", "电气 / 硬件": "Electrical / hardware", "软件 / 嵌入式": "Software / embedded", "制造 / 工艺": "Manufacturing / process", "质量": "Quality", "数据": "Data", "其他": "Other", "高尔夫": "Golf", "没定": "Not set", "控制": "Controls",
+  "准备投": "Draft", "电话初筛": "Phone screen", "网申": "Online", "内推": "Referral", "招聘会": "Career fair", "recruiter 联系": "Recruiter reached out", "学校平台": "School portal", "招聘经理": "Hiring manager", "技术面": "Technical", "现场面": "On-site", "不知道": "Unknown", "等消息": "Waiting", "进了下一轮": "Next round", "没过": "Didn't pass", "拿到 offer": "Got an offer", "约了电话初筛": "Phone screen scheduled",
+  /* 一份投递 */
+  "公司": "Company", "职位": "Role", "渠道": "Channel", "状态": "Status", "日期": "Date", "备注": "Notes", "下一步": "Next step", "记下来": "Save", "A：很想去、高度对口": "A: dream job, strong fit", "B：对口": "B: good fit", "C：碰运气": "C: long shot", "投递日期": "Date applied", "平台、来源": "Platform / source", "+ 新方向…": "+ New track…", "新方向叫什么": "New track name", "行业（可选）": "Industry (optional)", "用的简历版本": "Resume version used", "比如：半导体": "e.g., semiconductors", "比如：海投_ME": "e.g., general_ME", "比如：周五前回复": "e.g., reply by Friday", "签证信息（需要担保的话）": "Visa notes (if you need sponsorship)", "比如：Acme Robotics": "e.g., Acme Robotics", "比如：机器人、生物医学、销售工程": "e.g., robotics, biomedical, sales engineering", "比如：Workday、内推、招聘会": "e.g., Workday, referral, career fair", "JD 原文（可选，统计高频要求时用）": "JD text (optional, for requirement stats)", "原帖怎么写、有没有 H-{n}B 记录、E-Verify": "What the posting says, H-{n}B history, E-Verify",
+  "经过": "History", "现在：": "Now: ", "写面试复盘": "Write a debrief", "，投了 {n} 天": ", applied {n} days ago", "，投了 约 {n} 天": ", applied about {n} days ago", "约到面试了，加进面试安排": "Got an interview: add it", "面试复盘": "Interview debriefs",
+  /* 求职：准备 */
+  "知识": "Knowledge", "准备度": "Readiness", "确认了": "Confirmed", "改回答": "Edit answer", "看题目": "Questions", "还没练": "Not practiced", "模拟面试": "Mock interviews", "模拟一场": "Run one", "基本面试": "Core interview", "收起题目": "Hide questions", "练习设置": "Practice settings", "{n} 张": "{n} cards", "{n} 题": "{n} questions", "题目在下面": "Shown below", "基础概念快答": "Concept quick answers", "追问 {n}": "{n} follow-ups", "每天学几张新的": "New cards per day", "待确认 {n}": "To confirm {n}", "听面试官怎么问": "Hear how interviewers ask", "没学 {n} 张": "{n} not started", "到期 {n} 张": "{n} due", "技术面试：追问到底": "Technical: deep follow-ups", "再学 {n} 张新的": "Learn {n} new", "模拟用哪个题库的回答": "Which deck's answers to use", "自己挑题数的来电模拟": "Mock call (choose how many)", "复习今天的 {n} 张": "Review today's {n}", "AI 给的面试题、知识卡：": "Interview questions and knowledge cards from AI:", "把写好的回答一起复制给 AI": "Copy all my answers for AI", "卡住 {n} 秒时提示第一句": "Show the first line after {n} s of silence", "自动（现在约 {n} 分钟）": "Auto (about {n} min now)",
+  "先问你的项目，再一层一层往下追问细节": "Starts with your project, then digs deeper", "每天的面试练习：自动是按你过去两周实际练的时间多加两成": "Daily interview practice: auto = your actual time over the past two weeks, plus 20%", "招聘经理：项目、失败、意见不合、优缺点，用 STAR 讲经历": "Hiring manager: projects, failure, disagreement, strengths and weaknesses, told with STAR", "专业里的基础概念，两三句说清楚；题目来自你导入的知识卡和概念题": "Basic concepts in two or three sentences, from your knowledge cards and concept questions", "recruiter 打来：自我介绍、工作身份、薪资、搬家、入职时间": "A recruiter calls: intro, work status, salary, relocation, start date",
+  "每个模块都是一通模拟面试：面试官念题、你开口答、全程录音，结束后逐题回放、看参考说法。": "Each module is one mock interview: the interviewer reads, you answer out loud, everything is recorded, then you replay each answer and see the reference.", "掌握：{n} 次分开的复习都想起来了。复习对了两次的卡，会进每天的面试练习，用英文说一遍。": "Mastered: recalled in {n} separate reviews. Cards you've recalled twice join daily interview practice, where you say them in English.", "“确认了”是说：这件事是真的，回答里的说法也对。要改说法，先点“改回答”，或者把这一条发给 AI 改好再导入。": "\"Confirmed\" means it's true and the answer says it right. To change the wording, tap \"Edit answer\", or send it to AI and import the fix.", "达标：同一题在 {n} 次不同时间（隔 {n} 小时以上）都打了“还行”或“不错”。有待确认内容的题，确认前不算达标。点一行看每题的进度。": "Ready: rated \"OK\" or better at {n} separate times ({n}+ hours apart). Questions with open checks don't count until confirmed. Tap a row for details.",
+  "还行 {n}/{n}": "OK {n}/{n}", "达标 ✓": "Ready ✓", "练过": "Practiced", "待确认": "To confirm", "其他技术题": "Other technical", "公司专属": "Company-specific", "单题彩排": "Rehearse", "练这一类没达标的（{n} 题）": "Practice the ones not ready ({n})", "这一类都达标了，按时复习就行。": "All ready here; just keep up the reviews.", "还没打过“还行”": "No \"OK\" yet",
+  "达标 {n}/{n}。同一题要在 {n} 次不同时间（隔 {n} 小时以上）都打“还行”才算达标：分开几次各想起来一次，比一次连说几遍记得牢。": "Ready {n}/{n}. A question is ready after \"OK\" at {n} separate times ({n}+ hours apart): recalling it once each time beats repeating it many times at once.",
+  /* 求职：复盘 */
+  "练": "Practice", "在这里导入": "Import here", "记一次真实面试": "Log a real interview", "记下来有什么用": "Why log it", "真实面试 {n}": "Real interviews {n}", "发给 AI 做成题": "Send to AI to make questions", "模拟面试的复盘记录": "Mock interview reviews", "AI 回复的复盘导入码：": "Import code from AI's debrief reply:", "还没有对应题的 {n} 道": "{n} without a matching question", "被问过的题 {n} + {n}": "Asked questions {n} + {n}", "被问过的题 {n}": "Asked questions {n}", "{n}-{n}-{n}　问了 {n} 道题": "{n}-{n}-{n}  {n} questions asked", "{n}-{n}　问了 {n} 道题": "{n}-{n}  {n} questions asked", "日期没记　问了 {n} 道题": "No date  {n} questions asked", "{n} 次：听录音、看参考回答、给每题打分": "{n}: replay, see reference answers, rate each one",
+  "被问过的题会标成真题，每天的面试练习里多排。": "Questions you've been asked are marked as real and come up more in daily practice.", "下次面同一家、同一轮之前，翻出来看上次问了什么、哪里卡住。": "Before your next round with the same company, look back at what they asked and where you got stuck.", "投递的状态跟着改（约了面试、面试没过），成长页记一次真实的面试。": "The application status updates (interviewing, didn't pass), and the Grow page logs a real interview.", "被问过的题会标成真题，每天的面试练习里多排；没有对应题的，可以一次发给 AI 做成题。": "Questions you've been asked are marked as real and come up more in daily practice; any without a match can go to AI in one batch.", "复盘的研究里，针对一次具体经历、再加上外部反馈的复盘，平均能让之后的表现提高两成左右。": "In research on debriefs, reviewing a specific event with outside feedback improves later performance by about 20% on average.", "点“发给 AI”，拿回这一场的导入码（真题、改好的回答、改错卡）、感谢信草稿和给状态文件的更新。": "Tap \"Send to AI\" to get back an import code (real questions, fixed answers, correction cards), a thank-you draft, and a status-file update.",
+  "还没有记录。面完 24 小时内记一下最有用；以前的面试，也可以让 AI 按转写整理成复盘导入码导进来。": "No records yet. Logging within 24 hours is most useful; for past interviews, AI can turn transcripts into a debrief import code.", "导入的": "Imported", "发给 AI 了": "Sent to AI", "还没发": "Not sent", "开口和停顿": "Speaking speed and pauses", "开口用时": "Time to first word",
+  "结果": "Result", "哪一轮": "Round", "面试官": "Interviewer", "哪一份投递": "Which application", "没在投递里": "Not in applications", "哪里说得好": "What went well", "要补的知识": "Knowledge to brush up", "名字和职位": "Name and title", "哪里卡住或停顿了": "Where you got stuck or paused", "下次想改成怎么说": "What to say next time", "保存并发给 AI": "Save and send to AI", "比如：下周一前给答复": "e.g., answer by next Monday", "对方说的下一步、时间线": "Next steps and timeline they mentioned", "比如：传感器标定那题停了很久": "e.g., paused a long time on the sensor calibration question", "被问到的问题（一行一题，尽量写原话）": "Questions asked (one per line, as close to their words as you can)",
+  "趁记得清楚，尽量写原话。写得乱没关系，AI 会帮你理。": "Write it while it's fresh, in their words if you can. Messy is fine; AI will tidy it up.", "发给 AI 以后，会拿回三样：这一场的导入码（真题、改好的回答、改错卡、要补的知识）、一封感谢信草稿、一段贴进状态文件的更新。": "After sending to AI, you get back three things: an import code for this interview (real questions, fixed answers, correction cards, knowledge to learn), a thank-you draft, and a status-file update.", "卡住的地方：": "Where you got stuck: ", "下次要改：": "Change next time: ", "题库里还没有这一题": "Not in your question bank yet", "这场被问到的 {n} 道题": "{n} questions asked in this interview",
+  /* 一次记好几份 */
+  "自己快速记": "Quick entry", "发给 AI 整理": "Let AI tidy it", "看看会记成什么样": "Preview", "一行一份：公司 | 职位（后面可以再加 | 方向）": "One per line: company | role (optionally | track)", "投了一天累了，就用这里：自己一行写一份，或者把乱贴的内容交给 AI 整理。": "Tired after a day of applying? Write one per line, or paste anything and let AI tidy it.", "打开导入页": "Open import", "复制给 AI，让它整理成导入码": "Copy for AI to turn into an import code", "AI 回复以后，把它给的导入码贴进导入页：": "When AI replies, paste its import code on the import page:", "把今天投的职位随便贴进来：职位页面复制的文字、链接、自己的备注都行": "Paste today's applications any way you like: copied job text, links, your notes", "记下这 {n} 份": "Save these {n}", "已经记过": "Already logged", "（按职位名猜的）": "(guessed from title)", "（新方向）": "(new track)", "方向猜错了，记完以后点开那一份改。状态都是“已投”。": "If a track is wrong, open that entry afterwards to fix it. All are marked Applied.", "还没写内容。": "Nothing entered yet.",
+  /* 知识 */
+  "还没学": "Not started", "学这一组": "Study this group", "用英文说": "Say it in English", "{n} 张。点“学这一组”只练这一组：到期的和还没学的（最多 {n} 张）。": "{n} cards. \"Study this group\" practices only these: due and new (up to {n}).", "新的": "New", "复习": "Review", "再来一次": "Again", "看答案": "Show answer", "听英文问法": "Hear the question", "没学过也先猜一下，再看答案：先猜后学，记得更牢。": "New card: guess first, then check. Guessing first helps you remember.", "先自己说出来，中文英文都行，再看答案。": "Say it yourself first, in Chinese or English, then check.", "听一遍": "Listen", "没想起来": "Forgot", "想起来了": "Got it", "想起一部分": "Partly", "面试里可以这样说": "In an interview, you can say", "刚才你想起来多少？": "How much did you recall?", "看中文意思": "See Chinese meaning", "讲解": "Explanation", "这张卡里的词（点一下听）": "Words on this card (tap to hear)", "参考回答的中文意思": "Reference answer in Chinese",
+  "掌握 {n}/{n} 张。没想起来的明天再见；想起来的，隔的天数会越来越长。": "Mastered {n}/{n}. Forgotten cards come back tomorrow; for recalled ones, the gap keeps growing.", "复习对了两次的卡，会出现在“今天的面试练习”里，用英文说出来，这是面试真要用的说法。": "Cards recalled twice appear in today's interview practice, where you say them in English, the way you'll need them in interviews.", "接着复习 {n} 张": "Review {n} more", "学新的知识卡": "New knowledge cards",
+  /* 我的 */
+  "振动": "Vibration", "朗读": "Read aloud", "外观": "Appearance", "浅色": "Light", "深色": "Dark", "内容": "Content", "工具": "Tools", "关于": "About", "一直开": "Always on", "提示音": "Sounds", "英文语音": "English voice", "自动选择": "Auto", "试听英文": "Test English voice", "英文语速": "English speed", "试听中文": "Test Chinese voice", "跟随系统": "Follow system", "问 AI": "Ask AI", "对战角色": "Battle characters", "练习计划": "Practice plan", "设备检测": "Device check", "离线安装": "Install offline", "存储空间": "Storage", "检查更新": "Check for updates", "{n} 道": "{n}", "录音转文字": "Transcribe recordings", "备份与恢复": "Backup & restore", "说话中间停顿": "Pauses while speaking", "检查英文朗读": "Check English voice", "清空所有进度": "Clear all progress", "每天最多几道新题": "New items per day (max)", "怎么检查你说的话": "How to check your speech", "点麦克风自动识别": "Tap the mic for speech recognition", "一天从几点开始算": "Day starts at", "半夜 {n} 点": "Midnight", "凌晨 {n} 点": "{n} a.m.", "看答案时自动朗读": "Read answers aloud automatically", "关于 脱口app": "About Tuokou", "说英语时用什么识别": "Speech recognition engine", "打开 app 先看": "Open the app to", "起步灯：灯灭再开口": "Start lights: speak when they go out", "来电模拟可以看小抄": "Allow cheat sheet in mock calls",
+  "装到桌面，没网也能练": "Install to home screen, works offline", "只用键盘语音输入或打字": "Keyboard voice input or typing only", "停 {n} 秒才算说完": "Done after a {n}-second pause", "停 {n} 秒自动检查": "Auto-check after {n} s", "中文语音（耳机模式用）": "Chinese voice (headphone mode)", "听力题换着用不同的声音": "Vary voices in listening", "看占了多少、清理旧录音": "See usage, clear old recordings", "停一下就结束（手机默认）": "End on a short pause (phone default)", "关掉：每次自己点“检查”": "Off: tap \"Check\" yourself", "也用英式、澳式等其他口音": "Also use British, Australian and other accents", "朗读、识别、录音能不能用": "Whether read-aloud, recognition and recording work", "每天练什么、固定的练习时间": "What to practice daily, fixed times", "给 AI 的自我介绍（可选）": "About me, for AI (optional)", "换手机或清浏览器数据前先备份": "Back up before switching phones or clearing data", "脱口 {n}.{n}，离线版": "Tuokou {n}.{n}, offline version", "脱口 {n}.{n}.{n}，离线版": "Tuokou {n}.{n}.{n}, offline version",
+  "怎么用、为什么这样练（可以搜）": "How to use it and why (searchable)", "在手机上识别录音，转好了会提醒你": "Transcribe recordings on the phone; you'll be notified", "进度存在这台手机上，记得偶尔备份。": "Progress is stored on this phone. Back up now and then.", "自动判断：语音说完自动查，打字时不查": "Smart: check after speaking, not when typing", "句子按意群显示斜杠，慢速时一块一块读": "Show slashes between chunks; read chunk by chunk when slow", "手机自带的识别：快，但口音重时容易听错": "Phone's built-in: fast, but less accurate with accents", "把 AI 给的导入码贴进来，可以一次导好几个文件": "Paste import codes from AI; import several files at once", "练完一轮，和昨天的你打一场；可以导入你自己的角色": "After a round, battle yesterday's you; import your own characters", "还没读到语音列表。试听没声音的话，去设备检测看看。": "Voice list not loaded yet. If the test is silent, try Device check.", "{n} 句说法，{n} 个词，{n} 条回答和回复": "{n} phrases, {n} words, {n} answers and replies", "Whisper：更准，说完要等几秒（只在安装版里能用）": "Whisper: more accurate, takes a few seconds (installed app only)", "比如：机械工程硕士，正在准备美国工程类岗位面试，口语大约 A{n}–B{n}": "e.g., M.S. in mechanical engineering, preparing for US engineering interviews, speaking about A{n}–B{n}", "我导入的内容": "My imported content",
+  /* 导入 */
+  "再贴一段": "Paste another", "导入码长什么样": "What import codes look like", "选文件（可以一次选好几个）": "Choose files (several at once)", "每行一条，用 | 隔开：": "One item per line, separated by |:", "（下面的内容都放进这个题库）": " (everything below goes into this deck)", "英文有几种说法时用 // 隔开。题库名以“知识”开头的，是知识卡（求职 → 准备 → 知识）。": "Separate alternative English versions with //. Decks whose names start with 知识 are knowledge cards (Jobs → Prep → Knowledge).", "把 AI 给的导入码贴进来，或者选导入码文件。可以一次选好几个文件，也可以贴好几段；每一份单独读，带“题库”行的内容会放进各自的题库。": "Paste an import code from AI, or choose import files. You can pick several files or paste several parts; each is read separately, and 题库 lines put content into their own decks.",
+  "读到了": "Found", "确认导入": "Import", "一共 {n} 份：": "{n} sources:", "卡片 {n} 张（反射卡 {n}，找错 {n}，听力 {n}）": "{n} cards ({n} reflex, {n} error-spotting, {n} listening)", "面试题 {n} 道，追问 {n} 个": "{n} interview questions, {n} follow-ups", "面试回答 {n} 条，要点 {n} 条": "{n} answers, {n} cue lists", "投递 {n} 份（新的 {n}，已有的会更新）": "{n} applications ({n} new, existing ones updated)", "题目标签 {n} 条（优先级、方向）": "{n} question tags (priority, track)", "待确认 {n} 条（确认前，相关的题不算达标）": "{n} checks (related questions don't count as ready until confirmed)", "真题 {n} 道": "{n} real questions", "讲解 {n} 条（知识卡翻过来能看到）": "{n} explanations (on the back of knowledge cards)", "中文意思 {n} 条（看不懂英文回答时可以对照）": "{n} Chinese meanings (for checking English answers)", "真实面试复盘 {n} 场（被问到的题 {n} 道）": "{n} real interview debriefs ({n} questions asked)", "其中单词 {n} 个": "including {n} words",
+  /* 模拟面试记录、来电模拟 */
+  "复盘记录": "Review records", "还没有模拟记录。去“面试”页模拟一场，结束后就会出现在这里。": "No mock interviews yet. Run one from the Jobs page and it will show up here.", "每次模拟面试都在这里。点进去听录音、看参考回答、给每题打分；没说出来的题会安排你隔天再练。": "Every mock interview is here. Open one to replay, see reference answers, and rate each answer; ones you missed come back the next day.",
+  "接之前": "Before you pick up", "来电模拟": "Mock call", "题目来自": "Questions from", "问几道题": "How many questions", "通用面试题": "General questions", "开始，等它打来": "Start and wait for the call", "戴上耳机，找个安静的地方": "Put on headphones and find a quiet spot", "小抄模式：答题时可以看我的要点": "Cheat sheet: see my cues while answering", "先说结论，再讲经历；讲经历用过去式": "Lead with the point, then the story; tell stories in past tense", "“面试官”会打来电话，用英文念问题，屏幕上不显示文字。你开口回答，app 录音，挂断后一起复盘。": "The \"interviewer\" calls and reads questions in English with no text on screen. You answer out loud, the app records, and you review after hanging up.", "没听清就点 “Sorry, could you say that again?”，真实面试里这很正常": "Didn't catch it? Tap \"Sorry, could you say that again?\" It's normal in real interviews.",
+  /* 进度 */
+  "一": "Mon", "二": "Tue", "三": "Wed", "四": "Thu", "五": "Fri", "六": "Sat", "日": "Sun", "记录": "Records", "已掌握": "Mastered", "总分钟": "Total min", "连续天数": "Day streak", "对话记录": "Dialogues", "错误档案": "Error profile", "每类正确率": "Accuracy by type", "今天练过的句子": "Sentences practiced today", "最近 {n} 周": "Last {n} weeks", "今天每一句练得怎么样": "How each sentence went today", "最近 {n} 天（分钟）": "Last {n} days (min)", "你最常犯的错，写作时自动检查": "Your most common mistakes, checked when you write", "{n} 场：每一场的题、你说的话、分数": "{n} sessions: questions, what you said, scores", "连续答对、间隔拉到 {n} 天以上算已掌握。": "Mastered = correct in a row, with the gap stretched past {n} days.", "最近 {n} 天，后面的数字是和更早相比的变化": "Last {n} days; the number after is the change from before", "练几天以后，这里会显示每类错误的正确率和变化。": "After a few days of practice, accuracy by error type shows up here.", "已掌握 {n}，学习中 {n}，还没练 {n}": "Mastered {n}, learning {n}, not started {n}", "写好回答 {n}/{n}，来电模拟 {n} 次": "Answers written {n}/{n}, mock calls {n}", "用麦克风或输入框答几题，这里就会显示你开口有多快。": "Answer a few with the mic or keyboard and this will show how fast you start speaking.", "颜色越深练得越久；虚线框是自动补签的日子（每周 {n} 次）。": "Darker = longer practice; dashed boxes are automatic streak savers ({n} per week).",
+  /* 我导入的内容 */
+  "题库": "Deck", "看卡片": "View cards", "并到其他题库": "Merge into another deck", "{n} 张卡，{n} 道面试题": "{n} cards, {n} interview questions",
+  /* 常见提示 */
+  "记好了": "Saved", "记好了，成长页也记了一笔": "Saved, and logged on the Grow page", "保存好了": "Saved", "写一下公司名": "Enter a company name", "复制好了：可以贴进你的求职记录或状态文件": "Copied: paste it into your job log or status file", "这份投递已经记过了": "Already logged", "今天没有到期要练的题": "Nothing due to practice today", "现在没有要复习的卡": "No cards to review now", "新卡都学过了": "All new cards learned", "先把导入码贴进来，或者选文件": "Paste an import code or choose a file first", "记好了（成长页已经记过这一份，不重复加）": "Saved (already counted on the Grow page)", "保存好了，成长页记了一次真实的面试": "Saved, and logged a real interview on the Grow page", "导入好了：卡片 {n}，题目 {n}": "Imported: {n} cards, {n} questions", "导入好了：卡片 {n}，题目 {n}。在求职页能看到": "Imported: {n} cards, {n} questions. See them on the Jobs page", "导入好了：卡片 {n}，题目 {n}，投递 {n}。在求职页能看到": "Imported: {n} cards, {n} questions, {n} applications. See them on the Jobs page", "被问过的题都有对应的了": "Every asked question has a match", "记下了": "Noted", "已复制。打开 AI 里这个项目的对话，粘贴发送": "Copied. Open this project's chat in AI, paste and send"
+};
+/* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
+Object.assign(I18N_EN, {
+  "面试一题": "Interview question", "只听不看，和电话里一样": "Listen only, like a phone call", "看文字": "Show text", "我的小抄": "My cue card",
+  "开始回答（目标 {n} 秒）": "Start answering (target {n}s)", "正在回答": "Answering", "目标 {n} 秒": "Target {n}s", "我答完了": "I'm done",
+  "录音不可用：照样大声说，说完点结束。": "Recording isn't available: still say it out loud, then tap I'm done.",
+  "回想一下，对照检查": "Think back and check", "第一句直接回答了问题（先给结论）": "My first sentence answered the question (conclusion first)",
+  "讲经历用了过去式（I designed / I tested…）": "Used past tense for experiences (I designed / I tested…)", "没有 although…but、because…so": "No although…but or because…so",
+  "说了一个具体例子或数字": "Gave a specific example or number", "在目标时间以内": "Within the target time", "没打勾的会变成下一轮的重点。": "Anything unchecked becomes the focus of the next round.",
+  "断句：关": "Phrase breaks: off", "断句：开": "Phrase breaks: on", "这次说得怎么样？": "How did it go?",
+  "没说出来": "Couldn't say it", "较多卡顿": "Lots of pauses", "还行": "OK", "不错": "Good",
+  "听录音时听这五件事": "Listen for these five things", "：勾出有问题的，下面告诉你怎么练": ": tick the problems, and you'll see how to practice them",
+  "顺不顺": "Fluency", "有没有长时间停顿、很多 um、说到一半重来": "Long pauses, lots of um, restarting mid-sentence?",
+  "语法": "Grammar", "过去的事用过去式了吗？-s、be 动词呢？because 和 so 有没有一起用": "Past tense for past events? -s and be verbs? because and so together?",
+  "听不听得清": "Clarity", "词尾的 -s、-ed、-t 有没有吞掉？重音放对了吗": "Did you drop final -s, -ed, -t? Was the stress right?",
+  "结构": "Structure", "第一句有没有直接回答问题？讲经历有没有按 STAR": "Did your first sentence answer the question? Did your story follow STAR?",
+  "用词": "Word choice", "有没有想不起来的词、只能绕着说的地方": "Any words you couldn't recall, or had to talk around?",
+  "参考回答": "Model answer", "跟读参考回答": "Shadow the model answer", "再说一遍": "Say it again", "再答一次，压到 {n} 秒": "Answer again in {n}s",
+  "参考回答的中文意思": "Model answer in Chinese", "讲解": "Explanation", "我写好的回答": "My written answer", "录音转成的文字": "Transcript", "复盘": "Review",
+  "基础和技术知识的复习卡（控制、测试、机械……）导入以后在这里：每张卡先想、再看答案，按你想起来多少安排下次复习；复习对了两次的，会进每天的面试练习，用英文说。":
+    "Review cards for fundamentals and technical knowledge (controls, testing, mechanical…) show up here after you import them. Think first, then check the answer; the next review is scheduled by how much you remembered. Cards you get right twice join the daily interview practice, where you say them in English."
+});
+/* 第 3 批：英语练习的一轮、结算页 */
+Object.assign(I18N_EN, {
+  "反射卡": "Reflex card", "be 动词": "be verbs", "麦克风识别": "Mic recognition", "键盘语音输入": "Keyboard voice input", "检查": "Check",
+  "灯灭后点麦克风，大声说": "When the light goes out, tap the mic and speak up", "录下来，跟标准读音对比": "Record it and compare with the model pronunciation",
+  "我说完了，看答案": "I'm done, show the answer", "紫灯越多，秒出的比例越高": "More purple lights mean more instant answers",
+  "今天的练习完成了": "Today's practice is done", "再练一会儿就能打卡": "A little more practice to complete today", "题": "items", "秒出": "Instant",
+  "平均用时（秒）": "Average time (s)", "明天要复习 {n} 题。": "{n} to review tomorrow.", "再来一轮": "Another round",
+  "接着练几道面试题？": "Practice a few interview questions?", "今天的面试练习还没做：先来 {n} 道，约 {n} 分钟。": "Today's interview practice isn't done yet: start with {n} questions, about {n} min.",
+  "接着练面试 {n} 分钟": "Interview practice: {n} min", "看中文意思": "Show the Chinese meaning"
+});
+const I18N_MON = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], I18N_WK = {一:"Mon", 二:"Tue", 三:"Wed", 四:"Thu", 五:"Fri", 六:"Sat", 日:"Sun"};
+const I18N_ROUND = {电话初筛:"phone screen", 招聘经理:"hiring manager", 技术面:"technical", 现场面:"on-site", 其他:"other"};
+/* 整句对不上时，再试这些片段规则（日期、“还有 N 天”、带公司名的几种句式） */
+const I18N_FRAG = [
+  [/(\d{1,2})月(\d{1,2})日\s*周([一二三四五六日])/g, (m, a, b, c) => `${I18N_WK[c]}, ${I18N_MON[+a] || a} ${b}`],
+  [/：还有 (\d+) 天/g, ": in $1 days"], [/：就是今天/g, ": today"], [/：明天/g, ": tomorrow"], [/^还有 (\d+) 天/, "in $1 days"],
+  [/（(.*)）$/, " ($1)"], [/^对上：/, "Matched: "], [/^问过 (\d+) 次：?/, "Asked $1×: "], [/^等得最久：/, "Waiting longest: "], [/ (\d+) 天(?=，|$)/g, " $1 d"], [/，/g, ", "],
+  [/^导入好了：卡片 (\d+)/, "Imported: $1 cards"], [/题目 (\d+)/, "$1 questions"], [/投递 (\d+)/, "$1 applications"], [/。在求职页能看到$/, ". See them on the Jobs page"],
+  [/^公司：(.+)\(不在投递记录里\)$/, "Company: $1 (not in applications)"]
+];
+function i18nOn(){ try { return !!(typeof S !== "undefined" && S && S.settings && S.settings.uiLang === "en"); } catch (e) { return false; } }
+function i18nT(raw){
+  const t = String(raw == null ? "" : raw).trim(); if (!t || !/[\u4e00-\u9fff]/.test(t)) return null;
+  let v = I18N_EN[t];
+  if (v == null){ const nums = []; const k = t.replace(/\d+(?:\.\d+)?/g, m => { nums.push(m); return "{n}"; }); const tpl = I18N_EN[k]; if (tpl != null){ let i = 0; v = tpl.replace(/\{n\}/g, () => nums[i] != null ? nums[i++] : ""); } }
+  if (v == null){ let m;
+    if ((m = t.match(/^(.+)：(\d+) 题$/)) && I18N_EN[m[1]]) v = `${I18N_EN[m[1]]}: ${m[2]} questions`;
+    else if ((m = t.match(/^(.+)：(\d+) 张卡$/))) v = `${m[1]}: ${m[2]} cards`;
+    else if ((m = t.match(/^(.+)：完成了$/))) v = `${I18N_EN[m[1]] || m[1]}: done`;
+    else if ((m = t.match(/^(.+)，(电话初筛|招聘经理|技术面|现场面|其他)$/))) v = `${m[1]}, ${I18N_ROUND[m[2]]}`;
+    else { let s = t; for (const [re, r] of I18N_FRAG) s = s.replace(re, r); if (s !== t && !/[\u4e00-\u9fff]/.test(s)) v = s; }   /* 片段规则换完还剩中文的，就整句保持中文，不出现半中半英 */
+  }
+  return v == null ? null : String(raw).replace(t, v);
+}
+const I18N_ORIG = new Map();
+const I18N_SKIP = ".en, textarea, input, [data-noi18n], .asr-text, .jk-q, .cheat, script, style, code";   /* 讲解和中文意思的正文自己带 data-noi18n，标题照常翻 */
+function i18nNode(n){ const p = n.parentElement; if (!p || p.closest(I18N_SKIP)) return; const v = i18nT(n.nodeValue); if (v != null && v !== n.nodeValue){ if (!I18N_ORIG.has(n)) I18N_ORIG.set(n, n.nodeValue); n.nodeValue = v; } }
+function i18nApply(root){
+  if (!i18nOn() || !root) return;
+  if (root.nodeType === 3){ i18nNode(root); return; } if (root.nodeType !== 1) return;
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), ns = []; while (w.nextNode()) ns.push(w.currentNode); ns.forEach(i18nNode);
+  const els = [root, ...root.querySelectorAll("[placeholder],[aria-label],[title]")];
+  for (const el of els){ if (!el.getAttribute || (el.closest && el.closest("[data-noi18n]"))) continue;
+    for (const a of ["placeholder", "aria-label", "title"]){ const v0 = el.getAttribute(a); if (!v0) continue; const v = i18nT(v0); if (v != null && v !== v0){ if (!el.hasAttribute("data-zh-" + a)) el.setAttribute("data-zh-" + a, v0); el.setAttribute(a, v); } } }
+}
+function i18nRevert(){
+  for (const [n, v] of I18N_ORIG) if (n.isConnected) n.nodeValue = v; I18N_ORIG.clear();
+  for (const a of ["placeholder", "aria-label", "title"]) document.querySelectorAll(`[data-zh-${a}]`).forEach(el => { el.setAttribute(a, el.getAttribute(`data-zh-${a}`)); el.removeAttribute(`data-zh-${a}`); });
+}
+function i18nSync(){ document.documentElement.lang = i18nOn() ? "en" : "zh-CN"; if (i18nOn()) i18nApply(document.body); else { i18nRevert(); try { UI.render(); } catch (e) {} } }
+/* 新画出来的东西（换页面、弹窗、提示）都过一遍；只看新加的节点，不看文字改动，所以不会自己触发自己 */
+const I18N_OBS = new MutationObserver(ms => { if (!i18nOn()) return; for (const m of ms) for (const nd of m.addedNodes) i18nApply(nd); });
+I18N_OBS.observe(document.body, {childList:true, subtree:true});
+document.addEventListener("DOMContentLoaded", () => setTimeout(() => { if (i18nOn()) i18nSync(); }, 0));
+{ const cs = CHG.set; CHG.set = function(el){ const r = cs.apply(this, arguments); if (el && el.dataset && el.dataset.key === "uiLang") i18nSync(); return r; }; }
 
 </script>
 </body>
