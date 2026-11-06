@@ -1035,6 +1035,19 @@ html[lang="en"] .job-pl-k{white-space:normal}
 html[lang="en"] .job-count span{font-size:11.5px}
 .job-seg button{white-space:nowrap}
 
+/* v1.72.0：记投递（一条一张卡，可以收起） */
+.jrec-item{padding:12px 14px}
+#jrecList .jrec-item+.jrec-item{margin-top:10px}
+.jrec-head{display:flex;align-items:center;gap:8px}
+.jrec-tog{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:10px;border:0;background:none;padding:2px 0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.jrec-t{display:flex;flex-direction:column;min-width:0;gap:2px}
+.jrec-co{font-size:16px}
+.jrec-sub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.jrec-del{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--surface2);color:var(--muted);font-size:18px;line-height:1;cursor:pointer}
+.jrec-item.open .jrec-head{padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:2px}
+.jrec-more{margin-top:12px}
+.jrec-more>summary{cursor:pointer;color:var(--ink2)}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -1055,7 +1068,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.71.1"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.72.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -6321,7 +6334,7 @@ ACT["imp-preview"] = () => {
   const by = t => r.cards.filter(c => c.t === t).length; const dup = r.cards.filter(c => S.custom.some(x => x.id === c.id)).length;
   const decks = Array.from(new Set(r.cards.map(c => c.deck).concat(r.questions.map(q => q.deck))));
   const n = r.cards.length + r.answers.length + r.keys.length + r.questions.length + r.alts.length + r.plan.length + (r.articles || []).length + (r.slang || []).length + (r.growGoals || []).length + (r.growActs || []).length + (r.growSkills || []).length + (r.apps || []).length + (r.qtags || []).length + (r.checks || []).length + (r.real || []).length + (r.explains || []).length + (r.zhs || []).length + (r.debriefs || []).length;
-  const appNew = (r.apps || []).filter(a => !jobFindApp(a)).length;
+  const appNew = (r.apps || []).filter(a => !jobFindApp(a) && !jobFindAppLoose(a)).length;
   const who = r.meta.who[0];
   const badTxt = r.bad.every(b => typeof b === "number") ? `第 ${r.bad.join("、")} 行` : r.bad.map(b => typeof b === "number" ? `第 ${b} 行` : b).join("、");
   $("#impOut").innerHTML = `<div class="panel" style="margin-top:12px"><h3>读到了</h3><ul class="issues">
@@ -14557,8 +14570,8 @@ const isCC = q => /coffee|chat|社交|networking/i.test((q && q.deck) || "");
    原则：每天早上先复习（间隔复习、先说再看答案）；其余按一周轮换（开口、写、听、语块都练到，同一类任务隔几天再来一次）；
    有什么内容排什么（有 coffee chat 题库才排对话练习、有单词卡才排单词、错误档案有统计才排“看错误档案”）；面试前 3 天自动换成面试冲刺。 */
 ACT["pl-gen"] = async () => {
-  const goal = await choose("生成推荐计划：最想练什么？", `<p class="small muted">每天早上先复习；其余按一周轮着练开口、写作、听力和语块，同一类隔几天再练一次；面试前 3 天自动换成面试冲刺。重新生成只替换以前自动生成的，你自己加的不动。</p>`, [["iv", "面试"], ["cc", "Coffee chat 和社交"], ["daily", "日常口语"], ["write", "写作（笔友、邮件）"], ["mix", "都练一点"]]); if (!goal) return;
-  const mins = await choose("每天大概有多少时间？", `<p class="small muted">20 分钟：复习加 1 项；40 分钟：复习加 2 项；1 小时：复习加 3 项。</p>`, [["20", "20 分钟"], ["40", "40 分钟"], ["60", "1 小时"]]); if (!mins) return;
+  const goal = await choose("生成推荐计划：最想练什么？", `<p class="small muted">每天早上先复习；其余按一周轮着练开口、写作、听力和语块，同一类隔几天再练一次；面试前 3 天自动换成面试冲刺。重新生成只替换以前自动生成的，你自己加的不动。</p><p class="small muted" style="margin-top:6px">选“求职”：每天排今天的面试练习（按准备度自动挑题）和知识复习，周一、三、五各一段投递时间，周日看一次投递；约了面试，前三天换成冲刺，当天晚上写复盘。</p>`, [["job", "求职：面试练习、知识复习、投递"], ["iv", "面试（只排练习）"], ["cc", "Coffee chat 和社交"], ["daily", "日常口语"], ["write", "写作（笔友、邮件）"], ["mix", "都练一点"]]); if (!goal) return;
+  const mins = await choose("每天大概有多少时间？", `<p class="small muted">${typeof plPast === "function" ? plPast() : ""}20 分钟：复习加 1 项；40 分钟：复习加 2 项；1 小时：复习加 3 项。${goal === "job" ? "投递时间另算，不占这里的时间。" : ""}</p>`, [["20", "20 分钟"], ["40", "40 分钟"], ["60", "1 小时"]]); if (!mins) return;
   const qs = Object.values(QBY || {}).filter(q => q && q.id), ivQ = qs.filter(q => !isCC(q)), ccQ = qs.filter(isCC);
   const ccDecks = [...new Set(ccQ.map(q => q.deck))].sort((a, b) => (/闲聊/.test(b) ? 1 : 0) - (/闲聊/.test(a) ? 1 : 0));
   const hasWords = CAT.cards.some(c => c.t === "w"), hasErr = typeof errTop === "function" && errTop(5).length > 0;
@@ -14573,8 +14586,9 @@ ACT["pl-gen"] = async () => {
   /* 这一周的 3 道题：轮流彩排；下一周往后换 3 道 */
   const weekPick = (arr, key) => { if (!arr.length) return null; const n = soloN[key + week] = (soloN[key + week] || 0) + 1; return arr[(week * 3 + (n - 1) % 3) % arr.length]; };
   /* 每一种练习：时间段、写清楚怎么做、链接 */
+  const hasJobIv = typeof jobOwnsIv === "function" && jobOwnsIv(), hasKnow = typeof jobKnowCards === "function" && jobKnowCards().length > 0;
   const T = {
-    soloIv: () => { const q = weekPick(ivCore, "iv"); return q ? ["晚上", `彩排这周的面试题：${q.zh || q.id}（先说一遍，再看参考回答，再说一遍）`, "solo:" + q.id] : null; },
+    soloIvOld: () => { const q = weekPick(ivCore, "iv"); return q ? ["晚上", `彩排这周的面试题：${q.zh || q.id}（先说一遍，再看参考回答，再说一遍）`, "solo:" + q.id] : null; },
     soloCc: () => { const q = weekPick(ccCore, "cc"); return q ? ["晚上", `彩排这周的 coffee chat 题：${q.zh || q.id}（说完问回对方一句）`, "solo:" + q.id] : null; },
     talkIv: () => ivQ.length ? ["晚上", "对话练习 · 面试官：4 题连着答，答完看每题的反馈", "dtalk:iv"] : null,
     talkCc: () => { const d = pick(ccDecks, ccK++); return d ? ["晚上", `对话练习 · Coffee chat：${dbPersona(d)}（3–4 题，说完记得问回对方）`, "dtalk:cc:" + d] : T.dialogs(); },
@@ -14595,36 +14609,49 @@ ACT["pl-gen"] = async () => {
     words: () => hasWords ? ["午休", "单词：学 2–3 个新词，复习到期的", "words"] : null,
     pron: () => ["午休", "发音：练一组听辨，再测一句第一印象", "pron"],
     read: () => ["晚上", "阅读：读一篇（边听边读），把有用的词和短语加进想学的", "read"],
-    react: () => ["午休", "接话练习：听一句马上接，先给反应、再追问一句", "react"]
+    react: () => ["午休", "接话练习：听一句马上接，先给反应、再追问一句", "react"],
+    /* v1.72.0：有自己的面试题库时，面试练习用求职页“今天的面试练习”（按出现频率、准备度、离面试多远自动挑题），不再每周固定 3 道 */
+    soloIv: () => hasJobIv ? T.jobiv() : T.soloIvOld(),
+    jobiv: () => hasJobIv ? ["上午", `今天的面试练习：按准备度自动挑题（约 ${Math.round(jobBudget() / 60)} 分钟）`, "jobiv"] : T.soloIvOld(),
+    jobiv5: () => hasJobIv ? ["上午", "面试练习 5 分钟：先说每场都会问的题", "jobiv5"] : T.soloIvOld(),
+    jk: () => hasKnow ? ["午休", "知识复习：到期的知识卡加几张新的（先想，再看答案）", "jk"] : null,
+    jrec: () => { const g = +((S.job || {}).weekGoal) || 0; return ["下午", g ? `投递时间：投 ${Math.max(1, Math.ceil(g / 3))} 份（本周目标 ${g} 份，A 档先做），投完点“记投递”` : "投递时间：投 1–2 份认真改过的（A、B 档先做），投完点“记投递”", "jrec"]; },
+    jfollow: () => ((S.job || {}).apps || []).length ? ["下午", "看看投递：该跟进的发封邮件，投了 4 周还没回音的标成没回音", "jfollow"] : null
   };
   /* 一周轮换（周日 0 … 周六 6），每天按顺序取前几项 */
   const W = {
-    iv:    [["err", "soloIv", "journal"], ["soloIv", "b432", "pron"], ["talkIv", "soloIv", "chunks"], ["listen", "soloIv", "hands"], ["call", "pron", "mail"], ["soloIv", "free", "bossIv"], ["mock", "listen", "journal"]],
+    iv:    [["soloIv", "err", "jk"], ["soloIv", "b432", "jk"], ["talkIv", "soloIv", "chunks"], ["soloIv", "listen", "jk"], ["call", "jk", "mail"], ["soloIv", "free", "bossIv"], ["mock", "listen", "jk"]],
+    job:   [["jobiv", "jk", "listen"], ["jobiv", "jk", "chunks"], ["jobiv", "call", "jk"], ["jobiv", "jk", "b432"], ["jobiv", "jk", "err"], ["jobiv", "jk", "pron"], ["mock", "jk", "journal"]],
     cc:    [["err", "react", "journal"], ["talkCc", "chunks", "journal"], ["soloCc", "listen", "reply"], ["reply", "dialogs", "hands"], ["talkCc", "soloCc", "free"], ["dialogs", "listen", "b432"], ["bossCc", "pron", "chunks"]],
     daily: [["err", "reply", "journal"], ["dialogs", "pron", "words"], ["free", "listen", "journal"], ["reply", "hands", "words"], ["pron", "chunks", "listen"], ["talkCc", "react", "journal"], ["listen", "words", "hands"]],
     write: [["err", "mail", "words"], ["reply", "chunks", "err"], ["mail", "chunks", "journal"], ["reply", "pron", "listen"], ["mail", "chunks", "journal"], ["reply", "talkCc", "pron"], ["reply", "dialogs", "journal"]]
   };
-  const mixOrder = ["iv", "write", "cc", "iv", "daily", "cc", "write"];
+  const mixOrder = hasJobIv ? ["job", "write", "cc", "job", "daily", "cc", "job"] : ["iv", "write", "cc", "iv", "daily", "cc", "write"];
   const ivDate = S.settings.interviewDate && /^\d{4}-\d{2}-\d{2}$/.test(S.settings.interviewDate) ? S.settings.interviewDate : "";
+  /* 面试日期：求职页“面试安排”里的每一场，加上以前设置里的面试日期；每天看离它最近的下一场 */
+  const ivUp = typeof jobUpcoming === "function" ? jobUpcoming() : [];
+  const ivList = [...new Set([ivDate].concat(ivUp.map(x => x.date)).filter(Boolean))].sort();
+  const ivName = dd => { const x = ivUp.find(v => v.date === dd); return x ? x.name : "面试"; };
   const start = new Date(today() + "T12:00:00"); const items = [];   /* 从今天开始排 */
   const add = (date, x) => { if (x) items.push({id:"g" + Math.random().toString(36).slice(2, 9), date, cue:x[0], text:x[1], act:x[2] || "", gen:true, done:false}); };
   for (let i = 0; i < 14; i++){
     const dt = new Date(start); dt.setDate(start.getDate() + i); const d = ymd(dt), dow = dt.getDay(); week = Math.floor(i / 7);
-    const left = ivDate ? Math.round((new Date(ivDate + "T12:00:00") - dt) / 864e5) : null;
-    if (left === 0){ add(d, ["面试前", "面试前 15 分钟：把最重要的三个故事的要点各说一遍，不学新的", ivQ[0] ? "solo:" + ivQ[0].id : ""]); continue; }
+    const nd = ivList.find(x => x >= d) || "", left = nd ? Math.round((new Date(nd + "T12:00:00") - dt) / 864e5) : null;
+    if (left === 0){ add(d, ["面试前", "面试前 15 分钟：把最重要的三个故事的要点各说一遍，不学新的", ivQ[0] ? "solo:" + ivQ[0].id : ""]); add(d, ["晚上", `写面试复盘：${ivName(nd)}（面完 24 小时内写最有用）`, "jdeb"]); continue; }
     add(d, ["早上", `复习到期的卡，再学新卡（最多 ${newN} 张；先说出来，再看答案）`, main]);
-    if (left !== null && left > 0 && left <= 3 && ivQ.length){   /* 面试冲刺 */
-      const sprint = [T.call(), T.soloIv(), left === 1 ? T.soloIv() : T.mock()].filter(Boolean).slice(0, Math.max(2, extra));
+    if (left !== null && left > 0 && left <= 3 && (ivQ.length || hasJobIv)){   /* 面试冲刺：前三天 72 小时清单；按这一场挑题（离面试越近，相关的题越优先）；来电模拟；前一天只练熟的 */
+      const sprint = [left === 3 ? ["上午", `72 小时清单：${ivName(nd)}（问清形式、JD 配证据、看公司和面试官……）`, "j72"] : null, left === 1 || mins === "20" ? T.jobiv5() : T.soloIv(), T.call(), left === 2 ? T.mock() : null].filter(Boolean).slice(0, Math.max(2, extra + (left === 3 ? 1 : 0)));
       sprint.forEach(x => add(d, x)); continue;
     }
     const g = goal === "mix" ? mixOrder[dow] : goal;
     const keys = W[g][dow]; let n = 0;
-    for (const k of keys){ if (n >= extra) break; const x = T[k](); if (x){ add(d, x); n++; } }
+    for (const k0 of keys){ if (n >= extra) break; const k = k0 === "jobiv" && mins === "20" ? "jobiv5" : k0; const x = T[k](); if (x){ add(d, x); n++; } }
     if (n < extra){ for (const k of ["listen", "chunks", "journal"]){ if (n >= extra) break; if (!keys.includes(k)){ add(d, T[k]()); n++; } } }
+    if (goal === "job"){ if ([1, 3, 5].includes(dow)) add(d, T.jrec()); if (dow === 0) add(d, T.jfollow()); }   /* 投递时间另算 */
     if (dow === 6 && (S.reads || []).length && items.length && items[items.length - 1].date === d && items[items.length - 1].act !== main){ const x = T.read(); Object.assign(items[items.length - 1], {cue:x[0], text:x[1], act:x[2]}); }
   }
   const t = today(); S.plan = (S.plan || []).filter(x => !(x.gen && !x.done && x.date >= t)).concat(items); save(); UI.render();
-  toast(`排好了：14 天 ${items.length} 项${newWas !== newN ? `；每天新卡改成最多 ${newN} 张` : ""}${ivDate ? "；面试前几天是冲刺" : ""}`);
+  toast(`排好了：14 天 ${items.length} 项${newWas !== newN ? `；每天新卡改成最多 ${newN} 张` : ""}${ivList.length ? "；面试前几天是冲刺" : ""}`);
 };
 
 /* ===================== 对话首领战：面试官 / Coffee chat / 4/3/2 连击战 ===================== */
@@ -17210,8 +17237,10 @@ function jobApplyImport(r){
   for (const a0 of (r.apps || [])){
     const a = Object.assign({}, a0), rt = jobResolveTrack(a.track, a.trackRaw); a.track = rt.track; if (rt.ind && !a.ind) a.ind = rt.ind;
     const chG = a.chGuess; delete a.trackRaw; delete a.chGuess;
-    const x = jobFindApp(a);
+    const x = jobFindApp(a) || jobFindAppLoose(a);
     if (x){
+      if (jobNorm(a.co).length > jobNorm(x.co).length) x.co = a.co;
+      if (!jobNorm(x.role) && a.role) x.role = a.role;
       for (const k of ["track", "tier", "src", "res", "ind", "ch"]) if (a[k]) x[k] = a[k];
       if (!x.ch) x.ch = chG || "web";
       if (a.d){ x.d = a.d; x.dApprox = !!a.dApprox; }
@@ -17374,7 +17403,7 @@ ACT["job-go"] = el => { const m = el && el.dataset && +el.dataset.v; jobRun(m ? 
     try {
       const j = JB(), el = stageEl(); if (!el) return;
       if (isJob){
-        RUN.job = false; j.ivSec[today()] = Math.min(7200, (+j.ivSec[today()] || 0) + Math.min(sec, 3600)); if (!RUN.exited) j.doneDay = today(); save();
+        RUN.job = false; j.ivSec[today()] = Math.min(7200, (+j.ivSec[today()] || 0) + Math.min(sec, 3600)); if (!RUN.exited){ j.doneDay = today(); if (typeof planAutoDone === "function"){ planAutoDone("jobiv"); planAutoDone("jobiv5"); } } save();
         const b = el.querySelector('[data-act="again-session"]'); if (b){ b.dataset.act = "job-go"; b.dataset.v = "5"; b.textContent = "再练 5 分钟"; }
       } else if (jobOwnsIv() && !jobToday().done){
         const p = jobPlan(300); if (!p.items.length) return;
@@ -17485,7 +17514,7 @@ function jobRunMore(budget){
 }
 function jobPipeSumHTML(){
   const apps = JB().apps;
-  if (!apps.length) return `<section class="panel job-pipe"><b>投递</b><p class="small muted" style="margin-top:6px">把投过的职位记下来，过一阵就能看出哪个方向回音多、哪份简历管用。</p><button class="btn sm" style="margin-top:10px" data-act="job-new">记一份投递</button></section>`;
+  if (!apps.length) return `<section class="panel job-pipe"><b>投递</b><p class="small muted" style="margin-top:6px">把投过的职位记下来，过一阵就能看出哪个方向回音多、哪份简历管用。</p><button class="btn sm" style="margin-top:10px" data-act="job-new">记投递</button></section>`;
   const g = {}; for (const a of apps) g[jobGroup(a)] = (g[jobGroup(a)] || 0) + 1;
   const wk = K.growWeekStart ? K.growWeekStart(today()) : today();
   const thisWk = apps.filter(a => a.d && !a.dApprox && dnum(a.d) >= dnum(wk) && jobSent(a)).length;
@@ -17497,7 +17526,7 @@ function jobPipeSumHTML(){
     ${goal ? `<div class="rbar job-goal${thisWk >= goal ? " ok" : ""}" style="margin-top:8px"><i style="width:${gp}%"></i></div>` : ""}
     <div class="job-counts">${[["live", "面试中"], ["wait", "等待回音"], ["stale", "没回音"], ["ended", "已结束"]].map(([k, l]) => `<button class="job-count${k === "live" && g[k] ? " on" : ""}" data-act="job-seg" data-v="apps" data-f="${k}"><b class="num">${g[k] || 0}</b><span>${l}</span></button>`).join("")}</div>
     ${old.length ? `<p class="small muted" style="margin-top:8px">等得最久：${old.map(a => `${esc(a.co)} ${jobDays(a)} 天`).join("，")}</p>` : ""}
-    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-new">记一份投递</button><button class="btn sm" data-act="nav" data-v="jbulk">一次记好几份</button><button class="btn sm ghost" data-act="job-seg" data-v="apps" data-f="all">看全部</button></div>
+    <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-new">记投递</button><button class="btn sm ghost" data-act="job-seg" data-v="apps" data-f="all">看全部</button></div>
     ${goal ? "" : `<p class="small muted" style="margin-top:8px">定一个每周目标，比只说“多投点”更容易坚持：<button class="linkbtn small" data-act="job-seg" data-v="apps" data-to="jobGoal">去定</button></p>`}</section>`;
 }
 
@@ -17513,9 +17542,9 @@ function jobAppsSeg(){
   const apps = JB().apps, f = JOB_GROUPS.some(x => x[0] === L.jobF) ? L.jobF : "all";
   const g = {}; for (const a of apps) (g[jobGroup(a)] = g[jobGroup(a)] || []).push(a);
   const goal = +JB().weekGoal || 0;
-  const top = `<div class="row-gap" style="margin:2px 0 4px"><button class="btn primary" style="flex:1" data-act="job-new">记一份投递</button><button class="btn" style="flex:1" data-act="nav" data-v="jbulk">一次记好几份</button></div>
+  const top = `<div class="row-gap" style="margin:2px 0 4px"><button class="btn primary" style="flex:1" data-act="job-new">记投递</button></div>
     <label class="fld job-goalset" id="jobGoal"><span>每周目标：投几份</span><select data-chg="job-goal">${[0, 3, 5, 8, 10, 15, 20].map(v => `<option value="${v}"${v === goal ? " selected" : ""}>${v ? v + " 份" : "不定"}</option>`).join("")}</select></label>`;
-  if (!apps.length) return top + `<p class="panel small muted" style="margin-top:10px">还没有投递记录。点上面“记一份投递”，或者把 AI 给的投递导入码导进来（我的 → 导入新内容）。</p>` + jobIvsHTML();
+  if (!apps.length) return top + `<p class="panel small muted" style="margin-top:10px">还没有投递记录。点上面“记投递”，或者把 AI 给的投递导入码导进来（我的 → 导入新内容）。</p>` + jobIvsHTML();
   const chips = `<div class="chips job-filter">${[["all", "全部", apps.length], ...JOB_GROUPS.map(([k, l]) => [k, l, (g[k] || []).length])].filter(x => x[0] === "all" || x[2]).map(([k, l, n]) => `<button class="chip${f === k ? " on" : ""}" data-act="job-f" data-v="${k}" aria-pressed="${f === k}">${l} ${n}</button>`).join("")}</div>`;
   const lists = JOB_GROUPS.filter(([k]) => (g[k] || []).length && (f === "all" || f === k)).map(([k, l]) => { const def = f === k || !(["stale", "ended"].includes(k) && g[k].length > 3);
     return jobFoldHead("g:" + k, `${l} ${g[k].length}${k === "stale" ? `<span class="job-sec-note">投了 4 周以上还没动静</span>` : ""}`, def) + (jobFoldOpen("g:" + k, def) ? `<div class="list">${g[k].slice().sort(jobSortIn(k)).map(jobAppRowHTML).join("")}</div>` : ""); }).join("");
@@ -17543,7 +17572,7 @@ function jobAppsToolsHTML(){
   return `<div class="row-gap" style="margin-top:12px"><button class="btn sm" data-act="job-export">导出给状态文件</button><button class="btn sm" data-act="job-jd-ai">统计 JD 高频要求</button></div>
     <p class="small muted" style="margin-top:6px">统计高频要求要用 JD 原文：在投递里存够 3 份（现在 ${nJD} 份），一起发给 AI。</p>`;
 }
-ACT["job-new"] = () => UI.nav("japp", {});
+ACT["job-new"] = () => UI.nav("jbulk");   /* v1.72.0：记一份、记好几份都在“记投递”里 */
 VIEWS.japp = {
   tab:"iv", noRefresh:true,
   render(p){
@@ -17763,7 +17792,7 @@ function jobDebSave(id){
   if (a && x.result === "fail" && ["applied", "screen", "interview"].includes(a.st)) jobSetStatus(a, "failed", "面试复盘");
   else if (a && ["draft", "applied"].includes(a.st)) jobSetStatus(a, x.round === "screen" ? "screen" : "interview", "面试复盘");
   else if (a && a.st === "screen" && x.round !== "screen") jobSetStatus(a, "interview", "面试复盘");
-  save(); return x;
+  save(); if (typeof planAutoDone === "function") planAutoDone("jdeb"); return x;
 }
 ACT["jdeb-save"] = el => { const x = jobDebSave(el.dataset.id); if (!x) return; toast(x.grew && !el.dataset.id ? "保存好了，成长页记了一次真实的面试" : "保存好了"); UI.back(); };
 ACT["jdeb-ai"] = async el => { const x = jobDebSave(el.dataset.id); if (!x) return; await sendToClaude(jobDebText(x)); x.sent = Date.now(); save(); };
@@ -17878,6 +17907,7 @@ VIEWS.jknow = {
     const n = st.ids.length;
     if (st.i >= n){
       const j = JB(); j.knowSec = j.knowSec || {}; j.knowSec[today()] = (+j.knowSec[today()] || 0) + Math.round((Date.now() - st.t0) / 1000); st.t0 = Date.now(); save();
+      if (!st.planDone && typeof planAutoDone === "function"){ st.planDone = true; planAutoDone("jk"); }
       const cards = jobKnowCards(), m = cards.filter(jobKnowMastered).length, left = jobKnowQueue().length;
       return `<div class="wrap">${backBtn()}<h2>${esc(st.title)}：完成了</h2>
         <div class="statgrid"><div class="stat"><span class="num">${st.res.good}</span><span>想起来了</span></div><div class="stat"><span class="num">${st.res.hard}</span><span>想起一部分</span></div><div class="stat"><span class="num">${st.res.again}</span><span>没想起来</span></div></div>
@@ -17929,7 +17959,7 @@ function jobFollowHTML(){
   return `<section class="panel job-fu"><div class="job-row"><b>该跟进的 ${list.length} 件</b><span class="small muted">下一步日期到了</span></div>
     ${list.slice(0, 4).map(a => `<div class="job-fu-row"><button class="linkbtn" data-act="nav" data-v="japp" data-id="${a.id}">${esc(a.co)}</button><span class="small">${esc(a.next || "跟进一下")}${a.nextD < d ? `<span class="muted">（${a.nextD.slice(5).replace("-", "/")}）</span>` : ""}</span><button class="btn sm" data-act="job-fu-done" data-id="${a.id}">做完了</button></div>`).join("")}</section>`;
 }
-ACT["job-fu-done"] = el => { const a = jobApp(el.dataset.id); if (!a) return; a.hist = a.hist || []; a.hist.push({d:today(), st:a.st, note:"跟进：" + (a.next || "做完了")}); a.next = ""; a.nextD = ""; save(); toast("记下了"); UI.render(); };
+ACT["job-fu-done"] = el => { const a = jobApp(el.dataset.id); if (!a) return; a.hist = a.hist || []; a.hist.push({d:today(), st:a.st, note:"跟进：" + (a.next || "做完了")}); a.next = ""; a.nextD = ""; save(); if (typeof planAutoDone === "function") planAutoDone("jfollow"); toast("记下了"); UI.render(); };
 /* 一次记好几份：自己一行一份快速记（按职位名猜方向），或者把乱贴的内容发给 AI，让它整理成导入码 */
 function jobBulkParse(text){
   const out = [];
@@ -17946,21 +17976,100 @@ function jobBulkParse(text){
   }
   return out;
 }
+/* v1.72.0：记投递——一份或好几份都在这里记（原来的“记一份投递”和“一次记好几份”合成了一个页面）。
+   每一条的格式和“记一份投递”一样，标题上的箭头收起或展开，收起时露出公司和职位；底下“添加一条”，最后点“确认”一起记下。
+   草稿存在本机（L.jobDraft），没点确认就离开也不会丢。下面折起来两个更快的办法：一行一份快速记、发给 AI 整理 */
+function jrecBlank(prev){ return {k:jobRid(), open:true, co:"", role:"", track:"", trackNew:"", tier:"", d:(prev && prev.d) || today(), st:"applied", ch:(prev && prev.ch) || "web", src:(prev && prev.src) || "", res:"", visa:"", ind:"", next:"", nextD:"", note:"", jd:""}; }
+function jrecDraft(){ if (!L.jobDraft || !Array.isArray(L.jobDraft.items)) L.jobDraft = {items:[]}; if (!L.jobDraft.items.length) L.jobDraft.items.push(jrecBlank()); return L.jobDraft; }
+const jrecEmpty = it => !["co", "role", "note", "jd", "src", "res", "visa", "ind", "next"].some(k => String(it[k] || "").trim()) && !it.tier && !it.track;
+function jrecSync(){ const dr = jrecDraft(); document.querySelectorAll(".jrec-item").forEach(el => { const it = dr.items[+el.dataset.i]; if (!it) return; el.querySelectorAll("[data-f]").forEach(inp => { it[inp.dataset.f] = inp.value; }); }); saveLocal(); return dr; }
+function jrecSub(it){ return [it.role || "职位没写", it.track && it.track !== "__new" ? JOB_TL[it.track] : it.trackNew || "", it.tier ? it.tier + " 档" : ""].filter(Boolean).join("　"); }
+function jrecItemHTML(it, i, n){
+  const open = !!it.open;
+  const sel = (f, opts, v) => `<select data-f="${f}"${f === "track" ? ' data-chg="jrec-track"' : ' data-chg="jrec-head"'}>${opts.map(([k, l]) => `<option value="${esc(k)}"${k === (v || "") ? " selected" : ""}>${esc(l)}</option>`).join("")}</select>`;
+  const inp = (f, v, ph, type) => `<input type="${type || "text"}" data-f="${f}" data-chg="jrec-head" value="${esc(v || "")}"${ph ? ` placeholder="${esc(ph)}"` : ""}>`;
+  const head = `<div class="jrec-head"><button class="jrec-tog" data-act="jrec-tog" data-i="${i}" aria-expanded="${open}"><span class="jrec-t"><b class="jrec-co">${esc(it.co || "新的一份")}</b><span class="jrec-sub">${esc(jrecSub(it))}</span></span><span class="job-chev${open ? " open" : ""}" aria-hidden="true">${ICON.chev}</span></button>${n > 1 ? `<button class="jrec-del" data-act="jrec-del" data-i="${i}" aria-label="删掉这一条">×</button>` : ""}</div>`;
+  if (!open) return `<div class="panel jrec-item" data-i="${i}">${head}</div>`;
+  const more = ["src", "res", "visa", "next", "nextD", "note", "jd"].some(k => String(it[k] || "").trim());
+  return `<div class="panel jrec-item open" data-i="${i}">${head}
+    <label class="fld"><span>公司</span>${inp("co", it.co, "比如：Acme Robotics")}</label>
+    <label class="fld"><span>职位</span>${inp("role", it.role)}</label>
+    <div class="job-2col"><label class="fld"><span>方向</span>${sel("track", [["", "没定"], ...jobTracks(), ["__new", "+ 新方向…"]], it.track)}</label><label class="fld"><span>档位</span>${sel("tier", JOB_TIERS, it.tier)}</label></div>
+    <label class="fld jrec-trknew${it.track === "__new" ? "" : " hide"}"><span>新方向叫什么</span>${inp("trackNew", it.trackNew, "比如：机器人、生物医学")}</label>
+    <div class="job-2col"><label class="fld"><span>投递日期</span>${inp("d", it.d, "", "date")}</label><label class="fld"><span>状态</span>${sel("st", JOB_ST, it.st)}</label></div>
+    <div class="job-2col"><label class="fld"><span>渠道</span>${sel("ch", JOB_CH, it.ch || "web")}</label><label class="fld"><span>行业（可选）</span>${inp("ind", it.ind, "比如：半导体")}</label></div>
+    <details class="jrec-more"${more ? " open" : ""}><summary class="small">更多：平台、简历版本、签证、下一步、备注、JD</summary>
+      <label class="fld"><span>平台、来源</span>${inp("src", it.src, "比如：Workday、内推、招聘会")}</label>
+      <label class="fld"><span>用的简历版本</span>${inp("res", it.res, "A 档的定制版写名字；B、C 档不用填")}</label>
+      <label class="fld"><span>签证信息（需要担保的话）</span>${inp("visa", it.visa, "原帖怎么写、有没有 H-1B 记录、E-Verify")}</label>
+      <div class="job-2col"><label class="fld"><span>下一步</span>${inp("next", it.next, "比如：周五前回复")}</label><label class="fld"><span>日期</span>${inp("nextD", it.nextD, "", "date")}</label></div>
+      <label class="fld"><span>备注</span><textarea data-f="note" rows="2">${esc(it.note || "")}</textarea></label>
+      <label class="fld"><span>JD 原文（可选，统计高频要求时用）</span><textarea data-f="jd" rows="4">${esc(it.jd || "")}</textarea></label></details></div>`;
+}
 VIEWS.jbulk = {
   tab:"iv", noRefresh:true,
   render(){
-    const m = L.jbMode === "ai" ? "ai" : "quick";
-    const head = `<div class="wrap">${backBtn()}<h2>一次记好几份</h2><p class="small muted" style="margin:4px 0 12px">投了一天累了，就用这里：自己一行写一份，或者把乱贴的内容交给 AI 整理。</p>
-      <div class="seg"><button data-act="jb-mode" data-v="quick" aria-pressed="${m === "quick"}">自己快速记</button><button data-act="jb-mode" data-v="ai" aria-pressed="${m === "ai"}">发给 AI 整理</button></div>`;
-    if (m === "ai") return head + `<div class="panel"><label class="fld" style="margin-top:0"><span>把今天投的职位随便贴进来：职位页面复制的文字、链接、自己的备注都行</span><textarea id="jbAI" rows="9" placeholder="比如：\nAcme Robotics, Test Engineer，内推，地点 Boston\nhttps://jobs.example.com/12345\n还有一个 Formless 的机械岗"></textarea></label>
-      <label class="fld"><span>投递日期</span><input type="date" id="jbAID" value="${today()}"></label>
-      <button class="btn primary block" style="margin-top:12px" data-act="jb-ai">复制给 AI，让它整理成导入码</button>
-      <p class="small muted" style="margin-top:8px">AI 回复以后，把它给的导入码贴进导入页：<button class="linkbtn small" data-act="imp-open">打开导入页</button></p></div></div>`;
-    return head + `<div class="panel"><label class="fld" style="margin-top:0"><span>一行一份：公司 | 职位（后面可以再加 | 方向 | 档位）</span><textarea id="jbText" rows="7" data-chg="jb-prev" placeholder="Acme Robotics | Test Engineer\nBeta Motion | Controls Engineer I\nGamma Labs, Mechanical Engineer"></textarea></label>
-      <div class="job-2col"><label class="fld"><span>投递日期</span><input type="date" id="jbD" value="${today()}"></label><label class="fld"><span>渠道</span><select id="jbCh">${JOB_CH.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label></div>
-      <label class="fld"><span>档位（行里没写的都按这个）</span><select id="jbTier">${JOB_TIERS.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label>
-      <button class="btn sm" style="margin-top:10px" data-act="jb-prev">看看会记成什么样</button><div id="jbOut" style="margin-top:10px"></div></div></div>`;
+    const dr = jrecDraft(), n = dr.items.length, filled = dr.items.filter(it => !jrecEmpty(it)).length;
+    return `<div class="wrap">${backBtn()}<h2>记投递</h2><p class="small muted" style="margin:4px 0 12px">一份或好几份都在这里记：点每一条标题上的箭头收起或展开。没点确认就离开，草稿也会留着。</p>
+      <div id="jrecList">${dr.items.map((it, i) => jrecItemHTML(it, i, n)).join("")}</div>
+      <button class="btn block" style="margin-top:10px" data-act="jrec-add">＋ 添加一条</button>
+      <button class="btn primary block big" style="margin-top:12px" data-act="jrec-save">确认，记下 ${Math.max(filled, 1)} 份</button>
+      ${filled ? `<p style="text-align:center;margin-top:8px"><button class="linkbtn small" data-act="jrec-clear">清空草稿</button></p>` : ""}
+      <div class="sec-title" style="margin-top:22px">更快的办法</div>
+      <details class="panel" id="jbQuick"${L.jbMode === "quick" ? " open" : ""}><summary><b>一行一份快速记</b></summary>
+        <label class="fld"><span>一行一份：公司 | 职位（后面可以再加 | 方向 | 档位）</span><textarea id="jbText" rows="5" data-chg="jb-prev" placeholder="Acme Robotics | Test Engineer&#10;Beta Motion | Controls Engineer I | B&#10;Gamma Labs, Mechanical Engineer"></textarea></label>
+        <div class="job-2col"><label class="fld"><span>投递日期</span><input type="date" id="jbD" value="${today()}"></label><label class="fld"><span>渠道</span><select id="jbCh">${JOB_CH.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label></div>
+        <label class="fld"><span>档位（行里没写的都按这个）</span><select id="jbTier">${JOB_TIERS.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select></label>
+        <div class="row-gap" style="margin-top:10px"><button class="btn sm" data-act="jb-toitems">放进上面的列表，再改</button><button class="btn sm" data-act="jb-prev">直接记下</button></div>
+        <div id="jbOut" style="margin-top:10px"></div></details>
+      <details class="panel" id="jbAIBox"${L.jbMode === "ai" ? " open" : ""}><summary><b>内容太乱：发给 AI 整理</b></summary>
+        <label class="fld"><span>把投的职位随便贴进来：职位页面复制的文字、链接、自己的备注都行</span><textarea id="jbAI" rows="6" placeholder="比如：&#10;Acme Robotics, Test Engineer，内推，地点 Boston&#10;https://jobs.example.com/12345"></textarea></label>
+        <label class="fld"><span>投递日期</span><input type="date" id="jbAID" value="${today()}"></label>
+        <button class="btn primary block" style="margin-top:12px" data-act="jb-ai">复制给 AI，让它整理成导入码</button>
+        <p class="small muted" style="margin-top:8px">AI 回复以后，把它给的导入码贴进导入页：<button class="linkbtn small" data-act="imp-open">打开导入页</button></p></details></div>`;
   }
+};
+CHG["jrec-track"] = el => { const box = el.closest(".jrec-item"); const f = box && box.querySelector(".jrec-trknew"); if (f) f.classList.toggle("hide", el.value !== "__new"); CHG["jrec-head"](el); };
+CHG["jrec-head"] = el => { const dr = jrecSync(), box = el.closest(".jrec-item"); if (!box) return; const it = dr.items[+box.dataset.i]; if (!it) return;
+  const b = box.querySelector(".jrec-co"), s = box.querySelector(".jrec-sub"); if (b) b.textContent = String(it.co || "").trim() || "新的一份"; if (s) s.textContent = jrecSub(it);
+  const btn = $('[data-act="jrec-save"]'); if (btn) btn.textContent = `确认，记下 ${Math.max(dr.items.filter(x => !jrecEmpty(x)).length, 1)} 份`; };
+ACT["jrec-tog"] = el => { const dr = jrecSync(), it = dr.items[+el.dataset.i]; if (!it) return; it.open = !it.open; saveLocal(); UI.render(); };
+ACT["jrec-del"] = async el => { const dr = jrecSync(), i = +el.dataset.i, it = dr.items[i]; if (!it) return;
+  if (!jrecEmpty(it) && !await sheet("删掉这一条？", `${it.co || "新的一份"}${it.role ? "，" + it.role : ""}`, "删掉", true)) return;
+  dr.items.splice(i, 1); saveLocal(); UI.render(); };
+ACT["jrec-add"] = () => { const dr = jrecSync(), last = dr.items[dr.items.length - 1];
+  dr.items.forEach(it => { if (!jrecEmpty(it)) it.open = false; }); dr.items.push(jrecBlank(last)); saveLocal(); UI.render();
+  setTimeout(() => { const els = document.querySelectorAll(".jrec-item"), t = els[els.length - 1]; if (t && t.scrollIntoView) t.scrollIntoView({behavior:"smooth", block:"start"}); const c = t && t.querySelector('[data-f="co"]'); if (c) c.focus({preventScroll:true}); }, 60); };
+ACT["jrec-clear"] = async () => { if (!await sheet("清空草稿？", "还没确认的这些条目都会删掉。", "清空", true)) return; L.jobDraft = {items:[]}; saveLocal(); UI.render(); };
+ACT["jrec-save"] = () => {
+  const dr = jrecSync(), items = dr.items.filter(it => !jrecEmpty(it));
+  if (!items.length){ toast("先写一份：至少写公司名"); return; }
+  const at = f => dr.items.findIndex(it => !jrecEmpty(it) && f(it));
+  const noCo = at(it => !String(it.co || "").trim()); if (noCo >= 0){ dr.items[noCo].open = true; saveLocal(); UI.render(); toast(`第 ${noCo + 1} 条还没写公司`); return; }
+  const noTr = at(it => it.track === "__new" && !String(it.trackNew || "").trim()); if (noTr >= 0){ dr.items[noTr].open = true; saveLocal(); UI.render(); toast(`第 ${noTr + 1} 条选了新方向，写一下叫什么`); return; }
+  let added = 0, dup = 0, todayN = 0;
+  for (const it of items){
+    const base = {co:String(it.co).trim().slice(0, 60), role:String(it.role || "").trim().slice(0, 120)};
+    if (jobFindApp(base)){ dup++; continue; }
+    const track = it.track === "__new" ? jobTrackByName(it.trackNew, true) : (it.track || ""), st = it.st || "applied", d = it.d || "";
+    const a = Object.assign({id:"a" + jobRid(), d, dApprox:false, st, hist:[{d:today(), st, note:"记投递"}], ts:Date.now()}, base,
+      {track, tier:it.tier || "", ch:it.ch || "web", src:String(it.src || "").trim(), res:String(it.res || "").trim(), visa:String(it.visa || "").trim(), ind:String(it.ind || "").trim(), next:String(it.next || "").trim(), nextD:it.nextD || "", note:String(it.note || "").trim(), jd:String(it.jd || "").slice(0, 8000)});
+    if (["screen", "interview", "offer", "failed"].includes(st)) a.ivEver = true;
+    JB().apps.push(a); added++; if (jobSent(a) && d === today()) todayN++;
+  }
+  let msg = added ? `记好了 ${added} 份` : "都已经记过了";
+  if (dup && added) msg += `（${dup} 份以前记过，跳过了）`;
+  if (todayN){ const g = jobLogGrow("apply", todayN); msg += g === todayN ? "，成长页也记了" : g ? `，成长页补记了 ${g} 份` : "（成长页已经记过数，不重复加）"; }
+  if (added && typeof planAutoDone === "function") planAutoDone("jrec");
+  L.jobDraft = {items:[]}; L.jobSeg = "apps"; saveLocal(); save(); toast(msg); UI.back();
+};
+/* 快速记的几行，放进上面的列表里，可以一条条点开改，最后一起确认 */
+ACT["jb-toitems"] = () => {
+  const rows = jobBulkParse(($("#jbText") || {}).value); if (!rows.length){ toast("先写几行"); return; }
+  const dr = jrecSync(), d = ($("#jbD") || {}).value || today(), ch = ($("#jbCh") || {}).value || "web", gTier = ($("#jbTier") || {}).value || "";
+  dr.items = dr.items.filter(it => !jrecEmpty(it)); dr.items.forEach(it => { it.open = false; });
+  for (const r of rows) dr.items.push(Object.assign(jrecBlank(), {open:false, co:r.co, role:r.role, track:r.trackNew ? "__new" : r.track, trackNew:r.trackNew || "", tier:r.tier || gTier, d, ch}));
+  saveLocal(); UI.render(); toast(`放进去了 ${rows.length} 条：点开可以改，最后点确认`); window.scrollTo(0, 0);
 };
 ACT["jb-mode"] = el => { L.jbMode = el.dataset.v; saveLocal(); UI.render(); };
 function jbPrevHTML(rows){
@@ -18095,6 +18204,26 @@ function J_TIER_NOTE(){
   return `<p class="small muted" style="margin-top:6px">${tagged ? "" : "还没有标档位的投递。"}A 档本来就是更对口、更想去的，所以 A 档回音多，不一定都是定制的功劳；面试攒到十来次以后再看各档的差别。</p>`;
 }
 
+function jobFindAppLoose(a){
+  const c = jobNorm(a.co), r = jobNorm(a.role); if (!c) return null;
+  const sameCo = x => { const xc = jobNorm(x.co); return !!xc && (xc === c || (Math.min(xc.length, c.length) >= 3 && (xc.startsWith(c) || c.startsWith(xc)))); };
+  const cands = JB().apps.filter(x => sameCo(x) && (jobNorm(x.role) === r || !jobNorm(x.role)));
+  return cands.length === 1 ? cands[0] : null;
+}
+/* ---------- v1.72.0：推荐计划里的求职项（排在 battle.js 的“生成推荐计划”里，点了从这里打开） ---------- */
+if (typeof PLAN_ACTS !== "undefined") PLAN_ACTS.push(["jobiv", "今天的面试练习"], ["jobiv5", "面试练习 5 分钟"], ["jk", "知识复习"], ["jrec", "记投递"], ["jfollow", "看看该跟进的投递"], ["j72", "面试前 72 小时清单"], ["jdeb", "写面试复盘"]);
+{ const pg0 = ACT["plan-go"]; ACT["plan-go"] = el => { const a = (el && el.dataset && el.dataset.v) || "";
+    if (a === "jobiv") return jobRun(jobBudget()); if (a === "jobiv5") return jobRun(300, "面试练习 5 分钟");
+    if (a === "jk") return ACT["jk-go"](); if (a === "jrec") return UI.nav("jbulk"); if (a === "jdeb") return UI.nav("jdeb");
+    if (a === "jfollow" || a === "j72"){ L.jobSeg = a === "jfollow" ? "apps" : "today"; saveLocal(); return UI.tab ? UI.tab("iv") : UI.nav("iv"); }
+    return pg0(el); }; }
+/* 排计划时问每天多少时间：先告诉你过去两周实际练了多少（按实际做得到的选，比按理想选更容易坚持） */
+function plPast(){
+  const tn = dnum(today()); let tot = 0, n = 0;
+  for (let i = 1; i <= 14; i++){ const d = nstr(tn - i), sec = (+((S.days || {})[d] || {}).sec || 0) + (+((S.job || {}).ivSec || {})[d] || 0) + (+((S.job || {}).knowSec || {})[d] || 0); if (sec > 60){ tot += sec; n++; } }
+  return n ? `过去两周你练了 ${n} 天，那几天平均每天约 ${Math.round(tot / n / 60)} 分钟。按实际做得到的选，比按理想选更容易坚持。<br>` : "";
+}
+
 /* 脱口 · 界面语言（v1.71.0）：我的 → 界面语言选 English 时，把界面上固定的文字换成英文。
    练习内容（题目、卡片、参考回答、中文意思、讲解）一律不动：只换词典里有的整句（数字可以变），对不上的保持中文。
    做法：页面画出来以后（MutationObserver 看到新节点）逐个文本节点查词典；切回中文时把换过的还原，再重画一次。
@@ -18204,6 +18333,16 @@ Object.assign(I18N_EN, {
   "{n} 档": "Tier {n}",
   "A 档本来就是更对口、更想去的，所以 A 档回音多，不一定都是定制的功劳；面试攒到十来次以后再看各档的差别。": "A-tier jobs are the best fits to begin with, so more replies there aren't all thanks to tailoring. Compare tiers after about ten interviews.",
   "还没有标档位的投递。A 档本来就是更对口、更想去的，所以 A 档回音多，不一定都是定制的功劳；面试攒到十来次以后再看各档的差别。": "No applications have a tier yet. A-tier jobs are the best fits to begin with, so more replies there aren't all thanks to tailoring. Compare tiers after about ten interviews."
+});
+/* v1.72.0：记投递、推荐计划 */
+Object.assign(I18N_EN, {
+  "一份或好几份都在这里记：点每一条标题上的箭头收起或展开。没点确认就离开，草稿也会留着。": "Log one or several here. Tap the arrow on each to collapse or expand. If you leave before confirming, the draft stays.",
+  "新的一份": "New application", "＋ 添加一条": "+ Add another", "确认，记下 {n} 份": "Confirm: save {n}", "清空草稿": "Clear draft", "更快的办法": "Faster ways",
+  "一行一份快速记": "Quick: one per line", "放进上面的列表，再改": "Add to the list above", "直接记下": "Save directly", "内容太乱：发给 AI 整理": "Messy notes? Let AI tidy them",
+  "更多：平台、简历版本、签证、下一步、备注、JD": "More: platform, resume version, visa, next step, notes, JD", "A 档的定制版写名字；B、C 档不用填": "Name the tailored version for A-tier; skip for B and C",
+  "删掉这一条": "Remove this one", "删掉这一条？": "Remove this one?", "删掉": "Remove", "清空草稿？": "Clear the draft?", "还没确认的这些条目都会删掉。": "Unconfirmed entries will be removed.", "清空": "Clear",
+  "求职：面试练习、知识复习、投递": "Job search: interview practice, knowledge review, applications", "面试（只排练习）": "Interviews (practice only)",
+  "今天的面试练习": "Today's interview practice", "面试练习 5 分钟": "Interview practice, 5 min", "知识复习": "Knowledge review", "看看该跟进的投递": "Check follow-ups", "面试前 72 小时清单": "72-hour checklist", "写面试复盘": "Write a debrief"
 });
 const I18N_MON = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], I18N_WK = {一:"Mon", 二:"Tue", 三:"Wed", 四:"Thu", 五:"Fri", 六:"Sat", 日:"Sun"};
 const I18N_ROUND = {电话初筛:"phone screen", 招聘经理:"hiring manager", 技术面:"technical", 现场面:"on-site", 其他:"other"};
