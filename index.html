@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#16202B">
-<title>脱口</title>
+<title>只因</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -1095,11 +1095,11 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.72.3"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.73.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
-/* 脱口 · 内置内容（通用版）。个人练习在“我的定制内容”导入文件里。
+/* 只因 · 内置内容（通用版）。个人练习在“我的定制内容”导入文件里。
    注意：id 一经发布就不要改（进度按 id 记录），新内容只能追加。 */
 
 // 反射卡：[id, 类型, 中文, 英文（多个答案用 // 分隔）, 提示]
@@ -2038,7 +2038,7 @@ const MIGRATE = {"r012": "cxa46ti", "r034": "cwp070x", "r035": "cgebluz", "r036"
 const CONTENT = {MIGRATE, R_CARDS, T_CARDS, F_CARDS, E_CARDS, L_CARDS, QUESTIONS, CALL, JOURNAL_PROMPTS, TIPS, ALT_EXTRA, D_CARDS, DL_CARDS, DIALOGS, REF, CHUNKS};
 
 
-/* 脱口 · 核心逻辑（不碰 DOM，可在 Node 里测试） */
+/* 只因 · 核心逻辑（不碰 DOM，可在 Node 里测试） */
 "use strict";
 
 const TAGS = {
@@ -3039,7 +3039,7 @@ function growArea(x){
 }
 /* 一周从周一开始（按 app 自己的“今天”，也就是一天从几点开始算之后的日期） */
 function growWeekStart(d){ const n = dnum(d); const dow = new Date(n * 86400000).getUTCDay(); return nstr(n - ((dow + 6) % 7)); }
-/* 英语经验值：在脱口里练习，每 2 分钟 1 点，每天最多 cap（默认 15） */
+/* 英语经验值：在只因里练习，每 2 分钟 1 点，每天最多 cap（默认 15） */
 function growEnXP(sec, cap){ return Math.min(cap == null ? 15 : cap, Math.floor((sec || 0) / 120)); }
 /* 角色等级：第 n 级要累计 50 × n × (n − 1)：第 2 级 100，第 3 级 300，第 4 级 600……每升一级多要 100 */
 function growLevel(total){
@@ -3067,7 +3067,7 @@ function growWeekSum(log, days, wk, cap){
 }
 Object.assign(CORE, {growArea, growWeekStart, growEnXP, growLevel, growSkillLevel, growSuggest, growWeekSum});
 
-/* 脱口 · 基础设施：存储、语音、录音、云同步、AI 批改、导航 */
+/* 只因 · 基础设施：存储、语音、录音、云同步、AI 批改、导航 */
 "use strict";
 const BUILD = window.__BUILD__ || {pwa:false, version:"1.0"};
 const K = CORE;
@@ -3307,7 +3307,7 @@ const TTS = {
       u.onend = () => { this.miss = 0; fin(true); }; u.onerror = () => fin(false);
       this.keep.add(u);
       const est = 1500 + text.length * (lang === "zh" ? 260 : 85) / u.rate;
-      const tm = setTimeout(() => { if (!started){ this.miss = (this.miss || 0) + 1; if (this.miss >= 2 && !this.warned){ this.warned = true; toast("手机的朗读好像卡住了：先把脱口彻底关掉再打开；还没声音就重启一下手机", 8000); } } fin(true); }, est + 4000);
+      const tm = setTimeout(() => { if (!started){ this.miss = (this.miss || 0) + 1; if (this.miss >= 2 && !this.warned){ this.warned = true; toast("手机的朗读好像卡住了：先把只因彻底关掉再打开；还没声音就重启一下手机", 8000); } } fin(true); }, est + 4000);
       setTimeout(() => { try { speechSynthesis.speak(u); } catch (e) { fin(false); } }, 60);
     });
   }
@@ -3875,7 +3875,7 @@ async function sendToClaude(text){
   toast("复制没成功，长按文字手动复制");
 }
 function claudePrompt(kind, text, extra){
-  return `请帮我看看这段英文（${kind}）。只标出错误、给提示，不要直接改写；我自己改完再给我参考改法。${extra ? "\n" + extra : ""}\n最后，把值得反复练的句子做成脱口的导入码（格式：卡 | 中文 | 英文 | 类型 | 提示），我导回 app 复习。\n\n${text}`;
+  return `请帮我看看这段英文（${kind}）。只标出错误、给提示，不要直接改写；我自己改完再给我参考改法。${extra ? "\n" + extra : ""}\n最后，把值得反复练的句子做成只因的导入码（格式：卡 | 中文 | 英文 | 类型 | 提示），我导回 app 复习。\n\n${text}`;
 }
 async function saveFile(name, text){
   if (AI.dl){ try { await AI.dl.save({filename:name, data:text}); return true; } catch (e) { if (e && e.code === "declined") return false; } }
@@ -3921,7 +3921,7 @@ const ICON = {
   chat:SV('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/>')
 };
 
-/* 脱口 · 导航、首页、练习流程 */
+/* 只因 · 导航、首页、练习流程 */
 "use strict";
 const VIEWS = {};
 const ACT = {};
@@ -4058,7 +4058,7 @@ VIEWS.home = {
     const seg = [["quick","3 分钟"],["std","10 分钟"],["deep","20 分钟"]].map(([k,l]) => `<button data-act="goal" data-v="${k}" aria-pressed="${g===k}">${l}</button>`).join("");
     const mod = (v, icon, t, d) => `<button class="mod" data-act="nav" data-v="${v}">${ICON[icon]}<b>${t}</b><span>${d}</span></button>`;
     return `<div class="wrap">
-      <div class="top"><div class="wordmark">脱口</div><div class="top-end"><div class="streak"><span class="num">${st.streak}</span><span class="lbl">天<br>连续</span></div><button class="icon-btn" data-act="imp-open" aria-label="导入新内容">${ICON.imp}</button><button class="icon-btn" data-act="nav" data-v="progress" aria-label="进度">${ICON.chart}</button></div></div>
+      <div class="top"><div class="wordmark">只因</div><div class="top-end"><div class="streak"><span class="num">${st.streak}</span><span class="lbl">天<br>连续</span></div><button class="icon-btn" data-act="imp-open" aria-label="导入新内容">${ICON.imp}</button><button class="icon-btn" data-act="nav" data-v="progress" aria-label="进度">${ICON.chart}</button></div></div>
       ${installBanner()}${typeof asrResumeBanner === "function" ? asrResumeBanner() : ""}${typeof micBanner === "function" ? micBanner() : ""}${resumeBanner()}${typeof nextIvBanner === "function" ? nextIvBanner() : ""}${STORAGE_OK ? "" : `<div class="banner"><span>存储空间不够，进度没存上。先备份，再清理旧录音。</span><button class="btn sm primary" data-act="nav" data-v="storage">去看看</button></div>`}${typeof ttsBanner === "function" ? ttsBanner() : ""}${typeof backupBanner === "function" ? backupBanner() : ""}${typeof pendingBanner === "function" ? pendingBanner() : ""}
       <section class="hero">
         <div class="gantry" id="homeLights">${lamps()}</div>
@@ -4758,7 +4758,7 @@ ACT["c-drill-done"] = () => {
 };
 ACT["c-leech-claude"] = () => {
   const s = RUN.stage; if (!(s instanceof CardStage)) return; const c = s.card;
-  sendToClaude(`这句英文我总是记不住：${c.en}（${c.zh || c.wrong || ""}）。请帮我想一个更短或更好记的说法，或者拆成两句，再给我脱口的导入码（格式：卡 | 中文 | 英文 | 类型 | 提示）。`);
+  sendToClaude(`这句英文我总是记不住：${c.en}（${c.zh || c.wrong || ""}）。请帮我想一个更短或更好记的说法，或者拆成两句，再给我只因的导入码（格式：卡 | 中文 | 英文 | 类型 | 提示）。`);
 };
 /* 我的说法也对：把你的说法加进这张卡的正确答案 */
 ACT["c-mine"] = async () => {
@@ -5047,7 +5047,7 @@ function showSummary(){
 }
 ACT["again-session"] = () => startSession(["free","listen","solo"].includes(RUN.kind) ? "std" : RUN.kind, null, null, true);
 
-/* 脱口 · 来电模拟、耳机模式、日记、写作、面试、进度、设置、导入、备份、检测、引导、启动 */
+/* 只因 · 来电模拟、耳机模式、日记、写作、面试、进度、设置、导入、备份、检测、引导、启动 */
 "use strict";
 const CHG = {};
 document.addEventListener("change", e => { const el = e.target.closest("[data-chg]"); if (!el) return; const fn = CHG[el.dataset.chg]; if (fn) try { fn(el, e); } catch (err) { console.error(err); } });
@@ -5470,7 +5470,7 @@ ACT["say-chunk"] = el => TTS.speak(el.dataset.v, {rate:0.9});
 ACT["cr-claude"] = async el => {
   const rec = crRec(el.dataset.id); if (!rec) return;
   const lab = Object.fromEntries(SC_ITEMS.map(x => [x.k, x.t]));
-  const lines = [`下面是我在脱口里做的一次模拟面试（${modName(rec.mode)}，${fmtWhen(rec.ts)}）。请你：`,
+  const lines = [`下面是我在只因里做的一次模拟面试（${modName(rec.mode)}，${fmtWhen(rec.ts)}）。请你：`,
     "1. 逐题看“我说的”：指出语法错误和不自然的地方，给出更自然的说法；",
     "2. 看内容和结构（第一句有没有直接回答、有没有按 STAR），每题给一条最重要的建议；",
     "3. 最后给我导入码：要更新的回答写“答 | 题号 | 新回答”，我说错的句子写“改 | 我的原句 | 正确说法 | 类型 | 提示”。", ""];
@@ -5681,17 +5681,17 @@ function icsText(x){
   const t = planTime(x); if (!t) return ""; const t2 = new Date(t.getTime() + 30 * 60000);
   const f = dt => dt.getFullYear() + String(dt.getMonth() + 1).padStart(2, "0") + String(dt.getDate()).padStart(2, "0") + "T" + String(dt.getHours()).padStart(2, "0") + String(dt.getMinutes()).padStart(2, "0") + "00";
   const clean = s => String(s).replace(/[,;\\\n]/g, " ");
-  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//tuokou//plan//CN", "BEGIN:VEVENT", "UID:" + x.id + "@tuokou", "DTSTAMP:" + f(new Date()), "DTSTART:" + f(t), "DTEND:" + f(t2), "SUMMARY:" + clean(x.text), "DESCRIPTION:脱口的练习计划", "BEGIN:VALARM", "TRIGGER:-PT0M", "ACTION:DISPLAY", "DESCRIPTION:" + clean(x.text), "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//tuokou//plan//CN", "BEGIN:VEVENT", "UID:" + x.id + "@tuokou", "DTSTAMP:" + f(new Date()), "DTSTART:" + f(t), "DTEND:" + f(t2), "SUMMARY:" + clean(x.text), "DESCRIPTION:只因的练习计划", "BEGIN:VALARM", "TRIGGER:-PT0M", "ACTION:DISPLAY", "DESCRIPTION:" + clean(x.text), "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
 }
 function googleCalLink(x){
   const t = planTime(x); if (!t) return ""; const t2 = new Date(t.getTime() + 30 * 60000);
   const f = dt => dt.getFullYear() + String(dt.getMonth() + 1).padStart(2, "0") + String(dt.getDate()).padStart(2, "0") + "T" + String(dt.getHours()).padStart(2, "0") + String(dt.getMinutes()).padStart(2, "0") + "00";
-  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(x.text) + "&dates=" + f(t) + "/" + f(t2) + "&details=" + encodeURIComponent("脱口的练习计划");
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(x.text) + "&dates=" + f(t) + "/" + f(t2) + "&details=" + encodeURIComponent("只因的练习计划");
 }
 const IS_ANDROID = /Android/i.test(navigator.userAgent || "");
 function androidCalIntent(x){
   const t = planTime(x); if (!t) return ""; const t2 = new Date(t.getTime() + 30 * 60000);
-  return `intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;S.title=${encodeURIComponent(x.text)};S.description=${encodeURIComponent("脱口的练习计划")};l.beginTime=${t.getTime()};l.endTime=${t2.getTime()};S.browser_fallback_url=${encodeURIComponent(googleCalLink(x))};end`;
+  return `intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;S.title=${encodeURIComponent(x.text)};S.description=${encodeURIComponent("只因的练习计划")};l.beginTime=${t.getTime()};l.endTime=${t2.getTime()};S.browser_fallback_url=${encodeURIComponent(googleCalLink(x))};end`;
 }
 /* 打开外部链接（单独成函数，方便测试） */
 function goExternal(url){ if (url.startsWith("intent:")) location.href = url; else window.open(url, "_blank", "noopener"); }
@@ -5789,7 +5789,7 @@ ACT["pl-claude"] = () => {
   const d = today(); const all = (S.plan || []).slice().sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : (a.ts || 0) - (b.ts || 0));
   const todo = all.filter(x => !x.done), done = all.filter(x => x.done && dnum(d) - dnum(x.date) <= 7);
   const line = x => `计划 | ${x.date} | ${x.cue || ""} | ${x.text} | ${x.area === "career" ? "求职" : x.area === "life" ? "生活" : x.act || ""}${x.ifthen ? " | " + x.ifthen : ""}`;
-  sendToClaude(`这是我在脱口里的计划。请帮我整理：去掉重复的和已经过时的，按日期排好，“什么时候”写清楚。给我一段导入码：第一行写“计划 | 替换”，后面每项一行：计划 | 日期 | 什么时候 | 做什么 | 动作（英语练习写练习的动作，求职的写“求职”，生活的写“生活”，没有就空着）| 如果……就……（可以不写）。\n今天是 ${d}。\n\n还没做的：\n${todo.map(line).join("\n") || "（没有）"}\n\n最近做完的（只是给你参考，不用放进导入码）：\n${done.map(x => `- ${x.date} ${x.cue || ""} → ${x.text}`).join("\n") || "（没有）"}`);
+  sendToClaude(`这是我在只因里的计划。请帮我整理：去掉重复的和已经过时的，按日期排好，“什么时候”写清楚。给我一段导入码：第一行写“计划 | 替换”，后面每项一行：计划 | 日期 | 什么时候 | 做什么 | 动作（英语练习写练习的动作，求职的写“求职”，生活的写“生活”，没有就空着）| 如果……就……（可以不写）。\n今天是 ${d}。\n\n还没做的：\n${todo.map(line).join("\n") || "（没有）"}\n\n最近做完的（只是给你参考，不用放进导入码）：\n${done.map(x => `- ${x.date} ${x.cue || ""} → ${x.text}`).join("\n") || "（没有）"}`);
 };
 function callReviewHTML(){
   const st = CV.st;
@@ -6263,6 +6263,8 @@ VIEWS.me = {
         <p class="small muted" style="margin-top:6px">只换按钮、标题这些界面文字；练习内容（题目、卡片、回答、翻译）不变。 · Only the interface changes; practice content stays the same.</p></div>
       <div class="sec-title">练习</div><div class="panel">
         <label class="fld" style="margin-top:0"><span>每天最多几道新题</span><select data-chg="set" data-key="newPerDay" data-num="1">${[6,12,20].map(n => `<option value="${n}" ${s.newPerDay === n ? "selected" : ""}>${n} 道</option>`).join("")}</select></label>
+         <div class="fld"><span>智能调整新题</span><button class="btn sm${s.newSmart ? " primary" : ""}" data-act="new-smart" aria-pressed="${!!s.newSmart}">${s.newSmart ? "已开启" : "已关闭"}</button></div>
+         <p class="small muted" style="margin:4px 0 0">开启后按你最近 7 天每天练的量调：每天新题 ≈ 每天练的张数 ÷ 10，最多不超过上面设的数。每多 1 道新题，以后每天要多复习约 10 张。${s.newSmart && typeof smartNewToday === "function" ? `今天：${smartNewToday()} 道。` : ""}</p>
         <label class="fld"><span>怎么检查你说的话</span><select data-chg="set" data-key="inputMode"><option value="auto" ${s.inputMode === "auto" ? "selected" : ""}>点麦克风自动识别${!SR.ok ? "（这个浏览器不支持）" : SR.broken ? "（这台手机现在用不了）" : ""}</option><option value="keyboard" ${s.inputMode === "keyboard" ? "selected" : ""}>只用键盘语音输入或打字</option></select></label>
         <label class="fld"><span>说英语时用什么识别</span><select data-chg="set" data-key="srEngine" data-rerender="1"><option value="device" ${S.settings.srEngine !== "whisper" ? "selected" : ""}>手机自带的识别：快，但口音重时容易听错</option><option value="whisper" ${S.settings.srEngine === "whisper" ? "selected" : ""} ${ASR.supported() ? "" : "disabled"}>Whisper：更准，说完要等几秒（只在安装版里能用）</option></select></label>
         ${S.settings.srEngine === "whisper" ? `<label class="fld" style="margin-top:0"><span>Whisper 用哪个模型</span><select data-chg="asrmodel" data-rerender="1"><option value="base" ${(L.asrModel || "base") === "base" ? "selected" : ""}>快：base.en（约 80 MB）</option><option value="small" ${L.asrModel === "small" ? "selected" : ""}>准一些：small.en（约 250 MB，慢一两秒）</option></select></label>` : ""}
@@ -6289,9 +6291,9 @@ VIEWS.me = {
       <div class="sec-title">内容</div><div class="list"><button class="li" data-act="imp-open"><div class="grow"><b>导入新内容</b><span>把 AI 给的导入码贴进来，可以一次导好几个文件</span></div><span class="end">›</span></button>${liRow("custom","我导入的内容", S.custom.length + " 张卡，" + (S.customQ || []).length + " 道面试题")}${liRow("pending","问 AI", ((S.pending || []).length) + " 句说法，" + ((S.wantWords || []).length) + " 个词，" + ((S.dbAsk || []).length + (S.replyAsk || []).length) + " 条回答和回复")}${liRow("battle","对战角色","练完一轮，和昨天的你打一场；可以导入你自己的角色")}</div>
       <div class="sec-title">工具</div><div class="list">${liRow("plan","练习计划", "每天练什么、固定的练习时间" + (S.settings.planWhen ? "（" + esc(S.settings.planWhen) + "）" : ""))}${liRow("asr","录音转文字", BUILD.pwa ? "在手机上识别录音，转好了会提醒你" : "要在安装到手机上的版本里用")}${liRow("device","设备检测","朗读、识别、录音能不能用")}${liRow("install", BUILD.pwa ? "离线安装" : "离线版说明", BUILD.pwa ? "装到桌面，没网也能练" : "这个版本需要联网")}</div>
       <div class="sec-title">数据</div><div class="list">${liRow("backup","备份与恢复","换手机或清浏览器数据前先备份")}${liRow("storage","存储空间","看占了多少、清理旧录音")}</div>
-      <div class="sec-title">关于</div><div class="list">${liRow("about","关于 脱口app","怎么用、为什么这样练（可以搜）")}</div>
+      <div class="sec-title">关于</div><div class="list">${liRow("about","关于 只因","怎么用、为什么这样练（可以搜）")}</div>
       <p class="small muted" style="margin:14px 4px 0">${Cloud.on ? "进度会自动同步到你的 claude.ai 账号。" : BUILD.pwa ? "进度存在这台手机上，记得偶尔备份。" : "进度存在这个浏览器里。"}${STORAGE_OK ? "" : " 注意：这个浏览器存不了数据，关掉页面进度会丢，请先备份。"}</p>
-      <p class="small muted" style="margin:4px 4px 0">脱口 ${esc(BUILD.version)}${BUILD.pwa ? "，离线版" : ""}${BUILD.pwa ? `<button class="linkbtn small" style="margin-left:10px" data-act="sw-check">检查更新</button>` : ""}</p>
+      <p class="small muted" style="margin:4px 4px 0">只因 ${esc(BUILD.version)}${BUILD.pwa ? "，离线版" : ""}${BUILD.pwa ? `<button class="linkbtn small" style="margin-left:10px" data-act="sw-check">检查更新</button>` : ""}</p>
       <button class="btn danger block" style="margin-top:18px" data-act="reset">清空所有进度</button></div>`;
   }
 };
@@ -6515,13 +6517,13 @@ VIEWS.backup = {
   mount(){ const o = $("#bkOut"); if (o) o.value = JSON.stringify(S); }
 };
 /* v1.68.3：恢复时可以直接选备份文件（以前只能把内容整段粘贴进来，在电脑上要先用记事本打开再复制） */
-CHG["bk-pick"] = async el => { const f = el.files && el.files[0]; if (!f) return; try { const t = await f.text(); JSON.parse(t); const box = $("#bkIn"); if (box) box.value = t; toast("读好了：确认没问题就点“用这份备份覆盖”"); } catch (e) { toast("读不了这个文件：要用脱口导出的备份文件"); } el.value = ""; };
+CHG["bk-pick"] = async el => { const f = el.files && el.files[0]; if (!f) return; try { const t = await f.text(); JSON.parse(t); const box = $("#bkIn"); if (box) box.value = t; toast("读好了：确认没问题就点“用这份备份覆盖”"); } catch (e) { toast("读不了这个文件：要用只因导出的备份文件"); } el.value = ""; };
 ACT["bk-copy"] = async () => { const ok = await copyText(JSON.stringify(S)); if (ok){ L.lastBackup = Date.now(); saveLocal(); } toast(ok ? "备份已复制，存到备忘录或发给自己" : "复制没成功：长按下面的框，全选后复制"); };
 ACT["bk-file"] = async () => { if (await saveFile(`tuokou-backup-${today()}.json`, JSON.stringify(S))){ L.lastBackup = Date.now(); saveLocal(); toast("备份文件存好了，在手机的“下载”文件夹里"); } };
 ACT["bk-restore"] = async () => {
   const t = ($("#bkIn")||{}).value || ""; let o = null;
   try { o = JSON.parse(t.trim()); } catch (e) {}
-  if (!o || o.v !== 1 || !o.settings){ toast("这不是脱口的备份，检查一下是不是完整复制了"); return; }
+  if (!o || o.v !== 1 || !o.settings){ toast("这不是只因的备份，检查一下是不是完整复制了"); return; }
   if (!await sheet("用这份备份覆盖？", "这台设备上现在的进度会被替换。", "覆盖", true)) return;
   S = mergeInto(DEF(), o); rebuildCatalog(); rebuildQ(); applyTheme(); save(true); toast("恢复好了"); UI.tab("home");
 };
@@ -6619,10 +6621,10 @@ VIEWS.install = {
       <p style="margin-top:10px">换到离线版之前，先在“备份与恢复”里复制备份，装好后再恢复进去。</p></div></div>`;
   }
 };
-/* ---------- 关于 脱口app（v1.66.0）：按类别的问答，点开看解释，顶上可以搜 ---------- */
+/* ---------- 关于 只因（v1.66.0）：按类别的问答，点开看解释，顶上可以搜 ---------- */
 const ABOUT_QA = [
  ["开始使用", [
-  ["脱口是什么？", "一个练英语口语的 app：看中文，用英文说出来。它按你的记忆安排复习，记得牢的少出现，记不住的很快再来；还有游戏、对话首领战、情景对话、写作、阅读、发音这些练法。"],
+  ["只因是什么？", "一个练英语口语的 app：看中文，用英文说出来。它按你的记忆安排复习，记得牢的少出现，记不住的很快再来；还有游戏、对话首领战、情景对话、写作、阅读、发音这些练法。"],
   ["每天怎么用最好？", "首页“现在做”点“开始”，按今天的计划练；没有计划就点“练习”，10 分钟。没精神就点“只做 3 分钟”，保住连续天数。碎片时间用耳机模式，睡前说 1 分钟语音日记。"],
   ["推荐计划是怎么来的？", "“计划”页点“生成推荐计划”，选目标（面试、Coffee chat、日常聊天、写作）和每天多少分钟，app 按目标排好一周。你改过的项不会被重新生成覆盖。"],
   ["首页最上面的进度（比如 7/21）是什么？", "这一轮练习安排的总题数（今天该复习的加上新学的），7 是练到第几题。"]]],
@@ -6686,7 +6688,7 @@ const ABOUT_QA = [
 VIEWS.about = {
   tab:"me",
   render(){
-    return `<div class="wrap">${backBtn()}<h2>关于 脱口app</h2>
+    return `<div class="wrap">${backBtn()}<h2>关于 只因</h2>
       <input id="aboutQ" type="search" placeholder="搜索：比如 拿不准、大招、补练、导入码" style="width:100%;margin:10px 0 6px" autocomplete="off">
       <p class="small muted hidden" id="aboutNone">没找到，换个词试试</p>
       ${ABOUT_QA.map(([cat, items], ci) => `<details class="panel about-cat" ${ci === 0 ? "open" : ""}><summary><b>${esc(cat)}</b> <span class="small muted">${items.length}</span></summary>
@@ -6938,12 +6940,12 @@ function pendText(){
   const list = S.pending || []; if (!list.length) return "";
   const body = list.map((p, i) => `${i + 1}. 编号 ${p.cid}｜${p.zh}｜参考：${p.ref}｜` + (p.first ? `我第一遍说：${p.first}｜我第二遍说：${p.said}` : `我说：${p.said}`)).join("\n");
   const two = list.some(p => p.first) ? "有“第一遍、第二遍”的，两遍都要判断，导入码按每一遍分别写。" : "";
-  return `下面是我在脱口里说的句子，参考说法只是其中一种。请逐条判断我的说法对不对：语法、意思、自然不自然，错在哪里。${two}\n最后给我导入码：说对的写“也对 | 编号 | 我的说法”；说错的写“改 | 我的原句 | 正确说法 | 类型 | 提示”。\n\n${body}`;
+  return `下面是我在只因里说的句子，参考说法只是其中一种。请逐条判断我的说法对不对：语法、意思、自然不自然，错在哪里。${two}\n最后给我导入码：说对的写“也对 | 编号 | 我的说法”；说错的写“改 | 我的原句 | 正确说法 | 类型 | 提示”。\n\n${body}`;
 }
 function wwText(){
   const list = S.wantWords || []; if (!list.length) return "";
   const body = list.map((x, i) => `${i + 1}. ${x.w}${x.ctx ? `（我在这句话里看到的：${x.ctx}）` : ""}`).join("\n");
-  return `下面是我在脱口里想学的词和搭配。请给我做成单词卡导入码，第一行写“题库 | 单词”，然后每个一行：\n词 | 单词或搭配 | 中文意思 | 一个我面试或生活里会说的英文例句 | 例句的中文 |\n\n${body}`;
+  return `下面是我在只因里想学的词和搭配。请给我做成单词卡导入码，第一行写“题库 | 单词”，然后每个一行：\n词 | 单词或搭配 | 中文意思 | 一个我面试或生活里会说的英文例句 | 例句的中文 |\n\n${body}`;
 }
 ACT["pend-copy"] = () => { const t = pendText(); if (t) sendToClaude(t); };
 ACT["all-copy"] = () => { const parts = [pendText(), wwText(), dbaText()].filter(Boolean); if (parts.length) sendToClaude(parts.join("\n\n————————\n\n")); };
@@ -6957,7 +6959,7 @@ function ttsBanner(){
   return `<div class="banner"><span>英文朗读可能在用中文语音（会把 2024 读成“两千零二十四”）。跟着它练会学成中式发音，建议先改一下。</span><button class="btn sm primary" data-act="tts-fix">怎么改</button></div>`;
 }
 function showTtsFix(){
-  return choose("英文在用中文语音读", "跟着中文语音练英文，会学成中式发音。建议这样改：<br>① 手机设置里搜“文字转语音”（也可能叫“文本转语音输出”）。<br>② “首选引擎”选“Google 语音服务”。没有的话，到应用商店装“Speech Services by Google”。<br>③ 点它旁边的齿轮 → 安装语音数据 → 英语（美国），下载好。<br>④ 回到脱口：我的 → 朗读 → 英文语音，选 English (United States)，再点“检查英文朗读”。", [["ok", "知道了"]]);
+  return choose("英文在用中文语音读", "跟着中文语音练英文，会学成中式发音。建议这样改：<br>① 手机设置里搜“文字转语音”（也可能叫“文本转语音输出”）。<br>② “首选引擎”选“Google 语音服务”。没有的话，到应用商店装“Speech Services by Google”。<br>③ 点它旁边的齿轮 → 安装语音数据 → 英语（美国），下载好。<br>④ 回到只因：我的 → 朗读 → 英文语音，选 English (United States)，再点“检查英文朗读”。", [["ok", "知道了"]]);
 }
 ACT["tts-fix"] = () => showTtsFix();
 ACT["tts-check"] = async () => {
@@ -7138,7 +7140,7 @@ VIEWS.plan = {
       <p class="muted small" style="margin:6px 0 14px">写成“如果……就……”的计划，比只说“我要每天练”更容易坚持。选一个你每天一定会碰到的时刻。</p>
       <div class="panel"><div class="small muted">如果……</div><div class="chips" style="margin-top:8px">${PLAN_OPTS.map(o => `<button class="chip ${o === cur ? "k" : ""}" data-act="plan-pick" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>
         <label class="fld"><span>或者自己写</span><input type="text" id="planText" value="${esc(PLAN_OPTS.includes(cur) ? "" : cur)}" placeholder="比如：洗完澡以后"></label>
-        <p style="margin-top:12px">……我就打开脱口，至少练 3 分钟。</p></div>
+        <p style="margin-top:12px">……我就打开只因，至少练 3 分钟。</p></div>
       <button class="btn primary big block" style="margin-top:14px" data-act="plan-save">保存</button>
       ${cur ? `<button class="btn ghost block" style="margin-top:6px" data-act="plan-clear">不定计划</button>` : ""}</div>`;
   }
@@ -7152,7 +7154,7 @@ VIEWS.onboard = {
   full:true,
   render(){
     return `<div class="wrap" style="padding-top:32px"><div class="gantry big" id="obLamps">${lamps()}</div>
-      <div class="wordmark" style="margin-top:22px;font-size:60px">脱口</div>
+      <div class="wordmark" style="margin-top:22px;font-size:60px">只因</div>
       <p style="font-size:18px;margin-top:10px">把“知道”的英语，练成“脱口而出”。</p>
       <div class="panel" style="margin-top:22px"><h3>每道题这样练</h3><ol class="issues"><li>看中文提示</li><li>灯灭，马上开口说英文</li><li>对答案，给自己打分</li><li>app 按你说得怎么样，安排下次什么时候再练</li></ol></div>
       <label class="fld"><span>电话面试是哪天？可以先空着</span><input type="date" id="obDate" value="${esc(S.settings.interviewDate)}"></label>
@@ -7187,7 +7189,7 @@ if (document.readyState === "loading") document.addEventListener("DOMContentLoad
 /* 对话首领战里存下的回答：发给 AI 点评、改好、做成说的卡片 */
 function dbaText(){
   const L0 = S.dbAsk || []; if (!L0.length) return "";
-  return `下面是我在脱口的“对话首领战”里的回答（${L0.some(x => /Coffee|社交|chat/i.test(x.mode + x.who)) ? "面试和 coffee chat" : "面试"}），是语音识别转写的，可能有个别词识别错，不要因为这个扣分。参考回答只是一种说法，我不需要照背。
+  return `下面是我在只因的“对话首领战”里的回答（${L0.some(x => /Coffee|社交|chat/i.test(x.mode + x.who)) ? "面试和 coffee chat" : "面试"}），是语音识别转写的，可能有个别词识别错，不要因为这个扣分。参考回答只是一种说法，我不需要照背。
 请逐条：
 1. 点评：回答到了没有、内容具体不具体、说得自然不自然；讲项目的有没有讲结果；coffee chat 有没有把话题抛回给对方。
 2. 指出语法和用词的错误，说清楚错在哪里。
@@ -7293,7 +7295,7 @@ function dgJudge(t, said){
   return {cls:"", msg: fit.why || "好像没回答到对方的问题，看看下面的说法", gram:g};
 }
 
-/* 脱口 Tuokou · 代码画的怪物（3 小怪 + 3 精英 + 8 首领），给 src/battle.js 用。
+/* 只因 Tuokou · 代码画的怪物（3 小怪 + 3 精英 + 8 首领），给 src/battle.js 用。
    全部是原创形象，可以进仓库。每只都有 light / heavy / skill 三招，外加 hit / win / lose。
    用法：
      const m = TuokouMonsters.create('corefang', {
@@ -10360,7 +10362,7 @@ const MOVES_BLADE = {
 const GROUND = 386, FOOT_X = 210, UNITS = 300;   // monster frame: feet at y 386 round x 210; 300 units = ready-stance height
 const TIER_SCALE = { '小怪': 1, '精英': 1.15, '首领': 1.35, '人形': 1 };
 const TIER_KEY = { '小怪': 'minor', '精英': 'elite', '首领': 'boss', '人形': 'mob' };
-// ----- 对波（脱口 app）：每只首领用它原版技能的特效，终点是对波的交点 P()，一直保持到对波结束 -----
+// ----- 对波（只因 app）：每只首领用它原版技能的特效，终点是对波的交点 P()，一直保持到对波结束 -----
 // 停止：ctl.on 变成 false（app 叫停），或者这只怪物的图已经不在页面上（被移除、舞台被清掉）——两样都会让循环和光束马上停下
 const CLASH = (() => {
   const LONG = 6e5;
@@ -10658,7 +10660,7 @@ function create(id, opts) {
       const r = P.root.getBoundingClientRect(), h = host.getBoundingClientRect();
       return { x: r.left - h.left, y: r.top - h.top, w: r.width, h: r.height };
     },
-    // 脱口 app 的对波：照首领原版技能的前摇做完 → ready() → 等 go（双方都准备好）→ 用原版的特效射向交点（getPt 给舞台坐标），一直保持到 stop()（或者这只怪物被移除）
+    // 只因 app 的对波：照首领原版技能的前摇做完 → ready() → 等 go（双方都准备好）→ 用原版的特效射向交点（getPt 给舞台坐标），一直保持到 stop()（或者这只怪物被移除）
     clashSkill(getPt, go) {
       const P0 = () => { const s = getPt(); return toLocal(s.x, s.y); };
       const ctl = { on: true }; let rr; ctl.ready = new Promise((r) => { rr = r; });
@@ -10667,9 +10669,9 @@ function create(id, opts) {
       ctl.stop = () => { ctl.on = false; };
       return ctl;
     },
-    // 脱口 app：光线这种持续攻击时的受击——只做受击动作开头那一小段（崩一点碎片、摆一下受击姿势），不排队、不回起手式；光线打完再 play('hit') 完整播一次
+    // 只因 app：光线这种持续攻击时的受击——只做受击动作开头那一小段（崩一点碎片、摆一下受击姿势），不排队、不回起手式；光线打完再 play('hit') 完整播一次
     flinch() { if (!alive) return; try { const c = local('torso', 250, 240); fx.burst(c.x, c.y, 28); mv.go('hit', 70, { dx: -3 - Math.random() * 5 }); } catch (e) {} },
-    // 脱口 app 的对波用：停在某个姿势上（比如放技能的那一下），拿到某个部位在舞台上的位置（比如头、下巴）
+    // 只因 app 的对波用：停在某个姿势上（比如放技能的那一下），拿到某个部位在舞台上的位置（比如头、下巴）
     holdPose(n) { try { mv.set(n); } catch (e) {} },
     partBox(name) { const p = P.parts && P.parts[name]; if (!p) return null; const r = p.getBoundingClientRect(), h = host.getBoundingClientRect(); return { x: r.left - h.left, y: r.top - h.top, w: r.width, h: r.height }; },
     // take on a little of the scene's light: L = { tint: '#RRGGBB', ta, bri, sat, con } (the same table as the
@@ -14618,9 +14620,11 @@ function avgCards7(){ let n = 0; for (let k = 1; k <= 7; k++){ const d = new Dat
    所以“刚好跟得上”的新卡数 ≈ 最近每天练的张数 ÷ 10（至少 1）。堆积时留的新卡也不超过它 */
 function backlogInfo(){ const due = dueTodayN(), round = roundSize(), avg = Math.round(avgCards7()), per = Math.max(round, avg), fit = Math.max(1, Math.round(avg / 10));
   return {due, round, per, avg, fit, days:Math.max(1, Math.ceil(due / per)), trickle:Math.max(Math.min(1, S.settings.newPerDay || 0), Math.min(NEW_TRICKLE, fit, S.settings.newPerDay || 0))}; }
-function newLimitToday(){ const n = S.settings.newPerDay; return newPausedToday() ? backlogInfo().trickle : n; }
-function newFitHTML(){ const b = backlogInfo(), n = S.settings.newPerDay || 0; if (!b.avg || n <= b.fit * 1.5) return "";
-  return `<div class="panel" style="margin:6px 0;width:100%"><span class="small">你最近每天练 ${b.avg} 张：每天学 ${b.fit} 张新卡刚好跟得上（现在设的是 ${n} 张）。每多 1 张新卡，以后每天要多复习约 10 张。</span><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="new-fit">按这个来</button></div></div>`; }
+function smartNewToday(){ const n = S.settings.newPerDay || 0, avg = avgCards7(); if (!S.settings.newSmart || avg < 1) return n; return Math.min(n, Math.max(1, Math.round(avg / 10))); }
+function newLimitToday(){ const base = smartNewToday(); return newPausedToday() ? Math.min(base, backlogInfo().trickle) : base; }
+ACT["new-smart"] = () => { S.settings.newSmart = !S.settings.newSmart; save(); toast(S.settings.newSmart ? `智能调整已开启：今天 ${smartNewToday()} 道新题` : "智能调整已关闭"); UI.render(); };
+function newFitHTML(){ const b = backlogInfo(), n = S.settings.newPerDay || 0; if (S.settings.newSmart || !b.avg || n <= b.fit * 1.5) return "";
+  return `<div class="panel" style="margin:6px 0;width:100%"><span class="small">你最近每天练 ${b.avg} 张：每天学 ${b.fit} 张新卡刚好跟得上（现在设的是 ${n} 张）。每多 1 张新卡，以后每天要多复习约 10 张。</span><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="new-smart">开启智能调整</button></div></div>`; }
 ACT["new-fit"] = () => { const b = backlogInfo(); S.settings.newPerDay = b.fit; save(); toast(`每天新卡改成 ${b.fit} 张`); UI.render(); };
 ACT["new-override"] = () => { L.newOverride = today(); saveLocal(); toast("今天照常学新卡"); UI.render(); };
 /* ---------- v1.68.2：最弱的一类、错误专练 ---------- */
@@ -16313,7 +16317,7 @@ ACT["sl-pick"] = el => { const R = SL.run; if (!R || R.picked != null) return; c
   const st = S.slangStat = S.slangStat || {n:0, ok:0}; st.n++; if (ok) st.ok++; save(); UI.render(); };
 ACT["sl-next"] = () => { const R = SL.run; if (!R) return; R.i++; R.picked = null; SL.sel = null; if (R.i >= R.items.length){ if (typeof planAutoDone === "function") planAutoDone("slang"); UI.render(); return; } R.opts = slMakeOpts(R.items[R.i], R.all); UI.render(); setTimeout(() => ACT["sl-play"](), 200); };
 
-/* 脱口 · 成长（v1.69.0，v1.69.1 加了角色名、形象取景、角色页、快速记、成就、补记）
+/* 只因 · 成长（v1.69.0，v1.69.1 加了角色名、形象取景、角色页、快速记、成就、补记）
    打开 app 先到这里。三栏（Career / English / Life）每周的经验值、角色等级、技能、记一笔、复盘。
    规则和依据写在 DEVNOTES 的“成长页”一节；界面上的字保持短。
    数据都在 S.grow 里（随备份、恢复一起走）；自己上传的形象图片在 IndexedDB 的 grow:av（跟对战角色一样，不进备份）。 */
@@ -16375,7 +16379,7 @@ const GR_ACTS_DEF = [
   {id:"move", a:"life", name:"运动或散步 20 分钟以上", short:"运动", ic:"run", xp:10, sk:"stamina", lab:["workout", "workouts"]},
   {id:"lmin", a:"life", name:"最小的一步：出门走 5 分钟", short:"出门走走", ic:"leaf", xp:3, min:true, cap:1}
 ];
-const GR_MOCK = ["call", "phone", "basic", "tech", "concept", "dboss:iv", "dboss:432"];   /* 脱口里的模拟面试：面试技能 +1 */
+const GR_MOCK = ["call", "phone", "basic", "tech", "concept", "dboss:iv", "dboss:432"];   /* 只因里的模拟面试：面试技能 +1 */
 
 function grRid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 /* 现在的时钟（测试可以设 window.__growNow）；“今天”照旧用 app 的 today()（一天从几点开始算） */
@@ -16779,7 +16783,7 @@ function grIcs(items){
   const f = dt => dt.getFullYear() + String(dt.getMonth() + 1).padStart(2, "0") + String(dt.getDate()).padStart(2, "0") + "T" + String(dt.getHours()).padStart(2, "0") + String(dt.getMinutes()).padStart(2, "0") + "00";
   const clean = s => String(s).replace(/[,;\\\n]/g, " ");
   const ev = items.map(x => { const t = planTime(x), t2 = new Date(t.getTime() + 60 * 60000);
-    return ["BEGIN:VEVENT", "UID:" + x.id + "@tuokou", "DTSTAMP:" + f(new Date()), "DTSTART:" + f(t), "DTEND:" + f(t2), "SUMMARY:" + clean(x.text), "DESCRIPTION:" + clean(x.ifthen || "脱口的计划"), "BEGIN:VALARM", "TRIGGER:-PT10M", "ACTION:DISPLAY", "DESCRIPTION:" + clean(x.text), "END:VALARM", "END:VEVENT"].join("\r\n"); });
+    return ["BEGIN:VEVENT", "UID:" + x.id + "@tuokou", "DTSTAMP:" + f(new Date()), "DTSTART:" + f(t), "DTEND:" + f(t2), "SUMMARY:" + clean(x.text), "DESCRIPTION:" + clean(x.ifthen || "只因的计划"), "BEGIN:VALARM", "TRIGGER:-PT10M", "ACTION:DISPLAY", "DESCRIPTION:" + clean(x.text), "END:VALARM", "END:VEVENT"].join("\r\n"); });
   return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//tuokou//grow//CN"].concat(ev, ["END:VCALENDAR"]).join("\r\n");
 }
 ACT["gr-cal"] = async () => {
@@ -16825,12 +16829,12 @@ function grReviewText(wk, en){
   const enDays = []; for (let i = 0; i < 7; i++){ const ds = nstr(a + i); enDays.push(`${WD[i]} ${a + i > dnum(d) ? "–" : Math.round(((S.days || {})[ds] || {}).sec / 60 || 0)}`); }
   const sug = {}; for (const k of GR_A) sug[k] = K.growSuggest(goals[k], sum[k] || 0);
   const lines = [
-    `这是我在脱口“成长”里 ${grRange(wk)} 这一周的记录，请帮我复盘。今天是 ${d}。`, "",
+    `这是我在只因“成长”里 ${grRange(wk)} 这一周的记录，请帮我复盘。今天是 ${d}。`, "",
     `经验值（本周 / 目标）：Career ${sum.career}/${goals.career}，English ${sum.english}/${goals.english}，Life ${sum.life}/${goals.life}`,
     `求职：${grCounts(sum, "career").join("；") || "没有记录"}`,
     typeof jobWeekLine === "function" ? jobWeekLine(wk) : "",
     miles.length ? `好消息：${miles.map(m => m.nm.replace(/^好消息[:：]\s*/, "")).join("；")}` : "",
-    `英语：在脱口里练了 ${Object.keys(sum.enDay || {}).length ? Object.values(sum.enDay).reduce((s, v) => s + v, 0) : sum.enMin || 0} 分钟（${enDays.join("、")}）${grCounts(sum, "english").length ? "；" + grCounts(sum, "english").join("；") : ""}`,
+    `英语：在只因里练了 ${Object.keys(sum.enDay || {}).length ? Object.values(sum.enDay).reduce((s, v) => s + v, 0) : sum.enMin || 0} 分钟（${enDays.join("、")}）${grCounts(sum, "english").length ? "；" + grCounts(sum, "english").join("；") : ""}`,
     `生活：${grCounts(sum, "life").join("；") || "没有记录"}`,
     grMoodLine(wk),
     plan.length ? `求职和生活的计划：${plan.length} 项，做完 ${done.length} 项${undone.length ? `。没做的：${undone.slice(0, 10).map(x => x.text).join("；")}` : ""}` : "",
@@ -16997,7 +17001,7 @@ VIEWS.gchar = {
       <div class="fld"><span>每天提醒我记一下</span><div class="row-gap"><input type="time" id="grRemind" value="${esc(g.remind || "22:30")}" style="width:auto"><button class="btn sm" data-act="gr-remind">加到日历</button></div></div>`;
     const goalsHTML = `<div class="gr-goals">${GR_A.map(a => `<label class="fld"><span>${GR_L[a]}</span><input type="number" min="5" max="999" inputmode="numeric" data-chg="gr-goal" data-v="${a}" value="${goals[a]}"></label>`).join("")}</div>${g.next ? `<p class="small muted">下周一起：Career ${g.next.career}，English ${g.next.english}，Life ${g.next.life}</p>` : ""}`;
     const rules = `<div class="small" style="line-height:1.8;margin-top:6px">
-        <p>经验值只给你能控制的行动。English 按每天在脱口里练的时间自动算：每 2 分钟 1 点，每天最多 ${GR_EN_CAP} 点。真实的英语对话两栏都加。</p>
+        <p>经验值只给你能控制的行动。English 按每天在只因里练的时间自动算：每 2 分钟 1 点，每天最多 ${GR_EN_CAP} 点。真实的英语对话两栏都加。</p>
         <p>每周一清零。等级只涨不掉：第 2 级 100，第 3 级 300，第 4 级 600，每级多要 100。</p>
         <p>技能：第 2 级 3 次，第 3 级 9 次，第 4 级 18 次。口语、听力、写作、模拟面试自动算。</p>
         <p>手机下床才够得着就行，不用放卧室外。</p>
@@ -17125,7 +17129,7 @@ function grIcsDaily(hm){
   const [h, m] = String(hm || "22:30").split(":").map(Number), t = new Date(); t.setHours(h || 0, m || 0, 0, 0); if (t.getTime() < Date.now()) t.setDate(t.getDate() + 1);
   const f = dt => dt.getFullYear() + String(dt.getMonth() + 1).padStart(2, "0") + String(dt.getDate()).padStart(2, "0") + "T" + String(dt.getHours()).padStart(2, "0") + String(dt.getMinutes()).padStart(2, "0") + "00";
   return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//tuokou//grow//CN", "BEGIN:VEVENT", "UID:grow-daily@tuokou", "DTSTAMP:" + f(new Date()), "DTSTART:" + f(t), "DTEND:" + f(new Date(t.getTime() + 5 * 60000)), "RRULE:FREQ=DAILY",
-    "SUMMARY:脱口：记一下今天", "DESCRIPTION:给手机充电前，打开成长页点一下今天做了的事", "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:脱口：记一下今天", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    "SUMMARY:只因：记一下今天", "DESCRIPTION:给手机充电前，打开成长页点一下今天做了的事", "BEGIN:VALARM", "TRIGGER:PT0M", "ACTION:DISPLAY", "DESCRIPTION:只因：记一下今天", "END:VALARM", "END:VEVENT", "END:VCALENDAR"].join("\r\n");
 }
 ACT["gr-remind"] = () => {
   const g = G(), hm = (($("#grRemind") || {}).value || g.remind || "22:30"); if (!/^\d{2}:\d{2}$/.test(hm)) return; g.remind = hm; save();
@@ -17144,7 +17148,7 @@ function grSheetClose(){ document.querySelectorAll(".gr-sheet-bg").forEach(x => 
 function grSkillSheet(id){
   const s = grSkill(id); if (!s) return; GR_SHEET = {t:"skill", id}; const g = G(), n = grSkillN(s), L2 = K.growSkillLevel(n);
   const src = g.acts.filter(a => a.sk === s.id).map(a => `<div class="li"><div class="grow"><b>${esc(a.short || a.name)}</b><span>${esc(s.name)} +${a.skn || 1}，经验值 +${(a.xp || 0) + (a.bx || 0)}</span></div><button class="btn sm" data-act="gr-sheet-log" data-v="${a.id}">记一次</button></div>`).join("");
-  const auto = {speak:"脱口里一天说了 10 句以上，自动 +1", listen:"脱口里一天听了 5 题以上，自动 +1", write:"脱口里每写完一封，自动 +1", mock:"脱口里每次模拟面试，自动 +1"}[s.auto];
+  const auto = {speak:"只因里一天说了 10 句以上，自动 +1", listen:"只因里一天听了 5 题以上，自动 +1", write:"只因里每写完一封，自动 +1", mock:"只因里每次模拟面试，自动 +1"}[s.auto];
   grSheet(`<div class="gc-sh" style="--c:${GR_COLOR[s.a]}">${grIco(s.ic || "star", "gc-shi")}<div><h3>${esc(s.name)} <span class="num">Lv ${L2.lv}</span></h3><p class="small muted">${GR_L[s.a]}，累计 ${n} 次</p></div></div>
     <div class="gc-kb big" style="--c:${GR_COLOR[s.a]}"><i style="width:${Math.round(100 * L2.cur / L2.need)}%"></i></div><p class="small num" style="margin-top:6px">${L2.cur} / ${L2.need}，再 ${L2.need - L2.cur} 次升到 Lv ${L2.lv + 1}</p>
     ${auto ? `<p class="small muted" style="margin-top:10px">${auto}</p>` : ""}${src ? `<div class="list" style="margin-top:10px">${src}</div>` : ""}
@@ -17233,11 +17237,11 @@ function grAnalyzeText(){
   const weeks = []; for (let i = 3; i >= 0; i--){ const w = nstr(dnum(cur) - 7 * i), s = growWeek(w), gl = s.goals || (w === cur ? goals : null);
     weeks.push(`- ${grRange(w)}${w === cur ? "（这一周，还没结束）" : ""}：Career ${s.career}${gl ? "/" + gl.career : ""}，English ${s.english}${gl ? "/" + gl.english : ""}，Life ${s.life}${gl ? "/" + gl.life : ""}${grCounts(s, "career").length ? "；求职：" + grCounts(s, "career").join("、") : ""}${s.md ? `；心情平均 ${(s.md[0] / s.md[1]).toFixed(1)}` : ""}`); }
   const lv = K.growLevel(growTotal().all);
-  return [`这是我在脱口“成长”里的设置和最近四周的记录，请帮我综合分析判断。今天是 ${d}。`, "",
+  return [`这是我在只因“成长”里的设置和最近四周的记录，请帮我综合分析判断。今天是 ${d}。`, "",
     "我现在的设置：",
     `- 三栏每周目标：Career ${goals.career}，English ${goals.english}，Life ${goals.life}`,
     `- 按时起床：${g.wake} 前；晚上记心情：${g.moodOn ? "开" : "关"}`,
-    "- 英语经验值：在脱口里练习，每 2 分钟 1 点，每天最多 15。",
+    "- 英语经验值：在只因里练习，每 2 分钟 1 点，每天最多 15。",
     "- 记一笔的选项（栏｜名字｜经验值｜算哪个技能）：", ...acts,
     "- 技能（栏｜名字｜等级｜累计次数）：", ...sks,
     `- 角色：Lv ${lv.lv}`, "",
@@ -17248,7 +17252,7 @@ function grAnalyzeText(){
     "1. 这些目标、选项和技能设得合不合适：有没有该加的、该删的，经验值该调的（比如哪项太容易刷、哪项太难）。",
     "2. 最近几周的趋势：哪里在进步、哪里停住了。",
     "3. 接下来两周最值得调整的一两件事。",
-    "需要改的话，给我导入码（贴进脱口就能用）：",
+    "需要改的话，给我导入码（贴进只因就能用）：",
     "成长目标 | 求职 | 数字", "成长行动 | 栏（求职 / 英语 / 生活）| 名字 | 经验值 | 技能名（可以空着）", "成长技能 | 栏 | 名字",
     "（删选项和技能我自己在 app 里点。）"].filter((x, i, arr) => x !== "" || arr[i - 1] !== "").join("\n");
 }
@@ -17272,7 +17276,7 @@ function growApplyImport(r){
 /* v1.72.2：关弹窗前先把输入框里的名字存下来（没来得及触发 change 也不丢） */
 ACT["gr-sheet-close"] = () => { const inp = document.querySelector('.gc-sheet [data-chg="gr-name"]'); if (inp) CHG["gr-name"](inp); grSheetClose(); };
 
-/* 脱口 · 求职（v1.70.0）：底部“面试”标签升级成“求职”，页内分四段：今天 / 投递 / 准备 / 复盘。
+/* 只因 · 求职（v1.70.0）：底部“面试”标签升级成“求职”，页内分四段：今天 / 投递 / 准备 / 复盘。
    规则和依据见 DEVNOTES “求职页（v1.70.0）”。打包时放在 grow.js 后面：要包一层 showSummary、startSession、ivRunQs、iv-solo */
 "use strict";
 
@@ -17547,7 +17551,7 @@ function jobWeekLine(wk){
   const g = {}; for (const x of apps) g[jobGroup(x)] = (g[jobGroup(x)] || 0) + 1;
   const p0 = jobReadyGroups().find(x => x.k === "P0");
   const kc = jobKnowCards(), km = kc.filter(jobKnowMastered).length;
-  return `${kc.length ? `知识卡：掌握 ${km}/${kc.length}；` : ""}投递（脱口的求职页）：这周新投 ${nw.length} 份${nw.length ? `（${Object.entries(by).map(([k, n]) => k + " " + n).join("，")}）` : ""}；现在面试中 ${g.live || 0}、等待回音 ${g.wait || 0}、投了 4 周以上没回音 ${g.stale || 0}；这周面试练习 ${Math.round(ivMin)} 分钟${p0 ? `；每场都会问的题达标 ${p0.ready}/${p0.total}` : ""}`;
+  return `${kc.length ? `知识卡：掌握 ${km}/${kc.length}；` : ""}投递（只因的求职页）：这周新投 ${nw.length} 份${nw.length ? `（${Object.entries(by).map(([k, n]) => k + " " + n).join("，")}）` : ""}；现在面试中 ${g.live || 0}、等待回音 ${g.wait || 0}、投了 4 周以上没回音 ${g.stale || 0}；这周面试练习 ${Math.round(ivMin)} 分钟${p0 ? `；每场都会问的题达标 ${p0.ready}/${p0.total}` : ""}`;
 }
 
 /* ---------- 求职页 ---------- */
@@ -17763,7 +17767,7 @@ function jobExportText(){
   const meta = a => [a.d ? (a.dApprox ? a.d.slice(0, 7) : a.d.slice(5).replace("-", "/")) : "", a.src, a.ch && a.ch !== "web" ? JOB_CHL[a.ch] : "", [a.tier, a.track ? JOB_TL[a.track] : "", a.ind].filter(Boolean).join(" / ")].filter(Boolean).join("，");
   const line = (a, k) => `  - ${a.co}${a.role ? " " + a.role : ""}${meta(a) ? `（${meta(a)}）` : ""}${k === "ended" ? "：" + JOB_SL[a.st] : ""}${a.note ? "；" + a.note.split("\n")[0] : ""}`;
   const parts = [["live", "面试中"], ["wait", "等待中"], ["stale", "没回音（投了 4 周以上）"], ["draft", "准备投"], ["ended", "已结束"]].filter(([k]) => by[k]).map(([k, l]) => `- ${l}：\n` + by[k].slice().sort(jobSortIn(k)).map(a => line(a, k)).join("\n"));
-  return [`投递记录（截至 ${today()}，从脱口导出）`, ...parts].join("\n");
+  return [`投递记录（截至 ${today()}，从只因导出）`, ...parts].join("\n");
 }
 ACT["job-export"] = async () => { const ok = await copyText(jobExportText()); toast(ok ? "复制好了：可以贴进你的求职记录或状态文件" : "复制没成功，再点一次"); };
 ACT["job-jd-ai"] = () => {
@@ -17773,7 +17777,7 @@ ACT["job-jd-ai"] = () => {
 1. 统计反复出现的要求（技能、工具、知识点），按出现的职位数从多到少排，标出每条在哪几家出现。
 2. 按我的简历（有状态文件的话也参考）标出：有证据的、只有课程或自学的、完全没有的。
 3. 列出最该先准备的 10 个知识点，每个给一句面试版的英文回答（每句尽量 13 个词以内，最长不超过 20 个词）。
-4. 做成脱口的导入码：题库 | 面试·高频知识；问 | 题号 | 英文问法 | 中文 | 30 | 概念 | 提示；答 | 题号 | 回答；要点 | 题号 | 开口第一句；标签 | 题号 | P1 | 方向（${jobTracks().filter(t => t[0] !== "other").map(t => t[1]).join(" / ")}）。
+4. 做成只因的导入码：题库 | 面试·高频知识；问 | 题号 | 英文问法 | 中文 | 30 | 概念 | 提示；答 | 题号 | 回答；要点 | 题号 | 开口第一句；标签 | 题号 | P1 | 方向（${jobTracks().filter(t => t[0] !== "other").map(t => t[1]).join(" / ")}）。
 
 ` + list.map((a, i) => `【${i + 1}】${a.co}，${a.role || ""}（${JOB_TL[a.track] || "方向没定"}）\n${a.jd.trim().slice(0, 5000)}`).join("\n\n"));
 };
@@ -17917,7 +17921,7 @@ function jobDebText(x){
     `公司和职位：${a ? `${a.co}${a.role ? "，" + a.role : ""}` : x.co || "（没在投递里）"}；轮次：${rd}；日期：${x.d}${x.who ? `；面试官：${x.who}` : ""}${x.result ? `；结果：${(JOB_RESULTS.find(r => r[0] === x.result) || [])[1]}` : ""}`,
     f("被问到的问题", x.qs), f("卡住或停顿的地方", x.stuck), f("说得好的", x.good), f("下次想改成怎么说", x.change), f("要补的知识", x.learn), x.next ? `对方说的下一步：${x.next}` : "",
     "", "请给我三样：",
-    "1. 脱口的导入码：",
+    "1. 只因的导入码：",
     "   - 第一行：题库 | 面试·真题",
     "   - 每道被问到的题：问 | 题号 | 英文问法 // 其他问法 | 中文 | 秒数 | 角色（开场 / 初筛 / 核心 / 技术 / 概念 / 提问） | 提示",
     "   - 答 | 题号 | 按我真实经历写的参考回答（每句尽量 13 个词以内，最长不超过 20 个词；先说结论）",
@@ -18206,7 +18210,7 @@ ACT["jb-save"] = () => {
 ACT["jb-ai"] = async () => {
   const t = (($("#jbAI") || {}).value || "").trim(); if (!t){ toast("先把内容贴进来"); return; }
   const d = ($("#jbAID") || {}).value || today(), tracks = jobTracks().filter(x => x[0] !== "other").map(x => x[1]).join(" / ");
-  await sendToClaude(`下面是我投的职位（日期 ${d}），内容可能很乱：复制的网页、链接、我的备注。请整理成脱口的投递导入码，每个职位一行，只输出导入码，不要别的话：
+  await sendToClaude(`下面是我投的职位（日期 ${d}），内容可能很乱：复制的网页、链接、我的备注。请整理成只因的投递导入码，每个职位一行，只输出导入码，不要别的话：
 投递 | 公司 | 职位 | 方向 | 档位 | 日期 | 状态 | 来源 | 简历版本 | 备注 | 行业 | 渠道
 - 方向从这几个里选：${tracks}；都不合适就写一个简短的新方向名
 - 档位：A（很想去、高度对口，材料完整定制）、B（对口，用底稿改几条）、C（碰运气，原样投）；我写了“精投”就是 A，“海投”就是 C；看不出来就空着
@@ -18292,7 +18296,7 @@ function jobAskedHTML(){
     <p class="small muted" style="margin-top:6px">被问过的题会标成真题，每天的面试练习里多排。</p>` : "");
 }
 ACT["job-asked-ai"] = () => { const {miss} = jobAsked(); if (!miss.length){ toast("被问过的题都有对应的了"); return; }
-  sendToClaude(`下面是我在真实面试里被问到、但题库里还没有的题（括号里是哪家问的）。请按我的状态文件核对事实（拿不准的先问我，不要替我编经历），做成脱口的导入码：
+  sendToClaude(`下面是我在真实面试里被问到、但题库里还没有的题（括号里是哪家问的）。请按我的状态文件核对事实（拿不准的先问我，不要替我编经历），做成只因的导入码：
 题库 | 面试·真题
 问 | 题号 | 英文问法 // 其他问法 | 中文 | 秒数 | 角色（开场 / 初筛 / 核心 / 技术 / 概念 / 提问） | 提示
 答 | 题号 | 按我真实经历写的参考回答（每句尽量 13 个词以内，最长不超过 20 个词）
@@ -18337,7 +18341,7 @@ function plPast(){
   return n ? `过去两周你练了 ${n} 天，那几天平均每天约 ${Math.round(tot / n / 60)} 分钟。按实际做得到的选，比按理想选更容易坚持。<br>` : "";
 }
 
-/* 脱口 · 界面语言（v1.71.0）：我的 → 界面语言选 English 时，把界面上固定的文字换成英文。
+/* 只因 · 界面语言（v1.71.0）：我的 → 界面语言选 English 时，把界面上固定的文字换成英文。
    练习内容（题目、卡片、参考回答、中文意思、讲解）一律不动：只换词典里有的整句（数字可以变），对不上的保持中文。
    做法：页面画出来以后（MutationObserver 看到新节点）逐个文本节点查词典；切回中文时把换过的还原，再重画一次。
    打包时放在最后（要包一层 CHG.set）。词典是用 test 里的爬页面脚本把各主要页面的中文收集出来以后逐条翻的；没收进来的长说明暂时保持中文。 */
@@ -18349,7 +18353,7 @@ const I18N_EN = {
   "运动": "Exercise", "角色": "Character", "练英语": "English practice", "记一笔": "Log", "记投递": "Log applications", "快速记": "Quick log", "投申请": "Apply", "发消息": "Message", "去学校": "Campus", "以前几周": "Past weeks", "今天心情": "Today's mood", "今天的心情": "Today's mood", "加一项计划": "Add a plan item", "本周经验值": "XP this week", "周一清零 ·": "Resets Monday ·", "心情 {n}": "Mood {n}", "今天还没有计划": "No plan for today yet", "只做最小的一步": "Just the smallest step", "现在做": "Do now",
   "Lv {n}，再 {n} 升级": "Lv {n}, {n} XP to go", "角色：Lv {n}，再 {n} 经验值升级": "Character: Lv {n}, {n} XP to next level",
   /* 英语首页 */
-  "天": "days", "学": "Learn", "脱口": "Tuokou", "连续": "Streak", "默认": "Default", "通用": "General", "练习": "Practice", "游戏": "Game", "写作": "Writing", "发音": "Pronunciation", "阅读": "Reading", "进度": "Progress", "去准备": "Prepare", "开口说": "Speaking", "听和写": "Listening & writing", "没精神？": "Low energy?", "全部题库": "All decks", "日常生活": "Daily life", "天后面试": "days to interview",
+  "天": "days", "学": "Learn", "只因": "Cluck", "连续": "Streak", "默认": "Default", "通用": "General", "练习": "Practice", "游戏": "Game", "写作": "Writing", "发音": "Pronunciation", "阅读": "Reading", "进度": "Progress", "去准备": "Prepare", "开口说": "Speaking", "听和写": "Listening & writing", "没精神？": "Low energy?", "全部题库": "All decks", "日常生活": "Daily life", "天后面试": "days to interview",
   "反射训练": "Reflex drills", "情景对话": "Role-play dialogues", "语音日记": "Voice journal", "耳机模式": "Headphone mode", "接话练习": "Quick responses", "听力快练": "Quick listening", "听懂俚语": "Slang", "常用语块": "Useful chunks", "说话技巧": "Speaking tips", "语法要点": "Grammar points", "选择题库": "Choose decks", "全部收起": "Collapse all", "练习时长": "Practice time", "复习到期的卡": "Review due cards", "{n} 分钟": "{n} min", "按类型挑着练": "Practice by type", "开始今天的练习": "Start today's practice", "听懂面试官的问法": "Understand interview questions", "只做 {n} 分钟": "Just {n} min", "添加/修改练习计划": "Add or edit practice plan", "睡前 {n} 分钟": "{n} min before bed",
   "走路、坐车时听着练": "Listen while walking or commuting", "听辨、第一印象、重音": "Sound discrimination, first impressions, stress", "练哪些题库（可以多选）": "Which decks (pick several)", "点餐、闲聊、打电话办事": "Ordering, small talk, phone calls", "聊天、写邮件现成的说法": "Ready-made phrases for chat and email", "重音、语调、断句、连读": "Stress, intonation, pausing, linking", "有 AI 给的导入码？": "Have an import code from AI?", "时态、-s、-ed、语序": "Tense, -s, -ed, word order", "现在不方便说话（打字回答）": "Can't talk now (type answers)", "边听边读，挑有用的词和短语": "Read along and pick useful words", "听一句马上接；想不起词怎么说": "Reply right away; what to say when a word slips", "看中文，灯灭开口，把句子练成反射": "See Chinese, speak when the light goes out, make it automatic", "俚语、脏话：什么意思、是不是开玩笑": "Slang and swearing: what it means, if it's a joke", "回复消息、写邮件，按你的错误清单检查": "Reply and write emails, checked against your error list",
   "先说“I + 动词”，细节一块一块往后加。": "Start with \"I + verb\", then add details one chunk at a time.", "到期复习 {n} 题，今天还有 {n} 道新题": "{n} due for review, {n} new today", "面试官念题、你开口答，屏幕上不显示问题，和电话面试一样": "The interviewer reads, you answer out loud, no text on screen, like a phone interview",
@@ -18392,8 +18396,8 @@ const I18N_EN = {
   "还没学": "Not started", "学这一组": "Study this group", "用英文说": "Say it in English", "{n} 张。点“学这一组”只练这一组：到期的和还没学的（最多 {n} 张）。": "{n} cards. \"Study this group\" practices only these: due and new (up to {n}).", "新的": "New", "复习": "Review", "再来一次": "Again", "看答案": "Show answer", "听英文问法": "Hear the question", "没学过也先猜一下，再看答案：先猜后学，记得更牢。": "New card: guess first, then check. Guessing first helps you remember.", "先自己说出来，中文英文都行，再看答案。": "Say it yourself first, in Chinese or English, then check.", "听一遍": "Listen", "没想起来": "Forgot", "想起来了": "Got it", "想起一部分": "Partly", "面试里可以这样说": "In an interview, you can say", "刚才你想起来多少？": "How much did you recall?", "看中文意思": "See Chinese meaning", "讲解": "Explanation", "这张卡里的词（点一下听）": "Words on this card (tap to hear)", "参考回答的中文意思": "Reference answer in Chinese",
   "掌握 {n}/{n} 张。没想起来的明天再见；想起来的，隔的天数会越来越长。": "Mastered {n}/{n}. Forgotten cards come back tomorrow; for recalled ones, the gap keeps growing.", "复习对了两次的卡，会出现在“今天的面试练习”里，用英文说出来，这是面试真要用的说法。": "Cards recalled twice appear in today's interview practice, where you say them in English, the way you'll need them in interviews.", "接着复习 {n} 张": "Review {n} more", "学新的知识卡": "New knowledge cards",
   /* 我的 */
-  "振动": "Vibration", "朗读": "Read aloud", "外观": "Appearance", "浅色": "Light", "深色": "Dark", "内容": "Content", "工具": "Tools", "关于": "About", "一直开": "Always on", "提示音": "Sounds", "英文语音": "English voice", "自动选择": "Auto", "试听英文": "Test English voice", "英文语速": "English speed", "试听中文": "Test Chinese voice", "跟随系统": "Follow system", "问 AI": "Ask AI", "对战角色": "Battle characters", "练习计划": "Practice plan", "设备检测": "Device check", "离线安装": "Install offline", "存储空间": "Storage", "检查更新": "Check for updates", "{n} 道": "{n}", "录音转文字": "Transcribe recordings", "备份与恢复": "Backup & restore", "说话中间停顿": "Pauses while speaking", "检查英文朗读": "Check English voice", "清空所有进度": "Clear all progress", "每天最多几道新题": "New items per day (max)", "怎么检查你说的话": "How to check your speech", "点麦克风自动识别": "Tap the mic for speech recognition", "一天从几点开始算": "Day starts at", "半夜 {n} 点": "Midnight", "凌晨 {n} 点": "{n} a.m.", "看答案时自动朗读": "Read answers aloud automatically", "关于 脱口app": "About Tuokou", "说英语时用什么识别": "Speech recognition engine", "打开 app 先看": "Open the app to", "起步灯：灯灭再开口": "Start lights: speak when they go out", "来电模拟可以看小抄": "Allow cheat sheet in mock calls",
-  "装到桌面，没网也能练": "Install to home screen, works offline", "只用键盘语音输入或打字": "Keyboard voice input or typing only", "停 {n} 秒才算说完": "Done after a {n}-second pause", "停 {n} 秒自动检查": "Auto-check after {n} s", "中文语音（耳机模式用）": "Chinese voice (headphone mode)", "听力题换着用不同的声音": "Vary voices in listening", "看占了多少、清理旧录音": "See usage, clear old recordings", "停一下就结束（手机默认）": "End on a short pause (phone default)", "关掉：每次自己点“检查”": "Off: tap \"Check\" yourself", "也用英式、澳式等其他口音": "Also use British, Australian and other accents", "朗读、识别、录音能不能用": "Whether read-aloud, recognition and recording work", "每天练什么、固定的练习时间": "What to practice daily, fixed times", "给 AI 的自我介绍（可选）": "About me, for AI (optional)", "换手机或清浏览器数据前先备份": "Back up before switching phones or clearing data", "脱口 {n}.{n}，离线版": "Tuokou {n}.{n}, offline version", "脱口 {n}.{n}.{n}，离线版": "Tuokou {n}.{n}.{n}, offline version",
+  "振动": "Vibration", "朗读": "Read aloud", "外观": "Appearance", "浅色": "Light", "深色": "Dark", "内容": "Content", "工具": "Tools", "关于": "About", "一直开": "Always on", "提示音": "Sounds", "英文语音": "English voice", "自动选择": "Auto", "试听英文": "Test English voice", "英文语速": "English speed", "试听中文": "Test Chinese voice", "跟随系统": "Follow system", "问 AI": "Ask AI", "对战角色": "Battle characters", "练习计划": "Practice plan", "设备检测": "Device check", "离线安装": "Install offline", "存储空间": "Storage", "检查更新": "Check for updates", "{n} 道": "{n}", "录音转文字": "Transcribe recordings", "备份与恢复": "Backup & restore", "说话中间停顿": "Pauses while speaking", "检查英文朗读": "Check English voice", "清空所有进度": "Clear all progress", "每天最多几道新题": "New items per day (max)", "怎么检查你说的话": "How to check your speech", "点麦克风自动识别": "Tap the mic for speech recognition", "一天从几点开始算": "Day starts at", "半夜 {n} 点": "Midnight", "凌晨 {n} 点": "{n} a.m.", "看答案时自动朗读": "Read answers aloud automatically", "关于 只因": "About Cluck", "说英语时用什么识别": "Speech recognition engine", "打开 app 先看": "Open the app to", "起步灯：灯灭再开口": "Start lights: speak when they go out", "来电模拟可以看小抄": "Allow cheat sheet in mock calls",
+  "装到桌面，没网也能练": "Install to home screen, works offline", "只用键盘语音输入或打字": "Keyboard voice input or typing only", "停 {n} 秒才算说完": "Done after a {n}-second pause", "停 {n} 秒自动检查": "Auto-check after {n} s", "中文语音（耳机模式用）": "Chinese voice (headphone mode)", "听力题换着用不同的声音": "Vary voices in listening", "看占了多少、清理旧录音": "See usage, clear old recordings", "停一下就结束（手机默认）": "End on a short pause (phone default)", "关掉：每次自己点“检查”": "Off: tap \"Check\" yourself", "也用英式、澳式等其他口音": "Also use British, Australian and other accents", "朗读、识别、录音能不能用": "Whether read-aloud, recognition and recording work", "每天练什么、固定的练习时间": "What to practice daily, fixed times", "给 AI 的自我介绍（可选）": "About me, for AI (optional)", "换手机或清浏览器数据前先备份": "Back up before switching phones or clearing data", "只因 {n}.{n}，离线版": "Cluck {n}.{n}, offline version", "只因 {n}.{n}.{n}，离线版": "Cluck {n}.{n}.{n}, offline version",
   "怎么用、为什么这样练（可以搜）": "How to use it and why (searchable)", "在手机上识别录音，转好了会提醒你": "Transcribe recordings on the phone; you'll be notified", "进度存在这台手机上，记得偶尔备份。": "Progress is stored on this phone. Back up now and then.", "自动判断：语音说完自动查，打字时不查": "Smart: check after speaking, not when typing", "句子按意群显示斜杠，慢速时一块一块读": "Show slashes between chunks; read chunk by chunk when slow", "手机自带的识别：快，但口音重时容易听错": "Phone's built-in: fast, but less accurate with accents", "把 AI 给的导入码贴进来，可以一次导好几个文件": "Paste import codes from AI; import several files at once", "练完一轮，和昨天的你打一场；可以导入你自己的角色": "After a round, battle yesterday's you; import your own characters", "还没读到语音列表。试听没声音的话，去设备检测看看。": "Voice list not loaded yet. If the test is silent, try Device check.", "{n} 句说法，{n} 个词，{n} 条回答和回复": "{n} phrases, {n} words, {n} answers and replies", "Whisper：更准，说完要等几秒（只在安装版里能用）": "Whisper: more accurate, takes a few seconds (installed app only)", "比如：机械工程硕士，正在准备美国工程类岗位面试，口语大约 A{n}–B{n}": "e.g., M.S. in mechanical engineering, preparing for US engineering interviews, speaking about A{n}–B{n}", "我导入的内容": "My imported content",
   /* 导入 */
   "再贴一段": "Paste another", "导入码长什么样": "What import codes look like", "选文件（可以一次选好几个）": "Choose files (several at once)", "每行一条，用 | 隔开：": "One item per line, separated by |:", "（下面的内容都放进这个题库）": " (everything below goes into this deck)", "英文有几种说法时用 // 隔开。题库名以“知识”开头的，是知识卡（求职 → 准备 → 知识）。": "Separate alternative English versions with //. Decks whose names start with 知识 are knowledge cards (Jobs → Prep → Knowledge).", "把 AI 给的导入码贴进来，或者选导入码文件。可以一次选好几个文件，也可以贴好几段；每一份单独读，带“题库”行的内容会放进各自的题库。": "Paste an import code from AI, or choose import files. You can pick several files or paste several parts; each is read separately, and 题库 lines put content into their own decks.",
@@ -18413,6 +18417,317 @@ const I18N_EN = {
   "单词": "Words", "开始练": "Start", "只复习到期的": "Due only", "搜单词或意思": "Search words or meanings", "没有对上的": "No matches", "新词": "New", "到期": "Due", "3 天后": "In 3 days", "显示全部（45）": "Show all (45)", "还没有单词。": "No words yet.", "3 个 · 已学 1 · 该复习 0": "3 words · learned 1 · due 0", "加单词：导入“词 | 单词 | 中文意思 | 例句 | 例句的中文 |”": "Add words: import “词 | word | meaning | example | example in Chinese |”", "单词：只复习到期的": "Words: due only",
   "这周每天": "This week", "再 30 升级": "30 to next level", "到期 12 张": "12 due", "今天练 8 张": "8 practised today", "连续 3 天": "3-day streak",
   "你最近每天练 15 张：每天学 2 张新卡刚好跟得上（现在设的是 12 张）。每多 1 张新卡，以后每天要多复习约 10 张。": "You've practised 15 a day lately: 2 new cards a day is about right (now set to 12). Each extra new card a day means about 10 more reviews a day later.", "按这个来": "Use this", "每天新卡改成 2 张": "New cards set to 2 a day", "为什么要复习这么多？": "Why so many reviews?",
+  "智能调整新题": "Smart new cards", "已开启": "On", "已关闭": "Off", "开启智能调整": "Turn on smart adjust", "智能调整已关闭": "Smart adjust off", "智能调整已开启：今天 2 道新题": "Smart adjust on: 2 new today", "今天：2 道。": "Today: 2.", "开启后按你最近 7 天每天练的量调：每天新题 ≈ 每天练的张数 ÷ 10，最多不超过上面设的数。每多 1 道新题，以后每天要多复习约 10 张。": "When on, follows your last 7 days: new cards a day ≈ cards you practise a day ÷ 10, never more than the number above. Each extra new card a day means about 10 more reviews a day later.", "开启后按你最近 7 天每天练的量调：每天新题 ≈ 每天练的张数 ÷ 10，最多不超过上面设的数。每多 1 道新题，以后每天要多复习约 10 张。今天：2 道。": "When on, follows your last 7 days: new cards a day ≈ cards you practise a day ÷ 10, never more than the number above. Each extra new card a day means about 10 more reviews a day later. Today: 2.",
+  /* v1.73.0：计划模板、计划页、实验室和角色页、复盘、问 AI、备份、存储、录音转文字；我以前加的带数字的词条改成 {n} */
+  "再 {n} 升级": "{n} to next level",
+  "今天练 {n} 张": "{n} practised today",
+  "连续 {n} 天": "{n}-day streak",
+  "{n} 天后": "In {n} days",
+  "显示全部（{n}）": "Show all ({n})",
+  "{n} 个 · 已学 {n} · 该复习 {n}": "{n} words · learned {n} · due {n}",
+  "今天：{n} 道。": "Today: {n}.",
+  "智能调整已开启：今天 {n} 道新题": "Smart adjust on: {n} new today",
+  "每天新卡改成 {n} 张": "New cards set to {n} a day",
+  "复习到期的卡：今天到期 {n} 张，比一轮多——先清复习，今天只学 {n} 张新卡（照最近每天 {n} 张，约 {n} 天清完）": "Due reviews: {n} due today, more than one round. Clear reviews first; only {n} new today (at your recent {n} a day, about {n} days to catch up)",
+  "到期 {n} 张，比一轮多：先清复习，今天只学 {n} 张新卡。照最近每天 {n} 张，约 {n} 天清完。": "{n} due, more than one round: clear reviews first, only {n} new today. At your recent {n} a day, about {n} days to catch up.",
+  "你最近每天练 {n} 张：每天学 {n} 张新卡刚好跟得上（现在设的是 {n} 张）。每多 {n} 张新卡，以后每天要多复习约 {n} 张。": "You've practised {n} a day lately: {n} new cards a day is about right (now {n}). Each extra {n} new card a day means about {n} more reviews a day later.",
+  "开启后按你最近 {n} 天每天练的量调：每天新题 ≈ 每天练的张数 ÷ {n}，最多不超过上面设的数。每多 {n} 道新题，以后每天要多复习约 {n} 张。": "When on, follows your last {n} days: new cards a day ≈ cards practised a day ÷ {n}, never more than the number above. Each extra {n} new card a day means about {n} more reviews a day later.",
+  "开启后按你最近 {n} 天每天练的量调：每天新题 ≈ 每天练的张数 ÷ {n}，最多不超过上面设的数。每多 {n} 道新题，以后每天要多复习约 {n} 张。今天：{n} 道。": "When on, follows your last {n} days: new cards a day ≈ cards practised a day ÷ {n}, never more than the number above. Each extra {n} new card a day means about {n} more reviews a day later. Today: {n}.",
+  "三遍提速：同一题讲三遍（{n}、{n}、{n} 秒），一遍比一遍顺": "Three-pass speed-up: the same answer three times ({n}, {n}, {n} s), smoother each time",
+  "写作 · 写邮件：写一封跟进或感谢邮件，检查开头称呼和结尾落款": "Writing · Email: a follow-up or thank-you email; check the greeting and sign-off",
+  "写作 · 回复消息：写一封回复，写完会自动记进错误档案": "Writing · Reply: write a reply; mistakes go into your error log",
+  "写作 · 回复消息：回一封笔友的信（没有就用练习信）。先列关键词、直接写，写完点“检查”，改完点“完成”": "Writing · Reply: answer a pen-pal letter (or the practice one). List keywords, write straight through, tap “Check”, then “Done”",
+  "单词：学 {n}–{n} 个新词，复习到期的": "Words: learn {n}–{n} new words, review due ones",
+  "反射训练：开始时可以选练最弱的一类，看中文马上说英文": "Reflex drill: pick your weakest type at the start; see Chinese, say English right away",
+  "发音：练一组听辨，再测一句第一印象": "Pronunciation: one listening set, then a first-impression check",
+  "听力快练：听懂别人的问法（{n} 分钟）": "Quick listening: how people ask ({n} min)",
+  "复习到期的卡，再学新卡（最多 {n} 张；先说出来，再看答案）": "Due reviews, then new cards (up to {n}; say it first, then check)",
+  "完整模拟面试一次，结束后逐题回放、给自己打分": "One full mock interview; replay each answer and rate yourself",
+  "对话练习 · 面试官：{n} 题连着答，答完看每题的反馈": "Dialogue · Interviewer: {n} questions in a row, then feedback on each",
+  "对话首领战 · Coffee chat：游戏模式": "Dialogue boss · Coffee chat: game mode",
+  "对话首领战 · 面试官：游戏模式，把首领打倒（只有打到 {n} 血才算赢）": "Dialogue boss · Interviewer: game mode, knock the boss out (only {n} HP counts as a win)",
+  "常用语块：练一组（聊天或邮件），整块说出来": "Chunks: one set (chat or email), say them whole",
+  "情景对话：点餐、闲聊、打电话办事，挑一个": "Scenario: ordering, small talk or a phone errand, pick one",
+  "接话练习：听一句马上接，先给反应、再追问一句": "Reactions: hear a line, respond, then ask a follow-up",
+  "来电模拟：面试官念题、你开口答，屏幕上不显示问题，和电话面试一样": "Mock call: questions read aloud, nothing on screen, like a phone screen",
+  "看看投递：该跟进的发封邮件，投了 {n} 周还没回音的标成没回音": "Check applications: follow up where due; mark no-reply after {n} weeks",
+  "知识复习：到期的知识卡加几张新的（先想，再看答案）": "Knowledge review: due cards plus a few new (think first, then check)",
+  "语音日记：用过去式讲今天，{n} 分钟": "Voice journal: today in the past tense, {n} min",
+  "错误专练：练你最常犯的那一类错误（相关的卡，练完看这一类这周错了几次）": "Error drill: your most common error type (see this week's count after)",
+  "阅读：读一篇（边听边读），把有用的词和短语加进想学的": "Reading: one text (listen along), add useful words and phrases to learn",
+  "{n} 分钟练习": "{n}-min practice",
+  "……我就打开只因，至少练 {n} 分钟。": "…I'll open Cluck and practise at least {n} minutes.",
+  "写成“如果……就……”的计划，比只说“我要每天练”更容易坚持。选一个你每天一定会碰到的时刻。": "An “If…, then…” plan is easier to keep than “I'll practise every day”. Pick a moment you hit every day.",
+  "午饭后": "After lunch",
+  "坐车、走路的时候": "On the bus or walking",
+  "复制所有计划给 AI": "Copy all plans for AI",
+  "如果……": "If…",
+  "已完成": "Done",
+  "我的计划": "My plan",
+  "或者自己写": "Or write your own",
+  "接下来": "Next",
+  "早上起床洗漱完": "After getting ready in the morning",
+  "晚饭后坐下的时候": "Sitting down after dinner",
+  "每天固定的练习时间": "Daily practice time",
+  "比如：洗完澡以后": "e.g. after a shower",
+  "没做完": "Not done",
+  "清除推荐计划（{n}）": "Clear suggested plan ({n})",
+  "生成推荐计划": "Suggest a plan",
+  "睡前躺到床上的时候": "Getting into bed",
+  "让 AI 帮你整理": "Let AI tidy it",
+  "＋ 加一项": "+ Add",
+  "＋ 学音标（单独的计划）": "+ IPA (separate plan)",
+  "＋ 添加一项": "+ Add an item",
+  "学音标 ✓（单独的计划）": "IPA ✓ (separate plan)",
+  "今天的计划 {n}/{n}": "Today's plan {n}/{n}",
+  "展开 {n} 项": "Show {n} more",
+  "写好的回复和邮件（{n}）": "Written replies and emails ({n})",
+  "在“写作”里点“存起来问 AI”的内容。发给 AI：按错误代码只标出错误，不直接改写，你自己改。": "Saved from Writing. AI marks errors by code without rewriting; you fix them.",
+  "在对话首领战里点“存起来问 AI”的回答。发给 AI：逐条点评，按你自己的内容改一版更地道的说法，再做成说的卡片给你练。": "Saved from dialogue bosses. AI reviews each, writes a more natural version of your content, and makes speaking cards.",
+  "复制给 AI：挑说法、解释俚语、做成卡片": "Copy for AI: pick phrases, explain slang, make cards",
+  "对话首领战里的回答（{n}）": "Dialogue boss answers ({n})",
+  "把转写贴到这里": "Paste the transcript here",
+  "拿不准的说法（{n}）": "Unsure answers ({n})",
+  "现在没有。": "None right now.",
+  "现在没有拿不准的说法。练习时拿不准自己说得对不对，就点“拿不准，存起来问 AI”。": "No unsure answers. When practising, tap “Not sure, save to ask AI”.",
+  "真实对话转写": "Real conversation transcripts",
+  "要学的词（{n}）": "Words to learn ({n})",
+  "界面语言 · Interface language": "Interface language",
+  "+{n}，English +{n}，人脉 +{n}": "+{n}, English +{n}, Network +{n}",
+  "+{n}，English +{n}，面试 +{n}": "+{n}, English +{n}, Interview +{n}",
+  "+{n}，人脉 +{n}": "+{n}, Network +{n}",
+  "+{n}，体力 +{n}": "+{n}, Stamina +{n}",
+  "+{n}，作息 +{n}，每天一次": "+{n}, Routine +{n}, once a day",
+  "+{n}，口语 +{n}": "+{n}, Speaking +{n}",
+  "+{n}，每天一次": "+{n}, once a day",
+  "+{n}，简历 +{n}": "+{n}, Résumé +{n}",
+  "{n} / {n} 经验值": "{n} / {n} XP",
+  "{n}月{n}日–{n}日（这周）": "{n}/{n}–{n} (this week)",
+  "{n}月{n}日–{n}日（这一周）": "{n}/{n}–{n} (this week)",
+  "一次真实的对话（coffee chat、招聘会）": "A real conversation (coffee chat, career fair)",
+  "一次真实的面试": "A real interview",
+  "加到日历": "Add to calendar",
+  "原创角色": "Original character",
+  "在学校或图书馆做了 {n} 小时求职": "{n} h of job hunting at school or the library",
+  "好消息：拿到 offer": "Good news: an offer",
+  "好消息：收到回复或面试邀请": "Good news: a reply or interview invite",
+  "好消息：进了下一轮": "Good news: next round",
+  "形象和名字（Lv {n}）": "Look & name (Lv {n})",
+  "怎么算": "How it's counted",
+  "恢复默认": "Restore defaults",
+  "成就 {n}/{n}": "Achievements {n}/{n}",
+  "我的角色": "My character",
+  "手机下床才够得着就行，不用放卧室外。": "Just out of reach from bed is enough; no need to leave the bedroom.",
+  "技能": "Skills",
+  "投一份认真改过的申请": "Send one tailored application",
+  "投了": "Applied",
+  "按时起床（{n}:{n} 前）": "Up on time (before {n}:{n})",
+  "提醒和其他": "Reminders & more",
+  "播一遍庆祝的动作": "Play the celebration",
+  "改名字": "Rename",
+  "放在成长页的快速记": "Show in Quick log",
+  "新手冒险者": "Rookie adventurer",
+  "昨晚手机不在床边": "Phone away from bed last night",
+  "晚上记心情": "Evening mood check",
+  "最小的一步：出门走 {n} 分钟": "Smallest step: a {n}-min walk",
+  "最小的一步：看完一个职位的要求": "Smallest step: read one job's requirements",
+  "最近几周": "Recent weeks",
+  "本周 {n}/{n}": "This week {n}/{n}",
+  "每周一清零。等级只涨不掉：第 {n} 级 {n}，第 {n} 级 {n}，第 {n} 级 {n}，每级多要 {n}。": "Resets every Monday. Levels only go up: level {n} at {n}, level {n} at {n}, level {n} at {n}, each level needs {n} more.",
+  "每周目标": "Weekly goals",
+  "每天提醒我记一下": "Remind me daily to log",
+  "没做的计划不扣分。好消息算成就，不算经验值。": "Missed plans don't cost points. Good news counts as achievements, not XP.",
+  "点 ★ 放进快速记（最多 {n} 个）": "Tap ★ for Quick log (up to {n})",
+  "点一下看庆祝的动作": "Tap to see the celebration",
+  "用英语和人聊了 {n} 分钟以上": "Talked in English for {n}+ min",
+  "经验值": "XP",
+  "给真人发一条消息（校友、LinkedIn、请人内推）": "Message a real person (alumni, LinkedIn, referral)",
+  "综合分析": "Overall analysis",
+  "联系了": "Contacted",
+  "角色、技能和成就": "Character, skills & achievements",
+  "记一笔时角色出来庆祝": "Character celebrates when you log",
+  "记一笔的选项": "Log options",
+  "设置": "Settings",
+  "起床时间": "Wake-up time",
+  "起点（之前一周）": "Baseline (previous week)",
+  "运动或散步 {n} 分钟以上": "Exercise or walk {n}+ min",
+  "里程碑": "Milestones",
+  "，心情 –": ", mood –",
+  "下周的建议目标": "Suggested goals for next week",
+  "发给朋友": "Send to a friend",
+  "复制给 AI": "Copy for AI",
+  "导入 AI 给的导入码": "Import AI's code",
+  "手机不在床边": "Phone away from bed",
+  "按时起床": "Up on time",
+  "没有记录": "No records",
+  "用英语写两三句这周的事": "Write two or three sentences about this week in English",
+  "用这个当下周目标": "Use as next week's goals",
+  "聊了一次": "Had a chat",
+  "补记这周": "Fill in this week",
+  "记上": "Log it",
+  "备份": "Backup",
+  "备份内容": "What's backed up",
+  "复习进度、导入的卡片、面试回答、日记文字都在里面，录音不在。": "Review progress, imported cards, interview answers and journal text are included; recordings aren't.",
+  "复制备份": "Copy backup",
+  "存成文件": "Save as file",
+  "恢复": "Restore",
+  "用这份备份覆盖": "Restore from this backup",
+  "粘贴备份": "Paste backup",
+  "选备份文件（tuokou-backup-日期.json），或者把备份整段贴进来。会覆盖这台设备上现在的进度。": "Choose a backup file (tuokou-backup-date.json) or paste the whole backup. This replaces the progress on this device.",
+  "Whisper base.en，约 {n} MB，推荐": "Whisper base.en, about {n} MB, recommended",
+  "Whisper large-v{n}-turbo，约 {n} MB；手机上很慢，适合电脑": "Whisper large-v{n}-turbo, about {n} MB; slow on phones, better on a computer",
+  "Whisper small.en，约 {n} MB": "Whisper small.en, about {n} MB",
+  "一共用了": "Total used",
+  "下载": "Download",
+  "删掉 {n} 天前的日记录音": "Delete journal recordings older than {n} days",
+  "只有下载过的模型才会出现“删除”。还没下载的模型不占空间。": "Only downloaded models show “Delete”. Models not downloaded take no space.",
+  "均衡": "Balanced",
+  "录音转文字的模型": "Speech-to-text model",
+  "快": "Fast",
+  "日记录音": "Journal recordings",
+  "日记最多保留最近 {n} 篇。删录音不会删日记文字。": "Keeps the latest {n} journal entries. Deleting recordings keeps the text.",
+  "最准": "Most accurate",
+  "模型存在手机里，不联网也能用。不用的可以删掉，腾出空间。": "Models are stored on the phone and work offline. Delete unused ones to free space.",
+  "正在用": "In use",
+  "正在用：": "In use:",
+  "浏览器还没把这些数据设为长期保存，空间特别紧张时有可能被清掉，记得偶尔备份。": "The browser hasn't made this storage persistent; it may be cleared when space is very low. Back up now and then.",
+  "用显卡加速（出乱码就关掉）": "GPU acceleration (turn off if output is garbled)",
+  "用这个": "Use this",
+  "练习进度和卡片：约 {n} MB　日记录音 {n} 条　面试回答录音 {n} 条": "Progress & cards: about {n} MB　Journal recordings {n}　Interview recordings {n}",
+  "还没下载": "Not downloaded",
+  "进度和卡片都存在这台手机的浏览器里。换手机或清浏览器数据之前，先到“我的 → 备份”导出。": "Progress and cards live in this phone's browser. Before switching phones or clearing browser data, export from Me → Backup.",
+  "管理模型": "Manage models",
+  "还没有转写过的录音。": "No transcribed recordings yet.",
+  "选录音文件（可以一次选几个）": "Choose recordings (several at once)",
+  "用哪个语言模型": "Which language model",
+  "练过 {n} 次": "Practised {n}×",
+  "已写": "Written",
+  "未写": "Not written",
+  /* v1.73.0：游戏——怪物（用代码里的英文 id）、招式（奥特曼官方英文名）、场景、对战角色设置页 */
+  "碎岩蜥": "Scree",
+  "灰翼蛾": "Ashmoth",
+  "钻甲兽": "Drillback",
+  "雷尾蝎": "Voltail",
+  "霜牙兽": "Rimeback",
+  "锈卫": "Rustwarden",
+  "熔核龙": "Corefang",
+  "渊口": "Abyssmaw",
+  "棱晶龙": "Prismward",
+  "双冠蛇": "Twinhood",
+  "刃羽鸷": "Galecrest",
+  "陨角甲": "Starhorn",
+  "镇岳像": "Colossus",
+  "虚渊魔": "Nullwraith",
+  "拳斗兵": "Brawler",
+  "电棍兵": "Shocker",
+  "枪兵": "Gunner",
+  "盾卫": "Guard",
+  "刃卫": "Blade",
+  "出拳": "Punch",
+  "侧踢": "Side kick",
+  "火焰踢": "Flame kick",
+  "斯派修姆光线": "Specium Ray",
+  "泽斯帝姆光线": "Zestium Ray",
+  "哉佩利敖光线": "Zeperion Ray",
+  "梦比姆射线": "Mebium Shoot",
+  "突刺": "Thrust",
+  "斩击": "Slash",
+  "剑气斩": "Sword wave",
+  "细光线": "Thin beam",
+  "粗光线": "Wide beam",
+  "蓄力重拳": "Charged punch",
+  "垫步侧踢": "Step side kick",
+  "层叠风暴": "Layered storm",
+  "跳劈手刀": "Jumping chop",
+  "飞踢": "Flying kick",
+  "顶心肘": "Elbow strike",
+  "回旋踢": "Spin kick",
+  "出拳 · 侧踢 · 斯派修姆光线": "Punch · Side kick · Specium Ray",
+  "出拳 · 火焰踢 · 泽斯帝姆光线": "Punch · Flame kick · Zestium Ray",
+  "突刺 · 斩击 · 剑气斩": "Thrust · Slash · Sword wave",
+  "细光线 · 粗光线 · 斯派修姆光线（悬浮）": "Thin beam · Wide beam · Specium Ray (hover)",
+  "蓄力重拳 · 垫步侧踢 · 层叠风暴": "Charged punch · Step side kick · Layered storm",
+  "跳劈手刀 · 飞踢 · 哉佩利敖光线": "Jumping chop · Flying kick · Zeperion Ray",
+  "顶心肘 · 回旋踢 · 梦比姆射线": "Elbow strike · Spin kick · Mebium Shoot",
+  "街道": "Street",
+  "地下停车场": "Parking garage",
+  "工厂": "Factory",
+  "树林": "Woods",
+  "城市（巨大化）": "City (giant)",
+  "山林（巨大化）": "Mountains (giant)",
+  "游乐场（巨大化）": "Amusement park (giant)",
+  "燃气基地（巨大化）": "Gas plant (giant)",
+  "月球（巨大化）": "Moon (giant)",
+  "格斗型": "Fighter",
+  "剑士型": "Swordsman",
+  "光线型": "Beam",
+  "电光型": "Lightning",
+  "迪迦型": "Tiga type",
+  "红奈型": "Nexus type",
+  "梦比优斯型": "Mebius type",
+  "人形小兵": "Humanoid soldiers",
+  "你": "You",
+  "倒下": "Down",
+  "加压模式": "Pressure mode",
+  "原创小人": "Original figure",
+  "原创小人不能巨大化。导入自己的角色以后，可以在这里打开。": "The original figure can't go giant. Import your own character to turn this on.",
+  "原创小人的招式（一键套用三招）": "Original figure's moves (applies all three)",
+  "只影响这里的预览，练习和游戏照旧按现在的时间": "Only affects this preview; practice and games use the current time",
+  "只用我导入的敌人": "Only my imported enemies",
+  "图鉴": "Bestiary",
+  "地点": "Place",
+  "地点（普通大小）": "Place (normal size)",
+  "场景": "Scene",
+  "夜晚": "Night",
+  "白天": "Day",
+  "对手": "Opponent",
+  "对波预览": "Beam clash preview",
+  "导入发光部位（眼睛、胸灯）": "Import glow parts (eyes, chest light)",
+  "导入敌人的姿势表": "Import an enemy pose sheet",
+  "导入新的姿势表": "Import a new pose sheet",
+  "导入过的角色都存在这台手机上，可以随时换着用。图片不会上传。": "Imported characters stay on this phone; switch anytime. Images aren't uploaded.",
+  "小兵 · {n} 血": "Minion · {n} HP",
+  "小兵（{n} 血）": "Minion ({n} HP)",
+  "小怪": "Minion",
+  "小怪 · {n} 血": "Minion · {n} HP",
+  "巨大化": "Giant",
+  "强化兵 · {n} 血": "Elite soldier · {n} HP",
+  "强化兵（{n} 血）": "Elite soldier ({n} HP)",
+  "悬浮": "Hover",
+  "按现在的时间": "Use the current time",
+  "敌人": "Enemies",
+  "新导入的角色用哪个招式模板": "Move template for new characters",
+  "新敌人当哪一档": "Tier for new enemies",
+  "昨天的你": "Yesterday's you",
+  "每局随机": "Random each round",
+  "点上面的“轻击、重击、技能”按钮，就能在预览里看到这一招。": "Tap Light, Heavy or Skill above to preview that move.",
+  "精英": "Elite",
+  "精英 · {n} 血": "Elite · {n} HP",
+  "精英（{n} 血）": "Elite ({n} HP)",
+  "首领": "Boss",
+  "首领 · {n} 血": "Boss · {n} HP",
+  "首领（{n} 血）": "Boss ({n} HP)",
+  "背景柔化": "Soft background",
+  "胜利": "Win",
+  "自动演示 {n} 句": "Auto demo, {n} lines",
+  "自定义：轻击、重击、技能分别选": "Custom: pick Light, Heavy and Skill",
+  "被打中": "Hit",
+  "角色光影随场景": "Lighting follows the scene",
+  "角色大小": "Character size",
+  "角色招式": "Moves",
+  "角色选择": "Characters",
+  "让我的其他角色也来切磋": "Let my other characters spar too",
+  "说对了": "Correct",
+  "说错了": "Wrong",
+  "赢了": "Won",
+  "输了": "Lost",
+  "还没有导入敌人。": "No enemies imported yet.",
+  "选一个地点，预览就换到那里。默认每局随机。": "Pick a place to preview it there. Default: random each round.",
+  "轻击": "Light",
+  "重击": "Heavy",
+  "重新开始": "Restart",
+  "预览的时间": "Preview time",
+  "游戏里会遇到的对手。点一张卡片，在上面看它的动作。": "Opponents you'll meet in the game. Tap a card to see its moves above.",
 };
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
@@ -18485,6 +18800,7 @@ function i18nT(raw){
     else if ((m = t.match(/^(.+)，(电话初筛|招聘经理|技术面|现场面|其他)$/))) v = `${m[1]}, ${I18N_ROUND[m[2]]}`;
     else { let s = t; for (const [re, r] of I18N_FRAG) s = s.replace(re, r); if (s !== t && !/[\u4e00-\u9fff]/.test(s)) v = s; }   /* 片段规则换完还剩中文的，就整句保持中文，不出现半中半英 */
   }
+  if (v == null){ const mm = t.match(/^(早上|午休|晚上|睡前|周末|随时|中午|下午) → (.+)$/); if (mm){ const rest = i18nT(mm[2]); const cu = {早上:"Morning", 午休:"Lunch", 晚上:"Evening", 睡前:"Bedtime", 周末:"Weekend", 随时:"Anytime", 中午:"Noon", 下午:"Afternoon"}[mm[1]]; if (rest) v = cu + " → " + rest; } }   /* v1.73.0：计划项 */
   return v == null ? null : String(raw).replace(t, v);
 }
 const I18N_ORIG = new Map();
