@@ -1166,7 +1166,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.77.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.77.3"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -18582,6 +18582,12 @@ const JOB_SKILLS = [
  ["team", "Teamwork / cross-functional", "gen", /cross-functional|collaborat|teamwork|team player/i],
  ["project", "Project management", "gen", /project management|manag(?:e|ing) (?:multiple )?projects|own(?:ing)? projects/i],
  ["travel", "Travel", "gen", /\btravel\b/i],
+ /* v1.77.3：扫了用户的 45 份 JD，词表漏掉的几类（按出现的份数补） */
+ ["mfg", "Manufacturing / production support", "me", /manufacturing (?:process(?:es)?|support|environment|floor|issues|methods|techniques|experience|operations)|production (?:support|line|floor|environment|issues|equipment)|support(?:ing)? (?:production|manufacturing)|manufacturability|transfer to (?:production|manufacturing)|scale(?:-| )up/i],   /* 不认单独的 manufacturing：公司介绍、部门名、学位名里到处都是 */
+ ["integration", "System integration", "cs", /system(?:s)? integration|integrat(?:e|ing|ion of) (?:hardware|systems?|components|subsystems|sensors)/i],
+ ["vendor", "Vendors / suppliers", "gen", /\bvendors?\b|\bsuppliers?\b|contract manufacturers?/i],
+ ["reliab", "Reliability / durability testing", "rd", /reliability|durability|life testing|fatigue test/i],
+ ["enclosure", "Enclosures / housings", "me", /enclosures?|housings?\b/i],
  ["onsite", "On-site / in person", "gen", /on-?site|in-?person|in the office/i]
 ];
 function jobSkillByName(n){ const t = jobNorm(n); return JOB_SKILLS.find(([id, label]) => jobNorm(id) === t || jobNorm(label) === t || jobNorm(label.split("/")[0]) === t) || null; }
@@ -18663,7 +18669,7 @@ VIEWS.jdstat = {
         ${R.neg.length ? `<div style="margin-top:6px">写了身份限制（公民、安全许可、出口管制、不担保）：<b>${esc(R.neg.join("、"))}</b></div>` : `<div style="margin-top:6px">没有 JD 写身份限制。</div>`}
         ${R.pos.length ? `<div style="margin-top:6px">写了可以担保或接受 OPT：<b>${esc(R.pos.join("、"))}</b></div>` : ""}</div>
       ${haveKw.length ? `<div class="sec-title">你的强项</div><div class="panel small">你有证据、JD 又常写的：<b>${esc(haveKw.map(r => r.label).join("、"))}</b>。简历和求职信里用 JD 里的原词写这些。</div>` : ""}
-      <div class="sec-title">技术要求 ${tech.length}</div><div class="panel">${legend}<p class="small muted" style="margin:0 0 6px">按几份 JD 提到排。左边有橙色竖条的是缺口（你还没有证据、JD 又写在必须或加分里的），“最该补的”就是从这些里挑的。</p>${shown.map(row).join("")}
+      <div class="sec-title">技术要求 ${tech.length}</div><div class="panel" id="jdAll">${legend}<p class="small muted" style="margin:0 0 6px">按几份 JD 提到排。左边有橙色竖条的是缺口（你还没有证据、JD 又写在必须或加分里的），“最该补的”就是从这些里挑的。</p>${shown.map(row).join("")}
         ${tech.length > 25 ? `<button class="btn sm ghost" style="margin-top:8px" data-act="jd-all">${showAll ? "收起" : `全部 ${tech.length} 项`}</button>` : ""}</div>
       ${soft.length ? `<div class="sec-title">通用能力</div><div class="panel small">${soft.map(r => `${esc(r.label)} ${r.df}`).join("　")}<p class="small muted" style="margin-top:6px">这些几乎每份都写，靠故事证明（故事库里的 STAR），不算缺口。</p></div>` : ""}
       ${jobJdMatchListHTML(apps)}
@@ -18673,8 +18679,11 @@ VIEWS.jdstat = {
 ACT["jd-f"] = el => { L.jdF = el.dataset.v; saveLocal(); UI.render(); };
 ACT["jd-all"] = () => { L.jobFold = Object.assign({}, L.jobFold, {jdall:!(L.jobFold || {}).jdall}); saveLocal(); UI.render(); };
 ACT["jd-ev"] = el => { const ev = jobSkillEv(), k = el.dataset.v, order = ["", "y", "s", "e", "n"]; const nx = order[(order.indexOf(ev[k] || "") + 1) % order.length]; if (nx) ev[k] = nx; else delete ev[k]; save();
-  el.className = `jd-ev ev-${nx || "u"}`; el.textContent = JOB_EV_L[nx] || "还没标"; const rw = el.closest(".jd-row"), r = jobJdAnalyze(jobJdApps()).list.find(x => x.id === k);
-  if (rw && r) rw.classList.toggle("gap", r.req + r.pref > 0 && nx !== "y"); };
+  /* v1.77.3：同一项在“最该补的”和“技术要求”里都有，以前只改了点的那一个按钮。现在整页重画，两处、缺口名单、强项一起变；点的那一行尽量留在屏幕上原来的位置 */
+  const inGaps = !!el.closest("#jdGaps"), top = el.getBoundingClientRect().top;
+  UI.render();
+  setTimeout(() => { const nb = document.querySelector(`${inGaps ? "#jdGaps" : "#jdAll"} [data-act="jd-ev"][data-v="${k}"]`); if (nb) window.scrollBy(0, nb.getBoundingClientRect().top - top); }, 160);
+};
 /* 发给 AI：只发统计结果（已经数过了），让它按状态文件核对证据、补知识卡、给简历写法 */
 ACT["job-jd-ai"] = () => {
   const apps = jobJdApps(); if (apps.length < 3){ toast(`至少要 3 份存了 JD 原文的投递（现在 ${apps.length} 份）`); return; }
