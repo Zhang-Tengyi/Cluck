@@ -1116,7 +1116,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.74.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.74.3"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -13620,6 +13620,7 @@ const BT = (() => {
       for (const [f, q, parts] of jobs){
         if (run !== lightRun || !root.isConnected) return;
         if (!L && !parts){ if (q.img.getAttribute("src") !== q.src) q.img.src = q.src; continue; }
+        if (!q.img.getAttribute("src")) q.img.src = q.src;   /* v1.74.3：先显示原图，光线做好再换上去（以前做光线的 1–2 秒里人物是空的） */
         try {
           const url = await bakeCached(q.src, key, f === ghost, parts, f.glowId);
           if (run !== lightRun) return; const pre = new Image(); pre.src = url; try { await pre.decode(); } catch (e) {}
@@ -16769,7 +16770,7 @@ VIEWS.grow = {
     const review = rw && g.rv !== rw ? `<section class="panel gr-review"><b>本周复盘</b><div class="row-gap" style="margin-top:10px"><button class="btn primary" data-act="nav" data-v="greview" data-wk="${rw}">开始复盘</button></div></section>` : "";
     const banners = `${installBanner()}${STORAGE_OK ? "" : `<div class="banner"><span>存储空间不够，进度没存上。先备份，再清理旧录音。</span><button class="btn sm primary" data-act="nav" data-v="storage">去看看</button></div>`}${typeof backupBanner === "function" ? backupBanner() : ""}${typeof nextIvBanner === "function" ? nextIvBanner() : ""}${resumeBanner()}`;
     return `<div class="wrap gr">
-      <div class="gr-top"><div><div class="gr-date">${esc(fmtDate(d))}</div><div class="small muted gr-lvline">${g.name ? esc(g.name) + "　" : ""}Lv ${lv.lv}，再 ${lv.left} 升级</div></div><div class="gr-topr"><button class="icon-btn" data-act="imp-open" aria-label="导入新内容">${ICON.imp}</button>${grAvatarHTML(false)}</div></div>
+      <div class="gr-top"><div><div class="gr-date">${esc(fmtDate(d))}</div><div class="small muted gr-lvline">${g.name ? esc(g.name) + "　" : ""}Lv ${lv.lv}</div></div><div class="gr-topr"><button class="icon-btn" data-act="imp-open" aria-label="导入新内容">${ICON.imp}</button>${grAvatarHTML(false)}</div></div>
       ${banners}${review}${now1}${typeof jobGrowHTML === "function" ? jobGrowHTML() : ""}
       <section class="panel gr-week"><div class="gr-h"><b>本周经验值</b><span class="small muted">周一清零 · <button class="linkbtn small" data-act="gr-weeks">以前几周</button></span></div><div class="gr-bars">${GR_A.map(bar).join("")}</div></section>
       ${tiles}${mRow}${moodRow}${fold}${cal}
@@ -16924,7 +16925,7 @@ VIEWS.greview = {
       <div class="list">${GR_A.map(row).join("")}</div>${mood ? `<p class="small" style="margin:12px 2px 0"><b>心情</b></p>${grMoodListHTML(wk)}` : ""}
       ${grDet("bulk", "补记这周", `<div class="gr-bulk">${GR_BULK.map(k => grAct(k)).filter(Boolean).map(a => `<label class="gr-inline">${esc(a.short || a.name)}<input type="number" min="0" max="${a.cap ? 7 : 50}" inputmode="numeric" data-bulk="${a.id}"></label>`).join("")}</div><button class="btn sm" style="margin-top:10px" data-act="gr-bulk">记上</button>`)}
       <div class="panel" style="margin-top:14px"><b>下周的建议目标</b>
-        <p style="margin-top:6px"><span class="num">Career ${sug.career}，English ${sug.english}，Life ${sug.life}</span></p>
+        <p style="margin-top:6px"><span class="num">Career ${sug.career} · English ${sug.english} · Life ${sug.life}</span></p>
         <button class="btn sm" style="margin-top:8px" data-act="gr-goal-apply" data-c="${sug.career}" data-e="${sug.english}" data-l="${sug.life}">用这个当下周目标</button></div>
       <label class="fld"><span>用英语写两三句这周的事</span><textarea id="grEn" rows="3" data-chg="gr-en-draft" placeholder="This week I went to the library three times...">${esc(L.grEnDraft || "")}</textarea></label>
       <div class="row-gap" style="margin-top:12px"><button class="btn primary" data-act="gr-review-copy" data-wk="${wk}">复制给 AI</button><button class="btn" data-act="gr-friend" data-wk="${wk}">发给朋友</button></div>
@@ -17004,7 +17005,7 @@ function grSkillsHTML(){
   const tiles = sks.map(s => { const n = grSkillN(s), L2 = K.growSkillLevel(n), pct = Math.round(100 * L2.cur / L2.need);
     return `<button class="gc-skill" data-act="gr-skill" data-id="${s.id}" style="--c:${GR_COLOR[s.a]}">${grIco(s.ic || "star", "gc-ki")}<span class="gc-kn">${esc(s.name)}</span><span class="gc-kl num">Lv ${L2.lv}</span><span class="gc-kb"><i style="width:${pct}%"></i></span></button>`; }).join("");
   const form = GR_EDIT && GR_EDIT.t === "skill" ? grSkillForm(GR_EDIT.id ? grSkill(GR_EDIT.id) : null) : "";
-  const pick = sks.length > 3 ? `<div class="gc-rsel"><span class="small muted">分布图</span><button class="linkbtn small" data-act="gr-radar-pick">${rs.length === sks.length ? "全部" : `${rs.length} 个`}，换</button></div>` : "";
+  const pick = sks.length > 3 ? `<div class="gc-rsel"><span class="small muted">分布图</span><button class="linkbtn small" data-act="gr-radar-pick">${rs.length === sks.length ? "显示：全部技能 · 更改" : `显示：${rs.length} 个技能 · 更改`}</button></div>` : "";
   return `${pick}${rs.length >= 3 ? grRadar(rs) : ""}<div class="gc-skills">${tiles}<button class="gc-skill gc-add" data-act="gr-sk-add">${grIco("star", "gc-ki")}<span class="gc-kn">加技能</span></button></div>${form}`;
 }
 function grAchHTML(){
@@ -17043,7 +17044,7 @@ VIEWS.gchar = {
     const acts = GR_A.map(a => `<div class="gr-sec"><span class="small muted">${GR_L[a]}</span><div class="list">${grActRows(a)}</div></div>`).join("") + (GR_EDIT && GR_EDIT.t === "act" && !GR_EDIT.id ? grActForm(null) : `<div class="row-gap" style="margin-top:8px"><button class="btn sm ghost" data-act="gr-act-add">＋ 加一项</button><button class="btn sm ghost" data-act="gr-act-reset">恢复默认</button></div>`);
     const weeks = []; for (let i = 0; i < 8; i++) weeks.push(nstr(dnum(cur) - 7 * i));
     const wrows = weeks.map(w => { const x = growWeek(w); if (!(x.career || x.english || x.life) && w !== cur) return ""; const md = x.md ? (x.md[0] / x.md[1]).toFixed(1) : "–";
-      return `<div class="li"><div class="grow"><b>${grRange(w)}${w === cur ? "（这周）" : ""}</b><span><span class="num">Career ${x.career}，English ${x.english}，Life ${x.life}</span>，心情 ${md}</span></div></div>`; }).join("");
+      return `<div class="li"><div class="grow"><b>${grRange(w)}${w === cur ? "（这周）" : ""}</b><span><span class="num">Career ${x.career} · English ${x.english} · Life ${x.life} · 心情 ${md}</span></span></div></div>`; }).join("");
     const recent = g.log.slice(-30).reverse().map(e => `<div class="li"><div class="grow"><b>${esc(e.nm)}${e.n > 1 ? ` ×${e.n}` : ""}</b><span>${esc(fmtDate(e.d))}${e.xp + e.en ? `，+${e.xp + e.en}` : ""}</span></div><button class="btn sm gr-undo-btn" data-act="gr-undo" data-id="${e.id}">撤销</button></div>`).join("");
     const b = g.base || {};
     const set = `<label class="fld" style="margin-top:6px"><span>起床时间</span><input type="time" data-chg="gr-wake" value="${esc(g.wake)}"></label>
@@ -17051,7 +17052,7 @@ VIEWS.gchar = {
       <label class="switch"><span>晚上记心情</span><input type="checkbox" data-chg="gr-mood-on" ${g.moodOn ? "checked" : ""}></label>
       <label class="switch"><span>记一笔时角色出来庆祝</span><input type="checkbox" data-chg="gr-cheer-on" ${g.cheerOn !== false ? "checked" : ""}></label>
       <div class="fld"><span>每天提醒我记一下</span><div class="row-gap"><input type="time" id="grRemind" value="${esc(g.remind || "22:30")}" style="width:auto"><button class="btn sm" data-act="gr-remind">加到日历</button></div></div>`;
-    const goalsHTML = `<div class="gr-goals">${GR_A.map(a => `<label class="fld"><span>${GR_L[a]}</span><input type="number" min="5" max="999" inputmode="numeric" data-chg="gr-goal" data-v="${a}" value="${goals[a]}"></label>`).join("")}</div>${g.next ? `<p class="small muted">下周一起：Career ${g.next.career}，English ${g.next.english}，Life ${g.next.life}</p>` : ""}`;
+    const goalsHTML = `<div class="gr-goals">${GR_A.map(a => `<label class="fld"><span>${GR_L[a]}</span><input type="number" min="5" max="999" inputmode="numeric" data-chg="gr-goal" data-v="${a}" value="${goals[a]}"></label>`).join("")}</div>${g.next ? `<p class="small muted">下周一起：Career ${g.next.career} · English ${g.next.english} · Life ${g.next.life}</p>` : ""}`;
     const rules = `<div class="small" style="line-height:1.8;margin-top:6px">
         <p>经验值只给你能控制的行动。English 按每天在只因里练的时间自动算：每 2 分钟 1 点，每天最多 ${GR_EN_CAP} 点。真实的英语对话两栏都加。</p>
         <p>每周一清零。等级只涨不掉：第 2 级 100，第 3 级 300，第 4 级 600，每级多要 100。</p>
@@ -17097,7 +17098,7 @@ function grLabData(){
 function grLabHUD(){ const D = grLabData();
   const bars = D.bars.map(b => `<div class="gc-lab-bar${b.today ? " on" : ""}${b.future ? " fu" : ""}"><i style="height:${Math.max(b.n ? 8 : 2, Math.round(b.n / D.max * 100))}%"></i><span>${b.w}</span></div>`).join("");
   return `<div class="gc-lab-hud" aria-hidden="true"><div class="gc-lab-mon"><div class="gc-lab-mont">这周每天</div><div class="gc-lab-bars">${bars}</div></div>
-    <div class="gc-lab-stat"><div><b class="gc-lab-led"></b>Lv ${D.lv}<small>再 ${D.left} 升级</small></div><div><b class="gc-lab-led${D.heavy ? " warn" : ""}"></b>到期 ${D.due} 张</div><div><b class="gc-lab-led"></b>今天练 ${D.cards} 张</div><div><b class="gc-lab-led"></b>连续 ${D.streak} 天</div></div><div class="gc-lab-ring"></div></div>`; }
+    <div class="gc-lab-stat"><div><b class="gc-lab-led"></b>Lv ${D.lv}</div><div><b class="gc-lab-led${D.heavy ? " warn" : ""}"></b>到期 ${D.due} 张</div><div><b class="gc-lab-led"></b>今天练 ${D.cards} 张</div><div><b class="gc-lab-led"></b>连续 ${D.streak} 天</div></div><div class="gc-lab-ring"></div></div>`; }
 function grStageHTML(){
   const g = G(), arena = g.av.mode === "char" && typeof BT !== "undefined";
   return `<div class="gc-stagewrap"><button class="gc-stagebtn" data-act="gr-cheer" aria-label="播一遍庆祝的动作">${arena ? `<div class="gc-stage" id="gcStage" style='background-image:${GR_LAB}'></div>${grLabHUD()}` : `<div class="gc-stage gc-holostage" id="gcHolo" style='background-image:${GR_LAB}'>${grHoloHTML()}</div>`}</button>
@@ -19831,6 +19832,13 @@ const I18N_EN = {
   "选了 {n} 个": "{n} selected",
   "麦克风不可用": "Mic unavailable",
   "麦克风被拒绝了：在 Chrome 的网站设置里给这个页面开麦克风，或改用键盘语音输入": "Mic blocked: allow it for this page in Chrome's site settings, or use keyboard voice input",
+  /* v1.74.3 */
+  "心情 –": "Mood –",
+  "下周一起：Career {n} · English {n} · Life {n}": "From next week: Career {n} · English {n} · Life {n}",
+  "显示：全部技能 · 更改": "Showing: all skills · Change",
+  "显示：{n} 个技能 · 更改": "Showing: {n} skills · Change",
+  "Career {n} · English {n} · Life {n} · 心情 {n}": "Career {n} · English {n} · Life {n} · Mood {n}",
+  "Career {n} · English {n} · Life {n} · 心情 –": "Career {n} · English {n} · Life {n} · Mood –",
 };
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
