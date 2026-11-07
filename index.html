@@ -1078,6 +1078,20 @@ html[lang="en"] .job-count span{font-size:11.5px}
 @keyframes gcRing{from{opacity:.9;transform:translateX(-50%) scale(.6)}to{opacity:0;transform:translateX(-50%) scale(1.25)}}
 @media (prefers-reduced-motion: reduce){.gc-lab-mon::after,.gc-lab-ring{animation:none}}
 
+/* v1.75.0：排版——列表行里的文字可以缩窄、换行，右边的按钮保持原大小不被挤出框；输入框、选择框不超过外框；按钮多了自动换行；快速记的五角星缩小 */
+.li{min-width:0}
+.li > .grow, .li .grow{flex:1 1 auto;min-width:0}
+.li .grow, .li .grow *{overflow-wrap:anywhere}
+.li > button, .li > .btn, .li > a.btn, .li > .row-gap, .li > .chip{flex:0 0 auto}
+.panel, .gc-group, .gc-group details, .sheet{min-width:0;max-width:100%}
+.panel input, .panel select, .panel textarea, .sheet input, .sheet select, .sheet textarea, details input, details select, details textarea{max-width:100%;box-sizing:border-box}
+.row-gap{flex-wrap:wrap}
+.gr-pin{font-size:1rem !important;width:30px;min-width:30px;height:30px;padding:0 !important;flex:0 0 30px}
+.gc-lab-gain{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);z-index:6;pointer-events:none;text-align:center;font:800 13px/1.35 system-ui,sans-serif;color:#fff;text-shadow:0 0 10px rgba(120,200,255,.9),0 1px 2px #000;animation:gcGain 4.2s ease-out forwards;white-space:nowrap}
+.gc-lab-gain div{background:rgba(10,20,45,.72);border:1px solid rgba(140,210,255,.6);border-radius:8px;padding:3px 9px;margin:3px auto;width:max-content;max-width:92vw;white-space:normal}
+@keyframes gcGain{0%{opacity:0;transform:translate(-50%,-30%)}12%{opacity:1;transform:translate(-50%,-50%)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%)}}
+.gc-lab-gain b{display:block;font-size:13px}.gc-lab-gain span{display:inline-block;margin:0 4px;font-size:12px;color:#ffe28a}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -1098,7 +1112,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.74.8"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.75.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -6276,7 +6290,8 @@ VIEWS.me = {
     const opt = (list, cur) => `<option value="">自动选择</option>` + list.map(v => `<option value="${esc(v.name)}" ${v.name === cur ? "selected" : ""}>${esc(v.name)}（${esc(v.lang)}）</option>`).join("");
     return `<div class="wrap"><div class="top"><h2 style="font-size:26px">我的</h2></div>
       <div class="panel" data-noi18n><label class="fld" style="margin-top:0"><span>界面语言 · Interface language</span><select data-chg="set" data-key="uiLang"><option value="zh" ${s.uiLang !== "en" ? "selected" : ""}>中文</option><option value="en" ${s.uiLang === "en" ? "selected" : ""}>English</option></select></label>
-        <p class="small muted" style="margin-top:6px">只换按钮、标题这些界面文字；练习内容（题目、卡片、回答、翻译）不变。 · Only the interface changes; practice content stays the same.</p></div>
+        <p class="small muted" style="margin-top:6px">只换按钮、标题这些界面文字；练习内容（题目、卡片、回答、翻译）不变。 · Only the interface changes; practice content stays the same.</p>
+         ${s.uiLang === "en" ? `<p class="small muted" style="margin-top:8px">英文界面下没能翻成英文的文字会记在这里：复制发给 AI，就能一次补上。</p><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="i18n-miss-copy">复制没翻译的文字（${typeof I18N_MISS !== "undefined" ? I18N_MISS.size : 0}）</button><button class="btn sm ghost" data-act="i18n-miss-clear">清空</button></div>` : ""}</div>
       <div class="sec-title">练习</div><div class="panel">
         <label class="fld" style="margin-top:0"><span>每天最多几道新题</span><select data-chg="set" data-key="newPerDay" data-num="1">${[6,12,20].map(n => `<option value="${n}" ${s.newPerDay === n ? "selected" : ""}>${n} 道</option>`).join("")}</select></label>
          <div class="fld"><span>智能调整新题</span><button class="btn sm${s.newSmart ? " primary" : ""}" data-act="new-smart" aria-pressed="${!!s.newSmart}">${s.newSmart ? "已开启" : "已关闭"}</button></div>
@@ -16545,7 +16560,7 @@ function growLog(id, units, opt){
   if (ach.length) parts.push("解锁成就：" + ach.join("、"));
   if (!opt.quiet && before != null && UI.top() && UI.top().name === "grow"){ const goal = growGoal(a.a); GR_FX = {a:a.a, from:Math.min(100, Math.round(100 * before / Math.max(1, goal))), xp:e.xp + (a.a === "english" ? e.en : 0)}; }
   save(); if (!opt.quiet){ toast(parts.join("，") || "记下了"); if (u.up) grLvUp(u.lv);
-    const top = UI.top() && UI.top().name; if (top === "grow" && !e.mile) setTimeout(() => grCelebrate(e.xp + e.en), 0); else if (top === "gchar") GR_CHEER = true; }
+    const top = UI.top() && UI.top().name; { const gq = G(); let nm = ""; try { nm = grActName(a); } catch (e2) {} gq.cheerQ = (gq.cheerQ || []).concat([{lines:[nm, ...parts].filter(Boolean), at:Date.now()}]).slice(-3); GR_CHEER = true; save(); } }   /* v1.75.0：不弹小窗口，留到下次进实验室（记的是什么、加了多少） */
   return e;
 }
 let GR_FX = null, GR_JUST = null;
@@ -17110,9 +17125,24 @@ async function grArena(el){
 }
 function grCheerA(A){ if (!A) return; try { const p = A.cheer(); setTimeout(() => { try { if (A.root.isConnected && A.youIdle) A.youIdle(); } catch (e) {} }, 1900); return p; } catch (e) {} }
 function grHoloCheer(root){ const h = root && root.querySelector(".gc-holo"); if (!h) return; h.classList.remove("cheer"); void h.offsetWidth; h.classList.add("cheer"); }
+/* v1.75.0：实验室舞台建一次就留着（以前每次进来都拆掉重建，要重新加载、加光线，人物会消失一下）。再进来把原来的舞台放回去；换了角色才重建 */
+let GR_KEEP = null;
+async function grLabArena(el){
+  const g = G(), id = (g.av && g.av.char) || L.batActive || "rig";
+  if (GR_KEEP && GR_KEEP.id === id && GR_KEEP.host && GR_KEEP.host !== el){
+    try { el.replaceWith(GR_KEEP.host); GR_KEEP.A.layout && GR_KEEP.A.layout(); GR_KEEP.A.youIdle && GR_KEEP.A.youIdle(); return GR_KEEP.A; } catch (e) { try { GR_KEEP.A.dispose(); } catch (e2) {} GR_KEEP = null; }
+  }
+  if (GR_KEEP && GR_KEEP.id !== id){ try { GR_KEEP.A.dispose(); } catch (e) {} GR_KEEP = null; }
+  const A = await grArena(el); if (A) GR_KEEP = {id, A, host:el}; return A;
+}
+/* v1.75.0：记一笔以后不弹小窗口；下次进实验室，人物播胜利动作，舞台上浮出记的内容和分数 */
+function grGainShow(list){ const host = document.querySelector(".gc-stagebtn"); if (!host || !list || !list.length) return;
+  const el = document.createElement("div"); el.className = "gc-lab-gain"; el.setAttribute("aria-hidden", "true");
+  el.innerHTML = list.slice(-3).map(x => `<div>${(x.lines || [x.t || ""]).slice(0, 4).map((l, i) => i ? `<span>${esc(l)}</span>` : `<b>${esc(l)}</b>`).join("")}</div>`).join(""); host.appendChild(el); setTimeout(() => el.remove(), 4200); }
 function grStageMount(){
   const st = $("#gcStage"), ho = $("#gcHolo"); GR_STAGE_A = null;
-  if (st) grArena(st).then(A => { GR_STAGE_A = A; if (GR_CHEER && A){ GR_CHEER = false; grCheerA(A); } }).catch(() => {});
+  if (st) grLabArena(st).then(A => { GR_STAGE_A = A; const g = G(), q = g.cheerQ || [];
+    if (A && (GR_CHEER || q.length)){ GR_CHEER = false; grCheerA(A); if (q.length){ grGainShow(q); g.cheerQ = []; save(); } } }).catch(() => {});
   if (ho && GR_CHEER){ GR_CHEER = false; grHoloCheer(ho); }
 }
 ACT["gr-cheer"] = () => { const ho = $("#gcHolo"); if (ho) return grHoloCheer(ho); if (GR_STAGE_A && GR_STAGE_A.root.isConnected) grCheerA(GR_STAGE_A); };
@@ -20887,6 +20917,21 @@ const I18N_EN = {
   "；每分钟 {n} 个词": "; {n} words per minute",
   "；每天新卡改成最多 {n} 张": "; new cards set to at most {n} a day",
   "；面试前几天是冲刺": "; the days before an interview are a sprint",
+  /* v1.75.0 */
+  "周一": "Mon",
+  "周二": "Tue",
+  "周三": "Wed",
+  "周四": "Thu",
+  "周五": "Fri",
+  "周六": "Sat",
+  "周日": "Sun",
+  "已经过去的面试 {n} 场": "Past interviews ({n})",
+  "已学 {n} 个，该复习 {n} 个": "{n} learned, {n} due",
+  "复制没翻译的文字（{n}）": "Copy untranslated text ({n})",
+  "英文界面下没能翻成英文的文字会记在这里：复制发给 AI，就能一次补上。": "Text that couldn't be shown in English is collected here: copy it to AI to fix it all at once.",
+  "复制好了：{n} 条": "Copied: {n}",
+  "还没有记到没翻译的文字": "No untranslated text recorded yet",
+  "清空了没翻译的记录": "Cleared the untranslated list",
 };
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
@@ -21028,6 +21073,14 @@ function i18nT(raw){
     else if ((m = t.match(/^(.+)，(电话初筛|招聘经理|技术面|现场面|其他)$/))) v = `${m[1]}, ${I18N_ROUND[m[2]]}`;
     else { let s = t; for (const [re, r] of I18N_FRAG) s = s.replace(re, r); if (s !== t && !/[\u4e00-\u9fff]/.test(s)) v = s; }   /* 片段规则换完还剩中文的，就整句保持中文，不出现半中半英 */
   }
+  /* v1.75.0：几类拼出来的文字——计划模板里夹着题目原文；“前缀：内容”；结尾带 +分数；日期和星期 */
+  if (v == null){ const PT = [[/^彩排这周的 coffee chat 题：(.+)（说完问回对方一句）$/, "Rehearse this week's coffee chat question: $1 (ask them back after)"], [/^彩排这周的面试题：(.+)（先说一遍，再看参考回答，再说一遍）$/, "Rehearse this week's interview question: $1 (say it, read the model, say it again)"],
+      [/^单题彩排：(.+)$/, "Single-question rehearsal: $1"], [/^写面试复盘：(.+)（面完 (\d+) 小时内写最有用）$/, "Interview review: $1 (most useful within $2 hours)"], [/^对话练习 · Coffee chat：(.+)（(\d+)–(\d+) 题，说完记得问回对方）$/, "Dialogue · Coffee chat: $1 ($2–$3 questions, ask them back)"]];
+    for (const [re, out] of PT){ if (re.test(t)){ v = t.replace(re, out); break; } } }
+  if (v == null){ const md = t.match(/^(\d+)月(\d+)日(?:\s*周([一二三四五六日]))?(?:\s+(\d+:\d+))?$/); if (md){ const MO = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+md[1] - 1] || md[1], WD = md[3] ? {一:"Mon", 二:"Tue", 三:"Wed", 四:"Thu", 五:"Fri", 六:"Sat", 日:"Sun"}[md[3]] + ", " : ""; v = `${WD}${MO} ${md[2]}${md[4] ? " " + md[4] : ""}`; } }
+  if (v == null){ const mf = t.match(/^(.+?)\s+(\d+\/\d+)$/); if (mf && /[\u4e00-\u9fff]/.test(mf[1])){ const b = i18nT(mf[1]); if (b) v = b + " " + mf[2]; } }   /* 结尾带进度 1/3 */
+  if (v == null){ const ms = t.match(/^(.+?)\s*\+(\d+)$/); if (ms && /[\u4e00-\u9fff]/.test(ms[1])){ const b = i18nT(ms[1]); if (b) v = b + " +" + ms[2]; } }
+  if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = I18N_EN[mp[1] + "："] || I18N_EN[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; v = p.replace(/[:：]\s*$/, "") + ": " + (r || mp[2]); } } }
   if (v == null){ const mx = t.match(/^(.+?)\s*[×x]\s*(\d+)$/); if (mx){ const base = i18nT(mx[1]); if (base) v = base + " ×" + mx[2]; } }   /* v1.74.1：结尾带“×3”这类次数的 */
   if (v == null){ const mi = t.match(/^音标：学第 (\d+) 课「(.+?)」（约 (\d+) 分钟）(?:，再复习 (\d+) 课)?$/); if (mi){ const nm = i18nT(mi[1] + ". " + mi[2]); const en = nm ? nm.replace(/^\d+\.\s*/, "") : mi[2];
     v = `IPA: lesson ${mi[1]} “${en}” (about ${mi[3]} min)${mi[4] ? `, plus ${mi[4]} review${mi[4] === "1" ? "" : "s"}` : ""}`; } }   /* v1.74.1：学音标的计划项（中间是课名） */
@@ -21036,7 +21089,11 @@ function i18nT(raw){
 }
 const I18N_ORIG = new Map();
 const I18N_SKIP = ".en, textarea, input, [data-noi18n], .asr-text, .jk-q, .cheat, script, style, code";   /* 讲解和中文意思的正文自己带 data-noi18n，标题照常翻 */
-function i18nNode(n){ const p = n.parentElement; if (!p || p.closest(I18N_SKIP)) return; const v = i18nT(n.nodeValue); if (v != null && v !== n.nodeValue){ if (!I18N_ORIG.has(n)) I18N_ORIG.set(n, n.nodeValue); n.nodeValue = v; } }
+/* v1.75.0：英文界面下没翻成英文的界面文字记下来（练习内容在 I18N_SKIP 里，不记），设置里一键复制 */
+const I18N_MISS = (() => { try { return new Set(JSON.parse(localStorage.getItem("tk-i18n-miss") || "[]")); } catch (e) { return new Set(); } })(); let I18N_MISS_T = 0;
+function i18nMiss(t){ t = String(t || "").replace(/\s+/g, " ").trim(); if (!t || t.length > 300 || !/[\u4e00-\u9fff]/.test(t) || I18N_MISS.has(t) || I18N_MISS.size >= 1500) return; I18N_MISS.add(t);
+  clearTimeout(I18N_MISS_T); I18N_MISS_T = setTimeout(() => { try { localStorage.setItem("tk-i18n-miss", JSON.stringify([...I18N_MISS])); } catch (e) {} }, 800); }
+function i18nNode(n){ const p = n.parentElement; if (!p || p.closest(I18N_SKIP)) return; const v = i18nT(n.nodeValue); if (v == null) i18nMiss(n.nodeValue); if (v != null && v !== n.nodeValue){ if (!I18N_ORIG.has(n)) I18N_ORIG.set(n, n.nodeValue); n.nodeValue = v; } }
 function i18nApply(root){
   if (!i18nOn() || !root) return;
   if (root.nodeType === 3){ i18nNode(root); return; } if (root.nodeType !== 1) return;
@@ -21055,6 +21112,12 @@ const I18N_OBS = new MutationObserver(ms => { if (!i18nOn()) return; for (const 
 I18N_OBS.observe(document.body, {childList:true, subtree:true});
 document.addEventListener("DOMContentLoaded", () => setTimeout(() => { if (i18nOn()) i18nSync(); }, 0));
 { const cs = CHG.set; CHG.set = function(el){ const r = cs.apply(this, arguments); if (el && el.dataset && el.dataset.key === "uiLang") i18nSync(); return r; }; }
+
+/* v1.75.0：设置里复制 / 清空没翻译的文字 */
+ACT["i18n-miss-copy"] = async () => { const list = [...I18N_MISS]; if (!list.length){ toast("还没有记到没翻译的文字"); return; }
+  const txt = "下面是只因英文界面里没翻成英文的文字，请给我对应的英文（一行一条：中文 → English）：\n" + list.join("\n");
+  try { await navigator.clipboard.writeText(txt); toast(`复制好了：${list.length} 条`); } catch (e) { toast("复制没成功，再点一次试试"); } };
+ACT["i18n-miss-clear"] = () => { I18N_MISS.clear(); try { localStorage.removeItem("tk-i18n-miss"); } catch (e) {} toast("清空了没翻译的记录"); UI.render(); };
 
 </script>
 </body>
