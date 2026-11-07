@@ -1142,6 +1142,10 @@ details > *, details > * *{box-sizing:border-box}
 .jd-ev.ev-u{border-style:dashed}
 .jd-how ol li{margin-bottom:4px}
 
+/* v1.77.2：第四种标记“接触过” */
+.jd-ev.ev-e{background:color-mix(in srgb, var(--blue, #3B82F6) 14%, var(--surface));border-color:transparent;color:var(--ink)}
+.jd-legend > div{margin-top:3px;line-height:1.7}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -1162,7 +1166,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.77.1"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.77.2"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2760,7 +2764,7 @@ function parseImport(text){
     /* 真题 | 题号 | 公司 | 日期 */
     else if ((kind==="真题"||kind==="REAL") && p[1]){ res.real.push({qid:p[1].toUpperCase(), co:(p[2]||"").trim().slice(0, 60), d:jobDateKey(p[3]).d}); }
     /* 技能 | 名称 | 有证据 / 学过 / 没有（JD 高频要求里，你在每一项上有没有证据） */
-    else if ((kind==="技能"||kind==="SKILL") && p[1] && (p[2]||"").trim()){ const v = p[2].trim(); res.skills.push({name:p[1].trim().slice(0, 60), ev:/^(有证据|有|做过|y(es)?)$/i.test(v) ? "y" : /^(学过|课程|自学|学了|some|s)$/i.test(v) ? "s" : /^(没有|没|无|no?|n)$/i.test(v) ? "n" : ""}); }
+    else if ((kind==="技能"||kind==="SKILL") && p[1] && (p[2]||"").trim()){ const v = p[2].trim(); res.skills.push({name:p[1].trim().slice(0, 60), ev:/^(有证据|有|做过|y(es)?)$/i.test(v) ? "y" : /^(学过|课程|自学|学了|some|s)$/i.test(v) ? "s" : /^(接触过|接触|见过|用过一点|exposure|e)$/i.test(v) ? "e" : /^(没有|没|无|no?|n)$/i.test(v) ? "n" : ""}); }
     else res.bad.push(i+1);
   });
   for (const c of res.cards) c.id = "c" + hash(c.t + "|" + tokens(c.en).join(" "));
@@ -18617,7 +18621,7 @@ function jobJdAnalyze(apps){
   return {n:apps.length, list, years, neg, pos};
 }
 function jobJdApps(){ const f = L.jdF || "all"; return JB().apps.filter(a => (a.jd || "").trim().length > 80 && (f === "all" || (f === "A" ? a.tier === "A" : jobTrackMap(a.track) === f))); }
-const JOB_EV_L = {y:"有证据", s:"学过", n:"没有"};
+const JOB_EV_L = {y:"有证据", s:"学过", e:"接触过", n:"没有"};   /* v1.77.2 加“接触过”：见过、用过一点、在旁边看别人做过，自己还做不了 */
 VIEWS.jdstat = {
   tab:"iv",
   render(){
@@ -18637,7 +18641,12 @@ VIEWS.jdstat = {
     const yrs = R.years.filter(x => x.y != null), b = [[0, 1], [2, 3], [4, 99]].map(([lo, hi]) => yrs.filter(x => x.y >= lo && x.y <= hi).length);
     const haveKw = R.list.filter(r => ev[r.id] === "y").slice(0, 12);
     const showAll = !!(L.jobFold || {}).jdall, shown = showAll ? tech : tech.slice(0, 25);
-    const legend = `<p class="small muted jd-legend">每一行右边的按钮是<b>你自己</b>有没有这一项，点一下换：<span class="jd-ev ev-y">有证据</span> 做过、能拿出来讲 → <span class="jd-ev ev-s">学过</span> 课上或自学过、没有项目 → <span class="jd-ev ev-n">没有</span> → <span class="jd-ev ev-u">还没标</span>。</p>`;
+    const legend = `<div class="small muted jd-legend">每一行右边的按钮是<b>你自己</b>有没有这一项，点一下换到下一个：
+      <div><span class="jd-ev ev-y">有证据</span> 在项目或实习里做过，能讲出你具体做了什么</div>
+      <div><span class="jd-ev ev-s">学过</span> 认真学过（课、教程），能讲清是什么、怎么用，但没在项目里做过</div>
+      <div><span class="jd-ev ev-e">接触过</span> 见过、用过一点、在旁边看别人做过，说得出是什么，自己还做不了</div>
+      <div><span class="jd-ev ev-n">没有</span> 没碰过</div>
+      <div style="margin-top:4px">拿不准就问自己：面试官让你讲两分钟，你讲得出一件自己做的具体的事吗？讲得出算有证据；只讲得出概念算学过；只能说“见过”算接触过。</div></div>`;
     return head + `<details class="panel jd-how"${unknownTop > 3 ? " open" : ""}><summary><b>这一页怎么用</b></summary><ol class="small" style="margin:8px 0 0 18px;line-height:1.7">
         <li>下面“技术要求”里，把每一项右边的按钮按你的实际情况标一遍（只要标一次，以后每份新 JD 都用得上）。</li>
         <li>“最该补的”会自动从技术要求里挑出你<b>还没有证据</b>、JD 又常写在“必须”或“加分”里的，按重要程度排。挑最前面的一两项补：做个小项目、学一下、准备面试里的说法。</li>
@@ -18645,7 +18654,7 @@ VIEWS.jdstat = {
       <div class="chips job-filter">${chips.map(([k, l]) => `<button class="chip${f === k ? " on" : ""}" data-act="jd-f" data-v="${k}" aria-pressed="${f === k}">${esc(l)}</button>`).join("")}</div>
       ${R.n < 5 ? `<p class="note">这一类只有 ${R.n} 份 JD，排名靠前的几项可以参考，后面的差一两份就会变。</p>` : ""}
       <div class="sec-title">最该补的${unknownTop ? `<span class="job-sec-note">前 20 项里还有 ${unknownTop} 项没标</span>` : ""}</div>
-      <div class="panel" id="jdGaps"><p class="small muted" style="margin:0 0 6px">从下面的“技术要求”里挑出来的：你标了学过、没有或还没标，JD 又写在“必须”或“加分”里的，按重要程度排前 8。</p>
+      <div class="panel" id="jdGaps"><p class="small muted" style="margin:0 0 6px">从下面的“技术要求”里挑出来的：你标了学过、接触过、没有或还没标，JD 又写在“必须”或“加分”里的，按重要程度排前 8。</p>
         ${gaps.length ? gaps.map((r, i) => row(r).replace('<b>', `<b><span class="jd-rank">${i + 1}</span>`)).join("") : `<p class="small muted">前面的要求都标了“有证据”。</p>`}
         <p class="small muted" style="margin-top:8px">重要程度：一份 JD 写在“必须”里算 2 分、“加分”里算 1 分、只在职责里提到算 0.5 分，几份 JD 加起来。比如写在 10 份的“必须”、3 份的“加分”里，就是 23 分。</p>
         <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-jd-ai">发给 AI：核对证据，补知识卡</button></div></div>
@@ -18663,7 +18672,7 @@ VIEWS.jdstat = {
 };
 ACT["jd-f"] = el => { L.jdF = el.dataset.v; saveLocal(); UI.render(); };
 ACT["jd-all"] = () => { L.jobFold = Object.assign({}, L.jobFold, {jdall:!(L.jobFold || {}).jdall}); saveLocal(); UI.render(); };
-ACT["jd-ev"] = el => { const ev = jobSkillEv(), k = el.dataset.v, order = ["", "y", "s", "n"]; const nx = order[(order.indexOf(ev[k] || "") + 1) % order.length]; if (nx) ev[k] = nx; else delete ev[k]; save();
+ACT["jd-ev"] = el => { const ev = jobSkillEv(), k = el.dataset.v, order = ["", "y", "s", "e", "n"]; const nx = order[(order.indexOf(ev[k] || "") + 1) % order.length]; if (nx) ev[k] = nx; else delete ev[k]; save();
   el.className = `jd-ev ev-${nx || "u"}`; el.textContent = JOB_EV_L[nx] || "还没标"; const rw = el.closest(".jd-row"), r = jobJdAnalyze(jobJdApps()).list.find(x => x.id === k);
   if (rw && r) rw.classList.toggle("gap", r.req + r.pref > 0 && nx !== "y"); };
 /* 发给 AI：只发统计结果（已经数过了），让它按状态文件核对证据、补知识卡、给简历写法 */
@@ -18677,9 +18686,9 @@ ${lines.join("\n")}
 硬条件：要求工作年限 0–1 年 ${R.years.filter(x => x.y != null && x.y <= 1).length} 份、2–3 年 ${R.years.filter(x => x.y >= 2 && x.y <= 3).length} 份、4 年以上 ${R.years.filter(x => x.y >= 4).length} 份；写了身份限制的：${R.neg.join("、") || "没有"}。
 
 请：
-1. 按我的状态文件，核对上面每一项：有证据 / 学过（课程或自学）/ 没有。每项一行写成：技能 | 名称（照上面列表里的写法）| 有证据 或 学过 或 没有。
+1. 按我的状态文件，核对上面每一项：有证据（项目或实习里做过）/ 学过（课程或自学，没做过项目）/ 接触过（见过、用过一点、在旁边看别人做过）/ 没有。像 verification、troubleshooting 这类过程性的要求，看我有没有能对上的具体经历（做过什么、按什么标准判断、结果怎样），有就算有证据，并告诉我对上的是哪段经历。每项一行写成：技能 | 名称（照上面列表里的写法）| 有证据 或 学过 或 接触过 或 没有。
 2. 词表可能漏掉的高频要求（上面没列、但你看 JD 能看出来的），也列出来。
-3. 对“没有”和“学过”里排在前面的 8 项：各做一张知识卡，再给一句面试里的诚实说法（没做过就说没做过、会怎么补），做成只因的导入码：题库 | 知识·高频要求；问 | 题号 | 英文问法 | 中文 | 30 | 概念 |；答 | 题号 | 英文回答（每句尽量 13 个词以内）；讲解 | 题号 | 中文讲解；译 | 题号 | 中文意思；标签 | 题号 | P1 | 方向（${jobTracks().filter(t => t[0] !== "other").map(t => t[1]).join(" / ")}）。
+3. 对“没有”“接触过”和“学过”里排在前面的 8 项：各做一张知识卡，再给一句面试里的诚实说法（接触过的说清楚接触到哪一步、自己还没独立做过；没做过就说没做过、会怎么补），做成只因的导入码：题库 | 知识·高频要求；问 | 题号 | 英文问法 | 中文 | 30 | 概念 |；答 | 题号 | 英文回答（每句尽量 13 个词以内）；讲解 | 题号 | 中文讲解；译 | 题号 | 中文意思；标签 | 题号 | P1 | 方向（${jobTracks().filter(t => t[0] !== "other").map(t => t[1]).join(" / ")}）。
 4. 对“有证据”里排在前面的项：简历和求职信该怎么用 JD 的原词写。
 5. 有没有一个一两周能做完、能放进作品集的小项目，正好补上最大的缺口。`);
 };
@@ -18820,7 +18829,7 @@ function jobJdMatch(a){
   for (const {l, cls} of jobJdLines(a.jd)) if (cls === "req") for (const [id, , g, re] of JOB_SKILLS) if (g !== "gen" && re.test(l)) req.add(id);
   const lab = id => (JOB_SKILLS.find(x => x[0] === id) || [id, id])[1];
   let have = 0; const miss = [], unk = [];
-  for (const id of req){ const v = ev[id]; if (v === "y") have += 1; else if (v === "s"){ have += 0.5; miss.push(id); } else if (v === "n") miss.push(id); else unk.push(id); }
+  for (const id of req){ const v = ev[id]; if (v === "y") have += 1; else if (v === "s"){ have += 0.5; miss.push(id); } else if (v === "e"){ have += 0.25; miss.push(id); } else if (v === "n") miss.push(id); else unk.push(id); }
   return {n:req.size, have, pct:req.size ? Math.round(have / req.size * 100) : null, miss:miss.map(lab), unk:unk.map(lab)};
 }
 function jobJdMatchHTML(a){
@@ -21420,6 +21429,18 @@ Object.assign(I18N_EN, {
  "重要程度：一份 JD 写在“必须”里算 {n} 分、“加分”里算 {n} 分、只在职责里提到算 {n} 分，几份 JD 加起来。比如写在 {n} 份的“必须”、{n} 份的“加分”里，就是 {n} 分。": "Importance: each JD counts {n} if it's required, {n} if it's a plus, {n} if only in responsibilities, added up across JDs. Required in {n} JDs and a plus in {n} makes {n}.",
  "你的强项": "Your strengths",
  "按几份 JD 提到排。左边有橙色竖条的是缺口（你还没有证据、JD 又写在必须或加分里的），“最该补的”就是从这些里挑的。": "Sorted by how many JDs mention it. Rows with an orange bar on the left are gaps (no evidence yet, and listed as required or a plus); “Biggest gaps” is picked from these."
+});
+
+/* v1.77.2：第四种标记“接触过” */
+Object.assign(I18N_EN, {
+ "接触过": "Exposure",
+ "有没有这一项，点一下换到下一个：": ": whether you have it. Tap to switch to the next one:",
+ "在项目或实习里做过，能讲出你具体做了什么": "Done in a project or internship; you can say exactly what you did",
+ "认真学过（课、教程），能讲清是什么、怎么用，但没在项目里做过": "Studied it properly (course, tutorial); you can explain what it is and how it's used, but haven't done it in a project",
+ "见过、用过一点、在旁边看别人做过，说得出是什么，自己还做不了": "Seen it, used it a little, or watched someone do it; you can say what it is but can't do it alone yet",
+ "没碰过": "Never touched it",
+ "拿不准就问自己：面试官让你讲两分钟，你讲得出一件自己做的具体的事吗？讲得出算有证据；只讲得出概念算学过；只能说“见过”算接触过。": "Not sure? Ask yourself: if an interviewer gave you two minutes, could you describe one specific thing you did? If yes, Have evidence; if only the concept, Studied; if only “I've seen it”, Exposure.",
+ "从下面的“技术要求”里挑出来的：你标了学过、接触过、没有或还没标，JD 又写在“必须”或“加分”里的，按重要程度排前 8。": "Picked from “Technical requirements” below: items you marked Studied, Exposure, None or Not marked that JDs list as required or a plus, top 8 by importance."
 });
 
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
