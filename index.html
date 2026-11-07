@@ -1108,10 +1108,39 @@ html[lang="en"] .job-count span{font-size:11.5px}
 .job-chev svg{transform:rotate(180deg)}
 .job-chev.open svg{transform:rotate(-90deg)}
 
+/* v1.74.0 那一块在 1.76.1 的 style.css 里丢了（JD 高频要求页、只记数的提醒卡片、写公司名的弹窗、粘贴识别框），1.77.1 原样补回 */
+details > *, details > * *{box-sizing:border-box}
+.fld input, .fld select, .fld textarea{box-sizing:border-box;max-width:100%}
+.job-2col > *{min-width:0}
+.jr-paste{margin-bottom:12px}
+.job-pend{background:var(--amber-soft);border-color:transparent}
+.jn-row{margin-top:8px}
+.jn-row input{width:100%;box-sizing:border-box}
+.jd-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.jd-row:first-child{border-top:0;padding-top:2px}
+.jd-l{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.jd-bar{display:flex;height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.jd-bar i{display:block;height:100%}
+.jd-bar i.req{background:var(--purple)}
+.jd-bar i.pref{background:color-mix(in srgb, var(--purple) 45%, var(--surface2))}
+.jd-bar i.oth{background:color-mix(in srgb, var(--ink2) 25%, var(--surface2))}
+.jd-ev{flex:none;min-width:64px;padding:6px 8px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);color:var(--ink2);font-size:12.5px;cursor:pointer}
+.jd-ev.ev-y{background:color-mix(in srgb, var(--green) 18%, var(--surface));border-color:transparent;color:var(--ink)}
+.jd-ev.ev-s{background:var(--amber-soft);border-color:transparent;color:var(--ink)}
+.jd-ev.ev-n{background:color-mix(in srgb, var(--red) 14%, var(--surface));border-color:transparent;color:var(--ink)}
+
 /* v1.77.0：成熟投递的回音率、JD 匹配 */
 .job-funnel{margin:6px 0 10px;display:grid;gap:3px}
 .jd-match{margin:10px 0 0;line-height:1.6}
 .jrec-match .jd-match{margin-top:6px}
+
+/* v1.77.1：JD 页说清楚：缺口的橙色竖条、排名、四种标记的说明 */
+.jd-row.gap{box-shadow:inset 3px 0 0 var(--amber);padding-left:8px}
+.jd-rank{display:inline-block;min-width:1.4em;font-weight:700;color:var(--amber)}
+.jd-legend{margin:0 0 6px;line-height:2}
+.jd-legend .jd-ev{display:inline-block;min-width:0;padding:2px 8px;font-size:11.5px;cursor:default}
+.jd-ev.ev-u{border-style:dashed}
+.jd-how ol li{margin-bottom:4px}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1133,7 +1162,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.77.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.77.1"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -18597,28 +18626,35 @@ VIEWS.jdstat = {
     const chips = [["all", `全部 ${all.length}`], ["cs", `控制 ${cnt("cs")}`], ["rd", `测试 ${cnt("rd")}`], ["me", `机械 ${cnt("me")}`], ["A", `A 档 ${all.filter(a => a.tier === "A").length}`]];
     const head = `<div class="wrap">${backBtn()}<h2>JD 高频要求</h2><p class="small muted" style="margin:4px 0 10px">在本机统计你投的 JD：每一项出现在几份 JD 里，写在“必须”里还是“加分”里。点右边标一下你有没有证据，就能看出最该补的。</p>`;
     if (all.length < 3) return head + `<p class="panel small">至少要 3 份存了 JD 原文的投递（现在 ${all.length} 份）。办法：在“记投递”里把职位页面整页贴进来，或者导入 AI 整理的 JD 原文导入码（JD | 公司 | 职位 …… JD 结束）。</p></div>`;
-    const evBtn = r => `<button class="jd-ev ev-${ev[r.id] || "u"}" data-act="jd-ev" data-v="${r.id}">${esc(JOB_EV_L[ev[r.id]] || "标一下")}</button>`;
+    const evBtn = r => `<button class="jd-ev ev-${ev[r.id] || "u"}" data-act="jd-ev" data-v="${r.id}" aria-label="${esc(r.label)}：你有没有">${esc(JOB_EV_L[ev[r.id]] || "还没标")}</button>`;
+    const isGap = r => r.req + r.pref > 0 && ev[r.id] !== "y";
     const bar = r => `<span class="jd-bar"><i class="req" style="width:${Math.round(r.req / R.n * 100)}%"></i><i class="pref" style="width:${Math.round(r.pref / R.n * 100)}%"></i><i class="oth" style="width:${Math.round((r.resp + r.other) / R.n * 100)}%"></i></span>`;
-    const row = r => `<div class="jd-row"><div class="jd-l"><b>${esc(r.label)}</b><span class="small muted">${r.df}/${R.n} 份${r.req ? `，必须 ${r.req}` : ""}${r.pref ? `，加分 ${r.pref}` : ""}</span>${bar(r)}</div>${evBtn(r)}</div>`;
+    const row = r => `<div class="jd-row${isGap(r) ? " gap" : ""}"><div class="jd-l"><b>${esc(r.label)}</b><span class="small muted">${r.df}/${R.n} 份${r.req ? `，必须 ${r.req}` : ""}${r.pref ? `，加分 ${r.pref}` : ""}</span>${bar(r)}</div>${evBtn(r)}</div>`;
     /* 沟通、团队、动手、出差这类通用的不算缺口（做个项目也证明不了），单独列一行 */
     const tech = R.list.filter(r => r.g !== "gen"), soft = R.list.filter(r => r.g === "gen");
-    const gaps = tech.filter(r => r.req + r.pref > 0 && ev[r.id] !== "y").sort((x, y) => y.score - x.score).slice(0, 8);
+    const gaps = tech.filter(isGap).sort((x, y) => y.score - x.score).slice(0, 8);
     const unknownTop = tech.slice(0, 20).filter(r => !ev[r.id]).length;
     const yrs = R.years.filter(x => x.y != null), b = [[0, 1], [2, 3], [4, 99]].map(([lo, hi]) => yrs.filter(x => x.y >= lo && x.y <= hi).length);
     const haveKw = R.list.filter(r => ev[r.id] === "y").slice(0, 12);
     const showAll = !!(L.jobFold || {}).jdall, shown = showAll ? tech : tech.slice(0, 25);
-    return head + `<div class="chips job-filter">${chips.map(([k, l]) => `<button class="chip${f === k ? " on" : ""}" data-act="jd-f" data-v="${k}" aria-pressed="${f === k}">${esc(l)}</button>`).join("")}</div>
+    const legend = `<p class="small muted jd-legend">每一行右边的按钮是<b>你自己</b>有没有这一项，点一下换：<span class="jd-ev ev-y">有证据</span> 做过、能拿出来讲 → <span class="jd-ev ev-s">学过</span> 课上或自学过、没有项目 → <span class="jd-ev ev-n">没有</span> → <span class="jd-ev ev-u">还没标</span>。</p>`;
+    return head + `<details class="panel jd-how"${unknownTop > 3 ? " open" : ""}><summary><b>这一页怎么用</b></summary><ol class="small" style="margin:8px 0 0 18px;line-height:1.7">
+        <li>下面“技术要求”里，把每一项右边的按钮按你的实际情况标一遍（只要标一次，以后每份新 JD 都用得上）。</li>
+        <li>“最该补的”会自动从技术要求里挑出你<b>还没有证据</b>、JD 又常写在“必须”或“加分”里的，按重要程度排。挑最前面的一两项补：做个小项目、学一下、准备面试里的说法。</li>
+        <li>“你的强项”是你有证据、JD 又常要的：简历和求职信里用 JD 的原词写它们。</li></ol></details>
+      <div class="chips job-filter">${chips.map(([k, l]) => `<button class="chip${f === k ? " on" : ""}" data-act="jd-f" data-v="${k}" aria-pressed="${f === k}">${esc(l)}</button>`).join("")}</div>
       ${R.n < 5 ? `<p class="note">这一类只有 ${R.n} 份 JD，排名靠前的几项可以参考，后面的差一两份就会变。</p>` : ""}
       <div class="sec-title">最该补的${unknownTop ? `<span class="job-sec-note">前 20 项里还有 ${unknownTop} 项没标</span>` : ""}</div>
-      <div class="panel">${gaps.length ? gaps.map(row).join("") : `<p class="small muted">前面的要求都标了“有证据”。</p>`}
-        <p class="small muted" style="margin-top:8px">排法：写在“必须”里算 2、“加分”里算 1、只在职责里提到算 0.5，你标了“有证据”的不算。</p>
+      <div class="panel" id="jdGaps"><p class="small muted" style="margin:0 0 6px">从下面的“技术要求”里挑出来的：你标了学过、没有或还没标，JD 又写在“必须”或“加分”里的，按重要程度排前 8。</p>
+        ${gaps.length ? gaps.map((r, i) => row(r).replace('<b>', `<b><span class="jd-rank">${i + 1}</span>`)).join("") : `<p class="small muted">前面的要求都标了“有证据”。</p>`}
+        <p class="small muted" style="margin-top:8px">重要程度：一份 JD 写在“必须”里算 2 分、“加分”里算 1 分、只在职责里提到算 0.5 分，几份 JD 加起来。比如写在 10 份的“必须”、3 份的“加分”里，就是 23 分。</p>
         <div class="row-gap" style="margin-top:10px"><button class="btn sm primary" data-act="job-jd-ai">发给 AI：核对证据，补知识卡</button></div></div>
       <div class="sec-title">硬条件</div>
       <div class="panel small"><div>要求的工作年限：0–1 年 ${b[0]} 份，2–3 年 ${b[1]} 份，4 年以上 ${b[2]} 份，没写 ${R.years.length - yrs.length} 份。</div>
         ${R.neg.length ? `<div style="margin-top:6px">写了身份限制（公民、安全许可、出口管制、不担保）：<b>${esc(R.neg.join("、"))}</b></div>` : `<div style="margin-top:6px">没有 JD 写身份限制。</div>`}
         ${R.pos.length ? `<div style="margin-top:6px">写了可以担保或接受 OPT：<b>${esc(R.pos.join("、"))}</b></div>` : ""}</div>
-      ${haveKw.length ? `<div class="sec-title">简历关键词</div><div class="panel small">你有证据、JD 又常写的：<b>${esc(haveKw.map(r => r.label).join("、"))}</b>。简历和求职信里用 JD 里的原词写这些。</div>` : ""}
-      <div class="sec-title">技术要求 ${tech.length}</div><div class="panel">${shown.map(row).join("")}
+      ${haveKw.length ? `<div class="sec-title">你的强项</div><div class="panel small">你有证据、JD 又常写的：<b>${esc(haveKw.map(r => r.label).join("、"))}</b>。简历和求职信里用 JD 里的原词写这些。</div>` : ""}
+      <div class="sec-title">技术要求 ${tech.length}</div><div class="panel">${legend}<p class="small muted" style="margin:0 0 6px">按几份 JD 提到排。左边有橙色竖条的是缺口（你还没有证据、JD 又写在必须或加分里的），“最该补的”就是从这些里挑的。</p>${shown.map(row).join("")}
         ${tech.length > 25 ? `<button class="btn sm ghost" style="margin-top:8px" data-act="jd-all">${showAll ? "收起" : `全部 ${tech.length} 项`}</button>` : ""}</div>
       ${soft.length ? `<div class="sec-title">通用能力</div><div class="panel small">${soft.map(r => `${esc(r.label)} ${r.df}`).join("　")}<p class="small muted" style="margin-top:6px">这些几乎每份都写，靠故事证明（故事库里的 STAR），不算缺口。</p></div>` : ""}
       ${jobJdMatchListHTML(apps)}
@@ -18628,7 +18664,8 @@ VIEWS.jdstat = {
 ACT["jd-f"] = el => { L.jdF = el.dataset.v; saveLocal(); UI.render(); };
 ACT["jd-all"] = () => { L.jobFold = Object.assign({}, L.jobFold, {jdall:!(L.jobFold || {}).jdall}); saveLocal(); UI.render(); };
 ACT["jd-ev"] = el => { const ev = jobSkillEv(), k = el.dataset.v, order = ["", "y", "s", "n"]; const nx = order[(order.indexOf(ev[k] || "") + 1) % order.length]; if (nx) ev[k] = nx; else delete ev[k]; save();
-  el.className = `jd-ev ev-${nx || "u"}`; el.textContent = JOB_EV_L[nx] || "标一下"; };
+  el.className = `jd-ev ev-${nx || "u"}`; el.textContent = JOB_EV_L[nx] || "还没标"; const rw = el.closest(".jd-row"), r = jobJdAnalyze(jobJdApps()).list.find(x => x.id === k);
+  if (rw && r) rw.classList.toggle("gap", r.req + r.pref > 0 && nx !== "y"); };
 /* 发给 AI：只发统计结果（已经数过了），让它按状态文件核对证据、补知识卡、给简历写法 */
 ACT["job-jd-ai"] = () => {
   const apps = jobJdApps(); if (apps.length < 3){ toast(`至少要 3 份存了 JD 原文的投递（现在 ${apps.length} 份）`); return; }
@@ -21361,6 +21398,28 @@ Object.assign(I18N_EN, {
  "匹配 {n}% 以上的进面试：": "Match {n}%+, interviews: ",
  "匹配不到 {n}% 的：": "Match under {n}%: ",
  "投了 {n} 周以上、存了 JD 的投递有 {n} 份，攒到 {n} 份（匹配高的、低的各至少 {n} 份）就能比一比：匹配度高的是不是更容易拿到面试。": "Sent {n}+ weeks ago with a JD: {n}. At {n} (at least {n} each with high and low match), you can compare whether better matches get more interviews."
+});
+
+/* v1.77.1：JD 高频要求页的说明 */
+Object.assign(I18N_EN, {
+ "还没标": "Not marked",
+ "{n}：你有没有": "{n}: do you have it?",
+ "这一页怎么用": "How to use this page",
+ "下面“技术要求”里，把每一项右边的按钮按你的实际情况标一遍（只要标一次，以后每份新 JD 都用得上）。": "In “Technical requirements” below, mark the button on the right of each item to match what you actually have (once is enough; every new JD reuses it).",
+ "“最该补的”会自动从技术要求里挑出你": "“Biggest gaps” automatically picks, from the technical requirements, the items you ",
+ "还没有证据": "don't have evidence for",
+ "、JD 又常写在“必须”或“加分”里的，按重要程度排。挑最前面的一两项补：做个小项目、学一下、准备面试里的说法。": " and that JDs often list as required or a plus, ranked by importance. Take the top one or two: build a small project, study it, or prepare what to say in interviews.",
+ "“你的强项”是你有证据、JD 又常要的：简历和求职信里用 JD 的原词写它们。": "“Your strengths” are items you have evidence for that JDs often ask for: use the JD's exact words for them in your resume and cover letters.",
+ "每一行右边的按钮是": "The button on the right of each row is about ",
+ "你自己": "you",
+ "有没有这一项，点一下换：": ": whether you have it. Tap to change: ",
+ "做过、能拿出来讲 →": "done it, can show it →",
+ "课上或自学过、没有项目 →": "course or self-study, no project →",
+ "→": "→",
+ "从下面的“技术要求”里挑出来的：你标了学过、没有或还没标，JD 又写在“必须”或“加分”里的，按重要程度排前 8。": "Picked from “Technical requirements” below: items you marked Studied, None or Not marked that JDs list as required or a plus, top 8 by importance.",
+ "重要程度：一份 JD 写在“必须”里算 {n} 分、“加分”里算 {n} 分、只在职责里提到算 {n} 分，几份 JD 加起来。比如写在 {n} 份的“必须”、{n} 份的“加分”里，就是 {n} 分。": "Importance: each JD counts {n} if it's required, {n} if it's a plus, {n} if only in responsibilities, added up across JDs. Required in {n} JDs and a plus in {n} makes {n}.",
+ "你的强项": "Your strengths",
+ "按几份 JD 提到排。左边有橙色竖条的是缺口（你还没有证据、JD 又写在必须或加分里的），“最该补的”就是从这些里挑的。": "Sorted by how many JDs mention it. Rows with an orange bar on the left are gaps (no evidence yet, and listed as required or a plus); “Biggest gaps” is picked from these."
 });
 
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
