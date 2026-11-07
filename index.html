@@ -1094,6 +1094,13 @@ html[lang="en"] .job-count span{font-size:11.5px}
 /* v1.75.1：列表行宽度算上内边距（以前 content-box + 左右各 16px 内边距，比外框宽 30px，右边的按钮被截掉） */
 .li{box-sizing:border-box;max-width:100%}
 .list{box-sizing:border-box;max-width:100%}
+/* v1.75.3：列表行放不下时，右边的按钮整组换到下一行（以前按钮不能缩也不能换行，左边的文字被挤成一个字一行，日记的日期就竖着了） */
+.li{flex-wrap:wrap}
+.li > .grow{flex:1 1 10em;min-width:0}
+.li .grow, .li .grow *{overflow-wrap:break-word;word-break:normal}
+.li > .row-gap{max-width:100%;flex-wrap:wrap}
+.btn{box-sizing:border-box;max-width:100%}
+.btn.block{width:100%}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1115,7 +1122,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.75.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.75.4"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -20980,6 +20987,94 @@ const I18N_EN = {
   "说完停一下，会自动结束录音。第一次用要下载约 {n} MB 的模型（在“存储空间”里管理）。Whisper 偶尔会把很小的口误自动“修好”，所以语法检查可能漏掉个别错误。": "Pause when done and recording stops by itself. The first use downloads a model of about {n} MB (managed under Storage). Whisper sometimes “fixes” tiny slips, so the grammar check may miss an occasional error.",
   "纯绿背景、{n} 行 {n} 列：起手、轻击、重击·蓄力 / 重击、技能·蓄力、技能 / 被打中、赢、输。{n} 姿势表在第 {n} 行再加一个技能·出手。": "Plain green background, {n} rows × {n} columns: stance, light, heavy · charge / heavy, skill · charge, skill / hit, win, lose. A {n}-pose sheet adds skill · fire in row {n}.",
   "和导入角色一样的姿势表（纯绿背景，{n}、{n} 或 {n} 个姿势，人物朝左），app 会自动翻转，让它面对你。选它当哪一档：血量和出场位置跟着那一档走。当首领时，弱点照旧按你最近最常错的类型定；也可以把它固定给某种弱点。": "A pose sheet like your characters' (plain green, {n}, {n} or {n} poses, facing left); the app flips it to face you. Choose its tier: HP and position follow the tier. As a boss, its weakness still follows your most frequent recent mistakes, or you can fix it to one type.",
+  /* v1.75.3：用户第二份没翻译清单（练习时要说出英文的中文题目不翻） */
+  "快：base.en（约 {n} MB）": "Fast: base.en (about {n} MB)",
+  "第 {n}/{n} 只": "Enemy {n}/{n}",
+  "开头漏了一个词": "A word is missing at the start",
+  "开头漏了 be 动词（is / am / are）": "Missing be at the start (is / am / are)",
+  "我确定这样也对": "I'm sure this is right too",
+  "你有什么想问我的": "Do you have any questions for me",
+  "地道口语（真实对话）": "Natural speech (real conversations)",
+  "技术词汇": "Technical vocabulary",
+  "还有 {n} 题没打分": "{n} not rated yet",
+  "{n} 秒以上的停顿 {n} 次": "Pauses over {n} s: {n}",
+  "把这段录音转成文字": "Transcribe this recording",
+  "听完自己的录音，这题说得怎么样？": "After listening to yourself, how did this one go?",
+  "你说的文字": "What you said",
+  "检查我说的": "Check what I said",
+  "单题重练": "Re-practise this question",
+  "写这题的回答": "Write an answer for this question",
+  "想不起一个词时，别停下来：用 It's the thing you use to… / It's like… 把它描述出来，或者直接问 What's it called?": "When a word won't come, don't stop: describe it with It's the thing you use to… / It's like…, or just ask What's it called?",
+  "练 {n} 个": "Practise {n}",
+  "对照一下，你说对了吗？": "Compare: did you get it right?",
+  "第一次听你说话的人，最先听到的就是这几句。每句说 {n} 遍，只标 {n} 遍都没被听对的词。": "These are the first lines new listeners hear from you. Say each {n} times; only words missed all {n} times are marked.",
+  "听一个词，选你听到的是哪个。只用美式的声音，每题换一个声音。": "Hear a word and pick which one you heard. American voices only, a different one each time.",
+  "美式的 t 和 er": "The American t and er",
+  "听重音": "Hear the stress",
+  "练 {n} 题": "Practise {n}",
+  "节奏跟读": "Rhythm shadowing",
+  "先听标准读法，再录你的，连着听两遍找差别": "Hear the model, record yours, then play both twice to find the difference",
+  "别人没听懂过的词，加进来。可以写上它容易被听成什么。": "Add words people didn't understand. You can note what they get heard as.",
+  "加进来": "Add",
+  "还没有。": "None yet.",
+  "← 音标目录": "← IPA lessons",
+  "听一遍，选你听到的那个音标。": "Listen once and pick the IPA symbol you heard.",
+  "▶ 再听一遍": "▶ Listen again",
+  "：你听到的是": ": you heard",
+  "← 返回": "← Back",
+  "sheep 嘴角往两边拉、长一点；ship 短、放松": "sheep: spread your lips, longer; ship: short and relaxed",
+  "重音 · 第 {n}/{n} 题：重音在哪个音节？": "Stress · {n}/{n}: which syllable is stressed?",
+  "修改文章": "Edit article",
+  "be 动词：什么时候要 is / are / was / were": "be: when you need is / are / was / were",
+  "时态：先问自己“什么时候？”": "Tense: first ask yourself “when?”",
+  "-s：什么时候加": "-s: when to add it",
+  "① 主语是 he / she / it、一个人或一样东西，而且是一般现在时 → 动词加 -s。② 两个以上的东西 → 名词加 -s。③ I / you / we / they 后面，动词永远不加 -s。④ a / one / every / each 后面用单数。": "① Subject is he / she / it, one person or thing, in the present simple → the verb takes -s. ② Two or more things → the noun takes -s. ③ After I / you / we / they, the verb never takes -s. ④ After a / one / every / each, use the singular.",
+  "-ed：过去的事": "-ed: past events",
+  "已经结束的事，动词用过去式：大多数加 -ed（played、tested）；常用的不规则动词要单独记：go → went，take → took，get → got，come → came，buy → bought，do → did，make → made，see → saw。have / has 后面用过去分词：I've played、I've gone。": "Finished events take the past tense: most add -ed (played, tested); learn the common irregular ones: go → went, take → took, get → got, come → came, buy → bought, do → did, make → made, see → saw. After have / has, use the past participle: I've played, I've gone.",
+  "be 动词：形容词、名词、地点前面要有": "be: needed before adjectives, nouns and places",
+  "语序：先说“谁 + 做什么”": "Word order: “who + does what” first",
+  "中文常把时间、地点放前面；英语先说“谁 + 做什么 + 什么”，再往后加和谁、在哪、什么时候。时间也可以放句首，但地点一般放在动词后面。练法就是扩句：先说最短的一句，再一块一块往后加。": "Chinese often puts time and place first; English starts with “who + does what + what”, then adds with whom, where and when. Time can also open the sentence, but place usually follows the verb. Practise by expanding: say the shortest sentence, then add one chunk at a time.",
+  "because 和 so、although 和 but：二选一": "because / so, although / but: pick one",
+  "中文说“因为……所以……”“虽然……但是……”，英语只用其中一个。口语里最简单：因果只用 so，转折只用 but。": "Chinese says “because… so…” and “although… but…”; English uses only one of each pair. Easiest when speaking: use so for cause and effect, but for contrast.",
+  "从灯灭到说完一句的时间。越短，说明越接近脱口而出。": "Time from lights-out to finishing a line. Shorter means more fluent.",
+  "专业词": "Technical words",
+  "顽固错误 {n} 句：错过 {n} 次以上": "{n} stubborn mistakes: missed {n}+ times",
+  "专门练这些": "Practise these",
+  "还有什么想补充的": "Anything to add",
+  "你的优点": "Your strengths",
+  "期望薪资": "Salary expectations",
+  "什么时候能入职": "When you can start",
+  "怎么知道这个职位的": "How you heard about the role",
+  "具身智能": "Embodied AI",
+  "{n}D 打印": "{n}D printing",
+  "讲一个你做过的项目": "Tell me about a project you did",
+  "讲一次你解决技术难题的经历": "Tell me about solving a hard technical problem",
+  "讲一次团队合作 / 和队友意见不合的经历": "Tell me about teamwork / disagreeing with a teammate",
+  "讲一次失败或犯错，以及你学到了什么": "Tell me about a failure or mistake and what you learned",
+  "你的优点 / 需要改进的地方": "Your strengths / areas to improve",
+  "需要改进的地方": "Areas to improve",
+  "爱好": "Hobbies",
+  "最近怎么样？": "How have you been?",
+  "求职页的内容都能贴在这里：投递记录、面试题、知识卡、真实面试复盘拿回来的导入码。": "Anything for the Career page can be pasted here: applications, interview questions, knowledge cards, and import codes from real interview reviews.",
+  "小兵·空手。灰黑装甲的步兵，头盔一道青色光带，双手戴着加厚的动力拳套，指节发光。轻击：左右连拳；重击：蹲低后一记上勾拳；大招：拳套充能，一阵连打后一记重拳打出冲击环。": "Minion, unarmed. A grey-black armoured infantryman with a cyan visor stripe and heavy glowing power gauntlets. Light: left-right punches. Heavy: a low uppercut. Special: charged gauntlets, a flurry, then a big punch that sends out a shock ring.",
+  "小兵。灰黑装甲，手握电击警棍，棍身从拳头里横着伸出，像真正的警棍那样挥。轻击：从肩后抡下来；重击：双手举棍跳起来往下砸；大招：举棍蓄电火花四溅，正手、反手两棍，再跳起一记重砸，电光在对手身上炸开。": "Minion. Grey-black armour with a stun baton swung like a real one. Light: an overhead swing. Heavy: a two-handed jumping smash. Special: the baton charges with sparks, forehand and backhand strikes, then a leaping smash that bursts with lightning.",
+  "强化兵。藏青装甲加黄色条纹，前臂整个改装成一门能量炮（和手臂一体）。光弹沿着炮管方向平射出去。轻击：两发速射；重击：蓄能一发粗光弹；大招：五连发，再甩出一颗手雷。": "Elite soldier. Navy armour with yellow stripes; one forearm is an energy cannon firing straight along the barrel. Light: two quick shots. Heavy: one charged heavy blast. Special: five shots, then a thrown grenade.",
+  "强化兵。藏青装甲，前手能量防暴盾（斜对着对手），后手握一根长棍，平时放低在盾后。轻击：举棍越过盾牌砸下；重击：盾击；大招：光点聚进盾牌、能量场亮起，整个人冲撞过去，再举棍越盾重砸，打出冲击环。": "Elite soldier. Navy armour, an energy riot shield in front and a long staff held low behind it. Light: a staff strike over the shield. Heavy: a shield bash. Special: the shield charges and glows, a full-body charge, then a staff smash over the shield that sends out a shock ring.",
+  "精英。暗红重甲，头盔两只大角和发光面甲，一袭下摆燃着橙光的长披风盖住身后，手持一把刃口燃烧的弯刀。轻击：一刀斩；重击：先从上往下一直劈到低处，再从下往上撩起；大招：压得很低长时间蓄力聚光，冲刺穿过对手再穿回来，背对对手垂刀而立，对手身上一道道刀光疯狂划过，最后一个大十字炸开。": "Elite. Dark red heavy armour, a horned glowing helmet, a long cape burning orange at the hem, and a flaming curved blade. Light: one slash. Heavy: a top-to-bottom cleave, then an upward slash. Special: a long low charge, a dash through the opponent and back, standing with the blade lowered as slashes tear across them, ending in a huge exploding cross.",
+  "用指节走路的岩石爬兽，背着一块裂开的巨岩。轻击：抬爪往下挠；重击：转身甩尾抽过去；大招：裂缝烧红，张嘴往前喷火。": "A rocky crawler walking on its knuckles, carrying a cracked boulder. Light: a downward claw. Heavy: a spinning tail whip. Special: the cracks glow red and it breathes fire.",
+  "翅膀像破斗篷一样裹住身体，没有嘴。轻击：钩爪划；重击：双翼猛地一扇，甩出几道风刃，把对手卷进鳞粉旋风；大招：飞起来，收翅俯冲撞过去。": "Wings wrapped around it like a ragged cloak, no mouth. Light: a hooked claw. Heavy: a wing beat that throws wind blades and a whirl of scales. Special: it flies up, folds its wings and dives into the opponent.",
+  "犰狳般的带刺环甲、钻头长吻、铲子巨爪。轻击：铲爪刨；重击：钻头转起来往前顶；大招：钻进地里，从对手脚下钻出来。": "Spiked armadillo-like plates, a drill snout and shovel claws. Light: a digging claw. Heavy: a spinning drill thrust. Special: it burrows underground and bursts out under the opponent.",
+  "直立的蝎形怪，尾巴弯过头顶，尖端是一块蓝色晶刺。轻击：钳子夹；重击：尾巴从头顶甩下来一刺；大招：四肢着地，尾巴高高拱起，晶刺放出分叉的闪电，打完再站起来。": "An upright scorpion with its tail curled overhead, tipped with a blue crystal. Light: a pincer snap. Heavy: an overhead tail stab. Special: on all fours with the tail raised high, the crystal fires forked lightning, then it stands back up.",
+  "壮硕的极地怪，海象般的长獠牙，背脊和前臂长满冰晶。轻击：巨拳横扫；重击：低头用獠牙顶撞；大招：双拳砸地，冰刺一浪高过一浪冲向对手，最后一根巨大冰柱从对手脚下刺出、炸成碎冰。": "A hulking polar beast with walrus tusks and ice crystals on its back and arms. Light: a sweeping fist. Heavy: a tusk ram. Special: it pounds the ground, waves of ice spikes surge forward, and a giant ice pillar bursts up under the opponent.",
+  "生锈的青铜古代守卫，长着铜绿，一只竖缝独眼。轻击：三指钢爪抓；重击：举盾猛撞；大招：低头蓄能、喷出蒸汽，独眼射出绿色光束。": "A rusted bronze ancient guardian covered in verdigris, with one slit eye. Light: a three-fingered claw. Heavy: a shield ram. Special: it lowers its head, vents steam and fires a green beam from its eye.",
+  "一座会走路的火山：黑曜石外皮裂着岩浆纹，背上冒着火口，胸口岩肋后面是一团炉火。轻击：爪击；重击：一脚跺地，岩浆裂缝冲向对手，沿路喷出火柱，最后在对手脚下炸成火柱；大招：岩肋张开，胸口喷出熔岩光束。": "A walking volcano: obsidian skin veined with lava, vents on its back and a furnace behind its rock ribs. Light: a claw strike. Heavy: a stomp that sends a lava crack spouting fire pillars to the opponent. Special: its ribs open and its chest fires a lava beam.",
+  "深海来的怪物：一身发光斑点，额头挑着诱饵灯，满嘴针牙，下巴挂着触须。轻击：蹼爪抓；重击：张开大嘴扑咬；大招：诱饵灯发出一圈圈光把对手晃晕，再一口咬下去。": "A deep-sea monster with glowing spots, a lure on its forehead, needle teeth and chin barbels. Light: a webbed claw. Heavy: a lunging bite. Special: the lure dazzles the opponent with rings of light, then it bites.",
+  "修长的晶体龙，全身带棱的淡紫色晶甲，边缘泛彩光。轻击：晶爪斩；重击：肩上的晶刺射出一扇碎晶；大招：胸甲聚光，再分成五道彩色光束。": "A slender crystal dragon in faceted lavender armour with rainbow edges. Light: a crystal claw. Heavy: a fan of shards from its shoulder spikes. Special: its chest gathers light and splits into five coloured beams.",
+  "两个眼镜蛇头各自张开颈盾，脖子根上有发绿光的毒腺。轻击：一个头咬；重击：两个头一起扑咬；大招：两个头同时喷出发光的毒液流，溅开后化成一片毒雾。": "Two cobra heads with spread hoods and glowing green venom glands. Light: one head bites. Heavy: both heads lunge. Special: both spit glowing venom that splashes into a toxic cloud.",
+  "刀刃一样的钢灰羽毛，头上一簇风暴蓝的冠羽。轻击：爪击；重击：双翼一合，刮起一阵刃风；大招：猛扇几下翅膀升到空中，悬停着喷出一大片尖刺。": "Blade-like steel-grey feathers and a storm-blue crest. Light: a claw strike. Heavy: a wing clap that whips up a blade wind. Special: it beats up into the air and hovers, firing a spray of spikes.",
+  "随陨石落地的巨型甲虫，甲壳里嵌着陨石块，头上一根分叉的长角。轻击：巨臂横扫；重击：低头冲撞，用角把对手挑起来；大招：四臂举天，再猛地往下一甩，用无形的力量砸下一大片陨石。": "A giant beetle that fell with a meteor, shell studded with meteorite and a forked horn. Light: a sweeping arm. Heavy: a charge that tosses the opponent on its horn. Special: four arms raised, then swung down to bring a rain of meteors.",
+  "镇守山门的石像巨人：石块垒成的身躯箍着青铜环，头盔下一道金色符文眼缝。轻击：石拳直击；重击：双拳砸地，一排石刺冲到对手脚下；大招：蓄力下蹲，高高跳起，整个身子砸在对手身上。": "A stone giant guarding a mountain gate: a body of stacked blocks bound with bronze rings and a golden rune slit under its helmet. Light: a stone punch. Heavy: a ground pound sending a row of stone spikes. Special: it crouches, leaps high and crashes down on the opponent.",
+  "没有脸的瘦长外星怪，身体里嵌着一个转动的暗紫色漩涡，身后飘着一圈碎石。轻击：长爪斩；重击：消失，在对手面前现身一斩，再消失回原位；大招：在对手身上打开一个引力井，把一切吸进去再炸开。": "A faceless, gaunt alien with a swirling dark purple vortex in its body and a ring of floating rubble. Light: a long-claw slash. Heavy: it vanishes, reappears for a slash and vanishes back. Special: it opens a gravity well on the opponent that pulls everything in and explodes.",
 };
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
@@ -21129,6 +21224,9 @@ function i18nT(raw){
   if (v == null){ const mf = t.match(/^(.+?)\s+(\d+\/\d+)$/); if (mf && /[\u4e00-\u9fff]/.test(mf[1])){ const b = i18nT(mf[1]); if (b) v = b + " " + mf[2]; } }   /* 结尾带进度 1/3 */
   if (v == null){ const ms = t.match(/^(.+?)\s*\+(\d+)$/); if (ms && /[\u4e00-\u9fff]/.test(ms[1])){ const b = i18nT(ms[1]); if (b) v = b + " +" + ms[2]; } }
   /* v1.75.2：几类拼出来的文字（用户导出的没翻译清单里找到的） */
+  if (v == null){ const R3 = [[/^删除技能“(.+)”？$/, m => `Delete the skill “${i18nT(m[1]) || m[1]}”?`], [/^删除“(.+)”？$/, m => `Delete “${i18nT(m[1]) || m[1]}”?`],
+      [/^(.+?) \+(\d+)，经验值 \+(\d+)$/, m => `${i18nT(m[1]) || m[1]} +${m[2]}, XP +${m[3]}`], [/^英语：在只因里练了 (\d+) 分钟（(.+?)）(.*)$/, m => `English: practised ${m[1]} min in Cluck (${i18nT(m[2]) || m[2]})${m[3]}`], [/^；求职：$/, () => "; Career:"]];
+    for (const [re, f] of R3){ const m = t.match(re); if (m){ v = f(m); break; } } }   /* v1.75.4：删除确认里带名字的、带名字的加分说明 */
   if (v == null){ const R2 = [[/^问过 (\d+) 次：(.+)$/, (m) => `Asked ${m[1]}×: ${m[2]}`], [/^最近最需要练：(.+)，正确率 (\d+)%$/, (m) => `Needs the most work lately: ${i18nT(m[1]) || m[1]}, ${m[2]}% right`],
       [/^(\d+)月(\d+)日–(?:(\d+)月)?(\d+)日$/, (m) => { const M = n => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+n - 1] || n; return m[3] ? `${M(m[1])} ${m[2]} – ${M(m[3])} ${m[4]}` : `${M(m[1])} ${m[2]}–${m[4]}`; }],
       [/^(英语|中文) (.+?)（([a-z]{2}_[A-Z]{2}[^）]*)）$/, (m) => { const RG = {澳大利亚:"Australia", 英国:"UK", 印度:"India", 尼日利亚:"Nigeria", 美国:"US", 中国:"China", 香港:"Hong Kong", 澳门:"Macau", 马来西亚:"Malaysia", 新加坡:"Singapore", 台湾:"Taiwan", 加拿大:"Canada", 爱尔兰:"Ireland", 新西兰:"New Zealand", 南非:"South Africa", 菲律宾:"Philippines"}; return `${m[1] === "英语" ? "English" : "Chinese"} (${RG[m[2]] || m[2]}, ${m[3]})`; }]];
