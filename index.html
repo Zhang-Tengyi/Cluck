@@ -1125,7 +1125,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.75.5"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.76.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -6302,7 +6302,7 @@ VIEWS.me = {
     const s = S.settings; const enV = TTS.list("en"), zhV = TTS.list("zh");
     const opt = (list, cur) => `<option value="">自动选择</option>` + list.map(v => `<option value="${esc(v.name)}" ${v.name === cur ? "selected" : ""}>${esc(v.name)}（${esc(v.lang)}）</option>`).join("");
     return `<div class="wrap"><div class="top"><h2 style="font-size:26px">我的</h2></div>
-      <div class="panel" data-noi18n><label class="fld" style="margin-top:0"><span>界面语言 · Interface language</span><select data-chg="set" data-key="uiLang"><option value="zh" ${s.uiLang !== "en" ? "selected" : ""}>中文</option><option value="en" ${s.uiLang === "en" ? "selected" : ""}>English</option></select></label>
+      <div class="panel" data-noi18n><label class="fld" style="margin-top:0"><span>界面语言 · Interface language</span><select data-chg="set" data-key="uiLang"><option value="zh" ${s.uiLang !== "en" ? "selected" : ""}>中文</option>${Object.entries(typeof I18N_LANGS !== "undefined" ? I18N_LANGS : {en:{name:"English"}}).map(([k, v]) => `<option value="${k}" ${s.uiLang === k ? "selected" : ""}>${v.name}</option>`).join("")}</select></label>
         <p class="small muted" style="margin-top:6px">${s.uiLang === "en" ? "Only buttons, titles and other interface text change; practice content (questions, cards, answers, translations) stays the same." : "只换按钮、标题这些界面文字；练习内容（题目、卡片、回答、翻译）不变。"}</p>
          ${s.uiLang === "en" ? `<p class="small muted" style="margin-top:8px">Text that couldn't be shown in English is collected here. Copy it and send it to AI to fill it all in at once.</p><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="i18n-miss-copy">Copy untranslated text (${typeof I18N_MISS !== "undefined" ? I18N_MISS.size : 0})</button><button class="btn sm ghost" data-act="i18n-miss-clear">Clear</button></div>` : ""}</div>
       <div class="sec-title">练习</div><div class="panel">
@@ -18723,11 +18723,12 @@ ACT["job-fill-unlinked"] = () => {
   saveLocal(); UI.nav("jbulk");
 };
 
-/* 只因 · 界面语言（v1.71.0）：我的 → 界面语言选 English 时，把界面上固定的文字换成英文。
-   练习内容（题目、卡片、参考回答、中文意思、讲解）一律不动：只换词典里有的整句（数字可以变），对不上的保持中文。
-   做法：页面画出来以后（MutationObserver 看到新节点）逐个文本节点查词典；切回中文时把换过的还原，再重画一次。
-   打包时放在最后（要包一层 CHG.set）。词典是用 test 里的爬页面脚本把各主要页面的中文收集出来以后逐条翻的；没收进来的长说明暂时保持中文。 */
-"use strict";
+/* 只因的英文界面词典：中文原文 → English。
+   · 中文原文就是“编号”（和 gettext 一样），代码里的界面文字不用改；{n} 代表会变的数字，一句里有几个就按中文的先后顺序写几个。
+   · 练习内容（题目、卡片、参考回答、中文意思、语块、俚语解释）不翻；导入格式和导入关键词（卡 | 中文 | …、也对、改、计划 | 替换）不翻。
+   · 拼出来的文字（夹着名字、课名、日期的）在 i18n.js 的 i18nT 规则里处理，那几条规则现在只输出英文。
+   · 加一种语言：复制这个文件改名 lang_xx.js，把右边换成那种语言，文件最后登记到 I18N_LANGS（name 是设置里显示的名字），再在 build.py 的 parts 里、i18n.js 前面加上它；
+     然后运行 python3 tools/i18n_check.py xx，列出这种语言还缺哪些句子。i18nT 里输出英文的规则也要给新语言写一份。 */
 const I18N_EN = {
   /* 底部标签、通用按钮 */
   "成长": "Grow", "英语": "English", "求职": "Jobs", "我的": "Me", "返回": "Back", "退出": "Exit", "完成": "Done", "开始": "Start", "保存": "Save", "删除": "Delete", "取消": "Cancel", "确定": "OK", "编辑": "Edit", "导入": "Import", "预览": "Preview", "关闭": "Close", "知道了": "Got it", "主菜单": "Main menu", "导入新内容": "Import",
@@ -21122,6 +21123,17 @@ const I18N_EN = {
   "because 和 so 连用": "because with so",
   "① 后面是形容词、名词或地点，句子里没有别的动词 → 要 be：It's light.／It's a new phone.／I'm at home.　② 正在做 → be + -ing：My phone was freezing.　③ 被做 → be + 过去分词：The report was printed this morning.　④ 句子里已经有动作动词了（kept、fixed、helped）→ 不要再加 be：My phone kept freezing.，不说 My phone is kept freezing…　另外，主语是复数用 are / were，单数用 is / was。": "① Followed by an adjective, noun or place with no other verb in the sentence → you need be: It's light. / It's a new phone. / I'm at home.　② Doing something → be + -ing: My phone was freezing.　③ Having something done to it → be + past participle: The report was printed this morning.　④ The sentence already has an action verb (kept, fixed, helped) → don't add be: My phone kept freezing., not My phone is kept freezing…　Also, plural subjects take are / were, singular ones is / was.",
 };
+
+/* 语言登记表：设置里的“界面语言”选项从这里来 */
+var I18N_LANGS = (typeof I18N_LANGS !== "undefined" && I18N_LANGS) || {};
+I18N_LANGS.en = {name:"English", dict:I18N_EN};
+
+/* 只因 · 界面语言（v1.71.0）：我的 → 界面语言选 English 时，把界面上固定的文字换成英文。
+   练习内容（题目、卡片、参考回答、中文意思、讲解）一律不动：只换词典里有的整句（数字可以变），对不上的保持中文。
+   做法：页面画出来以后（MutationObserver 看到新节点）逐个文本节点查词典；切回中文时把换过的还原，再重画一次。
+   打包时放在最后（要包一层 CHG.set）。词典是用 test 里的爬页面脚本把各主要页面的中文收集出来以后逐条翻的；没收进来的长说明暂时保持中文。 */
+"use strict";
+/* v1.76.0：英文词典搬到 src/lang_en.js（I18N_EN、I18N_LANGS）；这里只留翻译程序 */
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
   "面试一题": "Interview question", "只听不看，和电话里一样": "Listen only, like a phone call", "看文字": "Show text", "我的小抄": "My cue card",
@@ -21250,15 +21262,18 @@ const I18N_FRAG = [
   [/^导入好了：卡片 (\d+)/, "Imported: $1 cards"], [/题目 (\d+)/, "$1 questions"], [/投递 (\d+)/, "$1 applications"], [/。在求职页能看到$/, ". See them on the Jobs page"],
   [/^公司：(.+)\(不在投递记录里\)$/, "Company: $1 (not in applications)"]
 ];
-function i18nOn(){ try { return !!(typeof S !== "undefined" && S && S.settings && S.settings.uiLang === "en"); } catch (e) { return false; } }
+/* v1.76.0：按设置里的界面语言取词典（现在只有英文）；找不到就用英文，和以前一样 */
+function i18nLang(){ try { return (typeof S !== "undefined" && S && S.settings && S.settings.uiLang) || "zh"; } catch (e) { return "zh"; } }
+function i18nDict(){ const L = I18N_LANGS[i18nLang()]; return (L && L.dict) || I18N_EN; }
+function i18nOn(){ try { return !!(typeof S !== "undefined" && S && S.settings && S.settings.uiLang !== "zh" && !!I18N_LANGS[S.settings.uiLang]); } catch (e) { return false; } }   /* v1.76.0：登记过的外语都算 */
 function i18nT(raw){
   const t = String(raw == null ? "" : raw).trim(); if (!t || !/[\u4e00-\u9fff]/.test(t)) return null;
-  let v = I18N_EN[t];
-  if (v == null){ const nums = []; const k = t.replace(/\d+(?:\.\d+)?/g, m => { nums.push(m); return "{n}"; }); const tpl = I18N_EN[k]; if (tpl != null){ let i = 0; v = tpl.replace(/\{n\}/g, () => nums[i] != null ? nums[i++] : ""); } }
+  let v = i18nDict()[t];
+  if (v == null){ const nums = []; const k = t.replace(/\d+(?:\.\d+)?/g, m => { nums.push(m); return "{n}"; }); const tpl = i18nDict()[k]; if (tpl != null){ let i = 0; v = tpl.replace(/\{n\}/g, () => nums[i] != null ? nums[i++] : ""); } }
   if (v == null){ let m;
-    if ((m = t.match(/^(.+)：(\d+) 题$/)) && I18N_EN[m[1]]) v = `${I18N_EN[m[1]]}: ${m[2]} questions`;
+    if ((m = t.match(/^(.+)：(\d+) 题$/)) && i18nDict()[m[1]]) v = `${i18nDict()[m[1]]}: ${m[2]} questions`;
     else if ((m = t.match(/^(.+)：(\d+) 张卡$/))) v = `${m[1]}: ${m[2]} cards`;
-    else if ((m = t.match(/^(.+)：完成了$/))) v = `${I18N_EN[m[1]] || m[1]}: done`;
+    else if ((m = t.match(/^(.+)：完成了$/))) v = `${i18nDict()[m[1]] || m[1]}: done`;
     else if ((m = t.match(/^(.+)，(电话初筛|招聘经理|技术面|现场面|其他)$/))) v = `${m[1]}, ${I18N_ROUND[m[2]]}`;
     else { let s = t; for (const [re, r] of I18N_FRAG) s = s.replace(re, r); if (s !== t && !/[\u4e00-\u9fff]/.test(s)) v = s; }   /* 片段规则换完还剩中文的，就整句保持中文，不出现半中半英 */
   }
@@ -21285,7 +21300,7 @@ function i18nT(raw){
       [/^(英语|中文) (.+?)（([a-z]{2}_[A-Z]{2}[^）]*)）$/, (m) => { const RG = {澳大利亚:"Australia", 英国:"UK", 印度:"India", 尼日利亚:"Nigeria", 美国:"US", 中国:"China", 香港:"Hong Kong", 澳门:"Macau", 马来西亚:"Malaysia", 新加坡:"Singapore", 台湾:"Taiwan", 加拿大:"Canada", 爱尔兰:"Ireland", 新西兰:"New Zealand", 南非:"South Africa", 菲律宾:"Philippines"}; return `${m[1] === "英语" ? "English" : "Chinese"} (${RG[m[2]] || m[2]}, ${m[3]})`; }]];
     for (const [re, f] of R2){ const m = t.match(re); if (m){ v = f(m); break; } } }
   /* “前缀：内容”：只有后面的内容也翻得了（或者本来就没有中文）才用；不然留给后面更具体的规则（v1.75.0 这条抢在学音标规则前面，“音标：学第……”只翻了一半） */
-  if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = I18N_EN[mp[1] + "："] || I18N_EN[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; if (r) v = p.replace(/[:：]\s*$/, "") + ": " + r; else if (/^(题库|劲敌|对方|角色|敌人|职位|公司|首领|复盘)$/.test(mp[1])) v = p.replace(/[:：]\s*$/, "") + ": " + mp[2]; } } }   /* 后面一定是名字的前缀：名字原样保留 */
+  if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = i18nDict()[mp[1] + "："] || i18nDict()[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; if (r) v = p.replace(/[:：]\s*$/, "") + ": " + r; else if (/^(题库|劲敌|对方|角色|敌人|职位|公司|首领|复盘)$/.test(mp[1])) v = p.replace(/[:：]\s*$/, "") + ": " + mp[2]; } } }   /* 后面一定是名字的前缀：名字原样保留 */
   if (v == null){ const mx = t.match(/^(.+?)\s*[×x]\s*(\d+)$/); if (mx){ const base = i18nT(mx[1]); if (base) v = base + " ×" + mx[2]; } }   /* v1.74.1：结尾带“×3”这类次数的 */
   if (v == null){ const mi = t.match(/^音标：学第 (\d+) 课「(.+?)」（约 (\d+) 分钟）(?:，再复习 (\d+) 课)?$/); if (mi){ const nm = i18nT(mi[1] + ". " + mi[2]); const en = nm ? nm.replace(/^\d+\.\s*/, "") : mi[2];
     v = `IPA: lesson ${mi[1]} “${en}” (about ${mi[3]} min)${mi[4] ? `, plus ${mi[4]} review${mi[4] === "1" ? "" : "s"}` : ""}`; } }   /* v1.74.1：学音标的计划项（中间是课名） */
