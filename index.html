@@ -1102,6 +1102,9 @@ html[lang="en"] .job-count span{font-size:11.5px}
 .btn{box-sizing:border-box;max-width:100%}
 .btn.block{width:100%}
 
+/* v1.75.5：表格的表头允许换行、字号小一点（英文表头比中文长，以前挤在一起互相重叠） */
+.panel table th, .card table th, table th{white-space:normal;word-break:normal;overflow-wrap:break-word;font-size:.72rem;line-height:1.2;vertical-align:bottom}
+
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
 code{font-size:12.5px;background:var(--surface2);padding:1px 5px;border-radius:5px;word-break:break-all}
@@ -1122,7 +1125,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.75.4"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.75.5"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -6300,8 +6303,8 @@ VIEWS.me = {
     const opt = (list, cur) => `<option value="">自动选择</option>` + list.map(v => `<option value="${esc(v.name)}" ${v.name === cur ? "selected" : ""}>${esc(v.name)}（${esc(v.lang)}）</option>`).join("");
     return `<div class="wrap"><div class="top"><h2 style="font-size:26px">我的</h2></div>
       <div class="panel" data-noi18n><label class="fld" style="margin-top:0"><span>界面语言 · Interface language</span><select data-chg="set" data-key="uiLang"><option value="zh" ${s.uiLang !== "en" ? "selected" : ""}>中文</option><option value="en" ${s.uiLang === "en" ? "selected" : ""}>English</option></select></label>
-        <p class="small muted" style="margin-top:6px">只换按钮、标题这些界面文字；练习内容（题目、卡片、回答、翻译）不变。 · Only the interface changes; practice content stays the same.</p>
-         ${s.uiLang === "en" ? `<p class="small muted" style="margin-top:8px">英文界面下没能翻成英文的文字会记在这里：复制发给 AI，就能一次补上。</p><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="i18n-miss-copy">复制没翻译的文字（${typeof I18N_MISS !== "undefined" ? I18N_MISS.size : 0}）</button><button class="btn sm ghost" data-act="i18n-miss-clear">清空</button></div>` : ""}</div>
+        <p class="small muted" style="margin-top:6px">${s.uiLang === "en" ? "Only buttons, titles and other interface text change; practice content (questions, cards, answers, translations) stays the same." : "只换按钮、标题这些界面文字；练习内容（题目、卡片、回答、翻译）不变。"}</p>
+         ${s.uiLang === "en" ? `<p class="small muted" style="margin-top:8px">Text that couldn't be shown in English is collected here. Copy it and send it to AI to fill it all in at once.</p><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="i18n-miss-copy">Copy untranslated text (${typeof I18N_MISS !== "undefined" ? I18N_MISS.size : 0})</button><button class="btn sm ghost" data-act="i18n-miss-clear">Clear</button></div>` : ""}</div>
       <div class="sec-title">练习</div><div class="panel">
         <label class="fld" style="margin-top:0"><span>每天最多几道新题</span><select data-chg="set" data-key="newPerDay" data-num="1">${[6,12,20].map(n => `<option value="${n}" ${s.newPerDay === n ? "selected" : ""}>${n} 道</option>`).join("")}</select></label>
          <div class="fld"><span>智能调整新题</span><button class="btn sm${s.newSmart ? " primary" : ""}" data-act="new-smart" aria-pressed="${!!s.newSmart}">${s.newSmart ? "已开启" : "已关闭"}</button></div>
@@ -21075,6 +21078,49 @@ const I18N_EN = {
   "随陨石落地的巨型甲虫，甲壳里嵌着陨石块，头上一根分叉的长角。轻击：巨臂横扫；重击：低头冲撞，用角把对手挑起来；大招：四臂举天，再猛地往下一甩，用无形的力量砸下一大片陨石。": "A giant beetle that fell with a meteor, shell studded with meteorite and a forked horn. Light: a sweeping arm. Heavy: a charge that tosses the opponent on its horn. Special: four arms raised, then swung down to bring a rain of meteors.",
   "镇守山门的石像巨人：石块垒成的身躯箍着青铜环，头盔下一道金色符文眼缝。轻击：石拳直击；重击：双拳砸地，一排石刺冲到对手脚下；大招：蓄力下蹲，高高跳起，整个身子砸在对手身上。": "A stone giant guarding a mountain gate: a body of stacked blocks bound with bronze rings and a golden rune slit under its helmet. Light: a stone punch. Heavy: a ground pound sending a row of stone spikes. Special: it crouches, leaps high and crashes down on the opponent.",
   "没有脸的瘦长外星怪，身体里嵌着一个转动的暗紫色漩涡，身后飘着一圈碎石。轻击：长爪斩；重击：消失，在对手面前现身一斩，再消失回原位；大招：在对手身上打开一个引力井，把一切吸进去再炸开。": "A faceless, gaunt alien with a swirling dark purple vortex in its body and a ring of floating rubble. Light: a long-claw slash. Heavy: it vanishes, reappears for a slash and vanishes back. Special: it opens a gravity well on the opponent that pulls everything in and explodes.",
+  /* v1.75.5：错误档案的说明和统计、旧计划项、离线安装、知识复习、行业和分组名、错误类型名、语法页 be 的讲解 */
+  "一共 {n} 次，最近一个月 {n} 次": "{n} in total, {n} in the last month",
+  "体谅": "Understanding",
+  "练这一类": "Practise this type",
+  "在清单里": "On the list",
+  "（导入时标了优先）": "(marked as priority on import)",
+  "形容词、地点前面要有 be：That's cool、It's hard、I'm here": "be is needed before adjectives and places: That's cool, It's hard, I'm here",
+  "讲过去的事用过去式；最近一直在做的用 I've been …": "Past tense for the past; I've been … for what you've been doing lately",
+  "先说“主语 + 动词”，别按中文语序一个词一个词翻": "Say “subject + verb” first; don't translate word by word in Chinese order",
+  "最近是 these days 或 lately；those days 是“那些日子（过去）”": "“Recently” is these days or lately; those days means “back then”",
+  "although 和 but 只留一个": "Keep only one of although and but",
+  "now / know、you / your、mouth / month 这种拼成了别的真词，意思就跑偏了": "Misspelling into another real word (now / know, you / your, mouth / month) changes the meaning",
+  "两个以上的东西加 -s": "Add -s for two or more things",
+  "I 永远大写": "I is always capitalised",
+  "一句只讲一件事，拆成两句": "One idea per sentence; split it in two",
+  "have 后面用过去分词：haven't played": "After have, use the past participle: haven't played",
+  "情态动词不能叠用：might can → could": "Don't stack modal verbs: might can → could",
+  "年份、季节前面用 in：in {n}、in the summer": "Use in before years and seasons: in {n}, in the summer",
+  "疑问句把 do / does / did / is / are 提前": "In questions, put do / does / did / is / are first",
+  "主语是 I 时动词不加 -s；he / she / it 后面要加 -s": "No -s after I; add -s after he / she / it",
+  "习惯用一般现在时：I usually go …": "Habits take the present simple: I usually go …",
+  "元音开头用 an：an interview": "Use an before vowel sounds: an interview",
+  "一般过去的事用过去式就够了": "The simple past is enough for past events",
+  "事物让人觉得怎样用 -ing：exciting、tiring": "Use -ing for how something feels: exciting, tiring",
+  "most 和 -est 二选一": "Use most or -est, not both",
+  "先回答对方的问题 → 再回应 → 再说自己的新话题 → 最后留一个问题": "Answer their question → respond → add your own topic → end with a question",
+  "复习到期的卡：今天到期 {n} 张，比一轮多——先清复习，今天不学新卡": "Due reviews: {n} due today, more than one round. Clear reviews first; no new cards today",
+  "看错误档案：这周哪类错误在减少？最常犯的那类，今天写和说的时候特别注意": "Error log: which mistakes are dropping this week? Watch your most common one when writing and speaking today",
+  "已经装在桌面上了。离线缓存已经准备好，没网也能打开。": "Already on your home screen. The offline cache is ready, so it opens without internet.",
+  "到期 {n} 张，没学 {n} 张": "{n} due, {n} not started",
+  "消费电子": "Consumer electronics",
+  "能源": "Energy",
+  "实验室自动化": "Lab automation",
+  "真空设备": "Vacuum equipment",
+  "食品饮料": "Food & beverage",
+  "暖通": "HVAC",
+  "生物科技": "Biotech",
+  "机加工": "Machining",
+  "电路与控制理论": "Circuits & control theory",
+  "中文结构直译": "Literal Chinese structure",
+  "although 和 but 连用": "although with but",
+  "because 和 so 连用": "because with so",
+  "① 后面是形容词、名词或地点，句子里没有别的动词 → 要 be：It's light.／It's a new phone.／I'm at home.　② 正在做 → be + -ing：My phone was freezing.　③ 被做 → be + 过去分词：The report was printed this morning.　④ 句子里已经有动作动词了（kept、fixed、helped）→ 不要再加 be：My phone kept freezing.，不说 My phone is kept freezing…　另外，主语是复数用 are / were，单数用 is / was。": "① Followed by an adjective, noun or place with no other verb in the sentence → you need be: It's light. / It's a new phone. / I'm at home.　② Doing something → be + -ing: My phone was freezing.　③ Having something done to it → be + past participle: The report was printed this morning.　④ The sentence already has an action verb (kept, fixed, helped) → don't add be: My phone kept freezing., not My phone is kept freezing…　Also, plural subjects take are / were, singular ones is / was.",
 };
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
@@ -21224,6 +21270,13 @@ function i18nT(raw){
   if (v == null){ const mf = t.match(/^(.+?)\s+(\d+\/\d+)$/); if (mf && /[\u4e00-\u9fff]/.test(mf[1])){ const b = i18nT(mf[1]); if (b) v = b + " " + mf[2]; } }   /* 结尾带进度 1/3 */
   if (v == null){ const ms = t.match(/^(.+?)\s*\+(\d+)$/); if (ms && /[\u4e00-\u9fff]/.test(ms[1])){ const b = i18nT(ms[1]); if (b) v = b + " +" + ms[2]; } }
   /* v1.75.2：几类拼出来的文字（用户导出的没翻译清单里找到的） */
+  /* v1.75.5：上次的“名字”还剩 N 题；现在检查的清单：代码 名字、…；（Whisper 模型，约 N MB，已下载） */
+  if (v == null){ const R4 = [[/^上次的“(.+)”还剩 (\d+) 题$/, m => `“${i18nT(m[1]) || m[1]}” from last time: ${m[2]} left`],
+      [/^现在检查的清单：(.+)$/, m => "Current checklist: " + m[1].split("、").map(x => { const c = x.trim().match(/^([A-C]\d+)\s+(.+)$/); return c ? c[1] + " " + (i18nT(c[2]) || c[2]) : (i18nT(x.trim()) || x.trim()); }).join(", ")],
+      [/^（Whisper ([\w.-]+)，约 (\d+) MB(?:，(已下载|还没下载))?）$/, m => `(Whisper ${m[1]}, about ${m[2]} MB${m[3] ? ", " + (m[3] === "已下载" ? "downloaded" : "not downloaded") : ""})`]];
+    for (const [re, f] of R4){ const m = t.match(re); if (m){ v = f(m); break; } } }
+  /* 中间用几个空格拼起来的（日期　几天前　题库：名字）：按空格拆开分别翻 */
+  if (v == null && /\S(\s{2,}|　+)\S/.test(t)){ const ps = t.split(/(\s{2,}|　+)/); let ch = false; const out = ps.map((x, i) => { if (i % 2) return x; const r = /[\u4e00-\u9fff]/.test(x) ? i18nT(x) : null; if (r){ ch = true; return r; } return x; }); if (ch) v = out.join(""); }
   if (v == null){ const R3 = [[/^删除技能“(.+)”？$/, m => `Delete the skill “${i18nT(m[1]) || m[1]}”?`], [/^删除“(.+)”？$/, m => `Delete “${i18nT(m[1]) || m[1]}”?`],
       [/^(.+?) \+(\d+)，经验值 \+(\d+)$/, m => `${i18nT(m[1]) || m[1]} +${m[2]}, XP +${m[3]}`], [/^英语：在只因里练了 (\d+) 分钟（(.+?)）(.*)$/, m => `English: practised ${m[1]} min in Cluck (${i18nT(m[2]) || m[2]})${m[3]}`], [/^；求职：$/, () => "; Career:"]];
     for (const [re, f] of R3){ const m = t.match(re); if (m){ v = f(m); break; } } }   /* v1.75.4：删除确认里带名字的、带名字的加分说明 */
@@ -21232,12 +21285,13 @@ function i18nT(raw){
       [/^(英语|中文) (.+?)（([a-z]{2}_[A-Z]{2}[^）]*)）$/, (m) => { const RG = {澳大利亚:"Australia", 英国:"UK", 印度:"India", 尼日利亚:"Nigeria", 美国:"US", 中国:"China", 香港:"Hong Kong", 澳门:"Macau", 马来西亚:"Malaysia", 新加坡:"Singapore", 台湾:"Taiwan", 加拿大:"Canada", 爱尔兰:"Ireland", 新西兰:"New Zealand", 南非:"South Africa", 菲律宾:"Philippines"}; return `${m[1] === "英语" ? "English" : "Chinese"} (${RG[m[2]] || m[2]}, ${m[3]})`; }]];
     for (const [re, f] of R2){ const m = t.match(re); if (m){ v = f(m); break; } } }
   /* “前缀：内容”：只有后面的内容也翻得了（或者本来就没有中文）才用；不然留给后面更具体的规则（v1.75.0 这条抢在学音标规则前面，“音标：学第……”只翻了一半） */
-  if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = I18N_EN[mp[1] + "："] || I18N_EN[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; if (r) v = p.replace(/[:：]\s*$/, "") + ": " + r; } } }
+  if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = I18N_EN[mp[1] + "："] || I18N_EN[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; if (r) v = p.replace(/[:：]\s*$/, "") + ": " + r; else if (/^(题库|劲敌|对方|角色|敌人|职位|公司|首领|复盘)$/.test(mp[1])) v = p.replace(/[:：]\s*$/, "") + ": " + mp[2]; } } }   /* 后面一定是名字的前缀：名字原样保留 */
   if (v == null){ const mx = t.match(/^(.+?)\s*[×x]\s*(\d+)$/); if (mx){ const base = i18nT(mx[1]); if (base) v = base + " ×" + mx[2]; } }   /* v1.74.1：结尾带“×3”这类次数的 */
   if (v == null){ const mi = t.match(/^音标：学第 (\d+) 课「(.+?)」（约 (\d+) 分钟）(?:，再复习 (\d+) 课)?$/); if (mi){ const nm = i18nT(mi[1] + ". " + mi[2]); const en = nm ? nm.replace(/^\d+\.\s*/, "") : mi[2];
     v = `IPA: lesson ${mi[1]} “${en}” (about ${mi[3]} min)${mi[4] ? `, plus ${mi[4]} review${mi[4] === "1" ? "" : "s"}` : ""}`; } }   /* v1.74.1：学音标的计划项（中间是课名） */
   if (v == null){ const mh = t.match(/^(Morning|Lunch|Evening|Bedtime|Weekend|Anytime|Noon|Afternoon) → (?:IPA: )?(.+)$/); if (mh && /[\u4e00-\u9fff]/.test(mh[2])){ const r = i18nT(mh[2]) || i18nT("音标：" + mh[2]); if (r) v = mh[1] + " → " + r; } }   /* 已经翻了一半的计划项 */
   if (v == null){ const mm = t.match(/^(早上|午休|晚上|睡前|周末|随时|中午|下午) → (.+)$/); if (mm){ const rest = i18nT(mm[2]); const cu = {早上:"Morning", 午休:"Lunch", 晚上:"Evening", 睡前:"Bedtime", 周末:"Weekend", 随时:"Anytime", 中午:"Noon", 下午:"Afternoon"}[mm[1]]; if (rest) v = cu + " → " + rest; } }   /* v1.73.0：计划项 */
+  if (v === "1 items") v = "1 item";   /* v1.75.5 */
   return v == null ? null : String(raw).replace(t, v);
 }
 const I18N_ORIG = new Map();
