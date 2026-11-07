@@ -1091,6 +1091,9 @@ html[lang="en"] .job-count span{font-size:11.5px}
 .gc-lab-gain div{background:rgba(10,20,45,.72);border:1px solid rgba(140,210,255,.6);border-radius:8px;padding:3px 9px;margin:3px auto;width:max-content;max-width:92vw;white-space:normal}
 @keyframes gcGain{0%{opacity:0;transform:translate(-50%,-30%)}12%{opacity:1;transform:translate(-50%,-50%)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-80%)}}
 .gc-lab-gain b{display:block;font-size:13px}.gc-lab-gain span{display:inline-block;margin:0 4px;font-size:12px;color:#ffe28a}
+/* v1.75.1：列表行宽度算上内边距（以前 content-box + 左右各 16px 内边距，比外框宽 30px，右边的按钮被截掉） */
+.li{box-sizing:border-box;max-width:100%}
+.list{box-sizing:border-box;max-width:100%}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1112,7 +1115,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.75.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.75.2"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -20932,6 +20935,51 @@ const I18N_EN = {
   "复制好了：{n} 条": "Copied: {n}",
   "还没有记到没翻译的文字": "No untranslated text recorded yet",
   "清空了没翻译的记录": "Cleared the untranslated list",
+  /* v1.75.2：用户导出的没翻译清单里的界面文字 */
+  "{n} 张卡": "{n} cards",
+  "还有 {n} 张没列出来": "{n} more not shown",
+  "已下载，占 {n} MB": "Downloaded, {n} MB",
+  "模拟面试时没说好的 {n} 道题，今天该重练了": "{n} questions you struggled with in mocks are due for re-practice today",
+  "学了 {n}/{n} 课，今天要复习 {n} 课": "{n}/{n} lessons done, {n} to review today",
+  "找到 {n} 个中文语音": "{n} Chinese voices found",
+  "{n} 米": "{n} m",
+  "首页的“开始”是学习模式，没有游戏；“游戏”里每说完一句马上出招。今天的游戏：{n} 轮，{n} 句，{n} 点。 昨天的你：{n}": "Start on the home page is study mode with no game; in Game each line triggers a move. Today's game: {n} rounds, {n} lines, {n} points. Yesterday's you: {n}",
+  "读": "Read",
+  "聊天、写邮件时现成的说法，整块背、整块用，比一个词一个词拼省力，也不容易错。这些也在“日常生活”题库里，每天的复习会练到；“写作”页面里点一下就能插进去。": "Ready-made phrases for chatting and emails: learn and use them whole; it's easier and safer than building word by word. They're also in the Daily life deck for daily review, and one tap inserts them on the Writing page.",
+  "练全部聊天语块": "Practise all chat chunks",
+  "练全部邮件说法": "Practise all email phrases",
+  "练这一组": "Practise this set",
+  "我导入的": "My imports",
+  "以前的日记": "Past journals",
+  "从头放": "Play from the start",
+  "屏幕会保持常亮，锁屏后会停下。这里的练习不改变复习安排，但计入练习时间。": "The screen stays on; locking stops it. This doesn't change reviews but counts as practice time.",
+  "半导体": "Semiconductors",
+  "机器人": "Robotics",
+  "医疗器械": "Medical devices",
+  "正在查看手机里存了哪些模型……": "Checking which models are on the phone…",
+  "已设为长期保存：手机空间紧张时，浏览器不会自动清掉这些数据。": "Persistent storage on: the browser won't clear this data when space is low.",
+  "正在查看用的是哪个模型……": "Checking which model is in use…",
+  "改名": "Rename",
+  "泽塔": "Z",
+  "迪迦": "Tiga",
+  "红奈": "Nexus",
+  "梦比优斯": "Mebius",
+  "替换图的大小": "Replacement image size",
+  "设定大招光线的起点": "Set where the special beam starts",
+  "删除这个角色": "Delete this character",
+  "能巨大化": "Can go giant",
+  "预览现在是巨人。巨人太高时，镜头会自动拉远，不会大出画面。": "The preview is now giant. If it's too tall, the camera pulls back so it stays in frame.",
+  "大小": "Size",
+  "每局随机（普通和巨大都会出现）": "Random each round (normal and giant)",
+  "只在普通大小": "Normal size only",
+  "只在巨大化": "Giant only",
+  "巨大时的身高": "Height when giant",
+  "你没在用的角色会以“劲敌”的身份出现：精英那一档偶尔出现，打完首领以后的加赛里也会出现，用它自己的招式和身高。能不能在巨大化的局里出现，看它自己“巨大化”里的设置。": "Characters you aren't using appear as rivals: now and then at the elite tier, and in the bonus round after a boss, with their own moves and height. Whether they appear in giant rounds follows their own Giant setting.",
+  "Whisper 用哪个模型": "Which Whisper model",
+  "准一些：small.en（约 {n} MB，慢一两秒）": "More accurate: small.en (about {n} MB, a second or two slower)",
+  "说完停一下，会自动结束录音。第一次用要下载约 {n} MB 的模型（在“存储空间”里管理）。Whisper 偶尔会把很小的口误自动“修好”，所以语法检查可能漏掉个别错误。": "Pause when done and recording stops by itself. The first use downloads a model of about {n} MB (managed under Storage). Whisper sometimes “fixes” tiny slips, so the grammar check may miss an occasional error.",
+  "纯绿背景、{n} 行 {n} 列：起手、轻击、重击·蓄力 / 重击、技能·蓄力、技能 / 被打中、赢、输。{n} 姿势表在第 {n} 行再加一个技能·出手。": "Plain green background, {n} rows × {n} columns: stance, light, heavy · charge / heavy, skill · charge, skill / hit, win, lose. A {n}-pose sheet adds skill · fire in row {n}.",
+  "和导入角色一样的姿势表（纯绿背景，{n}、{n} 或 {n} 个姿势，人物朝左），app 会自动翻转，让它面对你。选它当哪一档：血量和出场位置跟着那一档走。当首领时，弱点照旧按你最近最常错的类型定；也可以把它固定给某种弱点。": "A pose sheet like your characters' (plain green, {n}, {n} or {n} poses, facing left); the app flips it to face you. Choose its tier: HP and position follow the tier. As a boss, its weakness still follows your most frequent recent mistakes, or you can fix it to one type.",
 };
 /* 第 2 批：单题彩排、复盘打分、自查清单（v1.71.0 收尾时按英文界面扫描补的） */
 Object.assign(I18N_EN, {
@@ -21080,18 +21128,33 @@ function i18nT(raw){
   if (v == null){ const md = t.match(/^(\d+)月(\d+)日(?:\s*周([一二三四五六日]))?(?:\s+(\d+:\d+))?$/); if (md){ const MO = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+md[1] - 1] || md[1], WD = md[3] ? {一:"Mon", 二:"Tue", 三:"Wed", 四:"Thu", 五:"Fri", 六:"Sat", 日:"Sun"}[md[3]] + ", " : ""; v = `${WD}${MO} ${md[2]}${md[4] ? " " + md[4] : ""}`; } }
   if (v == null){ const mf = t.match(/^(.+?)\s+(\d+\/\d+)$/); if (mf && /[\u4e00-\u9fff]/.test(mf[1])){ const b = i18nT(mf[1]); if (b) v = b + " " + mf[2]; } }   /* 结尾带进度 1/3 */
   if (v == null){ const ms = t.match(/^(.+?)\s*\+(\d+)$/); if (ms && /[\u4e00-\u9fff]/.test(ms[1])){ const b = i18nT(ms[1]); if (b) v = b + " +" + ms[2]; } }
-  if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = I18N_EN[mp[1] + "："] || I18N_EN[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; v = p.replace(/[:：]\s*$/, "") + ": " + (r || mp[2]); } } }
+  /* v1.75.2：几类拼出来的文字（用户导出的没翻译清单里找到的） */
+  if (v == null){ const R2 = [[/^问过 (\d+) 次：(.+)$/, (m) => `Asked ${m[1]}×: ${m[2]}`], [/^最近最需要练：(.+)，正确率 (\d+)%$/, (m) => `Needs the most work lately: ${i18nT(m[1]) || m[1]}, ${m[2]}% right`],
+      [/^(\d+)月(\d+)日–(?:(\d+)月)?(\d+)日$/, (m) => { const M = n => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+n - 1] || n; return m[3] ? `${M(m[1])} ${m[2]} – ${M(m[3])} ${m[4]}` : `${M(m[1])} ${m[2]}–${m[4]}`; }],
+      [/^(英语|中文) (.+?)（([a-z]{2}_[A-Z]{2}[^）]*)）$/, (m) => { const RG = {澳大利亚:"Australia", 英国:"UK", 印度:"India", 尼日利亚:"Nigeria", 美国:"US", 中国:"China", 香港:"Hong Kong", 澳门:"Macau", 马来西亚:"Malaysia", 新加坡:"Singapore", 台湾:"Taiwan", 加拿大:"Canada", 爱尔兰:"Ireland", 新西兰:"New Zealand", 南非:"South Africa", 菲律宾:"Philippines"}; return `${m[1] === "英语" ? "English" : "Chinese"} (${RG[m[2]] || m[2]}, ${m[3]})`; }]];
+    for (const [re, f] of R2){ const m = t.match(re); if (m){ v = f(m); break; } } }
+  /* “前缀：内容”：只有后面的内容也翻得了（或者本来就没有中文）才用；不然留给后面更具体的规则（v1.75.0 这条抢在学音标规则前面，“音标：学第……”只翻了一半） */
+  if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = I18N_EN[mp[1] + "："] || I18N_EN[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; if (r) v = p.replace(/[:：]\s*$/, "") + ": " + r; } } }
   if (v == null){ const mx = t.match(/^(.+?)\s*[×x]\s*(\d+)$/); if (mx){ const base = i18nT(mx[1]); if (base) v = base + " ×" + mx[2]; } }   /* v1.74.1：结尾带“×3”这类次数的 */
   if (v == null){ const mi = t.match(/^音标：学第 (\d+) 课「(.+?)」（约 (\d+) 分钟）(?:，再复习 (\d+) 课)?$/); if (mi){ const nm = i18nT(mi[1] + ". " + mi[2]); const en = nm ? nm.replace(/^\d+\.\s*/, "") : mi[2];
     v = `IPA: lesson ${mi[1]} “${en}” (about ${mi[3]} min)${mi[4] ? `, plus ${mi[4]} review${mi[4] === "1" ? "" : "s"}` : ""}`; } }   /* v1.74.1：学音标的计划项（中间是课名） */
+  if (v == null){ const mh = t.match(/^(Morning|Lunch|Evening|Bedtime|Weekend|Anytime|Noon|Afternoon) → (?:IPA: )?(.+)$/); if (mh && /[\u4e00-\u9fff]/.test(mh[2])){ const r = i18nT(mh[2]) || i18nT("音标：" + mh[2]); if (r) v = mh[1] + " → " + r; } }   /* 已经翻了一半的计划项 */
   if (v == null){ const mm = t.match(/^(早上|午休|晚上|睡前|周末|随时|中午|下午) → (.+)$/); if (mm){ const rest = i18nT(mm[2]); const cu = {早上:"Morning", 午休:"Lunch", 晚上:"Evening", 睡前:"Bedtime", 周末:"Weekend", 随时:"Anytime", 中午:"Noon", 下午:"Afternoon"}[mm[1]]; if (rest) v = cu + " → " + rest; } }   /* v1.73.0：计划项 */
   return v == null ? null : String(raw).replace(t, v);
 }
 const I18N_ORIG = new Map();
-const I18N_SKIP = ".en, textarea, input, [data-noi18n], .asr-text, .jk-q, .cheat, script, style, code";   /* 讲解和中文意思的正文自己带 data-noi18n，标题照常翻 */
+const I18N_SKIP = ".en, textarea, input, [data-noi18n], .asr-text, .jk-q, .cheat, script, style, code, .zh, .wl-row";   /* v1.75.2：中文意思、单词列表也是练习内容 */   /* 讲解和中文意思的正文自己带 data-noi18n，标题照常翻 */
 /* v1.75.0：英文界面下没翻成英文的界面文字记下来（练习内容在 I18N_SKIP 里，不记），设置里一键复制 */
 const I18N_MISS = (() => { try { return new Set(JSON.parse(localStorage.getItem("tk-i18n-miss") || "[]")); } catch (e) { return new Set(); } })(); let I18N_MISS_T = 0;
-function i18nMiss(t){ t = String(t || "").replace(/\s+/g, " ").trim(); if (!t || t.length > 300 || !/[\u4e00-\u9fff]/.test(t) || I18N_MISS.has(t) || I18N_MISS.size >= 1500) return; I18N_MISS.add(t);
+/* v1.75.2：只记 app 自己代码里有的文字（导入的单词、面试题、题库名这些是你的内容，不记）：第一次用时读一遍页面里的脚本 */
+let I18N_SRC = null, I18N_SRC_P = null;
+function i18nSrc(){ if (I18N_SRC != null) return Promise.resolve(I18N_SRC); if (I18N_SRC_P) return I18N_SRC_P;
+  I18N_SRC_P = (async () => { let s = ""; for (const sc of document.scripts){ if (sc.src){ try { s += await (await fetch(sc.src)).text(); } catch (e) {} } else s += sc.textContent || ""; } I18N_SRC = s; return s; })(); return I18N_SRC_P; }
+function i18nInSrc(src, t){ if (src.includes(t)) return true; const parts = t.split(/(\d+(?:\.\d+)?)/); if (parts.length < 2) return false;
+  try { return new RegExp(parts.map((x, i) => i % 2 ? "(?:\\d+(?:\\.\\d+)?|\\$\\{[^}]{1,80}\\})" : x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("")).test(src); } catch (e) { return false; } }
+function i18nMiss(t){ t = String(t || "").replace(/\s+/g, " ").trim(); if (!t || t.length > 300 || !/[\u4e00-\u9fff]/.test(t) || I18N_MISS.has(t) || I18N_MISS.size >= 1500) return;
+  i18nSrc().then(src => { if (!src || !i18nInSrc(src, t) || I18N_MISS.has(t)) return; I18N_MISS.add(t); i18nMissSave(); }); }
+function i18nMissSave(){
   clearTimeout(I18N_MISS_T); I18N_MISS_T = setTimeout(() => { try { localStorage.setItem("tk-i18n-miss", JSON.stringify([...I18N_MISS])); } catch (e) {} }, 800); }
 function i18nNode(n){ const p = n.parentElement; if (!p || p.closest(I18N_SKIP)) return; const v = i18nT(n.nodeValue); if (v == null) i18nMiss(n.nodeValue); if (v != null && v !== n.nodeValue){ if (!I18N_ORIG.has(n)) I18N_ORIG.set(n, n.nodeValue); n.nodeValue = v; } }
 function i18nApply(root){
