@@ -1156,6 +1156,12 @@ select:focus, select:focus-visible{outline:2px solid var(--accent, #2563eb);outl
 /* v1.78.0：提示下面的“为什么”（第二行、小一号）；问 AI 页每条下面 app 当时的判断 */
 .fb .fb-why{display:block;margin-top:3px;font-size:13px;line-height:1.6;color:var(--muted)}
 .li .grow .pend-app{display:block;margin-top:2px}
+/* v1.79.0：选项框点开时的蓝框画在框里面，贴着边，不会压到下面的说明（以前画在框外 2px，Whisper 的说明又被 -4px 往上拉） */
+select:focus, select:focus-visible, .fld select:focus, .fld select:focus-visible{outline:2px solid var(--accent, #2563eb);outline-offset:-2px}
+/* v1.79.0：单词页两栏：我加的 / 全部 */
+.wl-tabs{display:flex;gap:8px;margin:8px 0 10px}
+.wl-tabs .chip{cursor:pointer;min-height:36px;padding:0 14px;font-size:14px}
+.wl-tabs .chip.on{background:var(--accent, #2563eb);border-color:var(--accent, #2563eb);color:#fff}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1177,7 +1183,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.78.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.79.1"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -3354,7 +3360,7 @@ const KEY = "tuokou.v1", LKEY = "tuokou.local";
 const DEF = () => ({v:1, createdAt:Date.now(), updatedAt:0, asrDocs:[], interviews:[], battle:{}, asrQ:[], game:{},
   settings:{goal:"std", profile:"", battle:true, srEngine:"device", interviewDate:"", newPerDay:12, inputMode:"auto", autoCheck:"smart", vibrate:true, sound:true, lights:true, autoSpeak:true,
     theme:"auto", cheat:true, callQs:3, onboarded:false, planWhen:"", deck:"all", callDeck:"core", dayStart:4, startPage:"grow"},
-  cards:{}, best:{}, custom:[], customQ:[], deckMeta:{}, dlgDone:{}, myAlts:{}, pending:[], hist:{}, misWords:{}, followAns:{}, refAns:{}, plan:[], ivDue:{}, soloIssues:{}, soloRate:{}, wantWords:[], answers:{}, days:{}, tags:{}, newToday:{d:"",n:0}, journal:[], calls:[], grow:{}, job:{}, qmeta:{}, ivMet:{}});
+  cards:{}, best:{}, custom:[], customQ:[], deckMeta:{}, dlgDone:{}, myAlts:{}, pending:[], hist:{}, misWords:{}, followAns:{}, refAns:{}, plan:[], ivDue:{}, soloIssues:{}, soloRate:{}, wantWords:[], myWords:[], answers:{}, days:{}, tags:{}, newToday:{d:"",n:0}, journal:[], calls:[], grow:{}, job:{}, qmeta:{}, ivMet:{}});
 const LDEF = () => ({enVoice:"", zhVoice:"", rate:0.95, thinkSec:4, device:{}, wDraft:"", jDraft:"", voiceMix:true, accentMix:false, hfSeen:{}, ttsCN:false, slashes:false, quiet:false, quietSound:false, resume:null, rdMode:"line", rdSlow:false, rdHide:false});
 function mergeInto(d, o){
   for (const k of Object.keys(o||{})){
@@ -4026,7 +4032,7 @@ const Cloud = {
     if (!this.db) return;
     const base = "data/users/" + this.uid + "/";
     const parts = {
-      state:{v:S.v, createdAt:S.createdAt, updatedAt:S.updatedAt, settings:S.settings, cards:S.cards, best:S.best, custom:S.custom, customQ:S.customQ, deckMeta:S.deckMeta, dlgDone:S.dlgDone, myAlts:S.myAlts, pending:S.pending, misWords:S.misWords, followAns:S.followAns, refAns:S.refAns, plan:S.plan, ivDue:S.ivDue, soloIssues:S.soloIssues, soloRate:S.soloRate, wantWords:S.wantWords, asrDocs:S.asrDocs, interviews:S.interviews, battle:S.battle, asrQ:S.asrQ, game:S.game, answers:S.answers, newToday:S.newToday, grow:S.grow},
+      state:{v:S.v, createdAt:S.createdAt, updatedAt:S.updatedAt, settings:S.settings, cards:S.cards, best:S.best, custom:S.custom, customQ:S.customQ, deckMeta:S.deckMeta, dlgDone:S.dlgDone, myAlts:S.myAlts, pending:S.pending, misWords:S.misWords, followAns:S.followAns, refAns:S.refAns, plan:S.plan, ivDue:S.ivDue, soloIssues:S.soloIssues, soloRate:S.soloRate, wantWords:S.wantWords, myWords:S.myWords, asrDocs:S.asrDocs, interviews:S.interviews, battle:S.battle, asrQ:S.asrQ, game:S.game, answers:S.answers, newToday:S.newToday, grow:S.grow},
       stats:{updatedAt:S.updatedAt, days:S.days, tags:S.tags, calls:S.calls},
       journal:{updatedAt:S.updatedAt, journal:S.journal}
     };
@@ -4271,8 +4277,8 @@ function planLine(){
   return `<div class="meta plan-line">${p ? `<span>你的计划：${esc(p)}</span>` : ""}<button class="btn sm" data-act="nav" data-v="plan">添加/修改练习计划</button></div>`;
 }
 /* 单词：首页单独一个入口，不用改首页的题库也能练（面试这周首页选的是面试题库，单词不会出现） */
-function wordStats(){
-  const tn = dnum(today()); const ws = CAT.cards.filter(c => c.t === "w");
+function wordStats(list){
+  const tn = dnum(today()); const ws = list || CAT.cards.filter(c => c.t === "w");
   const learned = ws.filter(c => S.cards[c.id]); const due = learned.filter(c => S.cards[c.id].due <= tn);
   return {total:ws.length, learned:learned.length, due:due.length};
 }
@@ -4282,18 +4288,28 @@ function wordsTile(){
 }
 /* v1.72.1：点“单词”先看写入了哪些词（到期的、新的、学过的），再选练习（以前一点就直接开始练） */
 let WL_ALL = false;
+let WL_TAB = "mine";   /* v1.79.0：单词页分两栏：我加的（默认）/ 全部 */
+/* v1.79.0：要学的词以前有两种格式：单词弹窗存 {w, ctx}，阅读、俚语页存的是字符串；问 AI 页和发给 AI 的文字按 x.w 读，字符串的那些显示成空白、发出去是 undefined、导入以后也去不掉。统一成 {w, ctx, ts} */
+function wwNorm(){ S.wantWords = (S.wantWords || []).map(x => typeof x === "string" ? {w:x, ctx:"", ts:0} : x).filter(x => x && String(x.w || "").trim()); return S.wantWords; }
+/* 自己加过的词（单词弹窗、阅读、俚语里加进“要学的词”的）：做成单词卡以后，单词页“我加的”一栏还认得 */
+function myWordAdd(w){ const k = String(w || "").trim().toLowerCase(); if (!k) return; S.myWords = S.myWords || []; if (!S.myWords.includes(k)) S.myWords.push(k); }
+function isMyWord(c){ const k = String(c.word || "").trim().toLowerCase(); return !!k && ((S.myWords || []).includes(k) || c.deck === "单词"); }   /* 题库“单词”就是问 AI 页把要学的词做成的卡 */
 VIEWS.words = { tab:"home",
   render(){
-    const tn = dnum(today()), ws = CAT.cards.filter(c => c.t === "w"), st = wordStats();
+    const tn = dnum(today()), all = CAT.cards.filter(c => c.t === "w"), mineL = all.filter(isMyWord), mine = WL_TAB !== "all", ws = mine ? mineL : all, st = wordStats(ws), pend = mine ? wwNorm() : [];
     const stOf = c => { const p = S.cards[c.id]; if (!p) return {k:1, lab:"新词", cls:""}; if (p.due <= tn) return {k:0, lab:"到期", cls:"amber"}; return {k:2, lab:`${p.due - tn} 天后`, cls:"muted"}; };
     const list = ws.map(c => ({c, s:stOf(c)})).sort((a, b) => a.s.k - b.s.k || (((S.cards[a.c.id] || {}).due || 0) - ((S.cards[b.c.id] || {}).due || 0)) || String(a.c.word || "").localeCompare(String(b.c.word || "")));
     const row = ({c, s}, i) => `<div class="li wl-row" data-k="${esc(((c.word || "") + " " + (c.mean || "") + " " + (c.en || "")).toLowerCase())}" style="align-items:flex-start${!WL_ALL && i >= 30 ? ";display:none" : ""}" ${!WL_ALL && i >= 30 ? "data-more=\"1\"" : ""}>
       <div class="grow"><div><button class="linkbtn" data-act="word" data-w="${esc(c.word || "")}"><b class="en">${esc(c.word || "")}</b></button>　<span class="small">${esc(c.mean || "")}</span></div>${c.en ? `<div class="small muted en" style="margin-top:2px">${esc(c.en)}</div>` : ""}</div>
       <span class="chip ${s.cls}" style="white-space:nowrap">${s.lab}</span></div>`;
-    return `<div class="wrap">${backBtn()}<h2>单词</h2><p class="small muted">${st.total} 个 · 已学 ${st.learned} · 该复习 ${st.due}</p>
-      <div class="row-gap" style="margin:10px 0"><button class="btn primary" data-act="words-start">开始练</button>${st.due ? `<button class="btn" data-act="words-due">只复习到期的</button>` : ""}</div>
+    const tabs = `<div class="wl-tabs" role="tablist">${[["mine", `我加的（${mineL.length}）`], ["all", `全部（${all.length}）`]].map(([v, l]) => `<button class="chip${(v === "mine") === mine ? " on" : ""}" role="tab" aria-selected="${(v === "mine") === mine}" data-act="wl-tab" data-v="${v}">${l}</button>`).join("")}</div>`;
+    const pendH = pend.length ? `<h3 style="margin-top:18px">还没做成单词卡（${pend.length}）</h3><p class="small muted">在“问 AI”页复制给 AI，导入它给的单词卡，就能练了。</p>
+      <div class="list">${pend.map(x => `<div class="li" style="align-items:flex-start"><div class="grow"><button class="linkbtn" data-act="word" data-w="${esc(x.w)}"><b class="en">${esc(x.w)}</b></button>${x.ctx ? `<div class="small muted en" style="margin-top:2px">${esc(x.ctx)}</div>` : ""}</div><span class="chip muted" style="white-space:nowrap">待做卡</span></div>`).join("")}</div>
+      <button class="btn block" data-act="nav" data-v="pending" style="margin-top:8px">去“问 AI”页</button>` : "";
+    return `<div class="wrap">${backBtn()}<h2>单词</h2>${tabs}<p class="small muted">${st.total} 个 · 已学 ${st.learned} · 该复习 ${st.due}</p>
+      ${ws.length ? `<div class="row-gap" style="margin:10px 0"><button class="btn primary" data-act="words-start" data-v="${mine ? "mine" : ""}">开始练</button>${st.due ? `<button class="btn" data-act="words-due" data-v="${mine ? "mine" : ""}">只复习到期的</button>` : ""}</div>` : ""}
       ${ws.length ? `<input id="wlQ" type="search" placeholder="搜单词或意思" style="width:100%;margin:4px 0 6px" autocomplete="off"><p class="small muted hidden" id="wlNone">没有对上的</p>
-      <div class="list">${list.map(row).join("")}</div>${!WL_ALL && list.length > 30 ? `<button class="btn block ghost" data-act="wl-all" id="wlAll" style="margin-top:8px">显示全部（${list.length}）</button>` : ""}` : `<p class="small muted">还没有单词。</p>`}
+      <div class="list">${list.map(row).join("")}</div>${!WL_ALL && list.length > 30 ? `<button class="btn block ghost" data-act="wl-all" id="wlAll" style="margin-top:8px">显示全部（${list.length}）</button>` : ""}` : mine ? `<p class="small muted" style="margin-top:8px">还没有自己加的词做成的单词卡。读文章、看例句、听俚语时点一个词，选“加到要学的词”，就会出现在这里。</p>` : `<p class="small muted">还没有单词。</p>`}${pendH}
       <p class="small muted" style="margin-top:10px">加单词：导入“词 | 单词 | 中文意思 | 例句 | 例句的中文 |”</p></div>`;
   },
   mount(){ const box = document.getElementById("wlQ"); if (!box) return;
@@ -4301,9 +4317,11 @@ VIEWS.words = { tab:"home",
       document.querySelectorAll(".wl-row").forEach(r => { const hit = !q || r.dataset.k.includes(q); const vis = hit && (q || WL_ALL || !r.dataset.more); r.style.display = vis ? "" : "none"; if (hit) n++; });
       const none = document.getElementById("wlNone"); if (none) none.classList.toggle("hidden", n > 0); const more = document.getElementById("wlAll"); if (more) more.style.display = q ? "none" : ""; }); }
 };
-ACT["words-go"] = () => { WL_ALL = false; UI.nav("words"); };
-ACT["words-start"] = () => startSession("words", {filter: c => c.t === "w"}, "单词");
-ACT["words-due"] = () => { const tn = dnum(today()); startSession("words", {filter: c => c.t === "w" && S.cards[c.id] && S.cards[c.id].due <= tn}, "单词：只复习到期的"); };
+ACT["words-go"] = () => { WL_ALL = false; WL_TAB = "mine"; UI.nav("words"); };   /* 每次进来先看“我加的” */
+ACT["wl-tab"] = el => { WL_TAB = el.dataset.v === "all" ? "all" : "mine"; WL_ALL = false; UI.render(); };
+const wlMine = el => !!(el && el.dataset && el.dataset.v === "mine");
+ACT["words-start"] = el => { const m = wlMine(el); startSession("words", {filter: c => c.t === "w" && (!m || isMyWord(c))}, m ? "单词：我加的" : "单词"); };
+ACT["words-due"] = el => { const tn = dnum(today()), m = wlMine(el); startSession("words", {filter: c => c.t === "w" && (!m || isMyWord(c)) && S.cards[c.id] && S.cards[c.id].due <= tn}, m ? "单词：我加的，只复习到期的" : "单词：只复习到期的"); };
 ACT["wl-all"] = () => { WL_ALL = true; UI.render(); };
 function todayLine(){
   const h = (S.hist || {})[today()] || []; const n = new Set(h.map(e => e.id)).size;
@@ -4877,7 +4895,7 @@ ACT.word = el => {
     <div class="small muted dict-h">词典：</div><div class="dict-grid">${DICTS.map(d => `<button class="btn sm" data-x="dict" data-for="d" data-v="${d.id}">${d.name}</button>`).join("")}</div></div>`;
   bg.addEventListener("click", e => {
     const b = e.target.closest("[data-x]"); if (e.target === bg || (b && b.dataset.x === "c")){ bg.remove(); return; } if (!b) return;
-    if (b.dataset.x === "add" || b.dataset.x === "addck"){ const item = (b.dataset.x === "addck" ? (cb || ck) : w).trim(); S.wantWords = S.wantWords || [];
+    if (b.dataset.x === "add" || b.dataset.x === "addck"){ const item = (b.dataset.x === "addck" ? (cb || ck) : w).trim(); wwNorm(); myWordAdd(item);
       if (!S.wantWords.some(x => x.w.toLowerCase() === item.toLowerCase())){ const host = el.closest(".en, .rd-s, .card, .li"); S.wantWords.push({w:item, ctx:host ? host.textContent.replace(/\s+/g, " ").trim().slice(0, 200) : "", ts:Date.now()}); save(); }
       toast("加好了。联网后在“我的 → 问 AI”里发给 AI，换成单词卡"); bg.remove(); return; }
     if (b.dataset.x === "cn") TTS.speak(ck, {rate:0.95}); else if (b.dataset.x === "cs") TTS.speak(ck, {rate:0.7});
@@ -6569,7 +6587,7 @@ VIEWS.me = {
         <label class="fld"><span>怎么检查你说的话</span><select data-chg="set" data-key="inputMode"><option value="auto" ${s.inputMode === "auto" ? "selected" : ""}>点麦克风自动识别${!SR.ok ? "（这个浏览器不支持）" : SR.broken ? "（这台手机现在用不了）" : ""}</option><option value="keyboard" ${s.inputMode === "keyboard" ? "selected" : ""}>只用键盘语音输入或打字</option></select></label>
         <label class="fld"><span>说英语时用什么识别</span><select data-chg="set" data-key="srEngine" data-rerender="1"><option value="device" ${S.settings.srEngine !== "whisper" ? "selected" : ""}>手机自带的识别：快，但口音重时容易听错</option><option value="whisper" ${S.settings.srEngine === "whisper" ? "selected" : ""} ${ASR.supported() ? "" : "disabled"}>Whisper：更准，说完要等几秒（只在安装版里能用）</option></select></label>
         ${S.settings.srEngine === "whisper" ? `<label class="fld" style="margin-top:0"><span>Whisper 用哪个模型</span><select data-chg="asrmodel" data-rerender="1"><option value="base" ${(L.asrModel || "base") === "base" ? "selected" : ""}>快：base.en（约 80 MB）</option><option value="small" ${L.asrModel === "small" ? "selected" : ""}>准一些：small.en（约 250 MB，慢一两秒）</option></select></label>` : ""}
-        ${S.settings.srEngine === "whisper" ? `<p class="small muted" style="margin-top:12px;margin:-4px 0 8px">说完停一下，会自动结束录音。第一次用要下载约 80 MB 的模型（在“存储空间”里管理）。Whisper 偶尔会把很小的口误自动“修好”，所以语法检查可能漏掉个别错误。</p>` : ""}
+        ${S.settings.srEngine === "whisper" ? `<p class="small muted" style="margin:12px 0 8px">说完停一下，会自动结束录音。第一次用要下载约 80 MB 的模型（在“存储空间”里管理）。Whisper 偶尔会把很小的口误自动“修好”，所以语法检查可能漏掉个别错误。</p>` : ""}
         <label class="fld"><span>给 AI 的自我介绍（可选）</span><textarea rows="3" data-chg="profile" placeholder="比如：机械工程硕士，正在准备美国工程类岗位面试，口语大约 A2–B1">${esc(S.settings.profile || "")}</textarea></label>
         <label class="fld"><span>说话中间停顿</span><select data-chg="srlong"><option value="on" ${L.srLong !== false ? "selected" : ""}>停 2.5 秒才算说完</option><option value="off" ${L.srLong === false ? "selected" : ""}>停一下就结束（手机默认）</option></select></label>
         <label class="fld"><span>停 2 秒自动检查</span><select data-chg="set" data-key="autoCheck">${[["smart","自动判断：语音说完自动查，打字时不查"],["on","一直开"],["off","关掉：每次自己点“检查”"]].map(([v, l]) => `<option value="${v}" ${(s.autoCheck || "smart") === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
@@ -6728,7 +6746,10 @@ ACT["imp-apply"] = () => {
   for (const x of r.plan){ if (!S.plan.some(y => y.date === x.date && y.text === x.text)){ const y = {id:"p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), date:x.date, cue:x.cue, text:x.text, act:x.act, done:false, ts:Date.now()}; if (x.area) y.area = x.area; if (x.ifthen) y.ifthen = x.ifthen; S.plan.push(y); } }
   if (typeof growApplyImport === "function") growApplyImport(r);
   if (typeof jobApplyImport === "function") jobApplyImport(r);
-  if ((S.wantWords || []).length){
+  if (wwNorm().length){
+    /* v1.79.0：先记下哪些单词卡是自己加的词做成的（单词页“我加的”） */
+    { const tk0 = x => String(x).toLowerCase().split(/\s+/).filter(Boolean);
+      for (const c of r.cards.filter(c => c.t === "w" && c.word)){ const b = tk0(c.word); if (S.wantWords.some(x => { const a = tk0(x.w); return a.every(t => b.includes(t)) || b.every(t => a.includes(t)); })) myWordAdd(c.word); } }
     /* 导入的单词卡和“要学的词”对上了（一样，或者一个是另一个的一部分，比如 stepped 和 stepped boss），就从列表里去掉 */
     const tk = x => String(x).toLowerCase().split(/\s+/).filter(Boolean);
     const have = r.cards.filter(c => c.t === "w" && c.word).map(c => tk(c.word));
@@ -6840,7 +6861,7 @@ VIEWS.device = {
     return `<div class="wrap">${p.from === "ob" ? "" : backBtn()}<h2>设备检测</h2><p class="muted small" style="margin:6px 0 14px">测一遍，app 会按结果调整练法。</p>
       <div class="panel"><h3>运行环境</h3><p class="small" style="margin-top:6px">${env}</p>
         ${MIC.blocked ? `<p class="note">这个页面拿不到麦克风：AI 的页面没有把麦克风交给里面的 app，所以和你手机的权限设置无关。答题请用键盘语音输入；要自动识别和录音，请用离线版（在 Chrome 里打开）。</p><button class="btn sm" style="margin-top:8px" data-act="dv-mic-reset">再试一次麦克风</button>` : ""}
-        ${d.micErr ? `<p class="small muted" style="margin-top:6px">上次的错误代码：${esc(d.micErr)}</p>` : ""}</div>
+        ${d.micErr ? `<p class="small muted" style="margin-top:6px">上次的错误代码：<span class="en">${esc(d.micErr)}</span></p>` : ""}</div>
       <div class="panel">${head("英文朗读","en")}<p class="small muted">${TTS.ok ? `找到 ${TTS.list("en").length} 个英文语音` : "这个浏览器不支持朗读"}</p>
         <div class="row-gap" style="margin-top:8px"><button class="btn sm" data-act="dv-say" data-lang="en">试听</button><button class="btn sm" data-act="dv-mark" data-k="en" data-v="ok">听到了</button><button class="btn sm" data-act="dv-mark" data-k="en" data-v="no">没声音</button></div>
         ${d.en === "no" ? `<p class="note">在手机设置里搜“文字转语音”，首选引擎选 Google 的语音服务，再下载“英语（美国）”的语音数据。</p>` : ""}</div>
@@ -7128,7 +7149,7 @@ VIEWS.pending = {
         <button class="btn primary block big" style="margin-top:14px" data-act="pend-copy">全部复制给 AI（${list.length} 句）</button>
         <button class="btn ghost block" style="margin-top:6px" data-act="pend-clear">已经问过了，清空</button>` :
         `<p class="muted">现在没有拿不准的说法。练习时拿不准自己说得对不对，就点“拿不准，存起来问 AI”。</p>`}
-      <h3 style="margin-top:22px">要学的词（${(S.wantWords || []).length}）</h3>
+      <h3 style="margin-top:22px">要学的词（${wwNorm().length}）</h3>
       <p class="muted small" style="margin:4px 0 10px">点单词时选“加到要学的词”，就会出现在这里。发给 AI，换成单词卡：卡片会考你“看中文说英文”，还要你用这个词说一句话。光点开看一眼记不牢，自己想起来、用出来才记得住。</p>
       ${(S.wantWords || []).length ? `<div class="list">${S.wantWords.map((x, i) => `<div class="li"><div class="grow"><b class="en" style="font-size:16px">${esc(x.w)}</b>${x.ctx ? `<span class="en" style="font-size:13.5px">${esc(x.ctx)}</span>` : ""}</div><button class="btn sm ghost" data-act="ww-del" data-i="${i}">删除</button></div>`).join("")}</div>
         <button class="btn primary block" style="margin-top:12px" data-act="ww-copy">复制给 AI，换成单词卡（${S.wantWords.length} 个）</button>
@@ -7250,7 +7271,7 @@ function pendText(){
   return `下面是我在只因里说的句子，参考说法只是其中一种。请逐条判断我的说法对不对：语法、意思、自然不自然，错在哪里。${two}${judge}\n最后给我导入码：说对的写“也对 | 编号 | 我的说法”；说错的写“改 | 我的原句 | 正确说法 | 类型 | 提示”。\n\n${body}`;
 }
 function wwText(){
-  const list = S.wantWords || []; if (!list.length) return "";
+  const list = wwNorm(); if (!list.length) return "";
   const body = list.map((x, i) => `${i + 1}. ${x.w}${x.ctx ? `（我在这句话里看到的：${x.ctx}）` : ""}`).join("\n");
   return `下面是我在只因里想学的词和搭配。请给我做成单词卡导入码，第一行写“题库 | 单词”，然后每个一行：\n词 | 单词或搭配 | 中文意思 | 一个我面试或生活里会说的英文例句 | 例句的中文 |\n\n${body}`;
 }
@@ -16361,7 +16382,8 @@ function rdPop(t, phrase, i){ const p = $("#rdPop"); if (!p) return;
   p.innerHTML = `<div class="card rd-popc"><b class="en">${esc(t)}</b><div class="row-gap" style="margin-top:6px"><button class="btn sm" data-act="rd-say" data-t="${esc(t)}">▶ 听</button><button class="btn sm primary" data-act="rd-want" data-t="${esc(t)}">加进想学的${phrase ? "短语" : "词"}</button>${phrase ? "" : `<button class="btn sm ghost" data-act="rd-from" data-i="${i}">从这里选短语</button>`}</div>${phrase ? "" : `<p class="small muted" style="margin-top:4px">选短语：点“从这里选短语”，再点短语的最后一个词</p>`}</div>`;
   p.scrollIntoView({block:"nearest", behavior:"smooth"}); }
 ACT["rd-say"] = el => { rdStopAll(); rdSay(el.dataset.t, 0.85); };
-ACT["rd-want"] = el => { const t = el.dataset.t; S.wantWords = S.wantWords || []; if (!S.wantWords.some(x => String(x).toLowerCase() === t.toLowerCase())) S.wantWords.push(t); save(); toast(`加进“想学的”了（${S.wantWords.length}）`); const p = $("#rdPop"); if (p) p.innerHTML = ""; };
+ACT["rd-want"] = el => { const t = el.dataset.t; wwNorm(); myWordAdd(t);   /* v1.79.0：以前存的是字符串，问 AI 页显示不出来 */
+  if (!S.wantWords.some(x => String(x.w).toLowerCase() === t.toLowerCase())){ const sent = document.querySelector(".sl-sent"); S.wantWords.push({w:t, ctx: sent ? sent.textContent.replace(/\s+/g, " ").trim().slice(0, 200) : "", ts:Date.now()}); } save(); toast(`加进“想学的”了（${S.wantWords.length}）`); const p = $("#rdPop"); if (p) p.innerHTML = ""; };
 ACT["rd-from"] = el => { RDG.sel = {a:RDG.cur, i:+el.dataset.i}; UI.render(); toast("再点短语的最后一个词"); };
 ACT["rd-retell"] = async () => { const btn = $("#rdMic"), h = $("#rdHeard"); if (RDG.retell && RDG.retell.on){ try { stopAny(); } catch (e) {} return; }
   RDG.retell = {on:true}; micState(btn, "live"); if (h) h.textContent = "在听……";
@@ -16615,7 +16637,7 @@ VIEWS.slang = {
         <div class="row-gap" style="margin:8px 0"><button class="btn sm" data-act="sl-play">▶ 听</button></div>
         <p class="en sl-sent" style="font-size:18px">${String(it.en).split(/(\s+)/).map((w, k) => /\S/.test(w) && /[A-Za-z]/.test(w) ? `<span class="rd-w${SL.sel != null && SL.sel === k ? " rd-pick" : ""}" data-act="sl-word" data-k="${k}">${esc(w)}</span>` : esc(w)).join("")}</p>
         <p class="small muted">点一个词：听读音、收藏进“想学的”</p><div id="slPop"></div>
-        <div style="margin-top:10px">${R.opts.map(o => `<button class="btn block${p != null ? (o === it.zh ? " pr-right" : o === p ? " pr-wrong" : "") : ""}" data-act="sl-pick" data-v="${esc(o)}" style="margin-top:6px;text-align:left" ${p != null ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>
+        <div style="margin-top:10px">${R.opts.map(o => `<button class="btn block${p != null ? (o === it.zh ? " pr-right" : o === p ? " pr-wrong" : "") : ""}" data-noi18n data-act="sl-pick" data-v="${esc(o)}" style="margin-top:6px;text-align:left" ${p != null ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>
         ${p != null ? `<div class="card" style="margin-top:10px"><p><b class="en">${esc(it.term)}</b>　<span class="chip">${esc(it.lvl === "俚语" ? "俚语" : "脏话 · " + it.lvl)}</span><span class="chip">语气：${esc(it.tone)}</span><span class="chip">${esc(it.use)}</span></p><p class="small" style="margin-top:6px">${esc(it.note)}</p></div>
           <button class="btn primary block" data-act="sl-next" style="margin-top:10px">下一句</button>` : ""}</div></div>`;
     }
@@ -19150,7 +19172,7 @@ const I18N_EN = {
   "装到桌面，没网也能练": "Install to home screen, works offline", "只用键盘语音输入或打字": "Keyboard voice input or typing only", "停 {n} 秒才算说完": "Done after a {n}-second pause", "停 {n} 秒自动检查": "Auto-check after {n} s", "中文语音（耳机模式用）": "Chinese voice (headphone mode)", "听力题换着用不同的声音": "Vary voices in listening", "看占了多少、清理旧录音": "See usage, clear old recordings", "停一下就结束（手机默认）": "End on a short pause (phone default)", "关掉：每次自己点“检查”": "Off: tap \"Check\" yourself", "也用英式、澳式等其他口音": "Also use British, Australian and other accents", "朗读、识别、录音能不能用": "Whether read-aloud, recognition and recording work", "每天练什么、固定的练习时间": "What to practice daily, fixed times", "给 AI 的自我介绍（可选）": "About me, for AI (optional)", "换手机或清浏览器数据前先备份": "Back up before switching phones or clearing data", "只因 {n}.{n}，离线版": "Cluck {n}.{n}, offline version", "只因 {n}.{n}.{n}，离线版": "Cluck {n}.{n}.{n}, offline version",
   "怎么用、为什么这样练（可以搜）": "How to use it and why (searchable)", "在手机上识别录音，转好了会提醒你": "Transcribe recordings on the phone; you'll be notified", "进度存在这台手机上，记得偶尔备份。": "Progress is stored on this phone. Back up now and then.", "自动判断：语音说完自动查，打字时不查": "Smart: check after speaking, not when typing", "句子按意群显示斜杠，慢速时一块一块读": "Show slashes between chunks; read chunk by chunk when slow", "手机自带的识别：快，但口音重时容易听错": "Phone's built-in: fast, but less accurate with accents", "把 AI 给的导入码贴进来，可以一次导好几个文件": "Paste import codes from AI; import several files at once", "练完一轮，和昨天的你打一场；可以导入你自己的角色": "After a round, battle yesterday's you; import your own characters", "还没读到语音列表。试听没声音的话，去设备检测看看。": "Voice list not loaded yet. If the test is silent, try Device check.", "{n} 句说法，{n} 个词，{n} 条回答和回复": "{n} phrases, {n} words, {n} answers and replies", "Whisper：更准，说完要等几秒（只在安装版里能用）": "Whisper: more accurate, takes a few seconds (installed app only)", "比如：机械工程硕士，正在准备美国工程类岗位面试，口语大约 A{n}–B{n}": "e.g., M.S. in mechanical engineering, preparing for US engineering interviews, speaking about A{n}–B{n}", "我导入的内容": "My imported content",
   /* 导入 */
-  "再贴一段": "Paste another", "导入码长什么样": "What import codes look like", "选文件（可以一次选好几个）": "Choose files (several at once)", "每行一条，用 | 隔开：": "One item per line, separated by |:", "（下面的内容都放进这个题库）": " (everything below goes into this deck)", "英文有几种说法时用 // 隔开。题库名以“知识”开头的，是知识卡（求职 → 准备 → 知识）。": "Separate alternative English versions with //. Decks whose names start with 知识 are knowledge cards (Jobs → Prep → Knowledge).", "把 AI 给的导入码贴进来，或者选导入码文件。可以一次选好几个文件，也可以贴好几段；每一份单独读，带“题库”行的内容会放进各自的题库。": "Paste an import code from AI, or choose import files. You can pick several files or paste several parts; each is read separately, and 题库 lines put content into their own decks.",
+  "再贴一段": "Paste another", "导入码长什么样": "What import codes look like", "选文件（可以一次选好几个）": "Choose files (several at once)", "每行一条，用 | 隔开：": "One item per line, separated by |:", "（下面的内容都放进这个题库）": " (everything below goes into this deck)", "英文有几种说法时用 // 隔开。题库名以“知识”开头的，是知识卡（求职 → 准备 → 知识）。": "Separate alternative English versions with //. Decks whose names start with 知识 are knowledge cards (Jobs → Prep → Knowledge).", "把 AI 给的导入码贴进来，或者选导入码文件。可以一次选好几个文件，也可以贴好几段；每一份单独读，带“题库”行的内容会放进各自的题库。": "Paste an import code from AI, or choose import files. You can pick several files or paste several parts; each is read separately; content after a DECK line (题库 in AI import codes) goes into its own deck.",
   "读到了": "Found", "确认导入": "Import", "一共 {n} 份：": "{n} sources:", "卡片 {n} 张（反射卡 {n}，找错 {n}，听力 {n}）": "{n} cards ({n} reflex, {n} error-spotting, {n} listening)", "面试题 {n} 道，追问 {n} 个": "{n} interview questions, {n} follow-ups", "面试回答 {n} 条，要点 {n} 条": "{n} answers, {n} cue lists", "投递 {n} 份（新的 {n}，已有的会更新）": "{n} applications ({n} new, existing ones updated)", "题目标签 {n} 条（优先级、方向）": "{n} question tags (priority, track)", "待确认 {n} 条（确认前，相关的题不算达标）": "{n} checks (related questions don't count as ready until confirmed)", "真题 {n} 道": "{n} real questions", "讲解 {n} 条（知识卡翻过来能看到）": "{n} explanations (on the back of knowledge cards)", "中文意思 {n} 条（看不懂英文回答时可以对照）": "{n} Chinese meanings (for checking English answers)", "真实面试复盘 {n} 场（被问到的题 {n} 道）": "{n} real interview debriefs ({n} questions asked)", "其中单词 {n} 个": "including {n} words",
   /* 模拟面试记录、来电模拟 */
   "复盘记录": "Review records", "还没有模拟记录。去“面试”页模拟一场，结束后就会出现在这里。": "No mock interviews yet. Run one from the Jobs page and it will show up here.", "每次模拟面试都在这里。点进去听录音、看参考回答、给每题打分；没说出来的题会安排你隔天再练。": "Every mock interview is here. Open one to replay, see reference answers, and rate each answer; ones you missed come back the next day.",
@@ -21797,6 +21819,560 @@ Object.assign(I18N_EN, {
  "说完一句，你的角色就出招：完全对、基本对、意思对（换了个说法）都出重击，完全对、而且看到就能开口、正常语速一口气说完（十个词的句子大约 7 秒），还有暴击；只要开口说了，至少也能擦伤对手；一个字没说，对手加一层护盾，还会反击你：小兵打得轻，首领打得最重。重练时说对就能打碎护盾。被识别错了，就点“我说对了，是识别错了”，和识别对了完全一样。每次第一次就说对，攒一格能量；攒满 5 格，下一张是大招卡，说对了就放大招。没看清，点“回放”。": "Finish a line and your character attacks: exactly right, mostly right and right meaning (different wording) all land a heavy hit. Exactly right, started as soon as you saw it and said in one go at normal speed (about 7 seconds for a ten-word line) is also a critical hit. If you say anything at all, you at least graze the opponent. If you say nothing, the opponent gains a shield and hits back: grunts hit lightly, bosses hardest. Getting it right on the retry breaks the shield. If you were misheard, tap “I said it right, it misheard me”; it counts exactly like being heard right. Each first-try success charges one energy cell; with all 5 charged, the next card is a special card: say it right to fire the special. Missed it? Tap “Replay”."
 });
 
+/* v1.79.0：音标课、发音、听懂俚语（语气、场合、讲解；中文意思是答案，不翻）、语法页和“为什么这样说”的讲解、写作和语法检查的说明、对话首领战的提示、导入和问 AI 页、用户的清单 */
+Object.assign(I18N_EN, {
+ "{n} 行": "{n} lines",
+ "去掉": "Remove",
+ "“毕业了”说 I've graduated，不说 I'm graduated。": "For “graduated”, say I've graduated, not I'm graduated.",
+ "开始练（{n} 题：听音选音标）": "Start ({n} questions: hear a sound, pick the symbol)",
+ "看音标读词 {n}/{n}：不看拼写，照音标读出来": "Read from IPA {n}/{n}: ignore the spelling and read the symbols",
+ "① 听你的录音": "① Listen to your recording",
+ "下次注意：": "Next time, watch:",
+ "读对了 ✓：": "Got it ✓:",
+ "回目录": "Back to lessons",
+ "最近 {n} 题对了 {n}%": "Last {n} questions: {n}% right",
+ "再练一轮": "Another round",
+ "换一组": "New set",
+ "▶ 标准读法": "▶ Model reading",
+ "第 {n}/{n} 遍：点一下开始说": "Round {n}/{n}: tap to start speaking",
+ "每分钟 {n} 个词": "{n} words per minute",
+ "每分钟 {n} 个词：有点快，句子中间可以停一下": "{n} words per minute: a bit fast; you can pause inside the sentence",
+ "识别只是估计，不一定是你的问题。": "Recognition is only an estimate; it isn't necessarily your mistake.",
+ "再测一次": "Test again",
+ "粗体大致是要重读的词，“/”是可以停一下的地方": "Bold words are roughly the stressed ones; “/” marks where you can pause",
+ "重音：{n}/{n}": "Stress: {n}/{n}",
+ "第 {n}/{n} 句：这句是什么意思？": "Line {n}/{n}: what does it mean?",
+ "点一个词：听读音、收藏进“想学的”": "Tap a word to hear it or save it to “Words to learn”",
+ "听懂了 {n}/{n}": "Understood {n}/{n}",
+ "收藏进想学的": "Save to words to learn",
+ "再点短语的最后一个词": "Now tap the last word of the phrase",
+ "结尾有没有一句下一步（比如约个时间）？": "Does it end with a next step (like setting up a time)?",
+ "快速 1.2×": "Fast 1.2×",
+ "快速听：1.2 倍速，练听快语速": "Fast listening: 1.2× speed, to practise fast speech",
+ "高频要求": "Common requirements",
+ "全部复制给 AI（{n} 句）": "Copy all for AI ({n} lines)",
+ "已经问过了，清空": "Already asked, clear",
+ "上次的错误代码：": "Last error code:",
+ "加进“想学的”了（{n}）": "Added to “Words to learn” ({n})",
+ "③ 对比一下，你读得和标准的一样吗？": "③ Compare: did you sound like the model?",
+ "你读得和标准的一样吗？": "Did you sound like the model?",
+ "听辨 {n}/{n}（{n}%）；看音标读词 {n}/{n}": "Listening {n}/{n} ({n}%); reading from IPA {n}/{n}",
+ "听辨 {n}/{n}（{n}%）": "Listening {n}/{n} ({n}%)",
+ "第一次检查查出：": "The first check found:",
+ "语气：": "Tone:",
+ "清空写好的回复？": "Clear the written replies?",
+ "确认 AI 已经收到再清。": "Clear only after the AI has received them.",
+ "导入“面试开场白”可以换成你自己的。": "Import “interview openers” to replace these with your own.",
+ "清掉固定的练习时间？": "Clear the fixed practice time?",
+ "偏难：换一篇简单点的，比如 Learning English 的版本": "On the hard side: switch to an easier article, like the Learning English version",
+ "✗ 试试 It's the thing you use to… / It's like…": "✗ Try It's the thing you use to… / It's like…",
+ "接着练的话，剩下的题用学习模式练，不再打斗。": "If you keep going, the rest of the cards use study mode, with no fighting.",
+ "读不了这张图，请换一张 PNG 或 JPG。": "Can't read this image. Please use a PNG or JPG.",
+ "找到了 {n} 个人物：请用只有 1 个人物的图，或者 3 行 3 列共 9 个姿势的姿势表（起手、轻击、重击·蓄力 / 重击、技能·蓄力、技能 / 被打中、赢、输），10 姿势表第 4 行再加一个技能·出手；以前的 2 行 3 列 6 姿势表也可以。背景要是纯绿色。": "Found {n} characters: use an image with only 1 character, or a 3 × 3 pose sheet with 9 poses (ready, light, heavy · charge / heavy, skill · charge, skill / hit, win, lose); a 10-pose sheet adds a 4th row with skill · release; old 2 × 3 six-pose sheets also work",
+ "这里要 11、10、9 或 6 个姿势的姿势表。": "This needs a pose sheet with 11, 10, 9 or 6 poses.",
+ "这里要 11、10、9 或 6 个姿势的姿势表。只有 1 个人物的单人图，可以导入姿势表以后，用来替换或补上其中一个姿势。": "This needs a pose sheet with 11, 10, 9 or 6 poses. A single-character image can be used after importing a pose sheet, to replace or add one of the poses.",
+ "这里只能放只有 1 个人物的单人图。": "Only a single-character image can go here.",
+ "冠词": "Articles",
+ "复数": "Plurals",
+ "生成推荐计划：最想练什么？": "Make a suggested plan: what do you most want to practise?",
+ "每天大概有多少时间？": "About how much time do you have each day?",
+ "投递时间另算，不占这里的时间。": "Time for applications is counted separately, not here.",
+ "周末": "Weekend",
+ "对话练习：和谁练？": "Conversation practice: with whom?",
+ "对话首领战：和谁打？": "Conversation boss: against whom?",
+ "各种人": "All kinds of people",
+ "先直接回答对方问的，再展开": "Answer the question directly first, then expand",
+ "加一个具体的东西，比如一个项目、一次经历、一个数字": "Add something concrete, like a project, an experience or a number",
+ "可以加 That sounds great / Thanks for asking / Actually 这类口头的说法": "You can add spoken phrases like That sounds great / Thanks for asking / Actually",
+ "少一点 well / like / sorry 和重复，卡住了就停一下再说": "Fewer well / like / sorry and repeats; if you get stuck, pause, then go on",
+ "少一点 well / like / sorry 和重复，想好一句再说": "Fewer well / like / sorry and repeats; think of a sentence first, then say it",
+ "讲你具体做了什么（I designed / I tested / I found…），最好带一个数字": "Say what you specifically did (I designed / I tested / I found…), ideally with a number",
+ "最后一定要讲结果：As a result, …": "Always end with the result: As a result, …",
+ "用 First / Then / So / As a result 把几件事串起来": "Link the steps with First / Then / So / As a result",
+ "准备两三个问题：团队、项目、对新人的建议": "Prepare two or three questions: the team, the projects, advice for new people",
+ "这一回合没开口，对方占了上风。哪怕先说一句“Let me think for a second”也好。": "You didn't speak this round, so they took the lead. Even “Let me think for a second” would help.",
+ "这一题没开口。哪怕先说一句“Let me think for a second”也好。": "You didn't speak on this one. Even “Let me think for a second” would help.",
+ "没讲结果：对方加了护盾，伤害减半。讲项目最后一定要说结果（As a result, ...）。": "No result: they raised a shield, so damage is halved. Always finish a project story with the result (As a result, ...).",
+ "夹杂中文": "Chinese mixed in",
+ "have 后面用过去分词：have stayed、haven't played": "After have, use the past participle: have stayed, haven't played",
+ "主语是 I 时动词不加 -s": "With I as the subject, the verb takes no -s",
+ "完成时、进行时的形式": "Perfect and progressive forms",
+ "习惯用一般现在时：I usually watch …": "Use the simple present for habits: I usually watch …",
+ "动词形式、情态动词叠用": "Verb forms, stacked modals",
+ "单复数": "Singular and plural",
+ "-ed / -ing 形容词": "-ed / -ing adjectives",
+ "中式搭配": "Chinese-style collocations",
+ "being 用多了": "Too much being",
+ "双重最高级": "Double superlatives",
+ "小写 i": "Lowercase i",
+ "说状态、地点直接用 be：I'm here、I'm busy；being 只在“正在被…”“这会儿表现得…”或者当名词用时出现": "For states and places, use be directly: I'm here, I'm busy; being only appears for “being done”, “acting a certain way right now”, or as a noun",
+ "频率词放在动词前，enough 放在形容词后，时间词放在句首或句末，间接问句不倒装": "Frequency words go before the verb, enough after the adjective, time words at the start or end; indirect questions don't invert",
+ "两个完整的句子之间用句号，或者用 and / but / so 连起来": "Put a period between two complete sentences, or join them with and / but / so",
+ "一句话太长": "Sentence too long",
+ "一封信问一两个问题就够": "One or two questions per message is enough",
+ "very 不能直接放在动词前：I really like it / I like it very much": "very can't go right before a verb: I really like it / I like it very much",
+ "very much 放在最后：I like the movie very much": "very much goes at the end: I like the movie very much",
+ "always、usually、never 放在动词前面：I always go …": "always, usually and never go before the verb: I always go …",
+ "always、never 放在主语后面：I always … / I never …（usually、sometimes 可以放句首）": "always and never go after the subject: I always … / I never … (usually and sometimes can start a sentence)",
+ "enough 放在形容词后面：big enough、good enough": "enough goes after the adjective: big enough, good enough",
+ "时间词放在句首或句末：Yesterday I went … / I went … yesterday": "Time words go at the start or end: Yesterday I went … / I went … yesterday",
+ "间接问句不倒装：Do you know where the station is? / I'm not sure what it is": "Indirect questions don't invert: Do you know where the station is? / I'm not sure what it is",
+ "also 放在 be 动词后面：I'm also … / I was also …": "also goes after the be-verb: I'm also … / I was also …",
+ "这里不用 being：It's my first time here / my first time coming here": "No being here: It's my first time here / my first time coming here",
+ "说状态直接 I'm busy / I'm here；be being + 形容词只用来说“这会儿表现得…”（You're being rude）": "For a state, just say I'm busy / I'm here; be being + adjective only means “acting … right now” (You're being rude)",
+ "go camping、go hiking：不加 to": "go camping, go hiking: no to",
+ "lately、recently 用现在完成时：Have you been anywhere lately?": "lately and recently take the present perfect: Have you been anywhere lately?",
+ "“两周前”一般说 two weeks ago": "“Two weeks back” is usually two weeks ago",
+ "形容词、名词、-ing 前面要有 be：That's so cool、It's getting cold、It's a good chance": "Adjectives, nouns and -ing need be before them: That's so cool, It's getting cold, It's a good chance",
+ "which / who 后面要有 be：the song that is really popular": "which / who needs be after it: the song that is really popular",
+ "形容词前面要有 be：It's hard、That's cool": "Adjectives need be before them: It's hard, That's cool",
+ "疑问句要有 do / does / is：What do you use your lab for?": "Questions need do / does / is: What do you use your lab for?",
+ "问过去的事用 did：Did you come here to study?": "Ask about the past with did: Did you come here to study?",
+ "“已经做完”用完成时：I've already finished …": "“Already done” takes the perfect: I've already finished …",
+ "this / that + 一个东西，后面的动词要加 -s：This place usually has …": "this / that + one thing takes a verb with -s: This place usually has …",
+ "enjoy 后面用 -ing：enjoy designing": "enjoy takes -ing: enjoy designing",
+ "sounds like + 名词：sounds like a really chill lifestyle": "sounds like + noun: sounds like a really chill lifestyle",
+ "some 后面的可数名词用复数：some videos、some trails": "After some, countable nouns are plural: some videos, some trails",
+ "两个以上用复数：three times": "More than one takes the plural: three times",
+ "not that into it：be into 才是“喜欢”": "not that into it: be into means “like”",
+ "来读书：to study": "Came here to study: to study",
+ "month 才是“月”，mouth 是“嘴”": "month is the time period; mouth is part of your face",
+ "肯定句用 too；either 只用在否定句：I love traveling too.": "Use too in positive sentences; either only in negative ones: I love traveling too.",
+ "前面讲的是过去的事，这里也用过去式：": "The earlier part is about the past, so use the past tense here too:",
+ "几个动作并列时形式一样：…and watched the stars": "Parallel actions take the same form: …and watched the stars",
+ "一封信问一两个就够，不然像在查户口": "One or two questions per message is enough; more feels like an interrogation",
+ "信的长度和对方差不多就好，写短一点不容易出错": "Keep it about as long as theirs; shorter is less likely to have mistakes",
+ "现在完成时：have / has + 过去分词": "Present perfect: have / has + past participle",
+ "带了具体的过去时间（yesterday、last year、in 2023）就用过去式：I wrote it last year.": "With a specific past time (yesterday, last year, in 2023), use the past tense: I wrote it last year.",
+ "讲经历，或者到现在还有影响的事，不说具体是什么时候。面试讲经验最常用。": "For experiences, or things that still matter now, without saying exactly when. Very common when talking about experience in interviews.",
+ "比较里的过去式：than I expected": "Past tense in comparisons: than I expected",
+ "than I expect 的意思是“比我现在预期的”，放在这里不通。": "than I expect means “than I expect now”, which doesn't fit here.",
+ "“比我想的……”：想法是之前就有的，所以用过去式。": "“…than I thought”: the expectation came earlier, so it's past tense.",
+ "比较级前面加 much": "much before a comparative",
+ "much、a lot、far 放在比较级前面，表示“……多了”。": "much, a lot and far go before a comparative to mean “a lot more …”.",
+ "very 不能修饰比较级：very harder ✗": "very can't modify a comparative: very harder ✗",
+ "有具体的过去时间，用过去式": "A specific past time takes the past tense",
+ "不能用现在完成时：I have finished it yesterday ✗": "Not the present perfect: I have finished it yesterday ✗",
+ "说了是过去哪个时间，动词用过去式。": "Once you say when in the past, the verb is past tense.",
+ "can / could / should / would + 动词原形": "can / could / should / would + base verb",
+ "这类词后面直接跟动词原形，不加 to，也不加 -s、-ed。could 比 can 客气，提建议常用：We could use…": "These take the base verb directly: no to, no -s, no -ed. could is politer than can and common for suggestions: We could use…",
+ "介词后面用 -ing": "-ing after a preposition",
+ "in、about、for、of 这些介词后面要接名词，动词就变成 -ing。": "Prepositions like in, about, for and of take a noun, so a verb becomes -ing.",
+ "这里的 to 是介词，不是不定式，后面用 -ing。": "This to is a preposition, not part of an infinitive, so -ing follows.",
+ "enjoy、finish、keep… 后面跟 -ing": "enjoy, finish, keep… take -ing",
+ "enjoy、finish、avoid、keep、practice、suggest、spend（时间）这些词后面直接跟 -ing。": "enjoy, finish, avoid, keep, practice, suggest and spend (time) take -ing directly.",
+ "want、need、plan… 后面跟 to + 动词原形": "want, need, plan… take to + base verb",
+ "want、need、plan、decide、hope、would like 后面用 to + 动词原形。": "want, need, plan, decide, hope and would like take to + base verb.",
+ "a / an 怎么选": "Choosing a or an",
+ "看读音，不看字母：元音开头用 an（an STM32 读 es-tee-em、an hour），辅音开头用 a（a university、a one-time fee）。": "Go by sound, not spelling: a vowel sound takes an (an STM32, said es-tee-em; an hour); a consonant sound takes a (a university, a one-time fee).",
+ "冠词：a / the / 不加": "Articles: a / the / none",
+ "The practice taught me a lot（泛指时）✗ → Practice taught me a lot": "The practice taught me a lot (when general) ✗ → Practice taught me a lot",
+ "第一次提到、或者“一个”用 a / an；双方都知道是哪个用 the；泛指一类、或者不可数的事情（practice、golf、data）不加。": "Use a / an for a first mention or “one”; the when both sides know which one; nothing for a whole category or uncountable things (practice, golf, data).",
+ "泛指一类东西用复数": "Plural for a whole category",
+ "说的是这一类东西、不是某一个，用复数：club fittings、microcontrollers。": "When you mean the whole kind, not one item, use the plural: club fittings, microcontrollers.",
+ "被动：be + 过去分词": "Passive: be + past participle",
+ "东西是被处理的一方时：be + 过去分词。The parts are tested every week.": "When the thing receives the action: be + past participle. The parts are tested every week.",
+ "“让我学到很多”：taught me a lot": "“Made me learn a lot”: taught me a lot",
+ "X let me learn a lot ✗（let 是“允许”）": "X let me learn a lot ✗ (let means “allow”)",
+ "英语说“……教会了我很多”：X taught me a lot；或者 I learned a lot from X。": "English says X taught me a lot, or I learned a lot from X.",
+ "make / let / have + 人 + 动词原形": "make / let / have + person + base verb",
+ "make、let、have + 人 + 动词原形，不加 to。help 后面加不加 to 都行。": "make, let, have + person + base verb, without to. help works with or without to.",
+ "if 后面用一般现在时说将来": "Simple present after if for the future",
+ "if 这半句用一般现在时，另一半才用 will：If it rains, we'll stay home.": "The if-half uses the simple present; only the other half uses will: If it rains, we'll stay home.",
+ "for + 一段时间，since + 起点": "for + a length of time, since + a starting point",
+ "和现在完成时一起说“多久了”：for 五年、since 2020。": "With the present perfect, to say how long: for five years, since 2020.",
+ "特殊疑问句：疑问词 + 助动词 + 主语": "Wh- questions: question word + helper verb + subject",
+ "问 what、where、how 时，疑问词后面先放 do / are / can 这类词，再放主语：Where are you going?": "After what, where or how, put do / are / can first, then the subject: Where are you going?",
+ "问句：助动词放在前面": "Questions: the helper verb goes first",
+ "You can help me? ✗（口语可以，但正式场合说 Could you help me?）": "You can help me? ✗ (OK in casual speech; formally say Could you help me?)",
+ "一般疑问句把 do / can / could 这类词放在主语前面；could you 比 can you 客气。": "Yes/no questions put do / can / could before the subject; could you is politer than can you.",
+ "he / she / it 后面的动词加 -s": "Add -s to the verb after he / she / it",
+ "主语是 he、she、it 或者单数的东西时，一般现在时的动词加 -s。": "When the subject is he, she, it or one thing, the simple-present verb takes -s.",
+ "有些动词后面能直接接另一个动词，就像中文的“帮忙调试”。help + 动词原形：I helped fix the website.（help to fix 也对，美国人更常省掉 to）。keep + -ing，意思是“一直……”：kept ringing。want、need、try + to + 动词：I want to learn.　let、make + 人 + 动词原形：Let me think.　讲过去的事，只把第一个动词变成过去式：helped fix、kept ringing。": "Some verbs can be followed directly by another verb (help debug). help + base verb: I helped fix the website. (help to fix is also right; Americans usually drop the to.) keep + -ing means “keep doing”: kept ringing. want, need, try + to + verb: I want to learn.　let, make + person + base verb: Let me think.　For the past, only the first verb changes: helped fix, kept ringing.",
+ "平时、习惯 → 一般现在时：I play.　已经结束的某一次 → 过去式：I played.　从过去到现在、已经、到现在为止 → 现在完成时：I've played.　此刻正在 → I'm playing.　最近一直在 → I've been playing.　打算好的将来 → I'm going to play.": "Habits, normally → simple present: I play.　One finished time → past: I played.　From the past up to now, already, so far → present perfect: I've played.　Right now → I'm playing.　Lately, ongoing → I've been playing.　A planned future → I'm going to play.",
+ "中文说“天气很冷”“我在家”不用“是”，英语要有 is / am / are / was：It's cold.　I'm tired.　I'm at home.　开口先说 It's 或 I'm，后面基本就对了。": "In Chinese you can say “weather very cold” or “I at home” with no verb, but English needs is / am / are / was: It's cold.　I'm tired.　I'm at home.　Start with It's or I'm and the rest is usually right.",
+ "已经结束的某一次 → 过去式": "One finished time → past tense",
+ "此刻正在做 → 进行时 am doing": "Happening right now → progressive: am doing",
+ "平时、习惯 → 一般现在时（不用 will）": "Habits → simple present (no will)",
+ "最近一直在做 → 现在完成进行时 have been doing": "Ongoing lately → present perfect progressive: have been doing",
+ "小写 i → I": "Lowercase i → I",
+ "这里应该是 it's（= it is）": "This should be it's (= it is)",
+ "毕业了：I've graduated / I graduated，不说 I'm graduated": "Graduated: I've graduated / I graduated, not I'm graduated",
+ "做完了：I've finished": "Finished: I've finished",
+ "习惯用一般现在时，不用 will：I usually go...": "Habits take the simple present, not will: I usually go...",
+ "已经毕业的话：My major was...": "If you've already graduated: My major was...",
+ "一个感叹号就够了": "One exclamation mark is enough",
+ "ME 容易被看成缅因州，写全称 Mechanical Engineering": "ME can be read as Maine; write out Mechanical Engineering",
+ "两个情态动词不能连用：might can → could": "Two modals can't go together: might can → could",
+ "第一次：It's my first time here / my first time doing...": "First time: It's my first time here / my first time doing...",
+ "most 和 -est 只用一个": "Use most or -est, not both",
+ "all kinds of + 复数": "all kinds of + plural",
+ "every time 不加 s": "every time has no s",
+ "次数加 s：three times": "Counting times takes s: three times",
+ "“最近、这几天”是 these days": "“Lately, these days” is these days",
+ "散步：go for a walk": "Take a walk: go for a walk",
+ "美式说法：elementary school": "American English: elementary school",
+ "小雨：light rain / drizzle": "Light rain: light rain / drizzle",
+ "半个月：two weeks": "Half a month: two weeks",
+ "月份是 month，不是 mouth": "The time period is month, not mouth",
+ "来读书：for school / to study": "Came to study: for school / to study",
+ "I'm excited about this role. 不接东西就只说 I'm excited.": "I'm excited about this role. With nothing after it, just say I'm excited.",
+ "I'm interested in this role. 不接东西就只说 I'm interested.": "I'm interested in this role. With nothing after it, just say I'm interested.",
+ "I'm looking forward to it. 或者 I'm looking forward to hearing from you.": "I'm looking forward to it. Or: I'm looking forward to hearing from you.",
+ "问事情说 How's everything going? 问人说 How are you doing?": "About things: How's everything going? About a person: How are you doing?",
+ "从过去一直到现在，要用 have + 过去分词：I've played since fourth grade.": "From the past until now takes have + past participle: I've played since fourth grade.",
+ "since 后面要有主语：since I was in fourth grade": "since needs a subject after it: since I was in fourth grade",
+ "主语是 I，用 am：I'm really interested.": "With I, use am: I'm really interested.",
+ "运动前面不加 the：play golf、practice golf": "No the before sports: play golf, practice golf",
+ "relocate 后面不加 it：I'm ready to relocate.": "No it after relocate: I'm ready to relocate.",
+ "“最近这段时间”是 these days": "“These days” is these days",
+ "美国人口语里也常这么说；正式一点用 There are": "Americans often say this in speech; more formally, use There are",
+ "口语里很常见；正式一点说 My friend and I": "Very common in speech; more formally, My friend and I",
+ "已经有动词 kept（一直……）了，前面不用再加 is / are：The cables kept wearing out.": "There's already a verb (kept), so no is / are before it: The cables kept wearing out.",
+ "专业前面用 in：a master's in mechanical engineering": "Use in before a field: a master's in mechanical engineering",
+ "在某个学校：at，不是 as": "At a school: at, not as",
+ "master's degree：master 后面要带 's 的音": "master's degree: say the 's after master",
+ "找工作：search for jobs / look for jobs": "Job hunting: search for jobs / look for jobs",
+ "可能漏了 be 动词：It's / That's ...": "Maybe a missing be-verb: It's / That's ...",
+ "可能漏了 be 动词：I'm ...": "Maybe a missing be-verb: I'm ...",
+ "because 和 so 只留一个": "Keep only one of because and so",
+ "but 短促放松的“呃”；bat 嘴张大、往两边咧；bot 嘴张大、舌头放低往后，像“啊”": "but: a short, relaxed “uh”; bat: mouth wide open and spread; bot: mouth open, tongue low and back, like “ah”",
+ "bad 下巴往下、嘴张得比 bed 大": "bad: drop your jaw; the mouth opens wider than for bed",
+ "l 舌尖顶上牙后面；r 舌尖不碰任何地方，舌头往后缩": "l: tongue tip touches behind the upper teeth; r: the tip touches nothing and the tongue pulls back",
+ "v 上牙轻碰下唇；w 双唇撅圆，牙不碰唇": "v: upper teeth lightly touch the lower lip; w: lips rounded, teeth off the lips",
+ "词尾的辅音要发出来，别吞掉，也别多加一个“呃”": "Say the final consonant; don't swallow it, and don't add an extra “uh”",
+ "两个元音中间的 t 发成轻轻的 d；结尾的 er 要卷舌": "A t between two vowels becomes a light d; a final er is r-colored",
+ "重音 ˈ 和弱读 ə": "Stress ˈ and the weak ə",
+ "ˈ 重音（about /əˈbaʊt/） ə 弱读": "ˈ stress (about /əˈbaʊt/)  ə weak",
+ "ˈ 标在重读音节的开头：那个音节读得更长、更响、调更高；ˌ 是次重音。ə 是英语里最常见的音：不重读的元音大多弱成这个又轻又短的“呃”，嘴巴放松、不用力。很多词读错，其实是重音放错了。": "ˈ marks the start of the stressed syllable: that syllable is longer, louder and higher; ˌ is secondary stress. ə is the most common sound in English: most unstressed vowels weaken into this light, short “uh”, with a relaxed mouth. Many words sound wrong because the stress is in the wrong place.",
+ "i 和 ɪ（sheep / ship）": "i and ɪ (sheep / ship)",
+ "i（sheep）：嘴角往两边拉，舌头抬高，音长一点。ɪ（ship）：嘴巴放松、稍微张开，又短又松，不是“衣”。有的词典把 i 写成 iː。": "i (sheep): corners of the mouth pulled to the sides, tongue high, a longer sound. ɪ (ship): mouth relaxed and slightly open, short and loose, not a full “ee”. Some dictionaries write i as iː.",
+ "æ 和 ɛ（bad / bed）": "æ and ɛ (bad / bed)",
+ "æ（bad）：嘴巴张大，下巴往下，舌头压低往前，像拉长的“哎啊”。ɛ（bed）：嘴巴张一半，像短的“诶”。中文里没有 æ，最容易读成 ɛ。": "æ (bad): mouth wide open, jaw down, tongue low and forward, like a stretched “a-ah”. ɛ (bed): mouth half open, like a short “eh”. Chinese has no æ, so it's easy to say ɛ instead.",
+ "短的“诶”": "A short “eh”",
+ "ʌ 和 ɑ（cut / cot）": "ʌ and ɑ (cut / cot)",
+ "ʌ（cut）：嘴巴半张、放松，短促的“啊”，舌头在中间。ɑ（hot，美式）：嘴巴张大，舌头往后往下，长一点的“啊”。美式的 hot、not、job 都是 ɑ，不是“奥”。": "ʌ (cut): mouth half open and relaxed, a short “uh”, tongue in the middle. ɑ (hot, American): mouth wide open, tongue back and low, a longer “ah”. American hot, not and job all use ɑ, not “aw”.",
+ "u（fool）：嘴唇圆、往前噘，舌头后部抬高，音长。ʊ（full）：嘴唇只微微圆，放松，又短又松。有的词典把 u 写成 uː。": "u (fool): lips round and pushed forward, back of the tongue raised, a long sound. ʊ (full): lips only slightly round, relaxed, short and loose. Some dictionaries write u as uː.",
+ "ʊ 和 u（full / fool）": "ʊ and u (full / fool)",
+ "eɪ（day）、oʊ（go）是滑动的音：从前一个滑到后一个，嘴型要变。常见的错是把 eɪ 读成短的 ɛ（pain 读成 pen），把 oʊ 读成“欧”。ɔ（law，美式）：嘴巴张开、嘴唇稍圆。": "eɪ (day) and oʊ (go) glide from the first sound to the second, so your mouth has to move. A common mistake is a short ɛ for eɪ (pain sounds like pen) or a flat “o” for oʊ. ɔ (law, American): mouth open, lips slightly round.",
+ "双元音": "Diphthongs",
+ "双元音 eɪ、oʊ（pain / pen）": "Diphthongs eɪ, oʊ (pain / pen)",
+ "r 化元音 ɝ、ɚ（work / walk）": "R-colored vowels ɝ, ɚ (work / walk)",
+ "ɝ（bird）、ɚ（teacher 的 er）：舌头卷起或往后缩，整个音都带着 r，美式里一定要卷。和 ɔr（born）、ɑr（farm）分开：ɝ 嘴巴不张大。": "ɝ (bird), ɚ (the er in teacher): curl the tongue up or pull it back so the whole sound carries the r; American English always colors it. Keep them apart from ɔr (born) and ɑr (farm): for ɝ the mouth doesn't open wide.",
+ "θ 和 ð（think / this）": "θ and ð (think / this)",
+ "θ（think）、ð（this）：舌尖轻轻放在上下牙之间往外送气；θ 不振动声带，ð 振动。最常见的错是读成 s、z 或者 t、d。": "θ (think), ð (this): put the tongue tip lightly between your teeth and blow out; θ is voiceless, ð is voiced. The most common mistake is s, z or t, d instead.",
+ "v：上牙轻轻碰下嘴唇，声带振动。w：嘴唇圆起来，不碰牙。f：和 v 一样碰嘴唇，但不振动。中文母语者常把 v 读成 w。": "v: upper teeth lightly touch the lower lip, voiced. w: lips rounded, not touching the teeth. f: same contact as v, but voiceless. Chinese speakers often say v as w.",
+ "n：舌尖顶住上牙后面。ŋ（sing）：舌头后部抬起，舌尖不动，后面不要加 g。词尾的辅音要读出来、不要吞，也不要加“呃”（bag 不是 bag-uh）；词尾清浊要分清：bag / back、prize / price。": "n: tongue tip pressed behind the upper teeth. ŋ (sing): back of the tongue raised, tip still, no g after it. Say final consonants; don't swallow them or add “uh” (bag, not bag-uh). Keep final voiced and voiceless sounds apart: bag / back, prize / price.",
+ "词尾 n / ŋ 和清浊（thin / thing）": "Final n / ŋ and voicing (thin / thing)",
+ "是 yes 里 y 的音": "The y sound in yes",
+ "音标写在两条斜线中间，比如 cat 是 /kæt/：一个符号只代表一个音，不管单词怎么拼。这一课的辅音符号和字母读法一样，几乎不用学；只有 j 要注意：音标里的 j 是 yes 里 y 的音（yes /jɛs/），不是字母 J 的音。元音符号后面几课再学，这一课只看辅音。": "IPA is written between two slashes; cat is /kæt/. One symbol is always one sound, however the word is spelled. In this lesson the consonant symbols read like the letters, so there's almost nothing to learn; only watch j: in IPA, j is the y sound in yes (yes /jɛs/), not the letter J. Vowel symbols come in later lessons; this one is consonants only.",
+ "ph 也读 f": "ph also sounds like f",
+ "字母 c、k 都可能是这个音": "The letters c and k can both make this sound",
+ "永远是 go 里的 g，不读“机”": "Always the g in go, never the j sound",
+ "字母 s 有时读 z": "The letter s sometimes sounds like z",
+ "这几个符号字母里没有，要单独记，每个配一个词：θ = think，ð = this，ʃ = she，ʒ = vision 中间的音，tʃ = chair，dʒ = job，ŋ = sing 的结尾。": "These symbols aren't letters, so learn each one with a word: θ = think, ð = this, ʃ = she, ʒ = the middle of vision, tʃ = chair, dʒ = job, ŋ = the end of sing.",
+ "像“嘘”，嘴唇稍微噘起": "Like “shh”, lips slightly pushed out",
+ "和 θ 一样，但声带振动": "Like θ, but voiced",
+ "舌尖放在上下牙之间送气，声带不振动": "Tongue tip between the teeth, blow out, voiceless",
+ "像 ʃ，但声带振动": "Like ʃ, but voiced",
+ "像“吃”，嘴唇噘起": "Like the ch in chair, lips pushed out",
+ "像“知”，更用力、嘴唇噘起": "Like the j in job, stronger, lips pushed out",
+ "后鼻音，像“昂”的尾巴，后面不加 g": "A back nasal, like the end of “sing”, with no g after it",
+ "单元音（一）": "Single vowels (1)",
+ "元音是音标里最难的部分，也是拼写最靠不住的地方：同一个字母 a，在 cat、father、about 里读法都不一样。每个符号记住一个词就行。": "Vowels are the hardest part of IPA, and spelling helps least: the same letter a sounds different in cat, father and about. Just remember one word for each symbol.",
+ "短而松，在“衣”和“诶”之间": "Short and loose, between “ee” and “eh”",
+ "长的“衣”，嘴角往两边拉（有的词典写 iː）": "A long “ee”, corners of the mouth pulled back (some dictionaries write iː)",
+ "嘴巴张大的“哎啊”，中文里没有": "A wide-open “a-ah”; Chinese doesn't have it",
+ "张大嘴的长“啊”（美式 hot）": "A long, wide-open “ah” (American hot)",
+ "短促、放松的“啊”": "A short, relaxed “uh”",
+ "单元音（二）和弱读": "Single vowels (2) and weak forms",
+ "ə 是英语里最常见的音，只出现在不重读的地方；ɝ 和 ɚ 都是卷舌的“儿”，区别是 ɝ 重读、ɚ 不重读。": "ə is the most common sound in English and appears only in unstressed places; ɝ and ɚ are both r-colored “er” sounds: ɝ is stressed, ɚ is not.",
+ "嘴张开、嘴唇稍圆（美式 law）": "Mouth open, lips slightly round (American law)",
+ "短而松的“乌”": "A short, loose “oo”",
+ "长的“乌”，嘴唇噘圆（有的词典写 uː）": "A long “oo”, lips rounded and pushed out (some dictionaries write uː)",
+ "不重读的卷舌“儿”": "Unstressed r-colored “er”",
+ "最轻最短的“呃”，嘴巴放松": "The lightest, shortest “uh”, mouth relaxed",
+ "重读的卷舌“儿”": "Stressed r-colored “er”",
+ "双元音从前一个音滑到后一个音，嘴型要跟着变。只读前一半是最常见的错：day 读成短的“诶”，go 读成“哦”。": "Diphthongs glide from one sound to the next, so the mouth shape changes. Saying only the first half is the most common mistake: day as a short “eh”, go as a flat “o”.",
+ "“奥—衣”": "“aw–ee”",
+ "“诶—衣”": "“eh–ee”",
+ "像“爱”": "Like “eye”",
+ "像“欧”，嘴唇越来越圆": "Like “oh”, lips rounding more and more",
+ "n（no） ŋ（sing） 词尾辅音": "n (no)  ŋ (sing)  final consonants",
+ "夸奖": "Praise",
+ "同意": "Agreeing",
+ "安慰": "Comforting",
+ "兴奋": "Excited",
+ "生气": "Angry",
+ "sick 在这里是“很棒”，不是生病": "sick here means “great”, not ill",
+ "来自 GOAT（Greatest Of All Time），年轻人用": "From GOAT (Greatest Of All Time); used by young people",
+ "hella = very，加州一带的说法，年轻人用": "hella = very; a California expression used by young people",
+ "clutch：关键时刻帮了大忙": "clutch: a big help at just the right moment",
+ "lit：很热闹、很嗨": "lit: lively and exciting",
+ "no cap = no lie，强调自己说的是真的": "no cap = no lie; stresses that you mean it",
+ "lowkey：有点、暗暗地；highkey 是“非常明显地”": "lowkey: kind of, quietly; highkey means “very obviously”",
+ "bet：好的、没问题": "bet: OK, sure",
+ "I'm down：我愿意、算我一个": "I'm down: I'm in, count me in",
+ "chill：没关系、放松；教授这样说是在安慰你": "chill: no problem, relax; the professor is reassuring you",
+ "my bad：随意的道歉，正式场合说 I'm sorry": "my bad: a casual apology; in formal settings say I'm sorry",
+ "wicked = very，波士顿和新英格兰的特色说法": "wicked = very; typical of Boston and New England",
+ "ghost：突然断联、不回消息": "ghost: suddenly stop replying and disappear",
+ "salty：不爽、有点记仇": "salty: annoyed, a bit bitter",
+ "为了自己脱身，把别人推出去背锅": "Blame someone else to save yourself",
+ "radio silence：完全没人回应": "radio silence: no response at all",
+ "笑着说的 shut up 是“不会吧、太夸张了”，不是让你闭嘴": "shut up said with a laugh means “no way!”, not “be quiet”",
+ "I'm dead / I'm crying：笑得不行": "I'm dead / I'm crying: laughing really hard",
+ "flex：炫耀": "flex: show off",
+ "很冲的脏话，但好朋友之间笑着说，常常是开玩笑；对陌生人说就是真骂人。看语气和关系": "A strong swear word, but between close friends, said with a laugh, it's often a joke; said to a stranger, it's a real insult. It depends on tone and relationship",
+ "fuck 放在 yeah 前面是加强语气，表示非常兴奋地同意，不是骂人": "fuck before yeah just adds force: very excited agreement, not an insult",
+ "表示非常吃惊；比 oh my God 冲": "Shows big surprise; stronger than oh my God",
+ "bullshit：胡说八道，这里是认真地不满": "bullshit: nonsense; here it's real annoyance",
+ "suck：很糟糕；日常常用，朋友、同事之间都行，正式场合别用": "suck: be really bad; common in everyday speech, fine with friends and coworkers, not in formal settings",
+ "piss off：惹恼。美国说 pissed 是“很生气”，英国是“喝醉了”": "piss off: annoy. In the US pissed means “very angry”; in the UK it means “drunk”",
+ "half-assed：敷衍了事": "half-assed: done with little effort",
+ "damn：轻的感叹，惊讶、可惜都能用": "damn: a mild exclamation, for surprise or disappointment",
+ "hell yeah：兴奋地同意": "hell yeah: excited agreement",
+ "screw it：算了、豁出去了": "screw it: forget it, let's just do it",
+ "badass 用来夸人或事很酷": "badass praises a person or thing as really cool",
+ "dick：很冲，说人很讨厌、不讲理；朋友之间也可能半开玩笑，看语气": "dick: strong; calls someone mean or unreasonable. Friends may say it half-jokingly; it depends on tone",
+ "可能是惊讶，也可能是不满，看语气；比 what the fuck 轻": "Can be surprise or annoyance, depending on tone; milder than what the fuck",
+ "感叹；有些人会介意宗教用词，自己说 oh my gosh 更安全": "An exclamation; some people mind religious words, so oh my gosh is safer for you to say",
+ "fucking 放在名词前常常只是加强语气、随口带的，不一定在生气": "fucking before a noun often just adds emphasis in passing; it doesn't always mean anger",
+ "bro / dude / man：朋友之间的称呼；面试、和长辈说话别用": "bro / dude / man: what friends call each other; don't use them in interviews or with older people",
+ "固定说法": "Set phrases",
+ "主谓一致": "Subject–verb agreement",
+ "闲聊": "Small talk",
+ "搭话": "Starting a chat",
+ "点餐": "Ordering food",
+ "朋友聊天": "Chatting with friends",
+ "职场": "Workplace",
+ "办事": "Errands",
+ "写消息": "Messages",
+ "雾团": "Mistling",
+ "铁甲虫": "Ironbug",
+ "电子蝠": "Glitchbat"
+});
+
+/* v1.79.0：单词页两栏、导入框的格式提示 */
+Object.assign(I18N_EN, {
+ "至少要 {n} 份存了 JD 原文的投递（现在 {n} 份）。办法：在“记投递”里把职位页面整页贴进来，或者导入 AI 整理的 JD 原文导入码（JD | 公司 | 职位 …… JD 结束）。": "Needs at least {n} applications with the JD text saved (now {n}). To add them, paste the whole job page in “Log applications”, or import an AI-made JD code (JD | 公司 | 职位 …… JD 结束).",
+ "复制给 AI，换成单词卡（{n} 个）": "Copy for AI to make word cards ({n})",
+ "已经发过了，清空": "Already sent, clear",
+ "我加的（{n}）": "Mine ({n})",
+ "全部（{n}）": "All ({n})",
+ "还没做成单词卡（{n}）": "Not made into cards yet ({n})",
+ "在“问 AI”页复制给 AI，导入它给的单词卡，就能练了。": "Copy them to an AI on the Ask AI page and import the word cards it gives you; then you can practise them.",
+ "待做卡": "No card yet",
+ "去“问 AI”页": "Go to Ask AI",
+ "单词：我加的": "Words: mine",
+ "单词：我加的，只复习到期的": "Words: mine, due only",
+ "还没有自己加的词做成的单词卡。读文章、看例句、听俚语时点一个词，选“加到要学的词”，就会出现在这里。": "No word cards from words you added yet. Tap a word while reading, in an example or in the slang lesson, choose “Add to words to learn”, and it shows up here.",
+ "卡 | 中文 | English | 类型 | 提示": "卡 | Chinese | English | type | tip   (卡 = card)"
+});
+
+/* v1.79.1：卡片自带的提示（反射卡、日常、找错）、开口小贴士、面试题的答题提示、日记的题目。题目中文、单词意思这些要说成英文的照旧不翻 */
+Object.assign(I18N_EN, {
+ "描述天气、东西：开口先说 It's": "Describing weather or things: start with It's",
+ "描述自己：开口先说 I'm": "Describing yourself: start with I'm",
+ "不说 The wind is...，直接 It's windy": "Not The wind is...; just It's windy",
+ "不加 to get here": "No to in get here (not get to here)",
+ "That 后面别漏 's": "Don't drop the 's after That",
+ "在美国，足球是 soccer": "In the US, football with a round ball is soccer",
+ "rusty：很久没练，手生了": "rusty: out of practice",
+ "right up my alley：正好是我喜欢、擅长的": "right up my alley: exactly my kind of thing",
+ "美国用华氏度：10°C ≈ 50°F": "The US uses Fahrenheit: 10°C ≈ 50°F",
+ "过去的事用过去式；年份用 in": "Past events take the past tense; years take in",
+ "已经毕业，不说 I'm here to study": "You've already graduated, so not I'm here to study",
+ "完成时：have + 过去分词": "Perfect: have + past participle",
+ "从过去持续到现在：现在完成时": "From the past up to now: present perfect",
+ "正在进行：am doing": "In progress: am doing",
+ "习惯用一般现在时，不用 will": "Habits take the simple present, not will",
+ "不用 had been": "Not had been",
+ "最近一直在做：have been doing": "Ongoing lately: have been doing",
+ "because 和 so 只留一个；口语里只用 so 最简单": "Keep only one of because and so; in speech, just so is easiest",
+ "面试里很容易说成 although...but": "In interviews it's easy to slip into although...but",
+ "and 后面的动作不加 to；躺着是 lie around": "No to before the action after and; lying around is lie around",
+ "tag along：跟着去": "tag along: go along with someone",
+ "在家：at home": "Being home: at home",
+ "last summer 前面不加 in / at": "No in / at before last summer",
+ "这几天是 these days，不是 those days": "Lately is these days, not those days",
+ "go for a walk，不说 have a walk": "go for a walk, not have a walk",
+ "出去玩：hang out": "Going out with friends: hang out",
+ "半个月 → two weeks": "Half a month → two weeks",
+ "肯定句用 too；either 只用于否定句": "Use too in positive sentences; either only in negative ones",
+ "动力：motivation": "Drive to do something: motivation",
+ "想不起单词就描述它": "Can't think of the word? Describe it",
+ "先给结论，再展开": "Give the conclusion first, then expand",
+ "电话面试的第一句": "First line of a phone interview",
+ "回答后加一句，别把话题聊死": "Add one more line after answering so the conversation doesn't die",
+ "疑问词 + do + 主语 + 动词": "Question word + do + subject + verb",
+ "口语捷径：陈述句 + 升调": "Spoken shortcut: statement + rising tone",
+ "陈述句 + right? 最简单": "Statement + right? is the easiest",
+ "重音：me-CHA-ni-cal en-gi-NEER-ing": "Stress: me-CHA-ni-cal en-gi-NEER-ing",
+ "ro-BO-tic；axis 读 AK-sis": "ro-BO-tic; axis is said AK-sis",
+ "AC-tu-a-tor；torque 只有一个音节，读 tork": "AC-tu-a-tor; torque has one syllable: tork",
+ "re-pea-ta-BI-li-ty，重音在 BI": "re-pea-ta-BI-li-ty, stress on BI",
+ "PRO-to-types，重音在开头": "PRO-to-types, stress at the start",
+ "I-te-ra-ted，重音在开头": "I-te-ra-ted, stress at the start",
+ "roles 不是 rules：o 要把嘴收圆": "roles, not rules: round your lips for the o",
+ "对方道歉、问你方便吗": "When they apologize and ask if it's a good time",
+ "数字没听清，就把你听到的数字说出来确认": "Didn't catch a number? Say the number you heard to confirm it",
+ "卡住超过 3 秒，先说这句": "Stuck for more than 3 seconds? Say this first",
+ "没做过的技术题，第一句先这样说": "For a technical question you haven't done, start like this",
+ "别说 I can relocate：can 和 can't 在电话里容易听混": "Don't say I can relocate: can and can't are easy to confuse on the phone",
+ "回答后反问一句，话题就接下去了": "Answer, then ask one back, and the conversation keeps going",
+ "陈述句加 isn't it / right，最自然的开场": "A statement + isn't it / right is the most natural opener",
+ "从过去到现在：have lived": "From the past until now: have lived",
+ "How have you been：问一段时间以来的近况": "How have you been: asks how things have been for a while",
+ "点餐最常用：I'll have… / Can I get…": "Most common for ordering: I'll have… / Can I get…",
+ "美国说 check，不说 bill": "In the US it's the check, not the bill",
+ "水电煤：utilities": "Water, power and gas: utilities",
+ "面试后感谢信的第一句": "First line of a thank-you note after an interview",
+ "did you 连起来像 didja；get it 连成 ge-tit": "did you links into didja; get it into ge-tit",
+ "what do you 说快了像 whaddaya": "Said fast, what do you sounds like whaddaya",
+ "think about it：k 连 a，t 连 it，像 thin-ka-bou-tit": "think about it: k links to a, t links to it, like thin-ka-bou-tit",
+ "连成一串：che-ki-tout": "Linked together: che-ki-tout",
+ "连成 no-ta-tall": "Linked: no-ta-tall",
+ "连成 pi-ki-tup": "Linked: pi-ki-tup",
+ "连成 tur-ni-toff": "Linked: tur-ni-toff",
+ "get back：t 轻到几乎不发音": "get back: the t is so light it's almost silent",
+ "take a look 连成 ta-ka-look": "take a look links into ta-ka-look",
+ "makes sense：两个 s 合成一个长 s": "makes sense: the two s sounds merge into one long s",
+ "in a minute 连成 i-na-mi-nit": "in a minute links into i-na-mi-nit",
+ "next week：xt 后面直接接 w，t 很轻，但别加“特”": "next week: xt runs straight into w; the t is light, but don't add an extra vowel",
+ "asked 读 askt，结尾两个辅音，中间不要加元音": "asked is said askt: two final consonants, no vowel between",
+ "costs 结尾 sts 三个辅音：先慢慢说 cost-s": "costs ends in three consonants, sts: say cost-s slowly first",
+ "tests 结尾 sts；well 的 l 要发出来": "tests ends in sts; say the l in well",
+ "used a 连成 use-da；seven iron 连成 se-ve-niron": "used a links into use-da; seven iron into se-ve-niron",
+ "别说 You too，服务员不吃饭；说错了也没事，美国人自己也常顺嘴说错": "Don't say You too: the server isn't eating. If you slip, it's fine; Americans do it too",
+ "这里说 you too 就对了": "Here, you too is right",
+ "I'm good 在这里是“不用了”，不是“我很好”": "I'm good here means “no thanks”, not “I'm fine”",
+ "美国人最常说 Here you go": "Americans most often say Here you go",
+ "几乎只有这一种说法": "This is almost the only way to say it",
+ "日常最常用 No problem；You're welcome 稍正式": "No problem is the everyday one; You're welcome is a bit more formal",
+ "No worries 最常见": "No worries is the most common",
+ "My bad 用在朋友、同事之间": "My bad is for friends and coworkers",
+ "不用真的讲你今天怎么样，回一句再反问就行": "You don't really have to say how your day is; reply briefly and ask back",
+ "What's up 不是真的在问问题": "What's up isn't really a question",
+ "美国人说 Have a good one 特别多": "Americans say Have a good one a lot",
+ "比 Can I ask you a question? 更自然": "More natural than Can I ask you a question?",
+ "heads-up = 提前告诉你一声": "heads-up = letting you know in advance",
+ "几乎固定这么说": "Almost always said this way",
+ "比 Yes, I agree with you 自然得多": "Much more natural than Yes, I agree with you",
+ "Speaking 最常用": "Speaking is the most common",
+ "点餐说 Can I get 或 I'll have，不说 I want": "When ordering, say Can I get or I'll have, not I want",
+ "公共场所说 restroom，不说 toilet": "In public places say restroom, not toilet",
+ "不要说 No, no, I'm not good（中式谦虚），美国人夸你，说谢谢就好": "Don't say No, no, I'm not good (Chinese-style modesty); when Americans compliment you, just say thanks",
+ "can't make it = 去不了": "can't make it = can't come",
+ "好久没见时用；不说 How are you recently": "For when you haven't seen someone in a while; not How are you recently",
+ "I'll let you go = 不耽误你了，电话收尾的固定说法": "I'll let you go = I won't keep you; a set way to end a call",
+ "Do you mind 是问“你介意吗”，同意要说 No 或 Not at all": "Do you mind asks whether you object, so to agree say No or Not at all",
+ "英语按事实回答：不喜欢就说 No（中文是“对，不喜欢”）": "English answers by the facts: if you don't like it, say No (Chinese would say “right, I don't”)",
+ "要去就说 Yes，和问题里的 not 无关": "If you're going, say Yes, whatever the not in the question",
+ "表态：别漏了 's（That cool 是你最常犯的错）": "Reacting: don't drop the 's (That cool is your most common mistake)",
+ "听到意外的事": "When you hear something unexpected",
+ "sound like + 名词，sound + 形容词": "sound like + noun, sound + adjective",
+ "体谅对方，不评价对方": "Show you understand; don't judge them",
+ "最近是 lately / these days，不是 those days": "Lately is lately / these days, not those days",
+ "in a bit of a funk：有点提不起劲": "in a bit of a funk: feeling a bit low",
+ "回答以后反问一句，话题就接下去了": "After answering, ask one back and the conversation keeps going",
+ "Have you ever + 过去分词": "Have you ever + past participle",
+ "By the way 转话题": "By the way changes the topic",
+ "Speaking of … 顺着话题转": "Speaking of … shifts the topic smoothly",
+ "didn't get a chance to：没来得及": "didn't get a chance to: didn't have time to",
+ "be into：喜欢、感兴趣；although 和 but 只留一个": "be into: like, be interested in; keep only one of although and but",
+ "邮件开头的客套": "A polite email opener",
+ "感谢信第一句": "First line of a thank-you note",
+ "第一句就说目的": "State your purpose in the first line",
+ "check in on：问一下进展": "check in on: ask how something is going",
+ "落款，后面换行写名字": "Sign-off; put your name on the next line",
+ "比较随意的落款": "A more casual sign-off",
+ "形容词前要有 be：That's": "Adjectives need be before them: That's",
+ "It 后面漏了 's；出门是 get myself outdoors": "Missing 's after It; going outside is get myself outdoors",
+ "漏了动词；已经毕业，用过去式": "Missing verb; you've graduated, so past tense",
+ "漏了 'm；拼写 familiar": "Missing 'm; spelling: familiar",
+ "习惯不用 will；go for a walk": "Habits don't take will; go for a walk",
+ "完成时后面用过去分词": "The perfect takes a past participle",
+ "已经做完：I've finished": "Already done: I've finished",
+ "正在进行：I'm trying": "In progress: I'm trying",
+ "过去式；年份用 in；一次是 once": "Past tense; years take in; one time is once",
+ "过去式；I 后面不加 -s": "Past tense; no -s after I",
+ "不用 had been；three times": "Not had been; three times",
+ "单数主语 + has": "Singular subject + has",
+ "I 后面动词不加 -s": "No -s on the verb after I",
+ "两台以上加 -s；3D printer": "More than one takes -s; 3D printer",
+ "过去的事用 Did you + 动词原形": "For the past: Did you + base verb",
+ "两个情态动词不能连用": "Two modals can't go together",
+ "专有名词一般不加 the": "Proper names usually take no the",
+ "肯定句用 too": "Positive sentences take too",
+ "这几天：these days": "Lately: these days",
+ "顽固错误：不说 I'm graduated": "Stubborn mistake: not I'm graduated",
+ "躺着：lie around": "Lying around: lie around",
+ "习惯不用 will；videos": "Habits don't take will; videos",
+ "从句里也要有 be": "The clause needs be too",
+ "month 拼写；半个月 → two weeks": "Spelling: month; half a month → two weeks",
+ "过去的事用过去式": "Past events take the past tense",
+ "先说 I + 动词": "Start with I + verb",
+ "开口先说 It's / I'm：描述东西用 It's，描述自己用 I'm。": "Start with It's / I'm: It's to describe things, I'm to describe yourself.",
+ "讲经历用过去式：came、took、started、was。": "Tell experiences in the past tense: came, took, started, was.",
+ "and 后面的动作不加 to；spend time doing。": "No to before the action after and; spend time doing.",
+ "卡住了就说：Sorry, let me say that again.": "Stuck? Say: Sorry, let me say that again.",
+ "面试回答先给结论，再讲原因。": "In interviews, give the conclusion first, then the reason.",
+ "回答完加一句追问，别把话题聊死。": "After answering, add a follow-up question so the conversation doesn't die.",
+ "说错的句子，不看稿说 3 遍再往下走。": "For a sentence you got wrong, say it 3 times without looking before moving on.",
+ "现在 → 过去 → 未来，60–90 秒。第一句直接说你是谁；讲经历用过去式；最后落到为什么是这个职位。": "Present → past → future, 60–90 seconds. Say who you are in the first sentence; tell experiences in the past tense; end with why this role.",
+ "STAR：背景 → 你的任务 → 你做了什么（多用 I）→ 结果（最好有数字）。全部用过去式。": "STAR: situation → your task → what you did (say I a lot) → result (ideally with a number). All in the past tense.",
+ "第一句说清问题是什么，再讲你怎么一步步排查，最后怎么解决、结果如何。": "First say what the problem was, then how you narrowed it down step by step, and finally how you solved it and what happened.",
+ "重点讲你怎么沟通、最后怎么达成一致；不说别人的坏话。": "Focus on how you communicated and how you reached agreement; don't speak badly of others.",
+ "选一个真实但不致命的错误，一半时间讲你怎么补救、学到了什么。": "Pick a real but not fatal mistake, and spend half the time on how you fixed it and what you learned.",
+ "两个理由：①职位内容和你的经历对得上 ②公司本身吸引你。面试前看职位描述和官网。": "Two reasons: ① the role matches your experience ② the company itself appeals to you. Read the job description and website before the interview.",
+ "优点配一个例子；需要改进的地方要真实，并说你正在怎么改。": "Back each strength with an example; the area to improve should be real, and say how you're working on it.",
+ "一定要问 1–2 个。别问官网上就能查到的。": "Always ask 1–2. Don't ask what's on the website.",
+ "按你的真实情况，一两句话说清楚。提前想好，不要临场组织。": "Based on your real situation, make it clear in a sentence or two. Prepare it ahead; don't improvise.",
+ "同上，一句话。": "Same as above: one sentence.",
+ "提前查好这个职位在当地的大概范围，可以给一个范围。": "Look up the usual local range for this role in advance; you can give a range.",
+ "一句话说清楚。": "Make it clear in one sentence.",
+ "一句话回答，可以补一句理由。": "Answer in one sentence; you can add one reason.",
+ "说 2 点：公司做什么 + 你特别感兴趣的一个产品或新闻。": "Say 2 things: what the company does + one product or piece of news that especially interests you.",
+ "今天你做了什么？用过去式讲 3 件事。": "What did you do today? Tell 3 things in the past tense.",
+ "今天最好玩的一件事是什么？": "What was the most fun thing today?",
+ "今天吃了什么？好吃吗？": "What did you eat today? Was it good?",
+ "今天为找工作做了什么？": "What did you do for your job search today?",
+ "今天玩了什么游戏，或者看了什么？": "What games did you play or what did you watch today?",
+ "今天遇到了什么麻烦？怎么解决的？": "What trouble did you run into today? How did you solve it?",
+ "明天打算做什么？（用 I'm going to）": "What are you going to do tomorrow? (Use I'm going to)"
+});
+
+/* v1.79.1：少见状态才出现的提示（面试录音指标、时间到、导入预览、计划、成长、求职统计、接话练习、首领一族的名字） */
+Object.assign(I18N_EN, {
+ "只因里一天说了 {n} 句以上，自动 +{n}": "Over {n} lines spoken in Cluck in a day: auto +{n}",
+ "只因里一天听了 {n} 题以上，自动 +{n}": "Over {n} listening items in Cluck in a day: auto +{n}",
+ "只因里每写完一封，自动 +{n}": "Each reply finished in Cluck: auto +{n}",
+ "只因里每次模拟面试，自动 +{n}": "Each mock interview in Cluck: auto +{n}",
+ "开口 {n}.{n} 秒": "Started after {n}.{n} s",
+ "{n} 秒以上的停顿 {n} 次（最长 {n} 秒）": "Pauses over {n} s: {n} (longest {n} s)",
+ "。候选里有你要说的那句，所以按它判断。": ". One of its other guesses was your sentence, so it judged by that.",
+ "。候选里有你要说的那句，所以按它判断。第一遍没听准的：": ". One of its other guesses was your sentence, so it judged by that. Words it didn't catch the first time:",
+ "后面还有 {n} 题。剩下的不会丢，会留到下次。": "{n} cards are left. They won't be lost; they'll wait for next time.",
+ "后面还有 {n} 题，其中 {n} 题是刚才没说出来、要再练一次的。剩下的不会丢，会留到下次。": "{n} cards are left, {n} of them ones you just missed and need to redo. They won't be lost; they'll wait for next time.",
+ "把没说出来的 {n} 题练完再结束": "Finish the {n} missed cards first",
+ "卡片 {n}": "Cards {n}",
+ "卡片 {n}（单词 {n}）": "Cards {n} ({n} words)",
+ "题目 {n}": "Questions {n}",
+ "题目 {n}（知识卡 {n}）": "Questions {n} ({n} knowledge cards)",
+ "写好回答 {n}/{n}，来电模拟 {n} 次，平均每通让对方重复 {n} 次": "Answers written {n}/{n}, mock calls {n}, about {n} repeat requests per call",
+ "写好回答 {n}/{n}，来电模拟 {n} 次，平均每通让对方重复 {n}.{n} 次": "Answers written {n}/{n}, mock calls {n}, about {n}.{n} repeat requests per call",
+ "复习到期的卡（{n} 题）": "Review due cards ({n})",
+ "几份？": "How many?",
+ "几条？": "How many?",
+ "几个？": "How many?",
+ "几次？": "How many times?",
+ "几封？": "How many?",
+ "加回删掉的 {n} 个选项。你自己加的、改过的不动。": "Adds back {n} deleted options. Ones you added or changed stay as they are.",
+ "加回删掉的 {n} 个选项、{n} 个技能。你自己加的、改过的不动。": "Adds back {n} deleted options and {n} skills. Ones you added or changed stay as they are.",
+ "乱序": "Scrambler"
+});
+
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
 var I18N_LANGS = (typeof I18N_LANGS !== "undefined" && I18N_LANGS) || {};
 I18N_LANGS.en = {name:"English", dict:I18N_EN};
@@ -21892,8 +22468,32 @@ function i18nT(raw){
       [/^首领「(.+)」还剩 (\d+)\/(\d+)（弱点：(.+)），下次游戏接着打。$/, m => `Boss “${T(m[1])}” has ${m[2]}/${m[3]} left (weak spot: ${T(m[4])}); keep fighting next game.`],
       [/^这一轮最需要加强：(.+)（没说出来 (\d+) 次）。$/, m => `Needs the most work this round: ${T(m[1])} (not said ${m[2]}×).`],
       [/^我听到的是：“(.+)”。差一点，再说一次。$/, m => `I heard: “${m[1]}”. Almost; say it again.`],
+      [/^知识·(.+)$/, m => `Knowledge · ${T(m[1])}`], [/^脏话 · (重|中|轻)$/, m => `Swearing · ${{"重":"strong","中":"medium","轻":"mild"}[m[1]]}`],
+      [/^(.+) 不是这个词的读法(：比一比哪个符号不一样|（常见的错误读法）)$/, m => `${m[1]}: not how this word is pronounced${m[2][0] === "：" ? "; compare which symbol is different" : " (a common wrong pronunciation)"}`],
+      [/^删除技能“(.+)”？$/, m => `Delete the skill “${m[1]}”?`], [/^删除“(.+)”？$/, m => `Delete “${m[1]}”?`],
       [/^(.+?)(，暴击)?：-(\d+)$/, m => { const l = i18nT(m[1]); return l ? `${l}${m[2] ? ", critical hit" : ""}: -${m[3]}` : null; }]];   /* 完全对，暴击：-15 / 补说对了：打碎护盾：-7 */
     for (const [re, f] of G){ const m = t.match(re); if (m){ v = f(m); if (v != null) break; } } }
+  /* v1.79.1：少见状态的提示（夹着名字、列表、日期的） */
+  if (v == null){ const T = x => i18nT(x) || x, pl = (n, a, b) => n === "1" ? a : b;
+    const item = x => { const w = i18nT(String(x).trim()); if (w) return w; const m = String(x).trim().match(/^(.+?) (\d+)(?:（(.+?) (\d+)）)?$/); if (!m) return null; const a = i18nT(m[1]); if (!a) return null; return `${a} ${m[2]}${m[3] ? ` (${m[4]} ${(i18nT(m[3]) || m[3]).toLowerCase()})` : ""}`; };
+    const list = x => { const ps = String(x).split("、"), tr = ps.map(item); return tr.every(Boolean) ? tr.join(", ") : null; };
+    const lc = x => String(x).charAt(0).toLowerCase() + String(x).slice(1);
+    const RC = {"没说出来":"missed", "较多卡顿":"hesitant", "还行":"OK", "不错":"good", "未打分":"unrated"};
+    const H = [
+      [/^转写好了：(.+)$/, m => `Transcribed: ${T(m[1])}`], [/^（听成了 (.+)）$/, m => ` (heard as ${m[1]})`],
+      [/^(\d+) 题((?: (?:没说出来|较多卡顿|还行|不错|未打分) \d+)+)$/, m => `${m[1]} ${pl(m[1], "question", "questions")}` + m[2].replace(/ (没说出来|较多卡顿|还行|不错|未打分) (\d+)/g, (z, k, n) => ` · ${RC[k]} ${n}`)],
+      [/^· (.+?)：(.+)$/, m => { const l = list(m[2]); return l ? `· ${m[1]}: ${l}` : null; }],
+      [/^对话练习（Coffee chat：(.+)）$/, m => `Conversation practice (coffee chat: ${T(m[1])})`], [/^单题彩排：(.+)$/, m => `Rehearse one question: ${m[1]}`], [/^跟读参考回答：(.+)$/, m => `Shadow the model answer: ${m[1]}`],
+      [/^练习进度和卡片：约 (.+?) 日记录音 (\d+) 条 面试回答录音 (\d+) 条$/, m => `Progress and cards: about ${m[1]} · journal recordings ${m[2]} · interview answer recordings ${m[3]}`],
+      [/^(✓ 反应对了|✗ 这是“(.+?)”的反应，这里是(.+?)|✗ 先给一个反应：(.+?)) (✓ 追问了|✗ 再追问一句)$/, m => `${m[1].startsWith("✓") ? "✓ Right reaction" : m[2] ? `✗ That reaction fits ${lc(T(m[2]))}; this is ${lc(T(m[3]))}` : `✗ React first: ${m[4]}`} ${m[5].startsWith("✓") ? "✓ Asked a follow-up" : "✗ Ask a follow-up"}`],
+      [/^(.+?) \+(\d+)，经验值 \+(\d+)$/, m => `${T(m[1])} +${m[2]}, XP +${m[3]}`], [/^(.+?)（(\d{1,2}:\d{2}) 前）$/, m => `${T(m[1])} (before ${m[2]})`], [/^现在做（(.+)）$/, m => `Do now (${T(m[1])})`],
+      [/^(.+?)：(就是今天|明天|还有 (\d+) 天)$/, m => `${m[1]}: ${m[2] === "就是今天" ? "today" : m[2] === "明天" ? "tomorrow" : `in ${m[3]} ${pl(m[3], "day", "days")}`}`],
+      [/^(学过 (\d+) 次|掌握 ✓)，(今天复习|(\d{2}\/\d{2}) 复习)$/, m => `${m[2] ? `Studied ${m[2]} ${pl(m[2], "time", "times")}` : "Mastered ✓"}, ${m[4] ? `review on ${m[4]}` : "review today"}`],
+      [/^问过 (\d+) 次(?:：(.+))?$/, m => `Asked ${m[1]} ${pl(m[1], "time", "times")}${m[2] ? ": " + m[2].replace(/、/g, ", ") : ""}`],
+      [/^每场都会问的题天天轮；方向题按你“等待回音”的投递里各方向的比例分；公司的题约到那家才出现(?:，现在离“(.+?)”越近，相关的题隔得越短)?。没达标的题一天最多练一次，同一题在 (\d+) 次不同时间都说得还行才算达标，之后隔一周复习。每天的量按你过去两周实际练的时间多加两成，可以在“准备”里改。$/,
+        m => `Questions asked in every interview rotate daily; track questions follow the mix of tracks among applications still “waiting to hear back”; company questions appear once you have an interview there${m[1] ? `, and the closer “${m[1]}” gets, the more often related questions come up` : ""}. A question that isn't passed yet comes up at most once a day; it passes after you say it well enough at ${m[2]} different times, then it's reviewed weekly. The daily amount is your actual practice time over the past two weeks plus 20%; change it in Prep.`],
+      [/^[^：]+、[^：]+$/, m => list(m[0])]];
+    for (const [re, f] of H){ const m = t.match(re); if (m){ v = f(m); if (v != null) break; } } }
   /* “前缀：内容”：只有后面的内容也翻得了（或者本来就没有中文）才用；不然留给后面更具体的规则（v1.75.0 这条抢在学音标规则前面，“音标：学第……”只翻了一半） */
   if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = i18nDict()[mp[1] + "："] || i18nDict()[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; if (r) v = p.replace(/[:：]\s*$/, "") + ": " + r; else if (/^(题库|劲敌|对方|角色|敌人|职位|公司|首领|复盘)$/.test(mp[1])) v = p.replace(/[:：]\s*$/, "") + ": " + mp[2]; } } }   /* 后面一定是名字的前缀：名字原样保留 */
   if (v == null){ const mx = t.match(/^(.+?)\s*[×x]\s*(\d+)$/); if (mx){ const base = i18nT(mx[1]); if (base) v = base + " ×" + mx[2]; } }   /* v1.74.1：结尾带“×3”这类次数的 */
@@ -21920,7 +22520,10 @@ function i18nPractice(t){
   const cards = (typeof CAT !== "undefined" && CAT && CAT.cards) || [];
   if (!I18N_PRAC || I18N_PRAC_N !== cards.length){ I18N_PRAC = new Set(); I18N_PRAC_N = cards.length; const add = x => { x = String(x == null ? "" : x).replace(/\s+/g, " ").trim(); if (x) I18N_PRAC.add(x); };
     try { for (const c of cards){ add(c.zh); add(c.mean); add(c.cue); add(c.subj); add(c.obj); add(c.note); add(c.tip); (c.steps || []).forEach(x => { add(x.hint); add(x.add); add(x.add + "：" + x.hint); add("＋ " + x.add + "：" + x.hint); }); } } catch (e) {}
-    try { (typeof CHUNKS !== "undefined" ? CHUNKS : []).forEach(x => add(x[1])); (typeof DIALOGS !== "undefined" ? DIALOGS : []).forEach(g => (g.turns || []).forEach(x => add(x.zh))); (typeof L_CARDS !== "undefined" ? L_CARDS : []).forEach(x => add(x[3])); (typeof DL_CARDS !== "undefined" ? DL_CARDS : []).forEach(x => add(x[3])); } catch (e) {} }
+    try { (typeof CHUNKS !== "undefined" ? CHUNKS : []).forEach(x => add(x[1])); (typeof DIALOGS !== "undefined" ? DIALOGS : []).forEach(g => (g.turns || []).forEach(x => add(x.zh))); (typeof L_CARDS !== "undefined" ? L_CARDS : []).forEach(x => add(x[3])); (typeof DL_CARDS !== "undefined" ? DL_CARDS : []).forEach(x => add(x[3])); } catch (e) {}
+    /* v1.79.0：俚语的中文意思（选项）、接话的中文、想不起词的东西名、开场白和邮件、聊天语块的中文意思 */
+    try { (typeof SLANG_ITEMS !== "undefined" ? SLANG_ITEMS : []).forEach(x => add(x[2])); (typeof REACT_ITEMS !== "undefined" ? REACT_ITEMS : []).forEach(x => add(x[2])); (typeof CIRCUM_ITEMS !== "undefined" ? CIRCUM_ITEMS : []).forEach(x => add(x[0]));
+      (typeof PRON_OPENERS !== "undefined" ? PRON_OPENERS : []).forEach(x => add(x[1])); [].concat(typeof MAIL_MOVES !== "undefined" ? MAIL_MOVES : [], typeof CHAT_MOVES !== "undefined" ? CHAT_MOVES : []).forEach(g => (g[1] || []).forEach(x => add(x[0]))); } catch (e) {} }
   return I18N_PRAC.has(t);
 }
 function i18nMiss(t){ t = String(t || "").replace(/\s+/g, " ").trim(); if (!t || t.length > 300 || !/[\u4e00-\u9fff]/.test(t) || I18N_MISS.has(t) || I18N_MISS.size >= 1500 || i18nPractice(t)) return;
