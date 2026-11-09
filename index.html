@@ -1162,6 +1162,22 @@ select:focus, select:focus-visible, .fld select:focus, .fld select:focus-visible
 .wl-tabs{display:flex;gap:8px;margin:8px 0 10px}
 .wl-tabs .chip{cursor:pointer;min-height:36px;padding:0 14px;font-size:14px}
 .wl-tabs .chip.on{background:var(--accent, #2563eb);border-color:var(--accent, #2563eb);color:#fff}
+/* v1.79.2：对战画面自己是一层（isolation）：里面的血条（90）、伤害数字（96）只在画面里比高低，不会再盖住提示条、弹窗、底部导航（以前提示条 80，被血条压在下面） */
+.bt-stage{isolation:isolate}
+/* 浮在页面最上面的：识别进度条 1000、弹窗 1100、提示条 1200（弹窗开着时提示也看得见） */
+.asr-bar{z-index:1000}
+.sheet-bg{z-index:1100}
+.toast{z-index:1200}
+/* v1.79.2：今天 / 昨天 不换行：放不下就往左长，再放不下由 A.setScore 缩小字号 */
+.bt-score{white-space:nowrap;display:flex;justify-content:flex-end}
+/* v1.79.2：CSS 里写的字翻译程序看不到，英文界面单独给一句（以后别把界面文字写在 CSS 的 content 里） */
+html[lang="en"] body.g-drill .g-top::after{content:"Shadowing: the battle is hidden for now"}
+/* v1.80.0：易混词页 */
+.mix-link{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.mix-row{padding-top:12px;padding-bottom:12px}
+.mix-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.mix-h .en{font-size:17px}
+
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1183,7 +1199,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.79.1"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.80.0"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2132,7 +2148,7 @@ const CONTENT = {MIGRATE, R_CARDS, T_CARDS, F_CARDS, E_CARDS, L_CARDS, QUESTIONS
 const TAGS = {
   fixed:{label:"固定说法",w:1.0},
   vocab:{label:"单词",w:1.0},
-  be:{label:"be 动词",w:1.0}, tense:{label:"时态",w:1.0}, order:{label:"语序",w:.9}, pair:{label:"成对词",w:.9},
+  be:{label:"be 动词",w:1.0}, tense:{label:"时态",w:1.0}, order:{label:"语序",w:.9}, pair:{label:"成对词",w:.9}, mix:{label:"易混词",w:.9},
   to:{label:"多余的 to",w:.8}, plural:{label:"复数 -s",w:.8}, agree:{label:"主谓一致",w:.7}, question:{label:"提问",w:.7},
   rescue:{label:"救急句",w:.8}, interview:{label:"面试语块",w:.8}, modal:{label:"情态动词",w:.6}, eding:{label:"-ed / -ing",w:.6},
   compare:{label:"比较级",w:.4}, article:{label:"冠词",w:.4}, prep:{label:"介词",w:.5}, colloc:{label:"地道说法",w:.6},
@@ -2142,7 +2158,7 @@ const TAGS = {
 };
 const TAG_ALIAS = {};
 for (const [k,v] of Object.entries(TAGS)) { TAG_ALIAS[k]=k; TAG_ALIAS[v.label]=k; TAG_ALIAS[v.label.replace(/\s+/g,"")]=k; }
-Object.assign(TAG_ALIAS, {"be":"be","be动词":"be","时态":"tense","成对":"pair","成对词":"pair","to":"to","多余to":"to","复数":"plural",
+Object.assign(TAG_ALIAS, {"易混":"mix","混淆":"mix","易混淆":"mix","be":"be","be动词":"be","时态":"tense","成对":"pair","成对词":"pair","to":"to","多余to":"to","复数":"plural",
   "语序":"order","介词":"prep","搭配":"colloc","地道":"colloc","地道说法":"colloc","救急":"rescue","救急句":"rescue","面试":"interview",
   "聊天":"chat","提问":"question","问句":"question","主谓一致":"agree","情态":"modal","情态动词":"modal","冠词":"article",
   "比较级":"compare","-ed/-ing":"eding","ed/ing":"eding","听力":"listen","发音":"pron","重音":"pron","闲聊":"smalltalk","small talk":"smalltalk","搭话":"starter","点餐":"food","吃饭":"food","朋友聊天":"friends",
@@ -2333,6 +2349,10 @@ const WHY = {
   funFunny: "fun 是“好玩、有意思”（It was fun），funny 是“好笑”（a funny story）。",
   listenHear: "listen 是主动去听（listen to music），hear 是听到（I heard a noise）。"
 };
+/* v1.79.2：易混词（affect / effect 这种）：说成另一个时，提示里讲区别；也算真的错（不提示“识别听错了”） */
+const MIX_WHY = [[[["affect", "affects", "affected", "affecting"], ["effect", "effects"]], "affect 是动词“影响”（It affected the results），effect 一般是名词“效果、影响”（It had a big effect）。两个读音几乎一样，说的时候看这里要动词还是名词。"], [[["advice"], ["advise", "advised", "advises"]], "advice 是名词“建议”（some advice，不加 s），advise 是动词（I'd advise you to…）。读音也不同：advice 结尾是 s，advise 结尾是 z。"], [[["accept", "accepts", "accepted"], ["except"]], "accept 是“接受”，except 是“除了”。"], [[["lose", "loses", "lost"], ["loose"]], "lose 是“丢、输”（读 /luːz/），loose 是“松的”（读 /luːs/）。"], [[["than"], ["then"]], "than 用在比较（bigger than），then 是“然后、那时”。"], [[["borrow", "borrowed"], ["lend", "lent"]], "borrow 是“借进来”（borrow it from him），lend 是“借出去”（lend it to her）。"], [[["bring", "brought"], ["take", "took"]], "bring 是带过来（朝说话的人这边），take 是带走（离开这里）。"], [[["rise", "rises", "rose", "risen"], ["raise", "raises", "raised"]], "rise 是自己升高（Prices rose），raise 是把东西抬高、提出来（raise the price、raise a question）。"], [[["fewer"], ["less"]], "fewer 跟可数名词的复数（fewer bugs），less 跟不可数名词（less time）。"], [[["between"], ["among"]], "between 一般说两者之间，among 说三个以上的“之中”。"], [[["especially"], ["specially"]], "especially 是“尤其”，specially 是“专门地”（specially designed）。"], [[["beside"], ["besides"]], "beside 是“在旁边”，besides 是“而且、除了……还”。"], [[["alone"], ["lonely"]], "alone 是“一个人、单独”（不一定难过），lonely 是“孤单、寂寞”。"], [[["sensible"], ["sensitive"]], "sensible 是“明智的、合理的”，sensitive 是“敏感的”（sensitive to noise）。"], [[["economic"], ["economical"]], "economic 是“经济上的、和经济有关的”，economical 是“省钱的、划算的”。"], [[["principle", "principles"], ["principal"]], "principle 是“原理、原则”，principal 是“主要的”或者“校长”。"], [[["complement", "complements"], ["compliment", "compliments"]], "complement 是“补充、相配”，compliment 是“称赞”。"], [[["ensure"], ["insure"], ["assure"]], "ensure 是“确保”，insure 是“上保险”，assure 是“向某人保证”（I assure you）。"], [[["adapt", "adapted"], ["adopt", "adopted"]], "adapt 是“适应、改编”，adopt 是“采用、收养”。"], [[["accuracy", "accurate"], ["precision", "precise"]], "accuracy / accurate 是“准”（接近真实值），precision / precise 是“精”（每次的结果都很接近、重复性好）。"], [[["stress"], ["strain"]], "工程里 stress 是“应力”（单位面积上的力），strain 是“应变”（变形量和原来长度的比）；日常说“压力大”是 stress。"], [[["efficient", "efficiency"], ["effective", "effectiveness"]], "efficient 是“效率高、不浪费”，effective 是“有效、能达到目的”。"], [[["verify", "verified", "verification"], ["validate", "validated", "validation"]], "verify 是按要求核对做得对不对（build it right），validate 是确认它满足实际用途（build the right thing）。"], [[["farther"], ["further"]], "farther 说实际距离，further 说程度、“进一步”（further questions）。"], [[["quiet"], ["quite"]], "quiet 是“安静”，quite 是“相当、挺”。"], [[["personal"], ["personnel"]], "personal 是“个人的”，personnel 是“人员”。"], [[["experience", "experiences"], ["experiment", "experiments"]], "experience 是“经验、经历”，experiment 是“实验”。"], [[["process"], ["progress"]], "process 是“过程、流程”，progress 是“进展”。"], [[["career"], ["carrier"]], "career 是“职业生涯”（重音在后：ca-REER），carrier 是“运输公司、载体”（CA-rri-er）。"], [[["tolerance", "tolerances"], ["clearance", "clearances"]], "tolerance 是“公差”（允许的尺寸误差），clearance 是“间隙”（两个零件之间的空隙）。"]];
+function mixFam(a, b){ for (const [fam] of MIX_WHY){ const ia = fam.findIndex(x => x.includes(a)), ib = fam.findIndex(x => x.includes(b)); if (ia >= 0 && ib >= 0 && ia !== ib) return fam[0][0]; } return ""; }
+function mixWhy(a, b){ if (a === b) return ""; for (const [fam, w] of MIX_WHY){ const ia = fam.findIndex(x => x.includes(a)), ib = fam.findIndex(x => x.includes(b)); if (ia >= 0 && ib >= 0 && ia !== ib) return w; } return ""; }   /* 只算不同的词（take / took 是时态，不是易混词） */
 /* 语法上成对的词：拼写很像，以前按“可能是发音”处理 */
 function gramPair(a, b){
   const H = /^(have|has|had)$/;
@@ -2366,7 +2386,7 @@ function wordWhy(a, b){
 }
 function classifySub(a, b){ // a = 参考答案里的词，b = 你说的词
   if (a===b+"s" || a===b+"es" || b===a+"s" || b===a+"es" || (a.endsWith("ies") && b===a.slice(0,-3)+"y") || (b.endsWith("ies") && a===b.slice(0,-3)+"y")) return "s";
-  const gp = gramPair(a, b); if (gp) return gp;   /* v1.78.0：had / have、has / have、did / do、this / these、a / an、been / being：拼写像，以前被当成“发音” */
+  const gp = gramPair(a, b); if (gp) return gp; if (mixWhy(a, b)) return "mix";   /* v1.78.0：had / have、has / have、did / do、this / these、a / an、been / being：拼写像，以前被当成“发音” */
   if (pastOf(b)===a || (IRR[b] && IRR[b][1]===a)) return "past";
   if (BE.has(a) && BE.has(b)) return "be";
   if ((a==="have"||a==="has") && BE.has(b)) return "perf";
@@ -2475,7 +2495,7 @@ function compareSaid0(target, alts, said){
   return best;
 }
 const SOUND_OK = 0.7;
-const GRAM_SUB = new Set(["s", "past", "be", "perf", "hadp", "agree2", "do", "det", "an", "being"]);   /* v1.78.0：加了语法成对的词 */
+const GRAM_SUB = new Set(["s", "past", "be", "perf", "hadp", "agree2", "do", "det", "an", "being", "mix"]);   /* v1.78.0：加了语法成对的词 */
 const GRAM_NOTE = new Set(["be", "tense", "to", "poss"]);
 const G_THIRD = new Set(["he","she","it","this","that","who","everyone","everybody","someone","somebody","nobody"]);
 const G_PL = new Set(["two","three","four","five","six","seven","eight","nine","ten","twenty","many","some","all","these","those","few","several","of","both","lots","kinds","types","sorts"]);
@@ -2527,6 +2547,7 @@ function feedbackNotes(ops){
       else if (kd === "det") add({k:"plural", msg:`这里用 ${o.a}，不是 ${o.b}`}, WHY.det);
       else if (kd === "an") add({k:"art", msg:`这里用 ${o.a}，不是 ${o.b}`}, WHY.an);
       else if (kd === "being") add({k:"tense", msg:`这里用 ${o.a}，不是 ${o.b}`}, WHY.being);
+      else if (kd === "mix") add({k:"mix", msg:`这里是 ${o.a}（你说的是 ${o.b}）`, fam:mixFam(o.a, o.b)}, mixWhy(o.a, o.b));
       else if (kd === "pron") notes.push({k:"pron", msg:`听起来像 ${o.b}，目标是 ${o.a}，可能是发音`});
       else add({k:"word", msg:`这里是 ${o.a}（你说的是 ${o.b}）`}, wordWhy(o.a, o.b));
     } else if (o.op === "del"){
@@ -2810,7 +2831,7 @@ function hintNotes(ops){
       out.push(k === "past" ? pastRule(o.a, o.b, prev, prev2).hint : k === "s" ? sRule(o.a, o.b, prev, prev2, o.poss).hint : k === "be" ? `be 动词 ${o.b} 用得不对` :
         k === "perf" ? `这里要用完成时 have，不是 ${o.b}` : k === "hadp" ? hadH() : k === "agree2" ? "has / have 要和主语对上（he / she / it 用 has）" :
         k === "do" ? "注意时态：过去的事用 did，现在的用 do / does" : k === "det" ? "this / that 跟单数，these / those 跟复数" : k === "an" ? "a / an 看后面那个词开头的读音" :
-        k === "being" ? "have 后面用 been，不用 being" : k === "pron" ? `${o.b} 可能没说清楚，注意发音` : `${o.b} 这个词不对`);
+        k === "being" ? "have 后面用 been，不用 being" : k === "mix" ? `${o.b} 和另一个词容易混：看看这里要的是哪个意思` : k === "pron" ? `${o.b} 可能没说清楚，注意发音` : `${o.b} 这个词不对`);
       prev = o.b;
     } else if (o.op === "del"){
       out.push(BE.has(o.a) ? (prev ? `${prev} 后面漏了 be 动词（is / am / are / was）` : "开头漏了 be 动词（is / am / are）") :
@@ -2971,6 +2992,24 @@ const MISSPELL = {excersies:"exercise",excersise:"exercise",exersice:"exercise",
   responsibilty:"responsibility",apreciate:"appreciate",appriciate:"appreciate",oppertunities:"opportunities",prefered:"preferred"};
 const HAB_VERBS = "play|finish|stay|work|try|graduate|learn|see|start|use|test|design|build|apply|hear|watch|visit|go|do|make|eat|buy|get|take|write|read|meet";
 const W_RULES = [
+  /* v1.80.0：易混词（没有参考说法时也认得出来；fam 用来统计你混过几次） */
+  {re:/\b(?:a|an|the|big|small|huge|great|little|positive|negative|side|any|no|much|real|direct|lasting)\s+affect\b/gi, tag:"易混词", fam:"affect", msg:()=>"这里要名词 effect（影响、效果）；affect 是动词"},
+  {re:/\badvices\b/gi, tag:"易混词", fam:"advice", msg:()=>"advice 不可数，不加 s：some advice"},
+  {re:/\bless\s+(?:bugs|errors|mistakes|people|parts|issues|problems|steps|tests|items|features|questions|hours|days|cars|options|meetings)\b/gi, tag:"易混词", fam:"fewer", msg:()=>"可数名词用 fewer：fewer bugs；less 跟不可数的（less time）"},
+  {re:/\bborrow(?:ed|s)?\s+(?:me|him|her|us|them)\b/gi, tag:"易混词", fam:"borrow", msg:()=>"借给别人是 lend：lend me …；borrow 是借进来"},
+  {re:/\b(?:more|less|better|worse|faster|slower|bigger|smaller|higher|lower|easier|harder|longer|shorter|cheaper|stronger|earlier|rather|other)\s+then\b/gi, tag:"易混词", fam:"than", msg:()=>"比较用 than：faster than；then 是“然后”"},
+  {re:/\bquiet\s+(?:hard|good|easy|difficult|different|big|small|interesting|nice|busy|sure|often|similar|expensive|cheap|far|close|tired)\b/gi, tag:"易混词", fam:"quiet", msg:()=>"“挺、相当”是 quite；quiet 是“安静”"},
+  {re:/\b(?:is|are|was|were|be|been|too|so|very|feels?|felt|looks?|looked|came|comes|come)\s+lose\b/gi, tag:"易混词", fam:"lose", msg:()=>"松的是 loose（读 /luːs/）；lose 是“丢、输”"},
+  {re:/\b(?:everyone|everybody|everything|all|anything|nothing|nobody|anyone|every day)\s+accept\b/gi, tag:"易混词", fam:"accept", msg:()=>"“除了”是 except；accept 是“接受”"},
+  {re:/\b(?:years?|months?)\s+of\s+(?:[a-z]+\s+)?experiment\b/gi, tag:"易混词", fam:"experience", msg:()=>"经验是 experience；experiment 是“实验”"},
+  {re:/\b(?:make|makes|making|made)\s+(?:(?:good|great|a lot of|some|much|little|no|real|quick|steady)\s+)?process\b/gi, tag:"易混词", fam:"process", msg:()=>"“有进展”是 make progress；process 是“过程、流程”"},
+  {re:/\b(?:rise|rises|rised|rose)\s+(?:a|the|my|our|your|his|her|their)\s+(?:question|questions|price|prices|hand|concern|concerns|issue|salary|rent)\b/gi, tag:"易混词", fam:"rise", msg:()=>"提出、抬高是 raise：raise a question；rise 是自己升高"},
+  {re:/\b(?:price|prices|cost|costs|temperature|temperatures|rent|level|levels)\s+(?:have|has|had)\s+raised\b/gi, tag:"易混词", fam:"rise", msg:()=>"自己升高用 rise：prices have risen；raise 要带宾语（raise the price）"},
+  {re:/\bsensible\s+to\s+(?:light|noise|temperature|heat|cold|pressure|changes?|vibration|moisture|humidity|touch|sound)\b/gi, tag:"易混词", fam:"sensible", msg:()=>"“对……敏感”是 sensitive to；sensible 是“合理、明智”"},
+  /* v1.79.2：AI 复查时发现漏判的几种（“意思对上了”就放过了） */
+  {re:/\blet me think of (?:it|that)\b/gi, tag:"搭配", msg:()=>"“我想一下”说 Let me think about it / Let me think for a second；think of 是“想出、想起”（think of a name）"},
+  {re:/\b(?:I'm|I’m|I am|im)\s+not\s+(?:(?:fully|really|very|so|that|too|quite)\s+)?closely\b/gi, tag:"语法", msg:()=>"少了动词：I don't follow it closely（不怎么关注）"},
+  {re:/,\s*(?:can|could|will|would|should|must)\s+(?!(?:i|you|we|they|he|she|it|someone|anyone|this|that|there|do)\b)[a-z]+/gi, tag:"语法", msg:()=>"逗号后面直接接 can 少了主语：…, so it can … 或者 … to keep up with …"},
   {re:/(^|[^A-Za-z'’])(i)(?=[^A-Za-z'’]|$)/g, g:2, tag:"书写", msg:()=>"小写 i → I"},
   {re:/\b(im|ive|dont|doesnt|didnt|cant|wont|isnt|arent|wasnt|werent|thats|whats|theres|youre|theyre|youve|weve|theyve|couldnt|shouldnt|wouldnt|havent|hasnt)\b/gi, tag:"书写", msg:m=>`缺撇号：${m} → ${APOS[m.toLowerCase()]}`},
   {re:/\bits\s+(?:a|an|the|so|really|very|not|just|my|been|getting|going|hard|good|cool|great|nice|fun|cold|hot|ok|okay|fine|true|time|normal|weird|important|interesting|difficult|easy)\b/gi, tag:"书写", msg:()=>"这里应该是 it's（= it is）"},
@@ -3032,6 +3071,8 @@ const W_RULES = [
   {re:/(?:^|[.!?,;]\s*|\b(?:and|but|so|because|well|wow|oh|yeah|now)\s+)((?:it|that|this)\s+(?:(?:so|really|very|too|just|not|a little|kind of|pretty)\s+){0,2}(?:cool|hard|good|great|nice|fun|cold|hot|interesting|difficult|easy|amazing|awesome|popular|impressive|important|weird|normal|true|crazy|beautiful|perfect|boring|expensive|cheap|busy|windy|sunny|rainy|late|early|fine))\b/gi, g:1, tag:"be 动词", msg:()=>"可能漏了 be 动词：It's / That's ..."},
   {re:/\b([Ii]\s+(?:(?:not|very|so|really|too|a little|kind of|pretty|also|just)\s+){0,2}(?:busy|tired|ready|hungry|nervous|familiar|happy|sure|interested|excited|sorry|glad|lazy|here|from|available|open to))\b/g, g:1, tag:"be 动词", msg:()=>"可能漏了 be 动词：I'm ..."}
 ];
+/* v1.80.0：易混词规则的提示 → 哪一组（统计用） */
+const MIX_RULE_FAM = new Map(W_RULES.filter(r => r.fam).map(r => [r.msg(), r.fam]));
 function checkWriting(text){
   text = String(text||"");
   const issues = [];
@@ -3275,7 +3316,7 @@ function battlePickOrder(entries){
 }
 
 const CORE = {wordDiff, nearMiss, soundSim, sndKey, battlePlan, battleFirst, battleSpecial, battleTicks, battleBeats, battleRef, battleOutcome, battlePickOrder, BAT_DMG,TAGS,TYPE_LABEL,TENSE_NOTE,tagKey,dstr,dnum,nstr,splitAlts,shuffle,hash,buildCatalog,INTERVALS,MASTERED_BOX,srsRate,
-  tokens,lcsOps,compareSaid,meaningCheck,speechFlags,hasWord,wordsMatch,speakEN,thoughtGroups,pronTip,splitSentences,chunkLex,findChunks,sayVariants,chunkSentence,hintNotes,classifySub,gramPair,pairGaps,sentenceFlags,WHY,pastOf,regPast,lev,parseImport,checkWriting,checkPast,dayDone,computeStreak,tagAgg,
+  tokens,lcsOps,compareSaid,meaningCheck,speechFlags,hasWord,wordsMatch,speakEN,thoughtGroups,pronTip,splitSentences,chunkLex,findChunks,sayVariants,chunkSentence,hintNotes,classifySub,gramPair,pairGaps,sentenceFlags,WHY,mixWhy,mixFam,MIX_WHY,MIX_RULE_FAM,pastOf,regPast,lev,parseImport,checkWriting,checkPast,dayDone,computeStreak,tagAgg,
   buildSession,diversify,interleave,pickQuestions,IRR,SESSION_CFG,jobTrackKey,jobStatusKey,jobDateKey,jobRealDate,fillerCount,mergeImports,jobGuessTrack,jobGuessCh,jobRoundKey,jobResultKey};
 
 
@@ -3360,7 +3401,7 @@ const KEY = "tuokou.v1", LKEY = "tuokou.local";
 const DEF = () => ({v:1, createdAt:Date.now(), updatedAt:0, asrDocs:[], interviews:[], battle:{}, asrQ:[], game:{},
   settings:{goal:"std", profile:"", battle:true, srEngine:"device", interviewDate:"", newPerDay:12, inputMode:"auto", autoCheck:"smart", vibrate:true, sound:true, lights:true, autoSpeak:true,
     theme:"auto", cheat:true, callQs:3, onboarded:false, planWhen:"", deck:"all", callDeck:"core", dayStart:4, startPage:"grow"},
-  cards:{}, best:{}, custom:[], customQ:[], deckMeta:{}, dlgDone:{}, myAlts:{}, pending:[], hist:{}, misWords:{}, followAns:{}, refAns:{}, plan:[], ivDue:{}, soloIssues:{}, soloRate:{}, wantWords:[], myWords:[], answers:{}, days:{}, tags:{}, newToday:{d:"",n:0}, journal:[], calls:[], grow:{}, job:{}, qmeta:{}, ivMet:{}});
+  cards:{}, best:{}, custom:[], customQ:[], deckMeta:{}, dlgDone:{}, myAlts:{}, pending:[], hist:{}, misWords:{}, followAns:{}, refAns:{}, plan:[], ivDue:{}, soloIssues:{}, soloRate:{}, wantWords:[], myWords:[], mixStats:{}, answers:{}, days:{}, tags:{}, newToday:{d:"",n:0}, journal:[], calls:[], grow:{}, job:{}, qmeta:{}, ivMet:{}});
 const LDEF = () => ({enVoice:"", zhVoice:"", rate:0.95, thinkSec:4, device:{}, wDraft:"", jDraft:"", voiceMix:true, accentMix:false, hfSeen:{}, ttsCN:false, slashes:false, quiet:false, quietSound:false, resume:null, rdMode:"line", rdSlow:false, rdHide:false});
 function mergeInto(d, o){
   for (const k of Object.keys(o||{})){
@@ -4032,7 +4073,7 @@ const Cloud = {
     if (!this.db) return;
     const base = "data/users/" + this.uid + "/";
     const parts = {
-      state:{v:S.v, createdAt:S.createdAt, updatedAt:S.updatedAt, settings:S.settings, cards:S.cards, best:S.best, custom:S.custom, customQ:S.customQ, deckMeta:S.deckMeta, dlgDone:S.dlgDone, myAlts:S.myAlts, pending:S.pending, misWords:S.misWords, followAns:S.followAns, refAns:S.refAns, plan:S.plan, ivDue:S.ivDue, soloIssues:S.soloIssues, soloRate:S.soloRate, wantWords:S.wantWords, myWords:S.myWords, asrDocs:S.asrDocs, interviews:S.interviews, battle:S.battle, asrQ:S.asrQ, game:S.game, answers:S.answers, newToday:S.newToday, grow:S.grow},
+      state:{v:S.v, createdAt:S.createdAt, updatedAt:S.updatedAt, settings:S.settings, cards:S.cards, best:S.best, custom:S.custom, customQ:S.customQ, deckMeta:S.deckMeta, dlgDone:S.dlgDone, myAlts:S.myAlts, pending:S.pending, misWords:S.misWords, followAns:S.followAns, refAns:S.refAns, plan:S.plan, ivDue:S.ivDue, soloIssues:S.soloIssues, soloRate:S.soloRate, wantWords:S.wantWords, myWords:S.myWords, mixStats:S.mixStats, asrDocs:S.asrDocs, interviews:S.interviews, battle:S.battle, asrQ:S.asrQ, game:S.game, answers:S.answers, newToday:S.newToday, grow:S.grow},
       stats:{updatedAt:S.updatedAt, days:S.days, tags:S.tags, calls:S.calls},
       journal:{updatedAt:S.updatedAt, journal:S.journal}
     };
@@ -4366,7 +4407,7 @@ VIEWS.home = {
       </div>
       <div class="sec-title">学</div>
       <div class="mods">
-        ${mod("chunks","chat","常用语块","聊天、写邮件现成的说法")}${mod("pron","ear","发音","听辨、第一印象、重音")}${mod("read","book","阅读","边听边读，挑有用的词和短语")}${wordsTile()}${mod("tips","chat","说话技巧","重音、语调、断句、连读")}${mod("grammar","pen","语法要点","时态、-s、-ed、语序")}
+        ${mod("chunks","chat","常用语块","聊天、写邮件现成的说法")}${mod("pron","ear","发音","听辨、第一印象、重音")}${mod("read","book","阅读","边听边读，挑有用的词和短语")}${wordsTile()}${mod("tips","chat","说话技巧","重音、语调、断句、连读")}${mod("grammar","pen","语法要点","时态、-s、-ed、语序")}${mod("mix","pen","易混词","affect / effect 这种")}
       </div>
       <p class="small muted" style="margin:12px 2px 0">有 AI 给的导入码？<button class="linkbtn small" data-act="imp-open">导入新内容</button></p>
       <p class="tip">${esc(tipOfDay())}</p>
@@ -4712,7 +4753,7 @@ class CardStage {
         wHint = `${mOk ? "意思可能对了，但" : ""}这张卡练的是“${c0.mean}”里 ${c0.word[0]} 开头的那个词（${/\s/.test(c0.word) ? c0.word.trim().split(/\s+/).length + " 个词" : c0.word.length + " 个字母"}），用上它再说一遍`; }
     }
     this.mean = null; this.flags = [];
-    if (cmp && !cmp.exact){ this.flags = K.speechFlags(this.said).concat(typeof rwSpeakFlags === "function" ? rwSpeakFlags(this.said, t.en) : []); const gram = (cmp.notes || []).some(n => /^(tense|plural|agree|be|art)$/.test(n.k)); if (!cmp.free && !wHint && !gram){ const m = K.meaningCheck(t.en, t.alt, this.said); if (m.ok) this.mean = m; }
+    if (cmp && !cmp.exact){ this.flags = K.speechFlags(this.said).concat(typeof rwSpeakFlags === "function" ? rwSpeakFlags(this.said, t.en) : []); const gram = (cmp.notes || []).some(n => /^(tense|plural|agree|be|art|mix)$/.test(n.k)); if (!cmp.free && !wHint && !gram){ const m = K.meaningCheck(t.en, t.alt, this.said); if (m.ok) this.mean = m; }
       if (this.mean && /^(colloc|chat|msg)$/.test(c0.tag || "")){ this.mean = null; const ws = String(t.en).replace(/[^A-Za-z' ]+/g, " ").trim().split(/\s+/).filter(Boolean);
         wHint = `意思对了，但这张卡练的就是这个说法本身：${ws.slice(0, 8).map(w => w[0] + "…").join(" ")}${ws.length > 8 ? " …" : ""}（${ws.length} 个词）`; } }
     if (cmp && cmp.free && freeFl) this.flags = freeFl;
@@ -4725,7 +4766,7 @@ class CardStage {
     if (this.firstMean == null && this.phase === "retry") this.firstMean = !!this.mean;
     /* 记下这张卡这次没说好的说法：下次补练时，先练没说好的那一块 */
     try { if (cmp && !cmp.exact && this.said && !(this.mean && !this.flags.length)){ S.lastMiss = S.lastMiss || {}; this.missAdded = this.said;   /* 意思对、语法也没问题的换说法不是错误，不记 */ S.lastMiss[this.card.id] = [this.said].concat([].concat(S.lastMiss[this.card.id] || [])).slice(0, 2); const ks = Object.keys(S.lastMiss); if (ks.length > 300) delete S.lastMiss[ks[0]]; } else if (cmp && cmp.exact && S.lastMiss) delete S.lastMiss[this.card.id]; } catch (e) {}
-    this.phase = "reveal"; this.render();
+    this.phase = "reveal"; mixTally(this); this.render();
   }
   retryHTML(){
     if (this.phase !== "retry") return "";
@@ -4998,7 +5039,7 @@ const GWHY = [
  {k:"art", t:"冠词：a / the / 不加", re:/\b(?:a|an|the)\s+\w+/i,
   rule:"第一次提到、或者“一个”用 a / an；双方都知道是哪个用 the；泛指一类、或者不可数的事情（practice、golf、data）不加。", bad:"The practice taught me a lot（泛指时）✗ → Practice taught me a lot"},
  {k:"plural", t:"泛指一类东西用复数", re:/\b(?:years|fittings|microcontrollers|sensors|projects|clubs|customers|engineers|tools|parts|motors|tests|products|people)\b/i,
-  rule:"说的是这一类东西、不是某一个，用复数：club fittings、microcontrollers。", bad:"firmware for microcontroller ✗ → microcontrollers"},
+  rule:"说的是这一类东西、不是某一个，用复数：microcontrollers。-ing 结尾的词当名词用、指一次一次的事时也能加 s：a fitting（一次试杆）→ club fittings，a meeting → meetings；说这种活动本身就不加：Club fitting taught me a lot。", bad:"firmware for microcontroller ✗ → microcontrollers"},
  {k:"passive", t:"被动：be + 过去分词", re:new RegExp("\\b(?:is|are|was|were|be|been|being|get|got)\\s+(?:not\\s+|already\\s+|usually\\s+)?(?:" + PP + ")\\b(?!\\s+(?:to|of|in|about|with)\\b)", "i"),
   rule:"东西是被处理的一方时：be + 过去分词。The parts are tested every week.", bad:"The parts test every week ✗"},
  {k:"taught", t:"“让我学到很多”：taught me a lot", re:/\btaught (?:me|us)\b|\blearned a lot from\b/i,
@@ -5062,6 +5103,11 @@ ACT["c-drill-mic"] = async el => {
   if (cmp.level !== "off" && cmp.score >= 0.85){ s.drill = Math.min(steps.length, s.drill + 1); Snd.good(); vib(12); s.render(); }
   else if (heard) heard.textContent = "还差一点：" + r.text;
 };
+/* v1.80.0：易混词：这一张里混了哪几组（第一遍、第二遍、语法检查里的都算，一张卡每组记一次） */
+function mixTally(st){ try { if (!st || st._mixDone || st.misrec) return; st._mixDone = true; const fams = new Set();
+  for (const c of [st.firstCmp, st.cmp]) for (const n of (c && c.notes) || []) if (n.k === "mix" && n.fam) fams.add(n.fam);
+  for (const f of st.flags || []){ const k = K.MIX_RULE_FAM && K.MIX_RULE_FAM.get(f.msg); if (k) fams.add(k); }
+  if (!fams.size) return; S.mixStats = S.mixStats || {}; for (const k of fams){ const x = S.mixStats[k] = S.mixStats[k] || {n:0, ts:0}; x.n++; x.ts = Date.now(); } } catch (e) {} }
 /* v1.78.0：这一句后面已经排着了（比如能量满了挑它当大招卡）：不再加一张，免得同一句连着出现两遍 */
 function pendingLater(id){ return RUN.items.slice(RUN.i + 1).some(x => x && x.k === "card" && x.id === id); }
 /* 没说出来的句子：这一轮隔几题再考一次，说对一次就过（研究里“每次练到说对一次，再隔天复习”最省时也最牢）；
@@ -7393,10 +7439,30 @@ VIEWS.grammar = {
   tab:"me",
   render(){
     return `<div class="wrap">${backBtn()}<h2>语法要点</h2><p class="muted small" style="margin:6px 0 4px">说的时候来不及想规则很正常。先记住“先问什么”，再靠大量开口练成反应。练的时候说错了，答案下面会写明是哪一条。</p>
+      <button class="panel mix-link" data-act="nav" data-v="mix"><b>易混词</b><span class="small muted">affect / effect、lose / loose 这种，30 组 →</span></button>
       ${GRAMMAR.map(t => `<div class="panel"><h3>${esc(t.h)}</h3><p class="small" style="margin-top:6px;line-height:1.7">${esc(t.p)}</p>${t.ex.map(e => `<div class="say-line" style="margin-top:8px"><div class="en sm">${wordsHTML(e)}</div><div class="say-btns">${sayBtns(e)}</div></div>`).join("")}</div>`).join("")}</div>`;
   }
 };
 
+/* ---------- v1.80.0：易混词：30 组的区别、你混过几次、一键加进练习（内置的卡和给用户的导入码文件是同一份） ---------- */
+const MIX_IMPORT = "题库 | 易混词\n卡 | 这个改动影响了测试结果。 | This change affected the test results. | 易混词 | 动词“影响”用 affect\n卡 | 这个改动对结果影响很大。 | This change had a big effect on the results. | 易混词 | 名词“影响、效果”用 effect\n卡 | 能给我一些建议吗？ | Can you give me some advice? | 易混词 | 名词 advice，不加 s\n卡 | 我建议你早点申请。 | I'd advise you to apply early. | 易混词 | 动词 advise，结尾读 z\n卡 | 我很乐意接受这个 offer。 | I'd be happy to accept the offer. | 易混词 | 接受：accept\n卡 | 除了周一，我每天都有空。 | I'm free every day except Monday. | 易混词 | 除了：except\n卡 | 这颗螺丝松了。 | This screw is loose. | 易混词 | 松的：loose，读 /luːs/\n卡 | 我不想输掉这场比赛。 | I don't want to lose this game. | 易混词 | 输、丢：lose，读 /luːz/\n卡 | 这个方案比上一个快。 | This design is faster than the last one. | 易混词 | 比较用 than\n卡 | 我们先测试，然后再改。 | We'll test it first, then make changes. | 易混词 | “然后”是 then\n卡 | 我能借一下你的卡尺吗？ | Can I borrow your calipers? | 易混词 | 借进来：borrow\n卡 | 你能借我五块钱吗？ | Could you lend me five dollars? | 易混词 | 借出去：lend\n卡 | 明天把简历带过来。 | Bring your resume tomorrow. | 易混词 | 带过来（到说话的人这边）：bring\n卡 | 走的时候把伞带上。 | Take your umbrella when you leave. | 易混词 | 带走：take\n卡 | 价格涨了很多。 | Prices have risen a lot. | 易混词 | 自己升：rise / risen\n卡 | 我想提一个问题。 | I'd like to raise a question. | 易混词 | 提出、抬高：raise\n卡 | 新版本的 bug 少了很多。 | The new version has far fewer bugs. | 易混词 | 可数名词用 fewer\n卡 | 这个方法用的时间更少。 | This method takes less time. | 易混词 | 不可数用 less\n卡 | 我在两个 offer 之间犹豫。 | I'm choosing between two offers. | 易混词 | 两者之间：between\n卡 | 他在团队里很受欢迎。 | He's popular among the team. | 易混词 | 三个以上之中：among\n卡 | 我喜欢运动，尤其是游泳。 | I love sports, especially swimming. | 易混词 | 尤其：especially\n卡 | 这个夹具是专门为这次测试设计的。 | This fixture was specially designed for this test. | 易混词 | 专门：specially\n卡 | 除了 Excel，我也会写 Python。 | Besides Excel, I also know Python. | 易混词 | 除了……还：besides\n卡 | 坐我旁边吧。 | Sit beside me. | 易混词 | 在旁边：beside\n卡 | 我喜欢一个人工作。 | I like working alone. | 易混词 | 一个人：alone\n卡 | 刚来美国的时候我有点孤单。 | I felt a bit lonely when I first came to the US. | 易混词 | 孤单：lonely\n卡 | 这个传感器对温度很敏感。 | This sensor is very sensitive to temperature. | 易混词 | 敏感：sensitive\n卡 | 这是个很合理的办法。 | That's a very sensible approach. | 易混词 | 合理、明智：sensible\n卡 | 这种材料更省钱。 | This material is more economical. | 易混词 | 省钱：economical；和经济有关：economic\n卡 | 我理解它的工作原理。 | I understand the working principle. | 易混词 | 原理：principle\n卡 | 主要问题是成本。 | The principal issue is cost. | 易混词 | 主要的：principal\n卡 | 谢谢夸奖！ | Thanks for the compliment! | 易混词 | 称赞：compliment\n卡 | 这两个技能可以互相补充。 | These two skills complement each other. | 易混词 | 补充、相配：complement\n卡 | 我们要确保零件在公差范围内。 | We need to ensure the parts are within tolerance. | 易混词 | 确保：ensure\n卡 | 我向你保证会按时完成。 | I assure you it'll be done on time. | 易混词 | 向人保证：assure\n卡 | 我适应新环境很快。 | I adapt to new environments quickly. | 易混词 | 适应：adapt\n卡 | 我们采用了新的测试流程。 | We adopted a new test process. | 易混词 | 采用：adopt\n卡 | 这台仪器很准，但重复性不好。 | This instrument is accurate, but not very precise. | 易混词 | 准：accurate；重复性好：precise\n卡 | 我们测了这根梁的应变。 | We measured the strain on the beam. | 易混词 | 应变：strain；应力：stress\n卡 | 这个方法有效，但效率不高。 | This method is effective, but not efficient. | 易混词 | 有效：effective；效率高：efficient\n卡 | 我们用测试核对了设计符合要求。 | We verified the design against the requirements. | 易混词 | 核对符合要求：verify\n卡 | 我们和客户一起确认了产品满足实际需要。 | We validated the product with customers. | 易混词 | 确认满足实际用途：validate\n卡 | 如果还有问题，随时联系我。 | If you have any further questions, feel free to reach out. | 易混词 | 进一步：further；实际距离：farther\n卡 | 这个面试挺难的。 | The interview was quite hard. | 易混词 | 挺、相当：quite\n卡 | 图书馆很安静。 | The library is very quiet. | 易混词 | 安静：quiet\n卡 | 这只是我个人的看法。 | That's just my personal opinion. | 易混词 | 个人的：personal；人员：personnel\n卡 | 我有三年的测试经验。 | I have three years of testing experience. | 易混词 | 经验：experience\n卡 | 我们做了一个实验来验证这个想法。 | We ran an experiment to test the idea. | 易混词 | 实验：experiment\n卡 | 这个项目进展很快。 | The project is making good progress. | 易混词 | 进展：progress\n卡 | 我改进了装配流程。 | I improved the assembly process. | 易混词 | 流程：process\n卡 | 我想在工程领域发展我的职业。 | I want to build my career in engineering. | 易混词 | 职业：career，重音在后\n卡 | 这两个零件之间的间隙太小了。 | The clearance between the two parts is too small. | 易混词 | 间隙：clearance；公差：tolerance\n改 | It had a big affect on the results. | It had a big effect on the results. | 易混词 | 名词“影响”是 effect\n改 | Can you give me some advices? | Can you give me some advice? | 易混词 | advice 不可数，不加 s\n改 | This screw is lose. | This screw is loose. | 易混词 | 松的是 loose\n改 | This design is faster then the last one. | This design is faster than the last one. | 易混词 | 比较用 than\n改 | Can you borrow me your calipers? | Can you lend me your calipers? | 易混词 | 借给别人是 lend\n改 | The new version has less bugs. | The new version has fewer bugs. | 易混词 | 可数名词用 fewer\n改 | The interview was quiet hard. | The interview was quite hard. | 易混词 | “挺”是 quite\n改 | I have three years of testing experiment. | I have three years of testing experience. | 易混词 | 经验是 experience\n改 | Prices have raised a lot. | Prices have risen a lot. | 易混词 | 自己涨用 rise / risen\n改 | I'd like to rise a question. | I'd like to raise a question. | 易混词 | 提出问题是 raise\n改 | This sensor is very sensible to temperature. | This sensor is very sensitive to temperature. | 易混词 | 敏感是 sensitive\n改 | We adapted a new test process. | We adopted a new test process. | 易混词 | 采用是 adopt\n改 | I'm free every day accept Monday. | I'm free every day except Monday. | 易混词 | 除了是 except\n";
+function mixHave(){ return (S.custom || []).filter(c => c.deck === "易混词").length; }
+VIEWS.mix = { tab:"home",
+  render(){
+    const st = S.mixStats || {}, have = mixHave(), total = (MIX_IMPORT.match(/\n(?:卡|改) \|/g) || []).length;
+    const fams = K.MIX_WHY.map(([fam, why]) => ({key: fam[0][0], words: fam.map(x => x[0]).join(" / "), why, n: (st[fam[0][0]] || {}).n || 0}));
+    const top = fams.filter(f => f.n).sort((a, b) => b.n - a.n);
+    const row = f => `<div class="panel mix-row"><div class="mix-h"><b class="en">${esc(f.words)}</b>${f.n ? `<span class="chip">混过 ${f.n} 次</span>` : ""}</div><p class="small" style="margin-top:4px">${esc(f.why)}</p></div>`;
+    return `<div class="wrap">${backBtn()}<h2>易混词</h2><p class="muted small" style="margin:6px 0 10px">中文是同一个词、或者读音很像的几组。练习时说成了另一个，答案下面会讲清楚区别，这里也会记下你混过几次。</p>
+      <div class="row-gap" style="margin:0 0 14px">${have ? `<button class="btn primary" data-act="mix-go">练易混词（${have} 张）</button><span class="small muted">已经加进练习 ✓</span>` : `<button class="btn primary" data-act="mix-add">加进练习（${total} 张卡）</button>`}</div>
+      ${top.length ? `<h3>你最常混的</h3>${top.slice(0, 5).map(row).join("")}<h3 style="margin-top:16px">全部 ${fams.length} 组</h3>` : ""}${fams.map(row).join("")}</div>`;
+  }
+};
+/* 和导入页“确认导入”存卡片的方式一样（同一份内容的卡片编号不变，再点一次不会多出来）；不跳回上一页 */
+ACT["mix-add"] = () => { const r = K.parseImport(MIX_IMPORT);
+  for (const c of r.cards){ const i = S.custom.findIndex(x => x.id === c.id); const clean = {id:c.id, t:c.t, tag:c.tag, en:c.en, alt:c.alt || [], note:c.note || "", zh:c.zh || "", wrong:c.wrong || "", grp:c.grp || "", word:c.word || "", mean:c.mean || "", deck:c.deck || "我的卡片"}; if (i >= 0) S.custom[i] = clean; else S.custom.push(clean); }
+  rebuildCatalog(); save(true); toast(`加好了：${r.cards.length} 张卡，在题库“易混词”里`); UI.render(); };
+ACT["mix-go"] = () => startSession("free", {filter: c => c.deck === "易混词"}, "易混词");
 /* ---------- 今天练过的 ---------- */
 VIEWS.today = {
   tab:"home",
@@ -11748,7 +11814,10 @@ const BT = (() => {
       removeAfter(t.animate([{transform:"translate(-50%, 0) scale(.7)", opacity:0}, {transform:"translate(-50%, -6px) scale(1.08)", opacity:1, offset:0.25}, {transform:"translate(-50%, -26px) scale(1)", opacity:0}], {duration:900, easing:"ease-out"}), t);
     };
     A.setNames = (g, y) => { root.querySelector('[data-w="ghost"] .bt-name').textContent = g; root.querySelector('[data-w="you"] .bt-name').textContent = y === "你" ? youName() : y; };
-    A.setScore = t => { root.querySelector(".bt-score").textContent = t; };
+    A.setScore = t => { const el = root.querySelector(".bt-score"); el.textContent = t; el.style.fontSize = "";
+      /* v1.79.2：今天 / 昨天 不换行；英文长，放不下就缩小字号（最多占画面宽度的六成） */
+      requestAnimationFrame(() => { try { const r = document.createRange(); r.selectNodeContents(el); const w = r.getBoundingClientRect().width, max = root.clientWidth * 0.6;
+        if (w > max && max > 0){ const fs = parseFloat(getComputedStyle(el).fontSize) || 15; el.style.fontSize = Math.max(10, fs * max / w).toFixed(1) + "px"; } } catch (e) {} }); };
     A.setHP = (v, instant, max) => {
       if (max != null) A.max = Math.max(1, max);
       A.hp = Math.max(0, Math.min(A.max, v));
@@ -14024,7 +14093,7 @@ const BT = (() => {
   /* Boss：名字不直接写语法点，弱点另外用小字写 */
   const BOSSES = {
     be:{name:"空壳", en:"Hollow", c1:"#6F7FA0", c2:"#9FE3FF"}, tense:{name:"回响", en:"Echo", c1:"#7C5FA0", c2:"#FFD46B"},
-    plural:{name:"分身", en:"Splitter", c1:"#4E8C70", c2:"#B6FF8F"}, pair:{name:"双生", en:"Twin", c1:"#94606F", c2:"#FF9FC2"},
+    plural:{name:"分身", en:"Splitter", c1:"#4E8C70", c2:"#B6FF8F"}, pair:{name:"双生", en:"Twin", c1:"#94606F", c2:"#FF9FC2"}, mix:{name:"重影", en:"Doubler", c1:"#6E5E94", c2:"#D9B8FF"},
     to:{name:"缠丝", en:"Tangler", c1:"#5A6E8A", c2:"#9FD8FF"}, order:{name:"乱序", en:"Scrambler", c1:"#8C704F", c2:"#FFB36B"},
     prep:{name:"迷途", en:"Stray", c1:"#4F6E8C", c2:"#8FF0FF"}, other:{name:"守门人", en:"Warden", c1:"#5E5E74", c2:"#E0E0FF"}
   };
@@ -15542,7 +15611,7 @@ const RW_RULES = [
   {c:"B14", re:/\blike\s+very\s+much\s+(?:the|this|that|these|those|my|your|his|her|our|their|to|playing|going|watching)\b/gi, tip:"very much 放在最后：I like the movie very much"},
   {c:"B14", re:/\b(?:I|you|we|they)\s+(?:go|eat|drink|play|work|study|watch|read|cook|run|swim|travel|call|walk|drive|get|take)\s+(?:always|usually|never)\b/gi, tip:"always、usually、never 放在动词前面：I always go …"},
   {c:"B14", re:/(?:^|[.!?]\s+)(?:always|never)\s+(?:I|we|you|they|he|she)\s+/gi, tip:"always、never 放在主语后面：I always … / I never …（usually、sometimes 可以放句首）"},
-  {c:"B14", re:/\benough\s+(?:big|good|fast|strong|tall|old|long|high|cheap|close|early|warm|cold|easy|hard|smart|large|small|quick|safe|clear)\b/gi, tip:"enough 放在形容词后面：big enough、good enough"},
+  {c:"B14", re:/\benough\s+(?:big|good|fast|strong|tall|old|long|high|cheap|close|early|warm|cold|easy|hard|smart|large|small|quick|safe|clear)s?\b/gi, tip:"enough 放在形容词后面：big enough、good enough"},
   {c:"B14", re:/\b(?:I|we|he|she|they)\s+(?:yesterday|today|tomorrow|last night|last week)\s+(?:went|go|had|did|was|were|will|am|is|are|have|met|saw|bought|got)\b/gi, tip:"时间词放在句首或句末：Yesterday I went … / I went … yesterday"},
   {c:"B14", re:/\b(?:know|tell me|wonder|not sure|remember|understand)\s+(?:where|what|when|why|how)\s+(?:is|are|was|were|does|do|did|can|will)\s+(?:the|my|your|his|her|this|that|he|she|they|you|we|it)\b/gi, tip:"间接问句不倒装：Do you know where the station is? / I'm not sure what it is"},
   {c:"B14", re:/\b(?:I|you|we|they|he|she)\s+also\s+(?:am|is|are|was|were)\b/gi, tip:"also 放在 be 动词后面：I'm also … / I was also …"},
@@ -22373,6 +22442,137 @@ Object.assign(I18N_EN, {
  "乱序": "Scrambler"
 });
 
+/* v1.79.2：易混词的说明、新的语法检查、拼起来的句子、跟读的提示 */
+Object.assign(I18N_EN, {
+ "还剩 {n} 题。": "{n} left.",
+ "易混词": "Confusable words",
+ "重影": "Doubler",
+ "“我想一下”说 Let me think about it / Let me think for a second；think of 是“想出、想起”（think of a name）": "“Let me think” is Let me think about it / Let me think for a second; think of means “come up with, recall” (think of a name)",
+ "少了动词：I don't follow it closely（不怎么关注）": "A verb is missing: I don't follow it closely",
+ "逗号后面直接接 can 少了主语：…, so it can … 或者 … to keep up with …": "No subject before can after the comma: …, so it can … or … to keep up with …",
+ "说的是这一类东西、不是某一个，用复数：microcontrollers。-ing 结尾的词当名词用、指一次一次的事时也能加 s：a fitting（一次试杆）→ club fittings，a meeting → meetings；说这种活动本身就不加：Club fitting taught me a lot。": "When you mean a whole kind of thing rather than one, use the plural: microcontrollers. -ing words used as nouns for separate events can take s too: a fitting (one fitting session) → club fittings, a meeting → meetings; for the activity itself, no s: Club fitting taught me a lot.",
+ "affect 是动词“影响”（It affected the results），effect 一般是名词“效果、影响”（It had a big effect）。两个读音几乎一样，说的时候看这里要动词还是名词。": "affect is the verb “to influence” (It affected the results); effect is usually the noun “result, impact” (It had a big effect). They sound almost the same, so decide whether you need a verb or a noun.",
+ "advice 是名词“建议”（some advice，不加 s），advise 是动词（I'd advise you to…）。读音也不同：advice 结尾是 s，advise 结尾是 z。": "advice is the noun (some advice, no s); advise is the verb (I'd advise you to…). They also sound different: advice ends in s, advise in z.",
+ "accept 是“接受”，except 是“除了”。": "accept means “take, agree to”; except means “but not”.",
+ "lose 是“丢、输”（读 /luːz/），loose 是“松的”（读 /luːs/）。": "lose means “misplace, be beaten” (said /luːz/); loose means “not tight” (said /luːs/).",
+ "than 用在比较（bigger than），then 是“然后、那时”。": "than is for comparisons (bigger than); then means “next” or “at that time”.",
+ "borrow 是“借进来”（borrow it from him），lend 是“借出去”（lend it to her）。": "borrow means take for a while (borrow it from him); lend means give for a while (lend it to her).",
+ "bring 是带过来（朝说话的人这边），take 是带走（离开这里）。": "bring means toward the speaker; take means away from here.",
+ "rise 是自己升高（Prices rose），raise 是把东西抬高、提出来（raise the price、raise a question）。": "rise means go up by itself (Prices rose); raise means lift something or bring it up (raise the price, raise a question).",
+ "fewer 跟可数名词的复数（fewer bugs），less 跟不可数名词（less time）。": "fewer goes with plural countable nouns (fewer bugs); less with uncountable nouns (less time).",
+ "between 一般说两者之间，among 说三个以上的“之中”。": "between is usually for two; among is for three or more.",
+ "especially 是“尤其”，specially 是“专门地”（specially designed）。": "especially means “above all”; specially means “for a particular purpose” (specially designed).",
+ "beside 是“在旁边”，besides 是“而且、除了……还”。": "beside means “next to”; besides means “also, in addition to”.",
+ "alone 是“一个人、单独”（不一定难过），lonely 是“孤单、寂寞”。": "alone means “by yourself” (not necessarily sad); lonely means “sad from being alone”.",
+ "sensible 是“明智的、合理的”，sensitive 是“敏感的”（sensitive to noise）。": "sensible means “reasonable”; sensitive means “easily affected” (sensitive to noise).",
+ "economic 是“经济上的、和经济有关的”，economical 是“省钱的、划算的”。": "economic means “about the economy”; economical means “saves money”.",
+ "principle 是“原理、原则”，principal 是“主要的”或者“校长”。": "principle means “a rule, a basic idea”; principal means “main” or “head of a school”.",
+ "complement 是“补充、相配”，compliment 是“称赞”。": "complement means “complete, go well with”; compliment means “praise”.",
+ "ensure 是“确保”，insure 是“上保险”，assure 是“向某人保证”（I assure you）。": "ensure means “make sure”; insure means “cover with insurance”; assure means “promise someone” (I assure you).",
+ "adapt 是“适应、改编”，adopt 是“采用、收养”。": "adapt means “adjust, rework”; adopt means “start using, take in”.",
+ "accuracy / accurate 是“准”（接近真实值），precision / precise 是“精”（每次的结果都很接近、重复性好）。": "accuracy / accurate is how close to the true value; precision / precise is how close repeated results are to each other.",
+ "工程里 stress 是“应力”（单位面积上的力），strain 是“应变”（变形量和原来长度的比）；日常说“压力大”是 stress。": "In engineering, stress is force per unit area and strain is the change in length divided by the original length; in everyday English, being under pressure is stress.",
+ "efficient 是“效率高、不浪费”，effective 是“有效、能达到目的”。": "efficient means “without waste”; effective means “gets the result”.",
+ "verify 是按要求核对做得对不对（build it right），validate 是确认它满足实际用途（build the right thing）。": "verify means checking it meets the requirements (built it right); validate means checking it works for the real use (built the right thing).",
+ "farther 说实际距离，further 说程度、“进一步”（further questions）。": "farther is physical distance; further is degree or “more” (further questions).",
+ "quiet 是“安静”，quite 是“相当、挺”。": "quiet means “not loud”; quite means “fairly, very”.",
+ "personal 是“个人的”，personnel 是“人员”。": "personal means “your own”; personnel means “staff”.",
+ "experience 是“经验、经历”，experiment 是“实验”。": "experience means what you've done or learned; experiment means a test.",
+ "process 是“过程、流程”，progress 是“进展”。": "process means the steps, the procedure; progress means moving forward.",
+ "career 是“职业生涯”（重音在后：ca-REER），carrier 是“运输公司、载体”（CA-rri-er）。": "career is your working life (stress at the end: ca-REER); carrier is a company or thing that carries (CA-rri-er).",
+ "tolerance 是“公差”（允许的尺寸误差），clearance 是“间隙”（两个零件之间的空隙）。": "tolerance is the allowed size variation; clearance is the gap between two parts."
+});
+
+/* v1.80.0：易混词页、内置的易混词卡的提示、没有参考说法时认得出来的易混词 */
+Object.assign(I18N_EN, {
+ "affect / effect 这种": "Like affect / effect",
+ "中文是同一个词、或者读音很像的几组。练习时说成了另一个，答案下面会讲清楚区别，这里也会记下你混过几次。": "Pairs that are one word in Chinese, or sound alike. If you say the other one in practice, the answer screen explains the difference, and this page counts how often you mix them up.",
+ "练易混词（{n} 张）": "Practise confusable words ({n} cards)",
+ "已经加进练习 ✓": "Added to practice ✓",
+ "加进练习（{n} 张卡）": "Add to practice ({n} cards)",
+ "你最常混的": "Your most common mix-ups",
+ "全部 {n} 组": "All {n} groups",
+ "混过 {n} 次": "Mixed up {n}×",
+ "加好了：{n} 张卡，在题库“易混词”里": "Added {n} cards to the deck “Confusable words”",
+ "affect / effect、lose / loose 这种，30 组 →": "affect / effect, lose / loose and more: 30 pairs →",
+ "动词“影响”用 affect": "The verb “to influence” is affect",
+ "名词“影响、效果”用 effect": "The noun “influence, result” is effect",
+ "名词 advice，不加 s": "advice is a noun, no s",
+ "动词 advise，结尾读 z": "advise is the verb; it ends in a z sound",
+ "接受：accept": "To take, agree to: accept",
+ "除了：except": "But not: except",
+ "松的：loose，读 /luːs/": "Not tight: loose, said /luːs/",
+ "输、丢：lose，读 /luːz/": "Be beaten, misplace: lose, said /luːz/",
+ "比较用 than": "Comparisons take than",
+ "“然后”是 then": "“Next” is then",
+ "借进来：borrow": "Take for a while: borrow",
+ "借出去：lend": "Give for a while: lend",
+ "带过来（到说话的人这边）：bring": "Toward the speaker: bring",
+ "带走：take": "Away from here: take",
+ "自己升：rise / risen": "Goes up by itself: rise / risen",
+ "提出、抬高：raise": "Lift, bring up: raise",
+ "可数名词用 fewer": "Countable nouns take fewer",
+ "不可数用 less": "Uncountable nouns take less",
+ "两者之间：between": "Of two: between",
+ "三个以上之中：among": "Of three or more: among",
+ "尤其：especially": "Above all: especially",
+ "专门：specially": "For a particular purpose: specially",
+ "除了……还：besides": "In addition to: besides",
+ "在旁边：beside": "Next to: beside",
+ "一个人：alone": "By yourself: alone",
+ "孤单：lonely": "Sad from being alone: lonely",
+ "敏感：sensitive": "Easily affected: sensitive",
+ "合理、明智：sensible": "Reasonable: sensible",
+ "省钱：economical；和经济有关：economic": "Saves money: economical; about the economy: economic",
+ "原理：principle": "A basic rule or idea: principle",
+ "主要的：principal": "Main: principal",
+ "称赞：compliment": "Praise: compliment",
+ "补充、相配：complement": "Go well with: complement",
+ "确保：ensure": "Make sure: ensure",
+ "向人保证：assure": "Promise someone: assure",
+ "适应：adapt": "Adjust: adapt",
+ "采用：adopt": "Start using: adopt",
+ "准：accurate；重复性好：precise": "Close to the true value: accurate; repeatable: precise",
+ "应变：strain；应力：stress": "Deformation: strain; force per area: stress",
+ "有效：effective；效率高：efficient": "Gets the result: effective; no waste: efficient",
+ "核对符合要求：verify": "Check it meets the requirements: verify",
+ "确认满足实际用途：validate": "Check it works for the real use: validate",
+ "进一步：further；实际距离：farther": "More, to a greater degree: further; physical distance: farther",
+ "挺、相当：quite": "Fairly, very: quite",
+ "安静：quiet": "Not loud: quiet",
+ "个人的：personal；人员：personnel": "Your own: personal; staff: personnel",
+ "经验：experience": "What you've done and learned: experience",
+ "实验：experiment": "A test: experiment",
+ "进展：progress": "Moving forward: progress",
+ "流程：process": "The steps: process",
+ "职业：career，重音在后": "Working life: career, stress at the end",
+ "间隙：clearance；公差：tolerance": "Gap between parts: clearance; allowed variation: tolerance",
+ "名词“影响”是 effect": "The noun for “influence” is effect",
+ "advice 不可数，不加 s": "advice is uncountable, no s",
+ "松的是 loose": "“Not tight” is loose",
+ "借给别人是 lend": "Giving it to someone for a while is lend",
+ "“挺”是 quite": "“Fairly” is quite",
+ "经验是 experience": "What you've learned from doing is experience",
+ "自己涨用 rise / risen": "Going up by itself is rise / risen",
+ "提出问题是 raise": "Bringing up a question is raise",
+ "敏感是 sensitive": "“Easily affected” is sensitive",
+ "采用是 adopt": "“Start using” is adopt",
+ "除了是 except": "“But not” is except",
+ "这里要名词 effect（影响、效果）；affect 是动词": "This needs the noun effect (result, impact); affect is a verb",
+ "advice 不可数，不加 s：some advice": "advice is uncountable, no s: some advice",
+ "可数名词用 fewer：fewer bugs；less 跟不可数的（less time）": "Countable nouns take fewer: fewer bugs; less goes with uncountable ones (less time)",
+ "借给别人是 lend：lend me …；borrow 是借进来": "Giving something for a while is lend: lend me …; borrow is taking",
+ "比较用 than：faster than；then 是“然后”": "Comparisons take than: faster than; then means “next”",
+ "“挺、相当”是 quite；quiet 是“安静”": "“Fairly, very” is quite; quiet means “not loud”",
+ "松的是 loose（读 /luːs/）；lose 是“丢、输”": "“Not tight” is loose (said /luːs/); lose means misplace or be beaten",
+ "“除了”是 except；accept 是“接受”": "“But not” is except; accept means “take, agree to”",
+ "经验是 experience；experiment 是“实验”": "Work experience is experience; experiment means a test",
+ "“有进展”是 make progress；process 是“过程、流程”": "“Getting somewhere” is make progress; process means the steps",
+ "提出、抬高是 raise：raise a question；rise 是自己升高": "Lifting or bringing up is raise: raise a question; rise means go up by itself",
+ "自己升高用 rise：prices have risen；raise 要带宾语（raise the price）": "Going up by itself is rise: prices have risen; raise needs an object (raise the price)",
+ "“对……敏感”是 sensitive to；sensible 是“合理、明智”": "“Easily affected by” is sensitive to; sensible means reasonable"
+});
+
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
 var I18N_LANGS = (typeof I18N_LANGS !== "undefined" && I18N_LANGS) || {};
 I18N_LANGS.en = {name:"English", dict:I18N_EN};
@@ -22416,16 +22616,16 @@ function i18nT(raw){
   if (v == null){ const ms = t.match(/^(.+?)\s*\+(\d+)$/); if (ms && /[\u4e00-\u9fff]/.test(ms[1])){ const b = i18nT(ms[1]); if (b) v = b + " +" + ms[2]; } }
   /* v1.75.2：几类拼出来的文字（用户导出的没翻译清单里找到的） */
   /* v1.75.5：上次的“名字”还剩 N 题；现在检查的清单：代码 名字、…；（Whisper 模型，约 N MB，已下载） */
-  if (v == null){ const R4 = [[/^上次的“(.+)”还剩 (\d+) 题$/, m => `“${i18nT(m[1]) || m[1]}” from last time: ${m[2]} left`],
+  if (v == null){ const R4 = [[/^上次的“(.+)”还剩 (\d+) 题$/, m => `“${i18nTk(m[1])}” from last time: ${m[2]} left`],
       [/^现在检查的清单：(.+)$/, m => "Current checklist: " + m[1].split("、").map(x => { const c = x.trim().match(/^([A-C]\d+)\s+(.+)$/); return c ? c[1] + " " + (i18nT(c[2]) || c[2]) : (i18nT(x.trim()) || x.trim()); }).join(", ")],
       [/^（Whisper ([\w.-]+)，约 (\d+) MB(?:，(已下载|还没下载))?）$/, m => `(Whisper ${m[1]}, about ${m[2]} MB${m[3] ? ", " + (m[3] === "已下载" ? "downloaded" : "not downloaded") : ""})`]];
     for (const [re, f] of R4){ const m = t.match(re); if (m){ v = f(m); break; } } }
   /* 中间用几个空格拼起来的（日期　几天前　题库：名字）：按空格拆开分别翻 */
   if (v == null && /\S(\s{2,}|　+)\S/.test(t)){ const ps = t.split(/(\s{2,}|　+)/); let ch = false; const out = ps.map((x, i) => { if (i % 2) return x; const r = /[\u4e00-\u9fff]/.test(x) ? i18nT(x) : null; if (r){ ch = true; return r; } return x; }); if (ch) v = out.join(""); }
-  if (v == null){ const R3 = [[/^删除技能“(.+)”？$/, m => `Delete the skill “${i18nT(m[1]) || m[1]}”?`], [/^删除“(.+)”？$/, m => `Delete “${i18nT(m[1]) || m[1]}”?`],
-      [/^(.+?) \+(\d+)，经验值 \+(\d+)$/, m => `${i18nT(m[1]) || m[1]} +${m[2]}, XP +${m[3]}`], [/^英语：在只因里练了 (\d+) 分钟（(.+?)）(.*)$/, m => `English: practised ${m[1]} min in Cluck (${i18nT(m[2]) || m[2]})${m[3]}`], [/^；求职：$/, () => "; Career:"]];
+  if (v == null){ const R3 = [[/^删除技能“(.+)”？$/, m => `Delete the skill “${i18nTk(m[1])}”?`], [/^删除“(.+)”？$/, m => `Delete “${i18nTk(m[1])}”?`],
+      [/^(.+?) \+(\d+)，经验值 \+(\d+)$/, m => `${i18nTk(m[1])} +${m[2]}, XP +${m[3]}`], [/^英语：在只因里练了 (\d+) 分钟（(.+?)）(.*)$/, m => `English: practised ${m[1]} min in Cluck (${i18nTk(m[2])})${m[3]}`], [/^；求职：$/, () => "; Career:"]];
     for (const [re, f] of R3){ const m = t.match(re); if (m){ v = f(m); break; } } }   /* v1.75.4：删除确认里带名字的、带名字的加分说明 */
-  if (v == null){ const R2 = [[/^问过 (\d+) 次：(.+)$/, (m) => `Asked ${m[1]}×: ${m[2]}`], [/^最近最需要练：(.+)，正确率 (\d+)%$/, (m) => `Needs the most work lately: ${i18nT(m[1]) || m[1]}, ${m[2]}% right`],
+  if (v == null){ const R2 = [[/^问过 (\d+) 次：(.+)$/, (m) => `Asked ${m[1]}×: ${m[2]}`], [/^最近最需要练：(.+)，正确率 (\d+)%$/, (m) => `Needs the most work lately: ${i18nTk(m[1])}, ${m[2]}% right`],
       [/^(\d+)月(\d+)日–(?:(\d+)月)?(\d+)日$/, (m) => { const M = n => ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+n - 1] || n; return m[3] ? `${M(m[1])} ${m[2]} – ${M(m[3])} ${m[4]}` : `${M(m[1])} ${m[2]}–${m[4]}`; }],
       [/^(英语|中文) (.+?)（([a-z]{2}_[A-Z]{2}[^）]*)）$/, (m) => { const RG = {澳大利亚:"Australia", 英国:"UK", 印度:"India", 尼日利亚:"Nigeria", 美国:"US", 中国:"China", 香港:"Hong Kong", 澳门:"Macau", 马来西亚:"Malaysia", 新加坡:"Singapore", 台湾:"Taiwan", 加拿大:"Canada", 爱尔兰:"Ireland", 新西兰:"New Zealand", 南非:"South Africa", 菲律宾:"Philippines"}; return `${m[1] === "英语" ? "English" : "Chinese"} (${RG[m[2]] || m[2]}, ${m[3]})`; }]];
     for (const [re, f] of R2){ const m = t.match(re); if (m){ v = f(m); break; } } }
@@ -22457,7 +22657,7 @@ function i18nT(raw){
       [/^（(\S+) 开头，(\d+) 个(字母|词)）$/, m => ` (starts with ${m[1]}, ${m[2]} ${m[3] === "字母" ? "letters" : "words"})`], [/^用 (\S+) 说一句完整的话$/, m => `Say a full sentence with “${m[1]}”`]];
     for (const [re, f] of F){ const m = t.match(re); if (m){ v = f(m); break; } } }
   /* v1.78.0：游戏里拼出来的提示（伤害、打倒了谁、首领、补练第几步、一轮的结算） */
-  if (v == null){ const T = x => i18nT(x) || x, pl = (n, a, b) => n === "1" ? a : b;
+  if (v == null){ const T = i18nTk, pl = (n, a, b) => n === "1" ? a : b;
     const G = [
       [/^打倒了(.+)！$/, m => `Defeated ${T(m[1])}!`], [/^打败了首领「(.+)」！$/, m => `Defeated the boss “${T(m[1])}”!`], [/^首领 · 弱点：(.+)$/, m => `Boss · weak spot: ${T(m[1])}`],
       [/^补练 (\d+)\/(\d+)：(.+)$/, m => { const l = i18nT(m[3]); return l ? `Drill ${m[1]}/${m[2]}: ${l}` : null; }],
@@ -22474,12 +22674,16 @@ function i18nT(raw){
       [/^(.+?)(，暴击)?：-(\d+)$/, m => { const l = i18nT(m[1]); return l ? `${l}${m[2] ? ", critical hit" : ""}: -${m[3]}` : null; }]];   /* 完全对，暴击：-15 / 补说对了：打碎护盾：-7 */
     for (const [re, f] of G){ const m = t.match(re); if (m){ v = f(m); if (v != null) break; } } }
   /* v1.79.1：少见状态的提示（夹着名字、列表、日期的） */
-  if (v == null){ const T = x => i18nT(x) || x, pl = (n, a, b) => n === "1" ? a : b;
-    const item = x => { const w = i18nT(String(x).trim()); if (w) return w; const m = String(x).trim().match(/^(.+?) (\d+)(?:（(.+?) (\d+)）)?$/); if (!m) return null; const a = i18nT(m[1]); if (!a) return null; return `${a} ${m[2]}${m[3] ? ` (${m[4]} ${(i18nT(m[3]) || m[3]).toLowerCase()})` : ""}`; };
+  if (v == null){ const T = i18nTk, pl = (n, a, b) => n === "1" ? a : b;
+    const item = x => { const w = i18nT(String(x).trim()); if (w) return w; const m = String(x).trim().match(/^(.+?) (\d+)(?:（(.+?) (\d+)）)?$/); if (!m) return null; const a = i18nT(m[1]); if (!a) return null; return `${a} ${m[2]}${m[3] ? ` (${m[4]} ${(i18nTk(m[3])).toLowerCase()})` : ""}`; };
     const list = x => { const ps = String(x).split("、"), tr = ps.map(item); return tr.every(Boolean) ? tr.join(", ") : null; };
     const lc = x => String(x).charAt(0).toLowerCase() + String(x).slice(1);
     const RC = {"没说出来":"missed", "较多卡顿":"hesitant", "还行":"OK", "不错":"good", "未打分":"unrated"};
     const H = [
+      [/^(.+)（接着练）$/, m => { const a = i18nT(m[1]); return a ? `${a} (continued)` : null; }],
+      [/^心情（1–5）：([\d、]+)$/, m => `Mood (1–5): ${m[1].replace(/、/g, ", ")}`],
+      [/^(?:心情（1–5）：([\d、]+)；)?有求职记录的日子平均 ([\d.]+)，其他日子 ([\d.]+)$/, m => `${m[1] ? `Mood (1–5): ${m[1].replace(/、/g, ", ")}; days` : "Days"} with job-search activity average ${m[2]}, other days ${m[3]}`],
+      [/^(.+) 和另一个词容易混：看看这里要的是哪个意思$/, m => `“${m[1]}” is easy to mix up with another word: check which meaning you need here`],
       [/^转写好了：(.+)$/, m => `Transcribed: ${T(m[1])}`], [/^（听成了 (.+)）$/, m => ` (heard as ${m[1]})`],
       [/^(\d+) 题((?: (?:没说出来|较多卡顿|还行|不错|未打分) \d+)+)$/, m => `${m[1]} ${pl(m[1], "question", "questions")}` + m[2].replace(/ (没说出来|较多卡顿|还行|不错|未打分) (\d+)/g, (z, k, n) => ` · ${RC[k]} ${n}`)],
       [/^· (.+?)：(.+)$/, m => { const l = list(m[2]); return l ? `· ${m[1]}: ${l}` : null; }],
@@ -22557,6 +22761,15 @@ ACT["i18n-miss-copy"] = async () => { const list = [...I18N_MISS]; if (!list.len
   const txt = "下面是只因英文界面里没翻成英文的文字，请给我对应的英文（一行一条：中文 → English）：\n" + list.join("\n");
   try { await navigator.clipboard.writeText(txt); toast(`复制好了：${list.length} 条`); } catch (e) { toast("复制没成功，再点一次试试"); } };
 ACT["i18n-miss-clear"] = () => { I18N_MISS.clear(); try { localStorage.removeItem("tk-i18n-miss"); } catch (e) {} toast("清空了没翻译的记录"); UI.render(); };
+
+/* v1.79.2：规则里夹着的名字翻不了（“游戏（接着练）”这种），也记进没翻译的清单（以前整句算翻好了，记不到） */
+function i18nTk(x){ const r = i18nT(x); if (r == null) i18nMiss(x); return r == null ? x : r; }
+/* v1.79.2：好几句拼在一起的（“还剩 9 题。上次是游戏：……”）整句对不上时，一句一句翻，每句都翻得了才换 */
+{ const base = i18nT; i18nT = function(raw){ const v = base(raw); if (v != null) return v; const t = String(raw == null ? "" : raw).trim(); if (!/[\u4e00-\u9fff]/.test(t)) return null;
+    const ss = t.match(/[^。！？]+[。！？]+|[^。！？]+$/g); if (!ss || ss.length < 2 || ss.join("") !== t) return null;
+    const tr = ss.map(x => base(x.trim())); if (!tr.every(Boolean)) return null; return String(raw).replace(t, tr.join(" ")); }; }
+/* v1.79.2：判断“是不是 app 自己的文字”：拼起来的句子在源码里找不到整句，就看里面每一段中文（两个字以上）是不是都在源码里 */
+{ const base = i18nInSrc; i18nInSrc = function(src, t){ if (base(src, t)) return true; const runs = String(t).match(/[\u4e00-\u9fff]{2,}/g) || []; return runs.length > 0 && runs.every(x => src.includes(x)); }; }
 
 </script>
 </body>
