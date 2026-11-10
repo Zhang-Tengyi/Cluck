@@ -1177,6 +1177,15 @@ html[lang="en"] body.g-drill .g-top::after{content:"Shadowing: the battle is hid
 .mix-row{padding-top:12px;padding-bottom:12px}
 .mix-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .mix-h .en{font-size:17px}
+/* v1.80.2：为什么这样说：你这句错在哪（你说的 → 应该是） */
+.why-h{margin:2px 0 8px;font-size:14px}
+.why-err{padding:8px 0 10px;border-bottom:1px solid var(--line, #e3e7ee)}
+.why-err:last-of-type{border-bottom:0}
+.why-pair{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+.why-pair .chip{margin-right:2px}
+.why-x{color:var(--bad, #b42318);text-decoration:line-through;text-decoration-thickness:1px}
+.why-ok{color:var(--good, #067647)}
+.why-arrow{color:var(--muted, #667085)}
 
 
 .has-ai-only{display:none!important}
@@ -1199,7 +1208,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.80.0"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.80.2"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -2349,6 +2358,30 @@ const WHY = {
   funFunny: "fun 是“好玩、有意思”（It was fun），funny 是“好笑”（a funny story）。",
   listenHear: "listen 是主动去听（listen to music），hear 是听到（I heard a noise）。"
 };
+
+/* ---------- v1.80.2：动词形式讲清楚：不规则动词说成 -ed（writted）、过去式和过去分词用混（have went、I seen）、该用原形的地方用了过去式（Did you went?） ---------- */
+const IRR2 = (() => { const o = {}; for (const row of "arise arose arisen|awake awoke awoken|bear bore borne|beat beat beaten|become became become|begin began begun|bend bent bent|bind bound bound|bite bit bitten|bleed bled bled|blow blew blown|break broke broken|breed bred bred|bring brought brought|build built built|burst burst burst|buy bought bought|catch caught caught|choose chose chosen|cling clung clung|come came come|creep crept crept|cut cut cut|deal dealt dealt|dig dug dug|do did done|draw drew drawn|drink drank drunk|drive drove driven|eat ate eaten|fall fell fallen|feed fed fed|feel felt felt|fight fought fought|find found found|flee fled fled|fling flung flung|fly flew flown|forbid forbade forbidden|forget forgot forgotten|forgive forgave forgiven|freeze froze frozen|get got gotten|give gave given|go went gone|grind ground ground|grow grew grown|hang hung hung|have had had|hear heard heard|hide hid hidden|hit hit hit|hold held held|hurt hurt hurt|keep kept kept|know knew known|lay laid laid|lead led led|leave left left|lend lent lent|let let let|lose lost lost|make made made|mean meant meant|meet met met|mislead misled misled|mistake mistook mistaken|misunderstand misunderstood misunderstood|overcome overcame overcome|oversee oversaw overseen|pay paid paid|put put put|read read read|rebuild rebuilt rebuilt|redo redid redone|rewrite rewrote rewritten|ride rode ridden|ring rang rung|rise rose risen|run ran run|say said said|see saw seen|seek sought sought|sell sold sold|send sent sent|set set set|shake shook shaken|shoot shot shot|show showed shown|shrink shrank shrunk|shut shut shut|sing sang sung|sink sank sunk|sit sat sat|sleep slept slept|slide slid slid|speak spoke spoken|spend spent spent|spin spun spun|split split split|spread spread spread|spring sprang sprung|stand stood stood|steal stole stolen|stick stuck stuck|sting stung stung|stink stank stunk|strike struck struck|swear swore sworn|sweep swept swept|swim swam swum|swing swung swung|take took taken|teach taught taught|tear tore torn|tell told told|think thought thought|throw threw thrown|understand understood understood|undertake undertook undertaken|undo undid undone|upset upset upset|wake woke woken|wear wore worn|weep wept wept|win won won|withdraw withdrew withdrawn|write wrote written".split("|")){ const [v, p, pp] = row.split(" "); o[v] = [p, pp]; } return Object.assign(o, IRR); })();
+const IRR2_LEMMA = (() => { const m = {}; for (const [v, [p, pp]] of Object.entries(IRR2)){ for (const w of [v, p, pp]) if (!m[w]) m[w] = v; } return m; })();
+const PAST2BASE = (() => { const m = {}; for (const [v, [p]] of Object.entries(IRR2)) if (!m[p] || m[p] === p) m[p] = v; return m; })();
+/* 不规则动词被说成 -ed 的样子（writed、writted、goed、taked、runned……），排除本来就是词的（learned、hanged、founded……） */
+const REGW = (() => { const ok = new Set("learned dreamed burned spelled smelled spilled leaned leaped lighted dived fitted knitted proved sawed sewed mowed hanged lied shined weaved wedded wetted speeded betted broadcasted forecasted kneeled quitted putted ridded winded bended seed leaded teared stringed ringed singed waked creeped spitted strived overseed costed flied founded wounded grounded bounded".split(" ")), real = new Set(Object.keys(IRR2_LEMMA)), out = {};
+  const add = (w, v) => { if (!ok.has(w) && !real.has(w) && !out[w]) out[w] = v; };
+  for (const v of Object.keys(IRR2)){ if (v === "be") continue; const p = IRR2[v][0];
+    if (v.endsWith("e")){ add(v + "d", v); const st = v.slice(0, -1); if (/[^aeiou][aeiou][bdgklmnprt]$/.test(st)) add(st + st.slice(-1) + "ed", v); }
+    else if (v.endsWith("y") && !/[aeiou]y$/.test(v)) add(v.slice(0, -1) + "ied", v);
+    else { add(v + "ed", v); if (/[^aeiou][aeiou][bdgklmnprt]$/.test(v)) add(v + v.slice(-1) + "ed", v); }
+    if (p !== v) add(p + "ed", v); }
+  return out; })();
+const REGW_RE = new RegExp("\\b(" + Object.keys(REGW).sort((a, b) => b.length - a.length).join("|") + ")\\b", "gi");
+const PAST_ONLY = Object.entries(IRR2).filter(([v, [p, pp]]) => p !== pp && p !== v && v !== "be" && p !== "got").map(([v, [p]]) => p);   /* 不含 got：You've got … 是对的 */
+const PASSIVE_PAST = ["wrote","took","ate","saw","did","gave","drove","spoke","broke","chose","froze","stole","forgot","drew","grew","threw","knew","shook","hid","bit","woke","wore","tore","sang","drank","rode","began","mistook","forgave","undertook","withdrew","blew","overcame","rewrote","redid","undid","oversaw"];
+const ED_NOT_PAST = "speed|proceed|succeed|exceed|breed|bleed|embed|indeed|heed|plead|shred|need|feed|seed|weed|greed|creed|deed|shed|bed|red|wed|led|fled|sped|bred|fed|naked|wicked|sacred|hundred|kindred|rugged|crooked|beloved|ragged|jagged|aged|blessed|learned|imbed|reed|sled";
+const PAST_ANY = [...new Set(Object.entries(IRR2).filter(([v, [p]]) => p !== v && v !== "be").map(([v, [p]]) => p))];   /* 不含 was / were：What I did was … 是对的 */
+const TO_PAST = PAST_ONLY.filter(p => !/^(found|felt|left|lost|saw|won|bit|lay|fell|ground|wound|bound|rose|sank|stank|swore|tore|wore|spoke|stole|broke|chose|froze|shook|hid|woke|drank|rode|began|rang|sang|swam|shrank|sprang|stung|struck|swept|wept|sat|slid|spun|led|met|sent|spent|lent|bent|meant|dealt|sold|told|held|kept|slept|bred|fed|fled|clung|flung|dug|stuck|stung|sought|caught|taught|brought|bought|thought|fought)$/.test(p)).concat(["went", "took", "ate", "came", "gave", "wrote", "bought", "thought", "told", "knew", "ran", "sent", "spent", "paid", "met", "heard", "made", "drove", "flew", "grew", "threw", "drew"]);
+const ING = {hear:"hearing", see:"seeing", meet:"meeting", work:"working", talk:"talking", speak:"speaking", discuss:"discussing", join:"joining", learn:"learning", chat:"chatting", connect:"connecting", receive:"receiving", get:"getting", start:"starting", be:"being", have:"having", catch:"catching", visit:"visiting", do:"doing", go:"going", live:"living", use:"using", wake:"waking", eat:"eating", drive:"driving", study:"studying", write:"writing", deal:"dealing", stay:"staying", cook:"cooking", take:"taking", sleep:"sleeping", run:"running", walk:"walking", commute:"commuting"};
+const THIRD = w => w === "have" ? "has" : w === "go" ? "goes" : w === "do" ? "does" : /(?:s|sh|ch|x|z)$/.test(w) ? w + "es" : /[^aeiou]y$/.test(w) ? w.slice(0, -1) + "ies" : w + "s";
+const UNC = {informations:"information", equipments:"equipment", feedbacks:"feedback", softwares:"software", hardwares:"hardware", furnitures:"furniture", knowledges:"knowledge", homeworks:"homework", luggages:"luggage", baggages:"baggage", evidences:"evidence", machineries:"machinery", sceneries:"scenery", traffics:"traffic"};
+const irrLine = v => { const [p, pp] = IRR2[v]; return `${v} → ${p} → ${pp}`; };
 /* v1.79.2：易混词（affect / effect 这种）：说成另一个时，提示里讲区别；也算真的错（不提示“识别听错了”） */
 const MIX_WHY = [[[["affect", "affects", "affected", "affecting"], ["effect", "effects"]], "affect 是动词“影响”（It affected the results），effect 一般是名词“效果、影响”（It had a big effect）。两个读音几乎一样，说的时候看这里要动词还是名词。"], [[["advice"], ["advise", "advised", "advises"]], "advice 是名词“建议”（some advice，不加 s），advise 是动词（I'd advise you to…）。读音也不同：advice 结尾是 s，advise 结尾是 z。"], [[["accept", "accepts", "accepted"], ["except"]], "accept 是“接受”，except 是“除了”。"], [[["lose", "loses", "lost"], ["loose"]], "lose 是“丢、输”（读 /luːz/），loose 是“松的”（读 /luːs/）。"], [[["than"], ["then"]], "than 用在比较（bigger than），then 是“然后、那时”。"], [[["borrow", "borrowed"], ["lend", "lent"]], "borrow 是“借进来”（borrow it from him），lend 是“借出去”（lend it to her）。"], [[["bring", "brought"], ["take", "took"]], "bring 是带过来（朝说话的人这边），take 是带走（离开这里）。"], [[["rise", "rises", "rose", "risen"], ["raise", "raises", "raised"]], "rise 是自己升高（Prices rose），raise 是把东西抬高、提出来（raise the price、raise a question）。"], [[["fewer"], ["less"]], "fewer 跟可数名词的复数（fewer bugs），less 跟不可数名词（less time）。"], [[["between"], ["among"]], "between 一般说两者之间，among 说三个以上的“之中”。"], [[["especially"], ["specially"]], "especially 是“尤其”，specially 是“专门地”（specially designed）。"], [[["beside"], ["besides"]], "beside 是“在旁边”，besides 是“而且、除了……还”。"], [[["alone"], ["lonely"]], "alone 是“一个人、单独”（不一定难过），lonely 是“孤单、寂寞”。"], [[["sensible"], ["sensitive"]], "sensible 是“明智的、合理的”，sensitive 是“敏感的”（sensitive to noise）。"], [[["economic"], ["economical"]], "economic 是“经济上的、和经济有关的”，economical 是“省钱的、划算的”。"], [[["principle", "principles"], ["principal"]], "principle 是“原理、原则”，principal 是“主要的”或者“校长”。"], [[["complement", "complements"], ["compliment", "compliments"]], "complement 是“补充、相配”，compliment 是“称赞”。"], [[["ensure"], ["insure"], ["assure"]], "ensure 是“确保”，insure 是“上保险”，assure 是“向某人保证”（I assure you）。"], [[["adapt", "adapted"], ["adopt", "adopted"]], "adapt 是“适应、改编”，adopt 是“采用、收养”。"], [[["accuracy", "accurate"], ["precision", "precise"]], "accuracy / accurate 是“准”（接近真实值），precision / precise 是“精”（每次的结果都很接近、重复性好）。"], [[["stress"], ["strain"]], "工程里 stress 是“应力”（单位面积上的力），strain 是“应变”（变形量和原来长度的比）；日常说“压力大”是 stress。"], [[["efficient", "efficiency"], ["effective", "effectiveness"]], "efficient 是“效率高、不浪费”，effective 是“有效、能达到目的”。"], [[["verify", "verified", "verification"], ["validate", "validated", "validation"]], "verify 是按要求核对做得对不对（build it right），validate 是确认它满足实际用途（build the right thing）。"], [[["farther"], ["further"]], "farther 说实际距离，further 说程度、“进一步”（further questions）。"], [[["quiet"], ["quite"]], "quiet 是“安静”，quite 是“相当、挺”。"], [[["personal"], ["personnel"]], "personal 是“个人的”，personnel 是“人员”。"], [[["experience", "experiences"], ["experiment", "experiments"]], "experience 是“经验、经历”，experiment 是“实验”。"], [[["process"], ["progress"]], "process 是“过程、流程”，progress 是“进展”。"], [[["career"], ["carrier"]], "career 是“职业生涯”（重音在后：ca-REER），carrier 是“运输公司、载体”（CA-rri-er）。"], [[["tolerance", "tolerances"], ["clearance", "clearances"]], "tolerance 是“公差”（允许的尺寸误差），clearance 是“间隙”（两个零件之间的空隙）。"]];
 function mixFam(a, b){ for (const [fam] of MIX_WHY){ const ia = fam.findIndex(x => x.includes(a)), ib = fam.findIndex(x => x.includes(b)); if (ia >= 0 && ib >= 0 && ia !== ib) return fam[0][0]; } return ""; }
@@ -2386,7 +2419,15 @@ function wordWhy(a, b){
 }
 function classifySub(a, b){ // a = 参考答案里的词，b = 你说的词
   if (a===b+"s" || a===b+"es" || b===a+"s" || b===a+"es" || (a.endsWith("ies") && b===a.slice(0,-3)+"y") || (b.endsWith("ies") && a===b.slice(0,-3)+"y")) return "s";
-  const gp = gramPair(a, b); if (gp) return gp; if (mixWhy(a, b)) return "mix";   /* v1.78.0：had / have、has / have、did / do、this / these、a / an、been / being：拼写像，以前被当成“发音” */
+  const gp = gramPair(a, b); if (gp) return gp; if (mixWhy(a, b)) return "mix";
+  /* v1.80.2：动词形式 */
+  if (REGW[b] && IRR2_LEMMA[a] === REGW[b]) return "irr";
+  { const la = IRR2_LEMMA[a], lb = IRR2_LEMMA[b];
+    if (la && la === lb && a !== b){ const [p, pp] = IRR2[la];
+      if (a === pp && b === p && p !== pp) return "ppform";
+      if (a === p && b === pp && p !== pp) return "pastform";
+      if (a === la && (b === p || b === pp)) return "base"; } }
+  if (!IRR2[a] && a.length > 2 && b === pastOf(a)) return "base";   /* v1.78.0：had / have、has / have、did / do、this / these、a / an、been / being：拼写像，以前被当成“发音” */
   if (pastOf(b)===a || (IRR[b] && IRR[b][1]===a)) return "past";
   if (BE.has(a) && BE.has(b)) return "be";
   if ((a==="have"||a==="has") && BE.has(b)) return "perf";
@@ -2495,7 +2536,7 @@ function compareSaid0(target, alts, said){
   return best;
 }
 const SOUND_OK = 0.7;
-const GRAM_SUB = new Set(["s", "past", "be", "perf", "hadp", "agree2", "do", "det", "an", "being", "mix"]);   /* v1.78.0：加了语法成对的词 */
+const GRAM_SUB = new Set(["s", "past", "be", "perf", "hadp", "agree2", "do", "det", "an", "being", "mix", "irr", "ppform", "pastform", "base"]);   /* v1.78.0：加了语法成对的词 */
 const GRAM_NOTE = new Set(["be", "tense", "to", "poss"]);
 const G_THIRD = new Set(["he","she","it","this","that","who","everyone","everybody","someone","somebody","nobody"]);
 const G_PL = new Set(["two","three","four","five","six","seven","eight","nine","ten","twenty","many","some","all","these","those","few","several","of","both","lots","kinds","types","sorts"]);
@@ -2522,7 +2563,9 @@ function pastRule(a, b, pv, pv2){
 }
 function feedbackNotes(ops){
   /* v1.78.0：每条提示尽量带上 why（为什么）：按错误类型给规则，不是只标出来 */
-  const notes = []; let prevA = "", prevA2 = "", prevB = "", prevB2 = "";
+  const notes = []; let prevA = "", prevA2 = "", prevB = "", prevB2 = "", cur = null;
+  /* v1.80.2：每条提示记下“你说的 / 应该是”（为什么这样说里用） */
+  { const push0 = notes.push.bind(notes); notes.push = (...xs) => { for (const x of xs) if (cur && x && x.said == null){ x.said = cur.op === "del" ? "" : cur.b; x.want = cur.op === "ins" ? "" : cur.a; } return push0(...xs); }; }
   const refW = ops.filter(o => o.a).map(o => o.a);
   const pastTime = refW.some((w, i) => w === "yesterday" || w === "ago" || (w === "last" && TIME_UNITS.has(refW[i + 1])));
   const seqRef = refW.some(w => /^(after|before|by|until|when|once)$/.test(w));   /* 参考里有“先后”的，过去完成时可能也对：不算错 */
@@ -2530,7 +2573,7 @@ function feedbackNotes(ops){
   const add = (n, why) => notes.push(why ? Object.assign(n, {why}) : n);
 
   for (let k = 0; k < ops.length; k++){
-    const o = ops[k];
+    const o = ops[k]; cur = o;
     if (o.op === "eq"){ prevA2 = prevA; prevA = o.a; prevB2 = prevB; prevB = o.b; continue; }
     if (o.op === "sub"){
       const pa = prevA, pa2 = prevA2; prevA2 = prevA; prevA = o.a; prevB2 = prevB; prevB = o.b;
@@ -2547,6 +2590,11 @@ function feedbackNotes(ops){
       else if (kd === "det") add({k:"plural", msg:`这里用 ${o.a}，不是 ${o.b}`}, WHY.det);
       else if (kd === "an") add({k:"art", msg:`这里用 ${o.a}，不是 ${o.b}`}, WHY.an);
       else if (kd === "being") add({k:"tense", msg:`这里用 ${o.a}，不是 ${o.b}`}, WHY.being);
+      else if (kd === "irr"){ const v = REGW[o.b], [p, pp] = IRR2[v]; add({k:"tense", msg:`这里是 ${o.a}（你说的是 ${o.b}）`}, `${v} 是不规则动词：${irrLine(v)}，不加 -ed，没有 ${o.b} 这个词。` + (o.a === pp && p !== pp ? `这里跟在 have / be 后面，用过去分词 ${pp}。` : o.a === p && p !== pp ? `说过去的事用过去式 ${p}。` : "")); }
+      else if (kd === "ppform"){ const v = IRR2_LEMMA[o.a], [p, pp] = IRR2[v]; add({k:"tense", msg:`这里用过去分词 ${o.a}，不是过去式 ${o.b}`}, `${irrLine(v)}：have / has / had 后面、被动（be + ……）里都用过去分词 ${pp}；${p} 是过去式，单独说过去的事才用。`); }
+      else if (kd === "pastform"){ const v = IRR2_LEMMA[o.a], [p, pp] = IRR2[v]; add({k:"tense", msg:`这里用过去式 ${o.a}，不是过去分词 ${o.b}`}, `${irrLine(v)}：单独说过去的事用过去式 ${p}；${pp} 是过去分词，要跟在 have / has / had 后面（I've ${pp}）。`); }
+      else if (kd === "base"){ const subj = /^(i|you|we|they|he|she|it)$/.test(pa), aux = [pa, subj ? pa2 : ""].find(w => /^(did|didn't|do|does|don't|doesn't)$/.test(w)), md = [pa, subj ? pa2 : ""].find(w => MODALS.has(w));
+        add({k:"tense", msg:`这里用原形 ${o.a}，不是 ${o.b}`}, aux ? `did / do / does 后面用动词原形：${o.a}（时态已经在 ${aux} 上了，不说 ${aux} … ${o.b}）。` : md ? `${md} 后面用动词原形 ${o.a}，不用 ${o.b}。` : pa === "to" ? `to 后面用动词原形：to ${o.a}，不说 to ${o.b}。` : /^(let|lets|make|makes|made|help|helps|helped)$/.test(pa2) ? "make / let / help + 人 + 动词原形。" : /^(i|you|we|they)$/.test(pa) ? `说现在、平时的事用一般现在时 ${o.a}；${o.b} 是过去式。` : ""); }
       else if (kd === "mix") add({k:"mix", msg:`这里是 ${o.a}（你说的是 ${o.b}）`, fam:mixFam(o.a, o.b)}, mixWhy(o.a, o.b));
       else if (kd === "pron") notes.push({k:"pron", msg:`听起来像 ${o.b}，目标是 ${o.a}，可能是发音`});
       else add({k:"word", msg:`这里是 ${o.a}（你说的是 ${o.b}）`}, wordWhy(o.a, o.b));
@@ -2831,7 +2879,7 @@ function hintNotes(ops){
       out.push(k === "past" ? pastRule(o.a, o.b, prev, prev2).hint : k === "s" ? sRule(o.a, o.b, prev, prev2, o.poss).hint : k === "be" ? `be 动词 ${o.b} 用得不对` :
         k === "perf" ? `这里要用完成时 have，不是 ${o.b}` : k === "hadp" ? hadH() : k === "agree2" ? "has / have 要和主语对上（he / she / it 用 has）" :
         k === "do" ? "注意时态：过去的事用 did，现在的用 do / does" : k === "det" ? "this / that 跟单数，these / those 跟复数" : k === "an" ? "a / an 看后面那个词开头的读音" :
-        k === "being" ? "have 后面用 been，不用 being" : k === "mix" ? `${o.b} 和另一个词容易混：看看这里要的是哪个意思` : k === "pron" ? `${o.b} 可能没说清楚，注意发音` : `${o.b} 这个词不对`);
+        k === "being" ? "have 后面用 been，不用 being" : k === "irr" ? `${o.b} 不是一个词：${REGW[o.b]} 是不规则动词` : k === "ppform" ? `${o.b} 是过去式；这里要过去分词` : k === "pastform" ? `${o.b} 是过去分词；单独说过去的事用过去式` : k === "base" ? `这里要用动词原形，不是 ${o.b}` : k === "mix" ? `${o.b} 和另一个词容易混：看看这里要的是哪个意思` : k === "pron" ? `${o.b} 可能没说清楚，注意发音` : `${o.b} 这个词不对`);
       prev = o.b;
     } else if (o.op === "del"){
       out.push(BE.has(o.a) ? (prev ? `${prev} 后面漏了 be 动词（is / am / are / was）` : "开头漏了 be 动词（is / am / are）") :
@@ -2992,7 +3040,33 @@ const MISSPELL = {excersies:"exercise",excersise:"exercise",exersice:"exercise",
   responsibilty:"responsibility",apreciate:"appreciate",appriciate:"appreciate",oppertunities:"opportunities",prefered:"preferred"};
 const HAB_VERBS = "play|finish|stay|work|try|graduate|learn|see|start|use|test|design|build|apply|hear|watch|visit|go|do|make|eat|buy|get|take|write|read|meet";
 const W_RULES = [
-  /* v1.80.0：易混词（没有参考说法时也认得出来；fam 用来统计你混过几次） */
+    /* v1.80.2：动词形式（没有参考说法时也认得出来）：不规则动词加 -ed、have + 过去式、be + 过去式、did / 情态动词 / to 后面不用原形 */
+  {re:REGW_RE, g:1, tag:"动词形式", msg:g => { const v = REGW[String(g).toLowerCase()]; return `${g} 不是一个词：${v} 是不规则动词（${irrLine(v)}），不加 -ed`; }},
+  {re:new RegExp("\\b(?:have|has|had)(?:n't|n’t)?\\s+(?:(?:already|just|never|ever|not|also|recently|finally|always|still)\\s+)?(" + PAST_ONLY.join("|") + ")\\b", "gi"), g:1, tag:"动词形式", msg:g => { const v = PAST2BASE[String(g).toLowerCase()]; return `have 后面用过去分词：have ${IRR2[v][1]}（${irrLine(v)}）`; }},
+  {re:new RegExp("(?:\\b(?:I|you|we|they|he|she)'d|\\b(?:I|you|we|they)'ve)\\s+(?:(?:already|just|never|ever|not|also)\\s+)?(" + PAST_ONLY.join("|") + ")\\b", "gi"), g:1, tag:"动词形式", msg:g => { const v = PAST2BASE[String(g).toLowerCase()]; return `have 后面用过去分词：have ${IRR2[v][1]}（${irrLine(v)}）`; }},
+  {re:new RegExp("\\b(?:am|is|are|was|were|be|been|being)\\s+(?:not\\s+)?(" + PASSIVE_PAST.join("|") + ")\\b", "gi"), g:1, tag:"动词形式", msg:g => { const v = PAST2BASE[String(g).toLowerCase()], pp = IRR2[v][1]; return `被动（“被……”）用过去分词：${pp}（${irrLine(v)}），不用过去式 ${g}`; }},
+  {re:new RegExp("\\b(?:did|didn't|didn’t|didnt)\\s+(?:(?:I|you|we|they|he|she|it)\\s+)?(?:not\\s+)?(" + PAST_ANY.join("|") + "|(?!(?:" + ED_NOT_PAST + ")\\b)[a-z]{3,}ed)\\b", "gi"), g:1, tag:"动词形式", msg:g => { const v = PAST2BASE[String(g).toLowerCase()]; return `did / do / does 后面用动词原形${v ? "：" + v : ""}（不说 ${g}）`; }},
+  {re:new RegExp("\\b(?:do|does|don't|don’t|doesn't|doesn’t|dont|doesnt)\\s+(?:I|you|we|they|he|she|it)\\s+(?:not\\s+)?(" + PAST_ANY.join("|") + "|(?!(?:" + ED_NOT_PAST + ")\\b)[a-z]{3,}ed)\\b", "gi"), g:1, tag:"动词形式", msg:g => { const v = PAST2BASE[String(g).toLowerCase()]; return `did / do / does 后面用动词原形${v ? "：" + v : ""}（不说 ${g}）`; }},
+  {re:new RegExp("\\b(?:don't|don’t|doesn't|doesn’t|dont|doesnt)\\s+(" + PAST_ANY.join("|") + "|(?!(?:" + ED_NOT_PAST + ")\\b)[a-z]{3,}ed)\\b", "gi"), g:1, tag:"动词形式", msg:g => { const v = PAST2BASE[String(g).toLowerCase()]; return `did / do / does 后面用动词原形${v ? "：" + v : ""}（不说 ${g}）`; }},
+  {re:new RegExp("\\b(?:can|could|will|would|should|must|might|can't|can’t|cannot|won't|won’t|wouldn't|couldn't|shouldn't)\\s+(?:not\\s+)?(" + PAST_ANY.filter(p => !/^(found|felt|left|lost|saw|won|bit|lay|fell|ground|wound|bound|led)$/.test(p)).join("|") + "|(?!(?:" + ED_NOT_PAST + ")\\b)[a-z]{3,}ed)\\b", "gi"), g:1, tag:"动词形式", msg:g => { const v = PAST2BASE[String(g).toLowerCase()]; return `can / will / should 这类词后面用动词原形${v ? "：" + v : ""}（不说 ${g}）`; }},
+  {re:new RegExp("\\bto\\s+(" + [...new Set(TO_PAST)].join("|") + ")\\b", "gi"), g:1, tag:"动词形式", msg:g => { const v = PAST2BASE[String(g).toLowerCase()]; return `to 后面用动词原形：to ${v}（不说 to ${g}）`; }},
+  {re:/\b(?:want|wants|wanted|need|needs|needed|plan|plans|planned|decide|decided|hope|hopes|hoped|try|tries|tried|would like|'d like|’d like)\s+to\s+(?!(?:bring|string|spring|thing|king|ring|sing|wing|sling|cling|fling|swing|sting|wring)\b)([a-z]{2,}ing)\b/gi, g:1, tag:"动词形式", msg:g => `want to 这类后面用动词原形（不说 to ${g}）`},
+  {re:/\blook(?:ing|s|ed)?\s+forward\s+to\s+(hear|see|meet|work|talk|speak|discuss|join|learn|chat|connect|receive|get|start|be|have|catch|visit)\b/gi, g:1, tag:"语法", msg:g => `look forward to 后面用 -ing：look forward to ${ING[String(g).toLowerCase()]}`},
+  {re:/\b(?:am|is|are|was|were|get|gets|got|getting)\s+used\s+to\s+(work|do|get|go|live|speak|use|wake|eat|drive|study|write|deal|stay|cook|take|talk|sleep|run|walk|commute)\b/gi, g:1, tag:"语法", msg:g => `be used to（习惯）后面用 -ing：used to ${ING[String(g).toLowerCase()]}；used to + 原形 是“以前常常”`},
+  {re:/\bsince\s+(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|a few|several|many)\s+(?:years?|months?|weeks?|days?|hours?|minutes?)\b/gi, tag:"语法", msg:()=>"一段时间用 for：for 3 years；since 后面跟起点（since 2020、since last year）"},
+  {re:/\bsuggest(?:s|ed)?\s+(?:me|him|her|us|them|you)\s+to\b/gi, tag:"语法", msg:()=>"suggest 后面不接“人 + to”：suggested that I apply / suggested applying"},
+  {re:/\bcan\s+able\s+to\b/gi, tag:"语法", msg:()=>"can 和 be able to 只用一个：I can … / I'm able to …"},
+  {re:/\bexplain(?:s|ed|ing)?\s+(?:me|him|her|us|them)\s+(?:the|a|an|it|this|that|how|what|why)\b/gi, tag:"搭配", msg:()=>"explain 后面先接事情，再 to + 人：explain it to me（不说 explain me it）"},
+  {re:/\b(?:discuss(?:es|ed|ing)?|mention(?:s|ed|ing)?)\s+about\b/gi, tag:"搭配", msg:()=>"discuss / mention 后面直接接内容，不加 about：discuss the plan"},
+  {re:/\bemphasi[sz](?:e|es|ed|ing)\s+on\b/gi, tag:"搭配", msg:()=>"emphasize 后面直接接内容，不加 on（put emphasis on 才加 on）"},
+  {re:/\bmarried\s+with\b/gi, tag:"搭配", msg:()=>"和谁结婚是 married to someone"},
+  {re:/\bpeople\s+(is|was|has)\b/gi, g:1, tag:"语法", msg:()=>"people 是复数：people are / were / have"},
+  {re:/(?:^|[.!?]\s*|,\s*|\b(?:and|but|so|because|if|when|that)\s+)(?:everyone|everybody|someone|somebody|nobody|no one|anybody)\s+(are|were|have|don't)\b/gi, g:1, tag:"语法", msg:()=>"everyone / someone 这类词当单数：everyone is / has / doesn't"},
+  {re:/\bthere\s+have\s+(?!been\b|to\b|got\b)/gi, tag:"语法", msg:()=>"“有……”是 There is / There are（There have 只用在 There have been …）"},
+  {re:/\b(informations|equipments|feedbacks|softwares|hardwares|furnitures|knowledges|homeworks|luggages|baggages|evidences|machineries|sceneries|traffics)\b/gi, g:1, tag:"单复数", msg:g => `${UNC[String(g).toLowerCase()]} 不可数，不加 s`},
+  {re:/\bmuch\s+(problems|people|things|questions|issues|bugs|friends|times|ideas|projects|students|cars|books|meetings|tasks|parts|tests|errors|mistakes|options|changes|details|steps)\b/gi, g:1, tag:"单复数", msg:g => `可数名词复数用 many：many ${g}；much 跟不可数的（much time）`},
+  {re:/\bmany\s+(information|advice|feedback|equipment|furniture|homework|luggage|money|traffic|knowledge|time|software|research|progress|stuff|fun)\b(?!\s+(?:zones?|slots?|periods?|frames?|steps?|packages?|engineers?|tools?|projects?))/gi, g:1, tag:"单复数", msg:g => `${g} 不可数，用 much / a lot of：a lot of ${g}`},
+/* v1.80.0：易混词（没有参考说法时也认得出来；fam 用来统计你混过几次） */
   {re:/\b(?:a|an|the|big|small|huge|great|little|positive|negative|side|any|no|much|real|direct|lasting)\s+affect\b/gi, tag:"易混词", fam:"affect", msg:()=>"这里要名词 effect（影响、效果）；affect 是动词"},
   {re:/\badvices\b/gi, tag:"易混词", fam:"advice", msg:()=>"advice 不可数，不加 s：some advice"},
   {re:/\bless\s+(?:bugs|errors|mistakes|people|parts|issues|problems|steps|tests|items|features|questions|hours|days|cars|options|meetings)\b/gi, tag:"易混词", fam:"fewer", msg:()=>"可数名词用 fewer：fewer bugs；less 跟不可数的（less time）"},
@@ -3086,6 +3160,8 @@ function checkWriting(text){
       if (m[0]==="") r.re.lastIndex++;
     }
   }
+  /* v1.80.2：同一处已经有“动词形式”的说明（更具体），别的规则就不重复说 */
+  { const vf = issues.filter(x => x.tag === "动词形式"); if (vf.length){ const keep = issues.filter(x => x.tag === "动词形式" || !vf.some(v => v.start < x.end && x.start < v.end)); issues.length = 0; issues.push(...keep); } }
   for (const w of text.matchAll(/[A-Za-z]+/g)){
     const fix = MISSPELL[w[0].toLowerCase()];
     if (fix) issues.push({start:w.index, end:w.index+w[0].length, text:w[0], tag:"拼写", msg:`拼写：${w[0]} → ${fix}`});
@@ -3566,10 +3642,19 @@ const TTS = {
   voices: [], keep: new Set(),
   init(){
     if (!this.ok) return;
-    const load = () => { try { this.voices = speechSynthesis.getVoices() || []; } catch (e) { this.voices = []; } };
+    /* v1.80.1：列表变了（安卓上是分几次加载的）就通知设置页更新下拉框 */
+    const load = () => { try { this.voices = speechSynthesis.getVoices() || []; } catch (e) { this.voices = []; }
+      const sig = this.voices.map(v => v.name + "|" + v.lang).join(","); if (sig !== this.sig){ this.sig = sig; this.onVoices(); } };
     load(); try { speechSynthesis.addEventListener("voiceschanged", load); } catch (e) { speechSynthesis.onvoiceschanged = load; }
-    setTimeout(load, 800); setTimeout(load, 2500);
+    setTimeout(load, 800); setTimeout(load, 2500); setTimeout(load, 6000);
   },
+  /* v1.80.1：设置页的英文、中文语音下拉框是打开页面时按当时的列表画的；列表后来才加载全，就一直是旧的（以前要换一个再换回来才对）。现在列表一变就重画这两个下拉框（正在点的那个不动） */
+  onVoices(){ try {
+    const e = x => String(x == null ? "" : x).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
+    const fill = (key, list, cur) => document.querySelectorAll(`select[data-key="${key}"]`).forEach(sel => { if (sel === document.activeElement) return;
+      sel.innerHTML = `<option value="">自动选择</option>` + list.map(v => `<option value="${e(v.name)}" ${v.name === cur ? "selected" : ""}>${e(v.name)}（${e(v.lang)}）</option>`).join(""); });
+    fill("enVoice", this.list("en"), L.enVoice); fill("zhVoice", this.list("zh"), L.zhVoice);
+  } catch (e) {} },
   norm(l){ return String(l||"").replace("_","-").toLowerCase(); },
   list(lang){ return this.voices.filter(v => this.norm(v.lang).startsWith(lang)); },
   voice(lang){
@@ -3597,10 +3682,16 @@ const TTS = {
       let busy = false; try { busy = speechSynthesis.speaking || speechSynthesis.pending; } catch (e) {}
       if (busy) this.cancel();
       pauseAllAudio();
-      /* v1.67.2：语音列表还没加载完时先等一下（最多 1.2 秒），不然没有具体的语音，手机会用系统默认的（中文）语音读英文 */
+      /* v1.67.2：语音列表还没加载完时先等一下，不然没有具体的语音，手机会用系统默认的（中文）语音读英文。
+         v1.80.1：安卓的列表是分几次加载的，刚打开 app 时常常只有系统默认的中文语音：以前只在列表完全是空的时候才等，这时候就直接读了
+         （没有英文语音 → 用中文语音读英文；存好的英文语音还没出来 → 换成了别的语音）。现在这种语言还没有语音、或者存好的那个还没出来，都先等（最多 2 秒）；
+         同一个语音等过一次还没有（可能被删了），这次打开 app 就不再等，用最合适的那个 */
       if (!this.voices.length){ try { this.voices = speechSynthesis.getVoices() || []; } catch (e) {} }
-      if (!this.voices.length && !o.voice && !o._waited){ const t0 = Date.now(); const again = () => { try { this.voices = speechSynthesis.getVoices() || []; } catch (e) {}
-          if (this.voices.length || Date.now() - t0 > 1200) this.speak(text, Object.assign({}, o, {_waited:true})).then(res); else setTimeout(again, 100); }; again(); return; }
+      const need = lang === "zh" ? "zh" : "en", pref = need === "zh" ? L.zhVoice : L.enVoice, wkey = need + "|" + (pref || "");
+      const missing = () => !this.list(need).length || (!!pref && !this.list(need).some(v => v.name === pref));
+      if (!o.voice && !o._waited && missing() && !(this.gaveUp && this.gaveUp[wkey])){ const t0 = Date.now(); const again = () => { try { this.voices = speechSynthesis.getVoices() || []; } catch (e) {}
+          const late = Date.now() - t0 > 2000; if (late && missing()){ this.gaveUp = this.gaveUp || {}; this.gaveUp[wkey] = true; }
+          if (!missing() || late) this.speak(text, Object.assign({}, o, {_waited:true})).then(res); else setTimeout(again, 100); }; again(); return; }
       const u = new SpeechSynthesisUtterance(lang === "zh" ? text : (o && o.raw ? text : K.speakEN(text)));
       let v = o.voice || this.voice(lang);
       if (v){ const cur = this.voices.find(x => x.name === v.name && x.lang === v.lang); if (cur) v = cur; }   /* 列表重新加载过：换成现在的那个 */
@@ -3666,9 +3757,9 @@ const SR = {
         r = rr; this.cur = rr; finals = ""; interim = ""; let sessHeard = false;
         rr.lang = "en-US"; rr.interimResults = true; rr.maxAlternatives = 5; rr.continuous = longMode;
         if (this.local) try { rr.processLocally = true; } catch (e) {}
-        rr.onspeechstart = () => { if (!tStart) tStart = performance.now(); o.onStart && o.onStart(); };
+        rr.onspeechstart = () => { SR.heardAt = Date.now(); if (!tStart) tStart = performance.now(); o.onStart && o.onStart(); };
         rr.onresult = e => {
-          if (rr !== r) return;
+          if (rr !== r) return; SR.heardAt = Date.now();
           const fins = [], finAlts = []; interim = "";
           for (let i = 0; i < e.results.length; i++){ const tx = String(e.results[i][0].transcript || "").trim(); if (!tx) continue; if (e.results[i].isFinal){ fins.push(tx); finAlts.push(Array.from(e.results[i]).map(a => String(a.transcript || "").trim()).filter(Boolean)); } else interim += (interim ? " " : "") + tx; }
           /* 安卓 Chrome 有时会把前一段整个再带一遍：后一段以前一段开头，就只留后一段；完全一样的只留一次 */
@@ -4708,7 +4799,7 @@ class CardStage {
   }
   elapsed(){ return this.t0 ? performance.now() - this.t0 : 0; }
   async mic(){
-    if (typeof GAME !== "undefined" && GAME.idleStop) GAME.idleStop();   /* 开口了 */
+    /* v1.80.2：按麦克风不再停“不开口”的计时：开着麦克风一直不出声也算没开口（GAME.idleArm 里看有没有听到声音） */
     const useW = whisperOn();
     if (this.live){ if (Date.now() - (this.liveT || 0) > 600){ if (useW) whisperStop(); else SR.stop(); } return; }
     this.liveT = Date.now();
@@ -4718,6 +4809,7 @@ class CardStage {
     const r = useW ? await whisperListen({heard, btn, onStop: () => clearInterval(this.clock)}) : await SR.listen({onInterim: t => { if (heard && heard.isConnected) heard.textContent = t || "在听……"; }});
     this.live = false; if (!this.alive || (this.phase !== "prompt" && this.phase !== "retry")) return;
     btn && btn.classList.remove("live");
+    if (!r.text && RUN.game && typeof GAME !== "undefined" && GAME.idleArm) try { GAME.idleArm(this); } catch (e) {}   /* v1.80.2：没听清：从现在重新计时 */
     if (r.endAt && this.t0) this.msFix = Math.max(0, r.endAt - this.t0);
     if (r.broke && !r.text){ toast("这台手机的自动识别用不了，已改用键盘语音输入"); this.render(); return; }
     if (r.error && !r.text){ if (heard) heard.textContent = srErrorText(r.error); if (r.error === "network" || r.error === "not-allowed") { const ty = $("#typed"); ty && ty.focus(); } return; }
@@ -4759,7 +4851,7 @@ class CardStage {
     if (cmp && cmp.free && freeFl) this.flags = freeFl;
     if (cmp && !cmp.exact && this.phase === "prompt" && !this.tries){
       const hints = wHint ? [wHint] : (this.mean || cmp.free) ? this.flags.map(f => f.msg).slice(0, 3) : K.hintNotes(cmp.ops);
-      if (hints.length){ this.tries = 1; this.hints = hints; this.hintMode = cmp.free && !wHint ? "free" : (this.mean || cmp.free) && !wHint ? "flags" : "diff"; this.firstSaid = this.said; this.firstCmp = cmp; Snd.bad(); vib([25,30,25]); this.phase = "retry"; this.render(); return; }
+      if (hints.length){ this.tries = 1; this.hints = hints; this.hintMode = cmp.free && !wHint ? "free" : (this.mean || cmp.free) && !wHint ? "flags" : "diff"; this.firstSaid = this.said; this.firstCmp = cmp; Snd.bad(); vib([25,30,25]); this.phase = "retry"; if (RUN.game && typeof GAME !== "undefined" && GAME.idleArm) try { GAME.idleArm(this); } catch (e) {}; this.render(); return; }
     }
     this.cmp = cmp || (this.phase === "retry" ? this.firstCmp : null);
     if (cmp){ if (cmp.exact){ Snd.good(); vib(15); } else if (this.mean && !this.flags.length){ Snd.good(); } else if (cmp.level === "off"){ Snd.bad(); vib([30,40,30]); } }
@@ -5072,11 +5164,22 @@ function grammarWhy(ref, said){
 }
 
 ACT["c-why"] = async () => { const st = RUN.stage; if (!st || !st.card) return; const ref = st.target().en, said = st.said || "", list = grammarWhy(ref, said);
-  const mine = (st.cmp && !st.misrec ? st.cmp.notes || [] : []).filter(n => n.why);   /* v1.78.0 */
-  const mineH = mine.map(n => `<div style="margin:0 0 12px"><b>${esc(n.msg)}</b><span class="chip" style="margin-left:6px">你这里错了</span><p class="small" style="margin:4px 0">${esc(n.why)}</p></div>`).join("");
+  /* v1.80.2：先讲“你这句错在哪”：每一处写出你说的、应该怎么说，再讲为什么。逐词对比的提示（第一遍、第二遍）、语法检查查出来的都算 */
+  const errs = [], seenE = new Set(), saidW = new Set(), addE = (sd, want, msg, why, tag, flag) => { const k = msg + "|" + (why || ""); if (!msg || seenE.has(k)) return;
+    if (flag && sd && saidW.has(String(sd).toLowerCase())) return;   /* 逐词对比已经讲过这个词了，语法检查就不重复 */
+    seenE.add(k); if (sd) saidW.add(String(sd).toLowerCase()); errs.push({sd, want, msg, why, tag, flag}); };
+  if (!st.misrec){
+    const two = st.firstCmp && st.firstCmp !== st.cmp && st.firstSaid && st.firstSaid !== said;
+    if (two) for (const n of st.firstCmp.notes || []) addE(n.said, n.want, n.msg, n.why, "第一遍");
+    for (const n of (st.cmp && st.cmp.notes) || []) addE(n.said, n.want, n.msg, n.why, "");
+    for (const f of st.flags || []) addE(f.text || "", "", f.msg, "", "", true);
+    const gc0 = said ? gramCheck(said, null) : null; if (gc0) for (const i of gc0.must) addE(i.text || "", "", i.msg, "", "", true);
+  }
+  const pairH = e => (e.sd || e.want) ? `<div class="why-pair">${e.tag ? `<span class="chip">${esc(e.tag)}</span>` : ""}${e.sd ? `<span class="small muted">你说的：</span><b class="en why-x">${esc(e.sd)}</b>` : `<span class="small muted">漏了：</span>`}${e.want ? `<span class="why-arrow">→</span><b class="en why-ok">${esc(e.want)}</b>` : e.flag ? "" : `<span class="why-arrow">→</span><span class="small muted">去掉</span>`}</div>` : "";
+  const mineH = errs.length ? `<h4 class="why-h">你这句错在哪</h4>` + errs.map(e => `<div class="why-err">${pairH(e)}<p class="small" style="margin:4px 0"><b>${esc(e.msg)}</b></p>${e.why ? `<p class="small" style="margin:2px 0">${esc(e.why)}</p>` : ""}</div>`).join("") + (list.length ? `<h4 class="why-h">这句用到的语法</h4>` : "") : "";
   const body = mineH + (list.length || mineH ? list.map(x => `<div style="margin:0 0 12px"><b>${esc(x.t)}</b>${x.pri ? "" : `<span class="chip" style="margin-left:6px">你这里错了</span>`}<p class="small" style="margin:4px 0">${esc(x.rule)}</p><p class="small" style="margin:2px 0">这句：<b class="en">${esc(x.ex)}</b></p><p class="small muted" style="margin:2px 0">${esc(x.bad)}</p></div>`).join("")
     : `<p class="small">这句没有常见的语法点。还想知道为什么，就复制问题问 AI。</p>`);
-  const q = `“${ref}”${said ? `（我说的是：${said}）` : ""}——为什么这样说？请用中文简单解释用到的语法，再给一个类似的例句。`;
+  const q = `“${ref}”${said ? `（我说的是：${said}）` : ""}——为什么这样说？${errs.length ? `app 指出的问题：${errs.map(e => e.msg).join("；")}。` : ""}请用中文简单解释用到的语法，再给一个类似的例句。`;
   const c = await choose("为什么这样说", body, [["copy", "复制问题问 AI"], ["ok", "知道了"]]);
   if (c === "copy"){ try { await navigator.clipboard.writeText(q); toast("问题复制好了"); } catch (e) { toast("复制不了：手动长按复制"); } } };
 ACT["c-check"] = () => { if (typeof GAME !== "undefined" && GAME.idleStop) GAME.idleStop(); const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return; const v = ($("#typed")||{}).value || ""; if (!v.trim()){ toast("先说出来，或在输入框里输入"); return; } SR.abort(); s.typed = true; s.finish(v.trim()); };
@@ -14454,10 +14557,15 @@ const GAME = {
   idleArm(stage){
     GAME.idleStop(); const st = GAME.st; if (!st || !stage || !stage.card) return;
     const words = String(stage.card.en || "").split(/\s+/).filter(Boolean).length, t1 = Math.min(20, 12 + Math.max(0, words - 8) * 0.5) * 1000;
-    let n = 0; const gen = GAME._idleGen = (GAME._idleGen || 0) + 1;   /* 每次开始、停止都换一个编号：正在出手时按了麦克风，打完也不会再安排下一次 */
+    /* v1.80.2：一张卡最多 3 下；第二遍、“没听清”以后都从那时重新计时，次数接着算 */
+    const since = stage._idleSince = Date.now(); stage._idleN = stage._idleN || 0;
+    const gen = GAME._idleGen = (GAME._idleGen || 0) + 1;   /* 每次开始、停止都换一个编号 */
+    /* v1.80.2：以前一按麦克风就不计时了：打开麦克风想半天也不会挨打。现在麦克风开着、一直没出声，也算没开口；正在说就不打，过一会儿再看 */
+    const heard = () => { const t0 = Math.max(since, stage.liveT || 0); return (typeof SR !== "undefined" && (SR.heardAt || 0) > t0) || (typeof Rec !== "undefined" && (Rec.loudAt || 0) > t0); };
     const tick = delay => { delay *= GAME.idleScale || 1; GAME._idleT = setTimeout(async () => {   /* idleScale 只给测试用 */
-      if (gen !== GAME._idleGen || !GAME.st || typeof RUN === "undefined" || RUN.stage !== stage || (stage.phase !== "prompt" && stage.phase !== "retry") || stage.live || document.hidden) return;
-      n++; await GAME.idleHit(n); if (gen === GAME._idleGen && n < 3 && GAME.st && RUN.stage === stage) tick(n === 1 ? 8000 : 10000); }, delay); };
+      if (gen !== GAME._idleGen || !GAME.st || typeof RUN === "undefined" || RUN.stage !== stage || (stage.phase !== "prompt" && stage.phase !== "retry") || document.hidden || stage._idleN >= 3) return;
+      if (stage.live && heard()){ tick(3000); return; }
+      stage._idleN++; await GAME.idleHit(stage._idleN); if (gen === GAME._idleGen && stage._idleN < 3 && GAME.st && RUN.stage === stage) tick(stage._idleN === 1 ? 8000 : 10000); }, delay); };
     tick(t1);
   },
   idleStop(){ clearTimeout(GAME._idleT); GAME._idleT = 0; GAME._idleGen = (GAME._idleGen || 0) + 1; },
@@ -22573,6 +22681,27 @@ Object.assign(I18N_EN, {
  "“对……敏感”是 sensitive to；sensible 是“合理、明智”": "“Easily affected by” is sensitive to; sensible means reasonable"
 });
 
+/* v1.80.2：动词形式和新的语法检查、为什么这样说 */
+Object.assign(I18N_EN, {
+ "一段时间用 for：for 3 years；since 后面跟起点（since 2020、since last year）": "A length of time takes for: for 3 years; since takes a starting point (since 2020, since last year)",
+ "suggest 后面不接“人 + to”：suggested that I apply / suggested applying": "suggest doesn't take “person + to”: suggested that I apply / suggested applying",
+ "can 和 be able to 只用一个：I can … / I'm able to …": "Use either can or be able to, not both: I can … / I'm able to …",
+ "explain 后面先接事情，再 to + 人：explain it to me（不说 explain me it）": "explain takes the thing first, then to + person: explain it to me (not explain me it)",
+ "discuss / mention 后面直接接内容，不加 about：discuss the plan": "discuss / mention take the topic directly, without about: discuss the plan",
+ "emphasize 后面直接接内容，不加 on（put emphasis on 才加 on）": "emphasize takes the thing directly, without on (only put emphasis on takes on)",
+ "和谁结婚是 married to someone": "Married to someone, not married with",
+ "people 是复数：people are / were / have": "people is plural: people are / were / have",
+ "everyone / someone 这类词当单数：everyone is / has / doesn't": "everyone / someone and similar words are singular: everyone is / has / doesn't",
+ "“有……”是 There is / There are（There have 只用在 There have been …）": "“There is / are” for existence (There have only in There have been …)",
+ "make / let / help + 人 + 动词原形。": "make / let / help + person + base verb.",
+ "你这句错在哪": "What's wrong in your sentence",
+ "这句用到的语法": "Grammar in this sentence",
+ "你说的：": "You said:",
+ "漏了：": "Missing:",
+ "去掉": "Remove",
+ "第一遍": "First try"
+});
+
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
 var I18N_LANGS = (typeof I18N_LANGS !== "undefined" && I18N_LANGS) || {};
 I18N_LANGS.en = {name:"English", dict:I18N_EN};
@@ -22698,6 +22827,33 @@ function i18nT(raw){
         m => `Questions asked in every interview rotate daily; track questions follow the mix of tracks among applications still “waiting to hear back”; company questions appear once you have an interview there${m[1] ? `, and the closer “${m[1]}” gets, the more often related questions come up` : ""}. A question that isn't passed yet comes up at most once a day; it passes after you say it well enough at ${m[2]} different times, then it's reviewed weekly. The daily amount is your actual practice time over the past two weeks plus 20%; change it in Prep.`],
       [/^[^：]+、[^：]+$/, m => list(m[0])]];
     for (const [re, f] of H){ const m = t.match(re); if (m){ v = f(m); if (v != null) break; } } }
+  /* v1.80.2：动词形式的提示（带着你说的词） */
+  if (v == null){ const V = [
+    [/^(\S+) 不是一个词：(\S+) 是不规则动词（(.+)），不加 -ed$/, m => `“${m[1]}” isn't a word: ${m[2]} is irregular (${m[3]}), no -ed`],
+    [/^have 后面用过去分词：have (\S+)（(.+)）$/, m => `After have, use the past participle: have ${m[1]} (${m[2]})`],
+    [/^被动（“被……”）用过去分词：(\S+)（(.+)），不用过去式 (\S+)$/, m => `The passive takes the past participle: ${m[1]} (${m[2]}), not the past tense ${m[3]}`],
+    [/^did \/ do \/ does 后面用动词原形(?:：(\S+))?（不说 (\S+)）$/, m => `After did / do / does, use the base verb${m[1] ? ": " + m[1] : ""} (not ${m[2]})`],
+    [/^can \/ will \/ should 这类词后面用动词原形(?:：(\S+))?（不说 (\S+)）$/, m => `After can / will / should, use the base verb${m[1] ? ": " + m[1] : ""} (not ${m[2]})`],
+    [/^to 后面用动词原形：to (\S+)（不说 to (\S+)）$/, m => `After to, use the base verb: to ${m[1]} (not to ${m[2]})`],
+    [/^want to 这类后面用动词原形（不说 to (\S+)）$/, m => `After want to and similar verbs, use the base verb (not to ${m[1]})`],
+    [/^look forward to 后面用 -ing：look forward to (\S+)$/, m => `look forward to takes -ing: look forward to ${m[1]}`],
+    [/^be used to（习惯）后面用 -ing：used to (\S+)；used to \+ 原形 是“以前常常”$/, m => `be used to (be accustomed to) takes -ing: used to ${m[1]}; used to + base verb means “did regularly in the past”`],
+    [/^(\S+) 不可数，不加 s$/, m => `${m[1]} is uncountable, no s`],
+    [/^可数名词复数用 many：many (\S+)；much 跟不可数的（much time）$/, m => `Plural countable nouns take many: many ${m[1]}; much goes with uncountable ones (much time)`],
+    [/^(\S+) 不可数，用 much \/ a lot of：a lot of (\S+)$/, m => `${m[1]} is uncountable: use much / a lot of: a lot of ${m[2]}`],
+    [/^这里用过去分词 (\S+)，不是过去式 (\S+)$/, m => `Use the past participle “${m[1]}” here, not the past tense “${m[2]}”`],
+    [/^这里用过去式 (\S+)，不是过去分词 (\S+)$/, m => `Use the past tense “${m[1]}” here, not the past participle “${m[2]}”`],
+    [/^这里用原形 (\S+)，不是 (\S+)$/, m => `Use the base form “${m[1]}” here, not “${m[2]}”`],
+    [/^(\S+) 是不规则动词：(.+?)，不加 -ed，没有 (\S+) 这个词。(?:这里跟在 have \/ be 后面，用过去分词 (\S+)。|说过去的事用过去式 (\S+)。)?$/, m => `${m[1]} is irregular: ${m[2]}, no -ed; “${m[3]}” isn't a word.${m[4] ? ` After have / be, use the past participle ${m[4]}.` : m[5] ? ` For the past, use ${m[5]}.` : ""}`],
+    [/^(\S+ → \S+ → \S+)：have \/ has \/ had 后面、被动（be \+ ……）里都用过去分词 (\S+)；(\S+) 是过去式，单独说过去的事才用。$/, m => `${m[1]}: after have / has / had and in the passive (be + …), use the past participle ${m[2]}; ${m[3]} is the past tense, only for the past on its own.`],
+    [/^(\S+ → \S+ → \S+)：单独说过去的事用过去式 (\S+)；(\S+) 是过去分词，要跟在 have \/ has \/ had 后面（I've (\S+)）。$/, m => `${m[1]}: for the past on its own, use the past tense ${m[2]}; ${m[3]} is the past participle and needs have / has / had (I've ${m[4]}).`],
+    [/^did \/ do \/ does 后面用动词原形：(\S+)（时态已经在 (\S+) 上了，不说 \S+ … (\S+)）。$/, m => `After did / do / does, use the base verb: ${m[1]} (the tense is already on ${m[2]}; not ${m[2]} … ${m[3]}).`],
+    [/^(\S+) 后面用动词原形 (\S+)，不用 (\S+)。$/, m => `After ${m[1]}, use the base verb ${m[2]}, not ${m[3]}.`],
+    [/^to 后面用动词原形：to (\S+)，不说 to (\S+)。$/, m => `After to, use the base verb: to ${m[1]}, not to ${m[2]}.`],
+    [/^说现在、平时的事用一般现在时 (\S+)；(\S+) 是过去式。$/, m => `For now and habits, use the simple present ${m[1]}; ${m[2]} is the past tense.`],
+    [/^(\S+) 不是一个词：(\S+) 是不规则动词$/, m => `“${m[1]}” isn't a word: ${m[2]} is irregular`], [/^(\S+) 是过去式；这里要过去分词$/, m => `“${m[1]}” is the past tense; this needs the past participle`],
+    [/^(\S+) 是过去分词；单独说过去的事用过去式$/, m => `“${m[1]}” is the past participle; for the past on its own, use the past tense`], [/^这里要用动词原形，不是 (\S+)$/, m => `This needs the base verb, not “${m[1]}”`]];
+    for (const [re, f] of V){ const m = t.match(re); if (m){ v = f(m); break; } } }
   /* “前缀：内容”：只有后面的内容也翻得了（或者本来就没有中文）才用；不然留给后面更具体的规则（v1.75.0 这条抢在学音标规则前面，“音标：学第……”只翻了一半） */
   if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = i18nDict()[mp[1] + "："] || i18nDict()[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; if (r) v = p.replace(/[:：]\s*$/, "") + ": " + r; else if (/^(题库|劲敌|对方|角色|敌人|职位|公司|首领|复盘)$/.test(mp[1])) v = p.replace(/[:：]\s*$/, "") + ": " + mp[2]; } } }   /* 后面一定是名字的前缀：名字原样保留 */
   if (v == null){ const mx = t.match(/^(.+?)\s*[×x]\s*(\d+)$/); if (mx){ const base = i18nT(mx[1]); if (base) v = base + " ×" + mx[2]; } }   /* v1.74.1：结尾带“×3”这类次数的 */
