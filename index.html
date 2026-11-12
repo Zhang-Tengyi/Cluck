@@ -1186,7 +1186,16 @@ html[lang="en"] body.g-drill .g-top::after{content:"Shadowing: the battle is hid
 .why-x{color:var(--bad, #b42318);text-decoration:line-through;text-decoration-thickness:1px}
 .why-ok{color:var(--good, #067647)}
 .why-arrow{color:var(--muted, #667085)}
-
+/* v1.80.3：第一遍错在哪（第二遍说对了也写出来） */
+.first-err{margin:0 0 10px;padding:8px 10px;border-radius:10px;background:var(--soft, rgba(127,127,127,.08))}
+.first-err .diff{margin:4px 0 6px;font-size:15px}
+.first-err .fb{margin:0}
+/* v1.80.3：游戏下面的“今天 / 昨天”开关；关掉就不显示分数 */
+.g-opt{display:inline-flex;align-items:center;gap:4px;margin-right:10px;font-size:12.5px;color:var(--muted, #667085);cursor:pointer}
+.g-opt input{width:15px;height:15px;margin:0}
+.bt-stage.noscore .bt-score{display:none}
+/* v1.80.3：英文句子里的中文标签（第一遍：、参考：），标了 data-i18n 才会翻；和句子同一行、同样的字 */
+i.lbl{font-style:normal}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1208,7 +1217,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.80.2"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.80.3"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -4571,7 +4580,7 @@ const RUN = {items:[], i:0, title:"", res:{}, t0:0, stage:null};
 VIEWS.run = {
   full:true, noRefresh:true,
   render(){
-    return `<div class="wrap"><div class="runbar"><button class="back" data-act="run-exit" aria-label="结束">✕</button><div class="track"><i id="runTrack"></i></div><span class="num" id="runCount"></span></div>${RUN.game ? `<div class="g-top"><div id="gArena"></div><div class="g-line"><span id="gName"></span><span id="gInfo"></span></div><div class="g-line2"><div class="g-say" id="gSay" aria-live="polite"></div><button class="linkbtn g-replay" data-act="g-replay">回放</button></div></div>` : ""}<div id="stage"></div></div>`;
+    return `<div class="wrap"><div class="runbar"><button class="back" data-act="run-exit" aria-label="结束">✕</button><div class="track"><i id="runTrack"></i></div><span class="num" id="runCount"></span></div>${RUN.game ? `<div class="g-top"><div id="gArena"></div><div class="g-line"><span id="gName"></span><span id="gInfo"></span></div><div class="g-line2"><div class="g-say" id="gSay" aria-live="polite"></div><label class="g-opt"><input type="checkbox" id="gScoreOpt" ${L.showScore === false ? "" : "checked"}><span>今天 / 昨天</span></label><button class="linkbtn g-replay" data-act="g-replay">回放</button></div></div>` : ""}<div id="stage"></div></div>`;
   },
   mount(){ Act.start(); if (typeof whisperOn === "function" && whisperOn() && L.asrReady) ASR.warm(); if (RUN.game && typeof GAME !== "undefined") GAME.start(); showItem(); },
   leave(){ if (RUN.stage && RUN.stage.leave) RUN.stage.leave(); RUN.stage = null; if (typeof GAME !== "undefined") GAME.stop(); }
@@ -4908,6 +4917,7 @@ class CardStage {
       const fl = this.firstLabel();
       if (this.typed) h += `<p class="small muted" style="margin:-4px 0 6px">打字输入：不按用时判断快慢，按你自己的感觉选</p>`;
       if (two) h += `<p class="small muted" style="margin:-4px 0 4px">第一遍${fl ? `（${fl}）` : ""}：<span class="en" style="font-size:16px">${esc(this.firstSaid)}</span></p>`;   /* v1.68.1：第一遍也写上判断 */
+      if (two && this.firstCmp && !this.firstCmp.exact && !this.misrec) h += firstErrHTML(this, t);   /* v1.80.3：第一遍错在哪、为什么（以前第二遍说对了就只写第一遍说了什么） */
       if (this.said) h += `<p class="small muted" style="margin:${two ? "0" : "-4px"} 0 10px">${this.misrec ? "识别成了" : two ? "第二遍" : "你说的"}：<span class="en" style="font-size:16px">${gc ? gc.html : esc(this.said)}</span></p>`;
       if (this.altNote) h += `<p class="small" style="margin:-6px 0 10px">手机第一遍听成了：<span class="en">${esc(this.altNote.top)}</span>。候选里有你要说的那句，所以按它判断。${this.altNote.meantW.length ? `第一遍没听准的：${this.altNote.meantW.map((w, i) => `<span class="w" data-act="word" data-w="${esc(w)}">${esc(w)}</span>${this.altNote.heardW[i] ? `（听成了 ${esc(this.altNote.heardW[i])}）` : ""}`).join("、")}。点一下听听，下次这几个词说慢一点、清楚一点。` : ""}</p>`;
       if (gc && (gc.must.length || gc.opt.length)) h += gramBoxHTML(gc);
@@ -5087,6 +5097,16 @@ class WordStage {
   }
 }
 ACT["w-ok"] = () => { const s = RUN.stage; if (!(s instanceof WordStage)) return; RUN.items.splice(Math.min(RUN.items.length, RUN.i + 4), 0, {k:"card", id:s.card.id, introDone:true}); nextItem(); };
+/* v1.80.3：第一遍错在哪：逐词对比 + 每处的说明；语法检查讲了原因的（比如 being），接在对应的那一处后面 */
+function firstErrHTML(st, t){ try {
+  const fc = st.firstCmp, fs = st.firstSaid || ""; if (!fc || !fs) return "";
+  const gc = gramCheck(fs, null), rw = typeof rwSpeakFlags === "function" ? rwSpeakFlags(fs, t.en) : [];
+  const items = (gc ? gc.must.concat(gc.opt) : []).concat(rw.filter(f => !(gc && gc.must.concat(gc.opt).some(i => i.msg === f.msg))).map(f => ({text:f.text || "", msg:f.msg})));
+  const notes = (fc.notes || []).map(n => Object.assign({}, n)), q = x => String(x).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  for (const n of notes) if (!n.why && n.said){ const k = items.findIndex(i => i.text && new RegExp("\\b" + q(n.said) + "\\b", "i").test(i.text)); if (k >= 0){ n.why = items[k].msg; items.splice(k, 1); } }
+  const li = notes.map(n => `<li>${esc(n.msg)}${n.why ? `<span class="fb-why">${esc(n.why)}</span>` : ""}</li>`).concat(items.map(i => `<li>${i.text ? `“${esc(i.text)}”：` : ""}${esc(i.msg)}</li>`));
+  return `<div class="first-err"><div class="small muted">第一遍错在哪：</div>${(fc.ops || []).length ? `<div class="diff">${diffHTML(fc.ops, fc.text || t.en, fs)}</div>` : ""}${li.length ? `<ul class="fb">${li.join("")}</ul>` : ""}</div>`;
+} catch (e) { return ""; } }
 function diffHTML(ops, ref, said){
   /* v1.78.0：比较用的词都是小写的，以前对比里显示成 i had designed…；现在照原句的大小写（I、PLC、Python），句首的大写不算 */
   const cs = {};
@@ -5170,7 +5190,8 @@ ACT["c-why"] = async () => { const st = RUN.stage; if (!st || !st.card) return; 
     seenE.add(k); if (sd) saidW.add(String(sd).toLowerCase()); errs.push({sd, want, msg, why, tag, flag}); };
   if (!st.misrec){
     const two = st.firstCmp && st.firstCmp !== st.cmp && st.firstSaid && st.firstSaid !== said;
-    if (two) for (const n of st.firstCmp.notes || []) addE(n.said, n.want, n.msg, n.why, "第一遍");
+    if (two){ for (const n of st.firstCmp.notes || []) addE(n.said, n.want, n.msg, n.why, "第一遍");
+      const g1 = gramCheck(st.firstSaid, null); if (g1) for (const i of g1.must.concat(g1.opt)) addE(i.text || "", "", i.msg, "", "第一遍", true); }   /* v1.80.3：第一遍的语法问题也列出来 */
     for (const n of (st.cmp && st.cmp.notes) || []) addE(n.said, n.want, n.msg, n.why, "");
     for (const f of st.flags || []) addE(f.text || "", "", f.msg, "", "", true);
     const gc0 = said ? gramCheck(said, null) : null; if (gc0) for (const i of gc0.must) addE(i.text || "", "", i.msg, "", "", true);
@@ -7294,7 +7315,7 @@ VIEWS.pending = {
     return `<div class="wrap">${backBtn()}<h2>问 AI</h2>
       <p class="muted small" style="margin:6px 0 14px">没网或拿不准的时候存在这里。联网后一键复制，发到和 AI 的对话里。AI 会逐条告诉你对不对，再给你导入码：说对的会加进答案，以后直接算对；说错的会变成找错卡。</p>
       <h3 style="margin-top:4px">拿不准的说法（${list.length}）</h3>
-      ${list.length ? `<div class="list">${list.map((p, i) => `<div class="li"><div class="grow">${p.first ? `<span class="en" style="font-size:14px">第一遍：${esc(p.first)}</span>` : ""}<b class="en" style="font-size:16px">${p.first ? "第二遍：" : ""}${esc(p.said)}</b><span data-noi18n>${esc(p.zh)}</span><span class="en" style="font-size:14px">参考：${esc(p.ref)}</span>${p.app && p.app.v ? `<span class="small muted pend-app"><span>app 的判断：</span>${p.app.v1 ? `<span>${esc(p.app.v1)}</span> → ` : ""}<span>${esc(p.app.v)}</span></span>` : ""}</div><button class="btn sm ghost" data-act="pend-del" data-i="${i}">删除</button></div>`).join("")}</div>
+      ${list.length ? `<div class="list">${list.map((p, i) => `<div class="li"><div class="grow">${p.first ? `<span class="en" style="font-size:14px"><i class="lbl" data-i18n>第一遍：</i>${esc(p.first)}</span>` : ""}<b class="en" style="font-size:16px">${p.first ? `<i class="lbl" data-i18n>第二遍：</i>` : ""}${esc(p.said)}</b><span data-noi18n>${esc(p.zh)}</span><span class="en" style="font-size:14px"><i class="lbl" data-i18n>参考：</i>${esc(p.ref)}</span>${p.app && p.app.v ? `<span class="small muted pend-app"><span>app 的判断：</span>${p.app.v1 ? `<span>${esc(p.app.v1)}</span> → ` : ""}<span>${esc(p.app.v)}</span></span>` : ""}</div><button class="btn sm ghost" data-act="pend-del" data-i="${i}">删除</button></div>`).join("")}</div>
         <button class="btn primary block big" style="margin-top:14px" data-act="pend-copy">全部复制给 AI（${list.length} 句）</button>
         <button class="btn ghost block" style="margin-top:6px" data-act="pend-clear">已经问过了，清空</button>` :
         `<p class="muted">现在没有拿不准的说法。练习时拿不准自己说得对不对，就点“拿不准，存起来问 AI”。</p>`}
@@ -11917,7 +11938,7 @@ const BT = (() => {
       removeAfter(t.animate([{transform:"translate(-50%, 0) scale(.7)", opacity:0}, {transform:"translate(-50%, -6px) scale(1.08)", opacity:1, offset:0.25}, {transform:"translate(-50%, -26px) scale(1)", opacity:0}], {duration:900, easing:"ease-out"}), t);
     };
     A.setNames = (g, y) => { root.querySelector('[data-w="ghost"] .bt-name').textContent = g; root.querySelector('[data-w="you"] .bt-name').textContent = y === "你" ? youName() : y; };
-    A.setScore = t => { const el = root.querySelector(".bt-score"); el.textContent = t; el.style.fontSize = "";
+    A.setScore = t => { const el = root.querySelector(".bt-score"); el.textContent = t; el.style.fontSize = ""; root.classList.toggle("noscore", L.showScore === false);   /* v1.80.3：可以不显示 */
       /* v1.79.2：今天 / 昨天 不换行；英文长，放不下就缩小字号（最多占画面宽度的六成） */
       requestAnimationFrame(() => { try { const r = document.createRange(); r.selectNodeContents(el); const w = r.getBoundingClientRect().width, max = root.clientWidth * 0.6;
         if (w > max && max > 0){ const fs = parseFloat(getComputedStyle(el).fontSize) || 15; el.style.fontSize = Math.max(10, fs * max / w).toFixed(1) + "px"; } } catch (e) {} }); };
@@ -14644,6 +14665,8 @@ const GAME = {
   stop(){ if (GAME.st){ GAME.st.A.clear(); GAME.st = null; } }
 };
 ACT["g-replay"] = () => GAME.replay();
+/* v1.80.3：游戏下面的小框：显示 / 不显示今天和昨天的分数（记在本机） */
+document.addEventListener("change", e => { const el = e.target; if (!el || el.id !== "gScoreOpt") return; L.showScore = !!el.checked; saveLocal(); document.querySelectorAll(".bt-stage").forEach(x => x.classList.toggle("noscore", L.showScore === false)); });
 ACT["g-tip-ok"] = () => { L.gameTip = true; saveLocal(); const t = document.querySelector(".g-tip"); if (t) t.remove(); };
 
 /* ---------- 一轮练完：在结算页最上面放对战 ---------- */
@@ -16219,7 +16242,7 @@ function ipaFinish(){
   const notes = [];
   for (const [id, [ok, n]] of Object.entries(byL)){ const acc = ok / n, s = st.L[id];
     if (V.kind === "lesson"){ if (acc >= 0.8){ st.L[id] = {box:0, due:tn + IPA_IV[0], done:today()}; notes.push("听辨过了 80%：明天复习一次，之后越隔越久。"); } else notes.push("听辨不到 80%：再学一遍这一课，先把例词多听几遍。"); }
-    else if (s){ if (acc >= 0.8){ s.box = Math.min(IPA_IV.length - 1, (s.box || 0) + 1); s.due = tn + IPA_IV[s.box]; } else { s.box = 0; s.due = tn + 1; notes.push(`${IPA_LESSONS.find(l => l.id === id).name}：这次没过 80%，明天再复习`); } }
+    else if (s){ if (acc >= 0.8){ s.box = Math.min(IPA_IV.length - 1, (s.box || 0) + 1); s.due = tn + IPA_IV[s.box]; } else { s.box = 0; s.due = tn + 1; notes.push(`${IPA_LESSONS.find(l => l.id === id).name}：这次没过 80%，明天再复习。`); } }
   }
   V.note = notes.join(" "); V.step = "done"; save(); if (typeof planAutoDone === "function") try { planAutoDone("ipa"); planAutoDone("pron"); } catch (e) {}
 }
@@ -22702,6 +22725,154 @@ Object.assign(I18N_EN, {
  "第一遍": "First try"
 });
 
+/* v1.80.3：问 AI 页、导入预览、结算、阅读、音标复习、第一遍错在哪、游戏的分数开关 */
+Object.assign(I18N_EN, {
+ "一起发": "Send together",
+ "把上面几样一起复制，一次发给 AI。": "Copy everything above at once and send it to the AI in one go.",
+ "一起复制给 AI": "Copy all for AI",
+ "两样都发过了，清空": "Sent both, clear",
+ "卡片 {n} 张（反射卡 {n}，找错 {n}，听力 {n}）": "{n} cards ({n} reflex, {n} fix-the-error, {n} listening)",
+ "卡片 {n} 张（反射卡 {n}，找错 {n}，听力 {n}），其中 {n} 张已经有了，会更新": "{n} cards ({n} reflex, {n} fix-the-error, {n} listening); already in your cards, will be updated: {n}",
+ "确认算对的说法 {n} 条": "{n} confirmed correct versions",
+ "{n}.{n} 秒，最快一次": "{n}.{n} s, your fastest",
+ "{n} 秒，最快一次": "{n} s, your fastest",
+ "时间到了。还剩 {n} 题没练，会留到下次；想接着练也可以。": "Time's up. {n} cards are left for next time; you can also keep going.",
+ "接着练剩下的 {n} 题": "Practise the remaining {n}",
+ "← 返回列表": "← Back to the list",
+ "点 ▶ 读一句；点一个词可以听、加进想学的；虚线是没练过的词（{n}%），实线是你在练的语块。": "Tap ▶ to hear a sentence; tap a word to hear it or add it to words to learn. Dotted = words you haven't practised ({n}%); solid = chunks you're practising.",
+ "▶ 从头听": "▶ Play from the start",
+ "修改": "Edit",
+ "读完了：用 {n} 句话复述": "Done reading: retell it in {n} sentences",
+ "读完了": "Done reading",
+ "听辨过了 {n}%：明天复习一次，之后越隔越久。": "Listening passed {n}%: review once tomorrow, then at longer and longer intervals.",
+ "听辨不到 {n}%：再学一遍这一课，先把例词多听几遍。": "Listening under {n}%: go through this lesson again, and listen to the example words a few more times first.",
+ "年份用 in：in {n}": "Years take in: in {n}",
+ "第一遍错在哪：": "What went wrong in your first try:",
+ "今天 / 昨天": "Today / Yesterday"
+});
+
+/* v1.80.3：带文字空位的模板（{0}、{1} 是名字这类文字，{n} 是数字），界面上拼出来的句子 */
+Object.assign(I18N_EN, {
+ "参考：": "Reference:",
+ "第一遍：": "First try:",
+ "这一轮点了 {n} 次“识别错了”。这多半是识别的问题，不是你：可以在“我的 → 练习”里把识别换成 Whisper，模型选准一些的 small.en，或者说的时候离麦克风近一点。": "You tapped “it misheard me” {n} times this round. That's most likely the recognizer, not you: in Me → Practice you can switch recognition to Whisper and pick the more accurate small.en model, or speak closer to the microphone.",
+ "选了 {0} 个": "{0} selected",
+ "做得好：{0}": "Well done: {0}",
+ "开始回答（目标 {n} 秒）": "Start answering (target {n} s)",
+ "目标 {n} 秒": "Target {n} s",
+ "对照一下，你说对了吗？{0}": "Compare: did you get it right? {0}",
+ "{0}（{1}）。题库和练习记录都不受影响。": "{0} ({1}). Your decks and practice records aren't affected.",
+ "{0}：{n} 题": "{0}: {n} questions",
+ "已写 {0}/{n}": "Written {0}/{n}",
+ "{n} 个词，按你现在的语速大约 {n} 秒（这题目标 {0} 秒左右）": "{n} words, about {n} s at your current pace (target for this question: about {0} s)",
+ "面试问题：{0}（{1}）。目标长度 {2} 秒左右。": "Interview question: {0} ({1}). Target length: about {2} s.",
+ "已掌握 {0}，学习中 {1}，还没练 {2}": "Mastered {0}, learning {1}, not started {2}",
+ "已经是最新：{0}": "Already up to date: {0}",
+ "服务器上是 {0}，手机上是 {1}。正在下载，等十几秒，关掉 app 再打开": "The server has {0}; your phone has {1}. Downloading now: wait 10–20 seconds, then close and reopen the app",
+ "英文有几种说法时用 // 隔开。题库名以“知识”开头的，是知识卡（求职 → 准备 → 知识）。": "Separate alternative English versions with //. Decks whose names start with “知识” are knowledge cards (Jobs → Prep → Knowledge).",
+ "第 {0} 行": "Line {0}",
+ "把“{0}”并到哪个题库？": "Merge “{0}” into which deck?",
+ "并好了：现在都在“{0}”里": "Merged: everything is now in “{0}”",
+ "{0}问：{1}": "{0} asked: {1}",
+ "app 现在一共占用约 {0}，手机还给它留了约 {1}。": "The app uses about {0} now; your phone has about {1} left for it.",
+ "删除以后能腾出空间；以后再用要重新下载。（{0}）": "Deleting frees up space; you'll need to download it again to use it. ({0})",
+ "达标 {0}/{n} 题。这 {n} 题是电话初筛最可能问的。每次练完给自己打分；同一题要在 {n} 次不同时间的练习里都打“还行”才算达标（间隔 {n} 小时以上）。还没达标的排在前面。": "Passed {0}/{n}. These {n} are the most likely phone-screen questions. Rate yourself after each practice; a question passes once you rate it “OK” at {n} different times ({n}+ hours apart). Ones not passed yet come first.",
+ "口头禅：{0}": "Filler words: {0}",
+ "{0}，回答了 {n} 题": "{0}, answered {n} questions",
+ "我是在说自己（I'm free now），还是在问对方（Let me know if you're free）？": "Am I talking about myself (I'm free now), or asking them (Let me know if you're free)?",
+ "{0} 厘米": "{0} cm",
+ "{0}（{n} 血）": "{0} ({n} HP)",
+ "和其他首领轮流出场": "Takes turns with the other bosses",
+ "{0} · {n} 血": "{0} · {n} HP",
+ "对上了：{0}。眼睛和胸灯会亮": "Matched: {0}. The eyes and chest light will glow",
+ "导入好了：当{0}": "Imported as {0}",
+ "替换好了：{0}": "Replaced: {0}",
+ "上次练到一半（{0}），还剩 {n} 题。": "Halfway through last time ({0}); {n} left.",
+ "每次约 {n} 分钟：先学新的一课，有到期的复习就顺便复习。全部学完以后，只在有复习的日子提醒。": "About {n} minutes each time: learn a new lesson first, and do any due reviews along the way. Once you've learned them all, it only reminds you on review days.",
+ "复习到期的卡：今天到期 {n} 张，比一轮多——先清复习，今天只学 {0} 张新卡（照最近每天 {1} 张，约 {n} 天清完）": "Review due cards: {n} due today, more than one round, so clear reviews first and learn only {0} new cards today (at your recent {1} a day, about {n} days to clear)",
+ "智能调整已开启：今天 {0} 道新题": "Smart adjust is on: {0} new cards today",
+ "你最近每天练 {n} 张：每天学 {0} 张新卡刚好跟得上（现在设的是 {n} 张）。每多 {n} 张新卡，以后每天要多复习约 {n} 张。": "You've practised {n} cards a day lately: {0} new cards a day keeps you on track (it's set to {n} now). Each extra new card means about {n} more reviews a day later.",
+ "每天新卡改成 {0} 张": "Set new cards per day to {0}",
+ "最常犯的错误：{0}": "Most common mistake: {0}",
+ "错误专练：{0}（这周 {1} 次，上周 {2} 次）": "Mistake drill: {0} ({1}× this week, {2}× last week)",
+ "{0}。练最弱的一类最有针对性；想自己挑就选“正常”。": "{0}. Practising your weakest type is the most targeted; to pick yourself, choose “Normal”.",
+ "练最弱的一类：{0}": "Practise your weakest type: {0}",
+ "{n} 分钟：复习加 {n} 项；{n} 分钟：复习加 {n} 项；{n} 小时：复习加 {n} 项。": "{n} min: {n} more review item; {n} min: {n} more; {n} hour: {n} more.",
+ "今天的面试练习：按准备度自动挑题（约 {n} 分钟）": "Today's interview practice: questions picked by readiness (about {n} min)",
+ "投递时间：投 {n} 份（本周目标 {0} 份，A 档先做），投完点“记投递”": "Application time: send {n} (this week's goal {0}; A-tier first), then tap “Log applications”",
+ "复习到期的卡，再学新卡（最多 {0} 张；先说出来，再看答案）": "Review due cards, then learn new ones (up to {0}; say it first, then check the answer)",
+ "{0}问：": "{0} asks:",
+ "看中文": "Show Chinese",
+ "{0}追问：": "{0} follows up:",
+ "第 {n} 遍，限时 {n} 秒：尽量讲全、讲快": "Round {n}, {n} s limit: cover everything, quickly",
+ "在听……限时 {n} 秒，到时间自动停": "Listening… {n} s limit; it stops automatically",
+ "长短合适（{0} 个词；两到四句最好）": "Good length ({0} words; two to four sentences is best)",
+ "长短合适（{0} 个词）": "Good length ({0} words)",
+ "比上一遍每分钟多说了 {0} 个词，连击加成 +{1}。": "{0} more words per minute than last time; combo bonus +{1}.",
+ "面试里别用“{0}”：这是朋友之间的说法。": "Don't use “{0}” in interviews: it's something friends say.",
+ "{n} 分": "{n} pts",
+ "对波结果：": "Beam clash result:",
+ "首领挨 {0} 点": "The boss takes {0}",
+ "你挨 {0} 点": "You take {0}",
+ "说对了 {n}，说错了 {n}": "{n} right, {n} wrong",
+ "对波！第 {n}/{n} 句": "Beam clash! Line {n}/{n}",
+ "听到：“{0}”": "Heard: “{0}”",
+ "平均 {n} 分。": "Average {n} pts.",
+ "推到了对手那边：对手挨 {0} 点": "Pushed to their side: they take {0}",
+ "被推到了你这边：你挨 {0} 点": "Pushed to your side: you take {0}",
+ "问了 {0} 个问题": "Asked {0} questions",
+ "你写了 {0} 个词，来信 {1} 个词": "You wrote {0} words; their message had {1}",
+ "（点一下插进去）": "(tap to insert)",
+ "写作规则还查到：": "The writing rules also found:",
+ "小问题（聊天里可以先不管，写邮件时要改）：{n}": "Minor issues (fine in chat; fix them in emails): {n}",
+ "存好了：{0} 句改过的句子变成了改错卡": "Saved: {0} corrected sentences became fix-the-error cards",
+ "你写过：{0}": "You wrote: {0}",
+ "存好了（共 {n} 条）。在“我的 → 问 AI”里一起发": "Saved ({n} in total). Send them together from Me → Ask AI",
+ "{0} · 第 {n}/{n} 题": "{0} · question {n}/{n}",
+ "容易混成 {0}": "Easy to confuse with {0}",
+ "练听辨": "Practise telling them apart",
+ "听辨 {n} 组听稳了": "{n} pairs you can now hear reliably",
+ "{0}；上次要注意：{1}": "{0}; last time, watch: {1}",
+ "去掉了 {0} 行像广告、导航的内容": "Removed {0} lines that looked like ads or navigation",
+ "加进想学的": "Add to words to learn",
+ "第 {n}/{n} 个：不说出它的名字，用英语描述它": "Item {n}/{n}: describe it in English without saying its name",
+ "第 {n}/{n} 句：听完马上接": "Line {n}/{n}: reply as soon as you've heard it",
+ "护盾 ×{0}": "Shield ×{0}",
+ "刚记了：{0}": "Just logged: {0}",
+ "本周 {n}/{0}": "This week {n}/{0}",
+ "Career {0} · English {1} · Life {2} · 心情 {3}": "Career {0} · English {1} · Life {2} · Mood {3}",
+ "经验值只给你能控制的行动。English 按每天在只因里练的时间自动算：每 {n} 分钟 {n} 点，每天最多 {0} 点。真实的英语对话两栏都加。": "XP only goes to actions you control. English is counted automatically from your practice time in Cluck: {n} point per {n} minutes, up to {0} a day. Real English conversations count in both columns.",
+ "{0}，累计 {n} 次": "{0}, {n} times in total",
+ "{0} / {1}，再 {2} 次升到 Lv {n}": "{0} / {1}, {2} more to reach Lv {n}",
+ "本周 {0} / {1}": "This week {0} / {1}",
+ "要求的工作年限：{n}–{n} 年 {0} 份，{n}–{n} 年 {1} 份，{n} 年以上 {2} 份，没写 {n} 份。": "Years of experience asked for: {n}–{n} years in {0}, {n}–{n} years in {1}, {n}+ years in {2}, not stated in {n}.",
+ "{0}；出现在：{1}": "{0}; appears in: {1}",
+ "认出来 {0} 条，看一眼对不对": "Recognized {0}; take a look and check",
+ "记下了 {0} 家：在求职页补详情": "Logged {0} companies: add details on the Jobs page",
+ "还有 {n} 份只记了数。{0}": "{n} more were only counted. {0}",
+ "面试练习 {0} 分钟": "Interview practice {0} min",
+ "投递 {0}": "Applications {0}",
+ "待确认 {0} 条": "{0} to confirm",
+ "投出 {0} 份，进面试 {1} 次": "{0} sent, {1} interviews",
+ "在本机直接统计存了 JD 原文的投递（现在 {0} 份）：每项要求出现在几份 JD 里、是必须还是加分。": "Counted on this phone from applications with the JD text saved (now {0}): how many JDs mention each requirement, and whether it's required or a plus.",
+ "改成“{0}”了，成长页记了一个好消息": "Changed to “{0}”; logged a win on the Grow page",
+ "改成“{0}”了": "Changed to “{0}”",
+ "投递记录（截至 {0}，从只因导出）": "Application log (as of {0}, exported from Cluck)",
+ "达标 {0}/{n}。同一题要在 {n} 次不同时间（隔 {n} 小时以上）都打“还行”才算达标：分开几次各想起来一次，比一次连说几遍记得牢。": "Passed {0}/{n}. A question passes once you rate it “OK” at {n} different times ({n}+ hours apart): recalling it on separate occasions sticks better than saying it several times in a row.",
+ "{0}：没达标的题": "{0}: questions not passed yet",
+ "早的 {0} 次": "{0} earlier",
+ "近的 {0} 次": "{0} recent",
+ "对方说的下一步：{0}": "Their next step: {0}",
+ "掌握 {0}/{n} 张。想多学，可以再学 {n} 张新的。": "Mastered {0}/{n}. To learn more, you can do {n} new ones.",
+ "掌握 {0}/{n} 张。没想起来的明天再见；想起来的，隔的天数会越来越长。": "Mastered {0}/{n}. The ones you didn't recall come back tomorrow; the ones you did are spaced further and further apart.",
+ "每周目标：{0} 份": "Weekly goal: {0}",
+ "记好了 {0} 份": "Logged {0}",
+ "（{0} 份以前记过，跳过了）": "({0} were logged before and skipped)",
+ "{0}，成长页补记了 {1} 份": "{0}, and {1} added to the Grow page",
+ "{0}，成长页补记了 {1} 份（另外 {n} 份之前只记了数）": "{0}, and {1} added to the Grow page ({n} others were only counted before)",
+ "{0} 档": "Tier {0}"
+});
+
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
 var I18N_LANGS = (typeof I18N_LANGS !== "undefined" && I18N_LANGS) || {};
 I18N_LANGS.en = {name:"English", dict:I18N_EN};
@@ -22718,7 +22889,7 @@ const I18N_FRAG = [
   [/(\d{1,2})月(\d{1,2})日\s*周([一二三四五六日])/g, (m, a, b, c) => `${I18N_WK[c]}, ${I18N_MON[+a] || a} ${b}`],
   [/：还有 (\d+) 天/g, ": in $1 days"], [/：就是今天/g, ": today"], [/：明天/g, ": tomorrow"], [/^还有 (\d+) 天/, "in $1 days"],
   [/（(.*)）$/, " ($1)"], [/^对上：/, "Matched: "], [/^问过 (\d+) 次：?/, "Asked $1×: "], [/^等得最久：/, "Waiting longest: "], [/ (\d+) 天(?=，|$)/g, " $1 d"], [/，/g, ", "],
-  [/^导入好了：卡片 (\d+)/, "Imported: $1 cards"], [/题目 (\d+)/, "$1 questions"], [/投递 (\d+)/, "$1 applications"], [/。在求职页能看到$/, ". See them on the Jobs page"],
+  [/^导入好了：卡片 (\d+)/, (z, n) => `Imported: ${n} card${n === "1" ? "" : "s"}`], [/题目 (\d+)/, "$1 questions"], [/投递 (\d+)/, "$1 applications"], [/。在求职页能看到$/, ". See them on the Jobs page"],
   [/^公司：(.+)\(不在投递记录里\)$/, "Company: $1 (not in applications)"]
 ];
 /* v1.76.0：按设置里的界面语言取词典（现在只有英文）；找不到就用英文，和以前一样 */
@@ -22854,6 +23025,19 @@ function i18nT(raw){
     [/^(\S+) 不是一个词：(\S+) 是不规则动词$/, m => `“${m[1]}” isn't a word: ${m[2]} is irregular`], [/^(\S+) 是过去式；这里要过去分词$/, m => `“${m[1]}” is the past tense; this needs the past participle`],
     [/^(\S+) 是过去分词；单独说过去的事用过去式$/, m => `“${m[1]}” is the past participle; for the past on its own, use the past tense`], [/^这里要用动词原形，不是 (\S+)$/, m => `This needs the base verb, not “${m[1]}”`]];
     for (const [re, f] of V){ const m = t.match(re); if (m){ v = f(m); break; } } }
+  /* v1.80.3：几种拼起来的句子：语法检查的“原话”：说明、X · 第几题、X 完成了、劲敌、经验值、导入预览和导入成功、下次复习、音标复习、题库名 */
+  if (v == null){ const T = i18nTk, pn = (n, a) => `${n} ${a}${n === "1" ? "" : "s"}`, cnt = x => x.replace(/卡片 (\d+)/, (z, n) => pn(n, "card")).replace(/题目 (\d+)/, (z, n) => pn(n, "question")).replace(/投递 (\d+)/, (z, n) => pn(n, "application")).replace(/，/g, ", ");
+    const W = [
+      [/^“(.+?)”：(.+)$/, m => { const r = i18nT(m[2]); return r ? `“${m[1]}”: ${r}` : null; }],
+      [/^(.+?) · (\d+)\/(\d+)$/, m => `${T(m[1])} · ${m[2]}/${m[3]}`],
+      [/^(.+?)完成了$/, m => { const r = i18nT(m[1]); return r ? `${r} complete` : null; }],
+      [/^劲敌：(.+)$/, m => `Rival: ${m[1]}`],
+      [/^\+(\d+) 经验值(?:，(.+?) (\d+)\/(\d+))?$/, m => `+${m[1]} XP${m[2] ? `, ${T(m[2])} ${m[3]}/${m[4]}` : ""}`],
+      [/^导入好了：(.+?)。英语页可以选“(.+?)”单独练$/, m => `Imported: ${cnt(m[1])}. On the English page, pick “${T(m[2])}” to practise it on its own`],
+      [/^下次复习 (\d{1,2}-\d{1,2})$/, m => `Next review ${m[1]}`],
+      [/^(.+?)：这次没过 (\d+)%，明天再复习。?$/, m => `${T(m[1])}: under ${m[2]}% this time; review it again tomorrow.`],
+      [/^([^\u4e00-\u9fff]+) (面试|改错|单词|知识)$/, m => `${m[1]} ${{"面试":"interview", "改错":"fixes", "单词":"words", "知识":"knowledge"}[m[2]]}`]];
+    for (const [re, f] of W){ const m = t.match(re); if (m){ v = f(m); if (v != null) break; } } }
   /* “前缀：内容”：只有后面的内容也翻得了（或者本来就没有中文）才用；不然留给后面更具体的规则（v1.75.0 这条抢在学音标规则前面，“音标：学第……”只翻了一半） */
   if (v == null){ const mp = t.match(/^(.{1,14}?)：(.+)$/); if (mp){ const p = i18nDict()[mp[1] + "："] || i18nDict()[mp[1]]; if (p){ const r = /[\u4e00-\u9fff]/.test(mp[2]) ? i18nT(mp[2]) : mp[2]; if (r) v = p.replace(/[:：]\s*$/, "") + ": " + r; else if (/^(题库|劲敌|对方|角色|敌人|职位|公司|首领|复盘)$/.test(mp[1])) v = p.replace(/[:：]\s*$/, "") + ": " + mp[2]; } } }   /* 后面一定是名字的前缀：名字原样保留 */
   if (v == null){ const mx = t.match(/^(.+?)\s*[×x]\s*(\d+)$/); if (mx){ const base = i18nT(mx[1]); if (base) v = base + " ×" + mx[2]; } }   /* v1.74.1：结尾带“×3”这类次数的 */
@@ -22890,7 +23074,7 @@ function i18nMiss(t){ t = String(t || "").replace(/\s+/g, " ").trim(); if (!t ||
   i18nSrc().then(src => { if (!src || !i18nInSrc(src, t) || I18N_MISS.has(t)) return; I18N_MISS.add(t); i18nMissSave(); }); }
 function i18nMissSave(){
   clearTimeout(I18N_MISS_T); I18N_MISS_T = setTimeout(() => { try { localStorage.setItem("tk-i18n-miss", JSON.stringify([...I18N_MISS])); } catch (e) {} }, 800); }
-function i18nNode(n){ const p = n.parentElement; if (!p || p.closest(I18N_SKIP)) return; let v = i18nT(n.nodeValue); if (v == null) i18nMiss(n.nodeValue);
+function i18nNode(n){ const p = n.parentElement; if (!p || (p.closest(I18N_SKIP) && !p.hasAttribute("data-i18n"))) return;   /* v1.80.3：英文句子里的中文标签（第一遍：、参考：）标 data-i18n 照样翻，排版不变 */ let v = i18nT(n.nodeValue); if (v == null) i18nMiss(n.nodeValue);
   if (v != null && /[：:]\s*$/.test(n.nodeValue) && /:$/.test(v) && n.nextSibling && !/^\s/.test(n.nextSibling.textContent || "")) v += " ";   /* v1.78.0：以前是 Second try:I had… */
   if (v != null && v !== n.nodeValue){ if (!I18N_ORIG.has(n)) I18N_ORIG.set(n, n.nodeValue); n.nodeValue = v; } }
 function i18nApply(root){
@@ -22926,6 +23110,39 @@ function i18nTk(x){ const r = i18nT(x); if (r == null) i18nMiss(x); return r == 
     const tr = ss.map(x => base(x.trim())); if (!tr.every(Boolean)) return null; return String(raw).replace(t, tr.join(" ")); }; }
 /* v1.79.2：判断“是不是 app 自己的文字”：拼起来的句子在源码里找不到整句，就看里面每一段中文（两个字以上）是不是都在源码里 */
 { const base = i18nInSrc; i18nInSrc = function(src, t){ if (base(src, t)) return true; const runs = String(t).match(/[\u4e00-\u9fff]{2,}/g) || []; return runs.length > 0 && runs.every(x => src.includes(x)); }; }
+
+/* v1.80.3：英文句子里夹着面试题的中文题目（计划、彩排）：换成这道题的英文（“你有什么想问我的吗？” → “Do you have any questions for me?”） */
+let I18N_QMAP = null, I18N_QN = -1;
+function i18nQSwap(v){ if (v == null || !/[\u4e00-\u9fff]/.test(v)) return v;
+  let qs = []; try { qs = typeof allQuestions === "function" ? allQuestions() : []; } catch (e) {}
+  if (!I18N_QMAP || I18N_QN !== qs.length){ I18N_QN = qs.length; I18N_QMAP = []; for (const q of qs){ const zh = String(q.zh || "").trim(), en = (q.v || [])[0]; if (zh.length >= 3 && en){ I18N_QMAP.push([zh, en]); const z2 = zh.replace(/[？?。]$/, ""); if (z2 !== zh && z2.length >= 3) I18N_QMAP.push([z2, en]); } } I18N_QMAP.sort((a, b) => b[0].length - a[0].length); }
+  for (const [zh, en] of I18N_QMAP) if (v.includes(zh)) v = v.replace(new RegExp(zh.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "[？?]?", "g"), `“${en}”`); return v; }
+{ const base = i18nT; i18nT = function(raw){ return i18nQSwap(base(raw)); }; }
+
+/* v1.80.3：带文字空位的模板词条（不只是数字）。词典里写 {0}、{1} 的是文字空位（名字、题库名……），{n} 是数字；整句按模板对上就换，空位里有中文的再翻一次（翻不了就记进清单）。
+   以前这种句子要一条一条写规则，很多没写到（“把“X”并到哪个题库？”“错误专练：X（这周 N 次……）”这些） */
+let I18N_TPLS = null, I18N_TPL_D = null;
+function i18nTplList(){ const D = i18nDict(); if (I18N_TPLS && I18N_TPL_D === D) return I18N_TPLS; I18N_TPL_D = D; I18N_TPLS = [];
+  for (const k of Object.keys(D)) if (/\{\d\}/.test(k)){ const slots = [];
+    const re = "^" + k.split(/(\{n\}|\{\d\})/).map(x => { if (x === "{n}"){ slots.push("n"); return "(\\d+(?:\\.\\d+)?)"; } if (/^\{\d\}$/.test(x)){ slots.push(+x[1]); return "(.*?)"; } return x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("") + "$";
+    try { I18N_TPLS.push([new RegExp(re), slots, D[k], k.replace(/\{[n\d]\}/g, "").length]); } catch (e) {} }
+  I18N_TPLS.sort((a, b) => b[3] - a[3]); return I18N_TPLS; }
+function i18nTpl(t){ for (const [re, slots, en] of i18nTplList()){ const m = t.match(re); if (!m) continue; const nums = [], vals = {}; slots.forEach((x, i) => { if (x === "n") nums.push(m[i + 1]); else vals[x] = m[i + 1]; });
+    let j = 0; return en.replace(/\{n\}/g, () => nums[j] != null ? nums[j++] : "").replace(/\{(\d)\}/g, (z, d) => { const x = vals[+d] == null ? "" : vals[+d]; return /[\u4e00-\u9fff]/.test(x) ? i18nTk(x) : x; }); }
+  return null; }
+/* v1.80.3：日期：11月8日 09:30、11月8日 周六、11月8日–14日 → 11/8 09:30、11/8 Sat、11/8–11/14（和“上次的你（11/5）”一样写成 月/日） */
+const I18N_WK2 = {"一":"Mon", "二":"Tue", "三":"Wed", "四":"Thu", "五":"Fri", "六":"Sat", "日":"Sun", "天":"Sun"};
+function i18nDate(t){ let m;
+  if ((m = t.match(/^(\d{1,2}) ?月 ?(\d{1,2}) ?日(?: ?(?:周|星期)([一二三四五六日天]))?(?: (\d{1,2}:\d{2}))?$/))) return `${m[1]}/${m[2]}${m[3] ? " " + I18N_WK2[m[3]] : ""}${m[4] ? " " + m[4] : ""}`;
+  if ((m = t.match(/^(\d{1,2})月(\d{1,2})日 ?[–—-] ?(?:(\d{1,2})月)?(\d{1,2})日$/))) return `${m[1]}/${m[2]}–${m[3] || m[1]}/${m[4]}`;
+  if ((m = t.match(/^(?:周|星期)([一二三四五六日天])$/))) return I18N_WK2[m[1]];
+  return null; }
+{ const base = i18nT; i18nT = function(raw){ const v = base(raw); if (v != null) return v; const t = String(raw == null ? "" : raw).trim(); if (!t || !/[\u4e00-\u9fff]/.test(t)) return null;
+    const w = i18nDate(t) || i18nTpl(t); return w == null ? null : i18nQSwap(String(raw).replace(t, w)); }; }
+
+/* v1.80.3：数量是 1 的时候英文用单数（以前是“1 lines”“1 cards”）：所有翻出来的句子最后统一改一次 */
+const I18N_SING = /(^|[^\d.])1 (card|line|question|word|time|day|minute|hour|item|application|sentence|pair|group|mistake|error|point|lesson|deck|recording|answer|file|part|version|interview|review|step|skill|option|goal|round|pt|repeat request)s\b/g;
+{ const base = i18nT; i18nT = function(raw){ const v = base(raw); return v == null ? v : v.replace(I18N_SING, (z, a, w) => `${a}1 ${w}`); }; }
 
 </script>
 </body>
