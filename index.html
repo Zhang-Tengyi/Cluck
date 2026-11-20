@@ -1202,6 +1202,8 @@ i.lbl{font-style:normal}
 .fbx details > summary::before{content:"▸";display:inline-block;width:1.1em;color:var(--muted, #667085)}
 .fbx details[open] > summary::before{content:"▾"}
 .fbx .fb-why{margin-left:1.1em}
+/* v1.80.6：游戏里练面试长回答时收起对战画面 */
+.g-top.g-long #gArena{display:none}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1223,7 +1225,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.80.4"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.80.6"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -1247,7 +1249,7 @@ const R_CARDS = [
   ["r013","be","我不是专家。","I'm not an expert.",""],
   ["r014","be","这正对我胃口。","That's right up my alley.","right up my alley：正好是我喜欢、擅长的"],
   ["r015","be","这很正常。","That's totally normal. // That's normal.",""],
-  ["r016","be","那真厉害。","That's really impressive.",""],
+  ["r016","be","那真厉害。","That's really impressive. // That's so impressive. // That's awesome. // That's amazing.",""],
   ["r017","be","这有点难说。","It's hard to say.",""],
   ["r018","be","这是个很好的机会。","It's a great opportunity. // It's a good opportunity.",""],
   ["r019","be","我对这个职位很感兴趣。","I'm very interested in this position. // I'm really interested in this position.",""],
@@ -1256,7 +1258,7 @@ const R_CARDS = [
   ["r022","be","我对 CAD 很熟。","I'm familiar with CAD. // I'm very familiar with CAD.",""],
   ["r023","be","我可以接受搬到别的城市。","I'm open to relocating.",""],
   ["r024","be","我是应届毕业生。","I'm a recent graduate.",""],
-  ["r025","be","那太好了。","That's great.",""],
+  ["r025","be","那太好了。","That's great. // That's awesome. // That's wonderful.",""],
   ["r026","be","今天有点凉。","It's a little chilly today.",""],
   ["r027","be","我饿了。","I'm hungry.",""],
   ["r028","be","这挺难的。","This is difficult. // It's difficult. // This is hard.",""],
@@ -2648,6 +2650,7 @@ function gapSim(a, b, merged){
   if (!merged && (gramPair(a, b) || classifySub(a, b) === "s" || pastOf(b) === a)) return 0.9;   /* 两个词合起来的只看读音（tha t's 不是 -s 的错） */
   const ka = sndKey(a), kb = sndKey(b);
   if (ka && kb && ka !== kb && ka.replace(/nk$/, "n") === kb.replace(/nk$/, "n")) return 0.85;   /* v1.80.4：n / ng 结尾（rain / ring、thin / thing），中文母语常混 */
+  if (ka && kb && ka !== kb && !merged && /l$/.test(ka + kb) && ka.replace(/l$/, "") === kb.replace(/[td]$/, "") || kb.replace(/l$/, "") === ka.replace(/[td]$/, "") && ka !== kb && !merged && /l$/.test(kb)) return 0.8;   /* v1.80.6：词尾 l 读得太轻像 d / t（role / road） */
   if (!ka || !kb || Math.max(ka.length, kb.length) < 3) return 0;
   return 1 - lev(ka, kb) / Math.max(ka.length, kb.length);
 }
@@ -3064,7 +3067,7 @@ const HAB_VERBS = "play|finish|stay|work|try|graduate|learn|see|start|use|test|d
 const W_RULES = [
     /* v1.80.4：AI 复查发现漏判的说法 */
   {re:/\bhire\s+manager\b/gi, tag:"搭配", msg:()=>"招聘经理是 hiring manager（不说 hire manager）"},
-  {re:/\bmake\s+(?:a\s+)?(?:phone\s+)?call\s+with\b/gi, tag:"搭配", msg:()=>"和某人通电话：have a call with someone（make a call 后面接 to：make a call to someone）"},
+  {re:/\bmake\s+(?:a\s+)?(?:phone\s+)?call\s+with\b/gi, tag:"地道说法", msg:()=>"“和某人通个电话”说 have a call with someone（a call 是一次通话）。make a call 是“打电话”这个动作，后面接打给谁：make a call to someone；make a call with 不这么说"},
   {re:/\bbig\s+rain\b/gi, tag:"地道说法", msg:()=>"大雨是 heavy rain（不说 big rain）"},   /* small rain 原来就有（小雨：light rain / drizzle） */
   /* v1.80.2：动词形式（没有参考说法时也认得出来）：不规则动词加 -ed、have + 过去式、be + 过去式、did / 情态动词 / to 后面不用原形 */
   {re:REGW_RE, g:1, tag:"动词形式", msg:g => { const v = REGW[String(g).toLowerCase()]; return `${g} 不是一个词：${v} 是不规则动词（${irrLine(v)}），不加 -ed`; }},
@@ -3109,7 +3112,7 @@ const W_RULES = [
   /* v1.79.2：AI 复查时发现漏判的几种（“意思对上了”就放过了） */
   {re:/\blet me think of (?:it|that)\b/gi, tag:"搭配", msg:()=>"“我想一下”说 Let me think about it / Let me think for a second；think of 是“想出、想起”（think of a name）"},
   {re:/\b(?:I'm|I’m|I am|im)\s+not\s+(?:(?:fully|really|very|so|that|too|quite)\s+)?closely\b/gi, tag:"语法", msg:()=>"少了动词：I don't follow it closely（不怎么关注）"},
-  {re:/,\s*(?:can|could|will|would|should|must)\s+(?!(?:i|you|we|they|he|she|it|someone|anyone|this|that|there|do)\b)[a-z]+/gi, tag:"语法", msg:()=>"逗号后面直接接 can 少了主语：…, so it can … 或者 … to keep up with …"},
+  {re:/,\s*(?:can|could|will|would|should|must)\s+(?!(?:i|you|we|they|he|she|it|someone|anyone|this|that|there|do)\b)[a-z]+/gi, tag:"语法", msg:()=>"逗号后面不能直接接 can：can 前面要有主语（…, so it can …），或者改成 to + 动词（… to keep up with …）"},
   {re:/(^|[^A-Za-z'’])(i)(?=[^A-Za-z'’]|$)/g, g:2, tag:"书写", msg:()=>"小写 i → I"},
   {re:/\b(im|ive|dont|doesnt|didnt|cant|wont|isnt|arent|wasnt|werent|thats|whats|theres|youre|theyre|youve|weve|theyve|couldnt|shouldnt|wouldnt|havent|hasnt)\b/gi, tag:"书写", msg:m=>`缺撇号：${m} → ${APOS[m.toLowerCase()]}`},
   {re:/\bits\s+(?:a|an|the|so|really|very|not|just|my|been|getting|going|hard|good|cool|great|nice|fun|cold|hot|ok|okay|fine|true|time|normal|weird|important|interesting|difficult|easy)\b/gi, tag:"书写", msg:()=>"这里应该是 it's（= it is）"},
@@ -3444,13 +3447,15 @@ function acrMap(ops){ const ref = []; for (const o of ops || []) if (o.op !== "i
   return map; }
 function acrFixNotes(notes, ops){ const m = acrMap(ops); if (!Object.keys(m).length) return notes;
   return notes.map(n => { const x = m[n.want]; if (!x || !/^这里要加 -s：/.test(n.msg || "")) return n; return Object.assign({}, n, {msg: `这里要加 -s：${x.acr}${ACR_WHY}`, said: x.base, want: x.acr}); }); }
-function acrFixHints(hints, ops){ const m = acrMap(ops); if (!Object.keys(m).length) return hints;
+/* v1.80.6：比较时都转成小写了，提示里单独的 i 要写回 I（以前“这里是 i（你说的是 this）”） */
+function fixI(s){ return String(s == null ? "" : s).replace(/(^|[：\s（，、])i(?=[\s）（，、：]|$)/g, "$1I"); }
+function acrFixHints(hints, ops){ hints = (hints || []).map(fixI); const m = acrMap(ops); if (!Object.keys(m).length) return hints;
   return (hints || []).map(h => { for (const x of Object.values(m)) if (String(h).startsWith(x.said + " 的词尾少了 -s")) return `${x.base} 后面要加 -s：${x.acr}${ACR_WHY}`; return h; }); }
 function compareSaid(t, alts, said){
   const r = compareSaid0(t, alts, said);
   /* v1.80.4：挑出来对比的是另一种说法，但参考说法差不多一样近：逐词对比和提示按参考说法讲（等级、分数不变）。以前按另一种讲，提示会很乱（drizzling） */
   try { if (r && !r.exact && alts && alts.length && r.text !== t){ const r0 = compareSaid0(t, [], said); if (r0 && r0.score >= r.score - 0.05){ r.ops = r0.ops; r.notes = r0.notes; r.text = r0.text; } } } catch (e) {}
-  try { if (r && r.notes) r.notes = acrFixNotes(r.notes, r.ops); } catch (e) {}
+  try { if (r && r.notes) r.notes = acrFixNotes(r.notes, r.ops).map(n => Object.assign({}, n, {msg: fixI(n.msg), said: n.said === "i" ? "I" : n.said, want: n.want === "i" ? "I" : n.want})); } catch (e) {}
   if (r && r.level === "off" && !r.exact && nearMiss(t, alts, said)){ r.near = true; r.nearN = Math.min(...[t].concat(alts || []).map(x => wordDiff(x, said).errs)); }
   return r;
 }
@@ -4617,8 +4622,14 @@ VIEWS.run = {
   render(){
     return `<div class="wrap"><div class="runbar"><button class="back" data-act="run-exit" aria-label="结束">✕</button><div class="track"><i id="runTrack"></i></div><span class="num" id="runCount"></span></div>${RUN.game ? `<div class="g-top"><div id="gArena"></div><div class="g-line"><span id="gName"></span><span id="gInfo"></span></div><div class="g-line2"><div class="g-say" id="gSay" aria-live="polite"></div><label class="g-opt"><input type="checkbox" id="gScoreOpt" ${L.showScore === false ? "" : "checked"}><span>今天 / 昨天</span></label><button class="linkbtn g-replay" data-act="g-replay">回放</button></div></div>` : ""}<div id="stage"></div></div>`;
   },
-  mount(){ Act.start(); if (typeof whisperOn === "function" && whisperOn() && L.asrReady) ASR.warm(); if (RUN.game && typeof GAME !== "undefined") GAME.start(); showItem(); },
-  leave(){ if (RUN.stage && RUN.stage.leave) RUN.stage.leave(); RUN.stage = null; if (typeof GAME !== "undefined") GAME.stop(); }
+  mount(){ Act.start(); if (typeof whisperOn === "function" && whisperOn() && L.asrReady) ASR.warm(); if (RUN.game && typeof GAME !== "undefined") GAME.start();
+    /* v1.80.6：去别的页面（跟读参考回答、详细错因……）看完回来，接着这一题，不重新出题（以前分析清空、要重说一遍） */
+    const k = RUN.keep; RUN.keep = null;
+    if (k && k.stage && k.item === RUN.items[RUN.i]){ RUN.stage = k.stage; try { k.stage.alive = true; gLong(k.stage instanceof IvStage); k.stage.render(); return; } catch (e) {} }
+    showItem(); },
+  leave(){ const st = RUN.stage;
+    if (st && !RUN.exited && st.phase && st.phase !== "prompt" && RUN.items && RUN.i < RUN.items.length){ RUN.keep = {stage: st, item: RUN.items[RUN.i]}; if (RUN.game && typeof GAME !== "undefined" && GAME.snap) try { RUN.gameResume = GAME.snap(); } catch (e) {} }
+    if (st && st.leave) st.leave(); RUN.stage = null; if (typeof GAME !== "undefined") GAME.stop(); }
 };
 function showItem(){
   /* 每练完一张卡都存一次进度（退出、切页面、app 被关掉都不会丢） */
@@ -4953,7 +4964,8 @@ class CardStage {
       const fl = this.firstLabel();
       if (this.typed) h += `<p class="small muted" style="margin:-4px 0 6px">打字输入：不按用时判断快慢，按你自己的感觉选</p>`;
       if (two) h += `<p class="small muted" style="margin:-4px 0 4px">第一遍${fl ? `（${fl}）` : ""}：<span class="en" style="font-size:16px">${esc(this.firstSaid)}</span></p>`;   /* v1.68.1：第一遍也写上判断 */
-      if (two && this.firstCmp && !this.firstCmp.exact && !this.misrec) h += firstErrHTML(this, t);   /* v1.80.3：第一遍错在哪、为什么（以前第二遍说对了就只写第一遍说了什么） */
+      if (two && this.firstCmp && !this.firstCmp.exact && !this.misrec && !this.firstMisrec) h += firstErrHTML(this, t) + (cmp && cmp.exact ? `<button class="btn block misrec-btn" data-act="c-misrec1">第一遍我说对了，是识别错了</button>` : "");   /* v1.80.3：第一遍错在哪；v1.80.6：第二遍完全对了，以前没地方说“第一遍是识别错了” */
+      else if (two && this.firstMisrec) h += `<p class="small muted" style="margin:-4px 0 8px">第一遍按识别错了算，这次可以选“秒出”。</p>`;
       if (this.said) h += `<p class="small muted" style="margin:${two ? "0" : "-4px"} 0 10px">${this.misrec ? "识别成了" : two ? "第二遍" : "你说的"}：<span class="en" style="font-size:16px">${gc ? gc.html : esc(this.said)}</span></p>`;
       if (this.altNote) h += `<p class="small" style="margin:-6px 0 10px">手机第一遍听成了：<span class="en">${esc(this.altNote.top)}</span>。候选里有你要说的那句，所以按它判断。${this.altNote.meantW.length ? `第一遍没听准的：${this.altNote.meantW.map((w, i) => `<span class="w" data-act="word" data-w="${esc(w)}">${esc(w)}</span>${this.altNote.heardW[i] ? `（听成了 ${esc(this.altNote.heardW[i])}）` : ""}`).join("、")}。点一下听听，下次这几个词说慢一点、清楚一点。` : ""}</p>`;
       if (gc && (gc.must.length || gc.opt.length)) h += gramBoxHTML(gc);
@@ -5003,7 +5015,7 @@ class CardStage {
   rate(r){
     /* v1.66.3：看了提示才说对（第一遍错了、不是识别错）不是自己独立想起来的：最多按“有卡顿/有错误”记 */
     /* v1.66.4：只在第一遍明显说错时才限制（不是“差一点”：只差一两个词很可能是手机听漏了 the、a 这种小词，不然这种句子每次都被要求重说、永远升不了档） */
-    const firstClear = !!((this.tries && !this.misrec && this.firstCmp && this.firstCmp.level !== "close") || this.anyHint);   /* anyHint：扩句前面哪一步看了提示 */
+    const firstClear = !!((this.tries && !this.misrec && !this.firstMisrec && this.firstCmp && this.firstCmp.level !== "close") || this.anyHint);   /* v1.80.6：第一遍是识别错了的不算 */   /* anyHint：扩句前面哪一步看了提示 */
     if ((r === "good" || r === "easy") && firstClear){ r = "hard"; toast("第一遍说错、看了提示才说对：这次按“有卡顿/有错误”记"); }
     const okNow = this.misrec || (this.cmp && (this.cmp.exact || this.cmp.level === "close")) || (this.mean && !(this.flags || []).length);
     const err = r === "hard" && (firstClear || !okNow || (!this.misrec && (this.flags || []).length > 0));   /* 有错误 vs 只是慢 */
@@ -5330,6 +5342,15 @@ ACT["c-misrec"] = () => {
   s.render(); toast("按你说对算。被识别错的词记下了，可以在“今天练过的”里专门听");
   if (typeof batMisrec === "function") batMisrec(s);
 };
+/* v1.80.6：第一遍其实说对了、是识别错了（第二遍完全对）：和“我说对了，是识别错了”一样记下被听错的词，只是对的是第一遍 */
+ACT["c-misrec1"] = () => {
+  const s = RUN.stage; if (!(s instanceof CardStage) || s.phase !== "reveal" || !s.firstCmp || s.firstCmp.exact) return;
+  const words = (s.firstCmp.ops || []).filter(o => o.op === "del" || o.op === "sub").map(o => o.a).filter(w => w && w.length > 1);
+  S.misWords = S.misWords || {}; for (const w of words) S.misWords[w] = (S.misWords[w] || 0) + 1;
+  S.misWords = Object.fromEntries(Object.entries(S.misWords).sort((a, b) => b[1] - a[1]).slice(0, 50)); save();
+  s.firstMisrec = true; s.anyHint = false; dropThisMiss(s); if (typeof batMisrec === "function") try { batMisrec(s); } catch (e) {}
+  s.render(); toast("第一遍按你说对算，这次可以选“秒出”。被识别错的词记下了");
+};
 ACT["c-rec"] = async el => {
   const s = RUN.stage; if (!(s instanceof CardStage) || (s.phase !== "prompt" && s.phase !== "retry")) return;
   if (s.recBusy) return;
@@ -5496,7 +5517,7 @@ class IvStage {
         <div style="margin-top:6px">${checks.map((c,i) => `<label class="check"><input type="checkbox" data-i="${i}"><span>${c}</span></label>`).join("")}</div><p class="small muted" style="margin-top:6px">没打勾的会变成下一轮的重点。</p>
         ${(() => { const ref = refFor(q); const mine = a && a.text ? a.text.trim() : "";
           return `<div style="margin-top:10px">${slashBtn()}</div>` + ivRateHTML(q.id) + selfCheckHTML(q.id, "solo", 0, ((S.soloIssues || {})[q.id] || {}).k)
-            + (ref ? `<details style="margin-top:10px" open><summary>参考回答</summary><div class="en sm" style="margin-top:6px;line-height:1.7">${wordsHTML(ref)}</div><button class="btn sm" style="margin-top:8px" data-act="nav" data-v="reader" data-q="${q.id}" data-src="ref">跟读参考回答</button></details>` : "")
+            + (ref ? `<details style="margin-top:10px" open><summary>参考回答</summary><div class="en sm" style="margin-top:6px;line-height:1.7">${wordsHTML(ref)}</div><div class="say-btns" style="margin-top:6px">${sayBtns(ref)}</div><button class="btn sm" style="margin-top:8px" data-act="nav" data-v="reader" data-q="${q.id}" data-src="ref">跟读参考回答</button></details>` : "")
             + ((((S.qmeta || {})[q.id] || {}).zhA) ? `<details style="margin-top:10px"><summary>参考回答的中文意思</summary><p class="small" style="margin-top:6px;line-height:1.7" data-noi18n>${esc(S.qmeta[q.id].zhA)}</p></details>` : "")
             + (ref && typeof jobVocabHTML === "function" ? jobVocabHTML(ref) : "")
             + ((((S.qmeta || {})[q.id] || {}).ex) ? `<details style="margin-top:10px"><summary>讲解</summary><p class="small" style="margin-top:6px;line-height:1.7" data-noi18n>${esc(S.qmeta[q.id].ex)}</p></details>` : "")
@@ -5580,6 +5601,11 @@ function showSummary(){
   save(true);
 }
 ACT["again-session"] = () => startSession(["free","listen","solo"].includes(RUN.kind) ? "std" : RUN.kind, null, null, true);
+
+/* v1.80.6：游戏里练面试长回答时，上面的对战画面先收起来（只留名字那一行），回到普通卡片再放出来 */
+function gLong(on){ const g = document.querySelector(".g-top"); if (g) g.classList.toggle("g-long", !!on); }
+for (const [C, on] of [[typeof CardStage !== "undefined" ? CardStage : null, false], [typeof ListenStage !== "undefined" ? ListenStage : null, false], [typeof WordStage !== "undefined" ? WordStage : null, false], [typeof IvStage !== "undefined" ? IvStage : null, true]])
+  if (C && C.prototype && C.prototype.show){ const s0 = C.prototype.show; C.prototype.show = function(...a){ gLong(on); return s0.apply(this, a); }; }
 
 /* 只因 · 来电模拟、耳机模式、日记、写作、面试、进度、设置、导入、备份、检测、引导、启动 */
 "use strict";
@@ -15573,8 +15599,8 @@ async function dbResolve(said, secs){
   $("#dbFb").innerHTML = `<div class="card db-fb"><p><b>${st.mode === "432" ? "这一遍" : st.follow ? "这个追问" : "这一题"} ${Math.round(sc.cov * 100)} 分</b>${dmg ? `，伤害 ${dmg}` : ""}${ask ? `；你问了 ${sc.questions} 个问题` : ""}${st.mode === "432" && wpm ? `；每分钟 ${wpm} 个词` : ""}${sc.ai ? `<span class="small muted">（AI 按意思判的）</span>` : ""}</p>${note ? `<p class="small">${esc(note)}</p>` : ""}${sc.fb ? `<p class="small">${esc(sc.fb)}</p>` : ""}
     ${(sc.sub || []).length ? `<p class="small muted" style="margin-top:4px">${sc.sub.map(x => `${esc(x.s)} ${x.v}`).join(" · ")}</p>` : ""}
     ${sc.pts.map(p => `<p class="small ${p.ok ? "" : "db-miss"}">${p.ok ? "✓" : "✗"} ${esc(p.s)}${p.tip ? `<span class="muted">：${esc(p.tip)}</span>` : ""}</p>`).join("")}
-    ${sc.rewrite ? `<p class="small muted" style="margin-top:6px">你可以这样说：</p><p class="small en">${esc(sc.rewrite)}</p>` : ""}
-    ${ref ? `<details style="margin-top:6px"><summary class="small muted">参考回答：一种说法（不用照背）</summary><p class="small en">${esc(ref)}</p></details>` : ""}
+    ${sc.rewrite ? `<p class="small muted" style="margin-top:6px">你可以这样说：</p><div class="small en">${wordsHTML(sc.rewrite)}</div><div class="say-btns" style="margin-top:4px">${sayBtns(sc.rewrite)}</div>` : ""}
+    ${ref ? `<details style="margin-top:6px"><summary class="small muted">参考回答：一种说法（不用照背）</summary><div class="small en">${wordsHTML(ref)}</div><div class="say-btns" style="margin-top:4px">${sayBtns(ref)}</div></details>` : ""}
     ${said ? `<button class="btn sm" data-act="db-ask" style="margin-top:8px">存起来问 AI</button>` : ""}
     ${st.game && st.anim ? `<button class="btn sm" data-act="db-replay" style="margin-top:8px">回放</button>` : ""}
     <button class="btn primary block" data-act="db-next" style="margin-top:10px">${more ? "继续" : "看结果"}</button></div>`;
@@ -19091,9 +19117,9 @@ const JOB_SKILLS = [
  ["pcb", "PCB / electronics", "ee", /\bpcbs?\b|circuit boards?|altium|kicad|board (?:layout|design)|electronics?\b|circuit (?:design|analysis)|analog circuits?/i],
  ["power", "Power / high voltage", "ee", /power electronics|high voltage|power distribution|power supplies/i],
  ["vacuum", "Vacuum / gas systems", "ee", /\bvacuum\b|gas (?:handling|delivery|systems?)|plasma/i],
- ["semi", "Semiconductor equipment", "ee", /semiconductor|wafer|\bfab\b|cleanroom/i],
- ["med", "Medical device / regulated", "gen", /medical devices?|\bfda\b|iso ?13485|iec ?60601|regulated/i],
- ["quality", "Quality systems (ISO, Six Sigma, Lean)", "gen", /iso ?9001|six sigma|\blean\b|quality (?:systems?|management)|\bcapa\b/i],
+ ["semi", "Semiconductor equipment", "ee", /semiconductor|wafer|\bfab\b(?! shops?)|cleanroom/i],   /* v1.80.5：fab shop 是加工厂，不是晶圆厂 */
+ ["med", "Medical device / regulated", "gen", /medical devices?|\bfda\b|iso ?13485|iec ?60601|regulated (?:industr\w*|environments?|products?)/i],
+ ["quality", "Quality systems (ISO, Six Sigma, Lean)", "gen", /iso ?9001|six sigma|\blean (?:manufacturing|principles|methodolog\w*|tools|practices|production)|quality (?:systems?|management)|\bcapa\b/i],
  ["comm", "Communication", "gen", /communicat/i],
  ["team", "Teamwork / cross-functional", "gen", /cross-functional|collaborat|teamwork|team player/i],
  ["project", "Project management", "gen", /project management|manag(?:e|ing) (?:multiple )?projects|own(?:ing)? projects/i],
@@ -19108,20 +19134,28 @@ const JOB_SKILLS = [
 ];
 function jobSkillByName(n){ const t = jobNorm(n); return JOB_SKILLS.find(([id, label]) => jobNorm(id) === t || jobNorm(label) === t || jobNorm(label.split("/")[0]) === t) || null; }
 function jobSkillEv(){ const j = JB(); if (!j.skillEv || typeof j.skillEv !== "object") j.skillEv = {}; return j.skillEv; }
-const JOB_SEC_REQ = /^(minimum|basic|required|requirements?|must[- ]haves?|qualifications?|what (?:you|we)(?:'|’)?(?:ll| will| are)? ?(?:need|bring|look(?:ing)? for)|you (?:have|bring|are|should have)|who you are|about you|skills|experience|education|your background)/i;
-const JOB_SEC_PREF = /^(preferred|nice[- ]to[- ]haves?|bonus|desired|additional|plus\b|ideal|it would be great|extra credit|good to have|we'?d love)/i;
-const JOB_SEC_RESP = /^(responsibilit|what you(?:'|’)?ll do|what you will do|the role|about the role|role overview|job (?:summary|description)|your (?:impact|role)|duties|day[- ]to[- ]day|in this role|key responsibilities)/i;
-const JOB_PREF_CUE = /\b(preferred|a plus|is a plus|nice to have|bonus|desired|desirable|ideally)\b/i;
+/* v1.80.5：拿用户 24 份真实 JD 核对后补的小标题：What You Have、What Will Set You Apart、What we're looking for、Key Requirements…（以前 FieldAI 两份 JD 每一行都算“其他”） */
+const JOB_SEC_REQ = /^(minimum|basic|required|requirements?|must[- ]haves?|qualifications?|what (?:you|we)(?:'|’)?(?:ll|re| will| are)? ?(?:need|bring|have|look(?:ing)? for)|what you have|(?:who|what) we(?:'|’)?re looking for|we(?:'|’)?re looking for|you (?:have|bring|are|should have)|who you are|about you|skills|experience|education|your (?:background|qualifications|skills|experience|profile)|key (?:requirements|qualifications|skills)|(?:job|position|minimum|basic) (?:requirements|qualifications)|technical skills|what it takes|to be successful|you(?:'|’)?ll (?:need|thrive|succeed))/i;
+const JOB_SEC_PREF = /^(preferred|nice[- ]to[- ]haves?|bonus|desired|additional (?:skills|qualifications|experience)|plus\b|pluses|ideal|it would be great|extra (?:credit|points)|good to have|we'?d love|what (?:will|would) set you apart|(?:what )?(?:will |would )?(?:make|set) you (?:stand out|apart)|stand out|even better)/i;
+const JOB_SEC_RESP = /^(responsibilit|what you(?:'|’)?ll (?:do|work on)|what you will (?:get to )?do|what you(?:'|’)?ll get to do|what you (?:may|will) work on|the role|about the (?:role|job|position|opportunity)|role overview|job (?:summary|description|duties|responsibilities)|position (?:summary|overview)|your (?:impact|role)|duties|essential (?:duties|functions)|primary responsibilities|day[- ]to[- ]day|in this role|key responsibilities)/i;
+/* v1.80.5：公司介绍、福利薪资、平等就业 / AI 筛简历这类声明：不算要求（以前 AI、verification、housing 这些词会被算进去） */
+const JOB_SEC_SKIP = /^(about (?!the (?:role|job|position|opportunity)\b|you\b)|who we are|our (?:mission|story|company|culture|values|team|benefits)|why (?:join|work|you(?:'|’)?ll love)|what we offer|benefits|perks|compensation|salary|pay (?:range|transparency)|equal (?:employment )?opportunit|eeo|diversity|accommodation|privacy|disclaimer|e-?verify)/i;
+const JOB_SKIP_LINE = /equal (?:employment )?opportunit|do(?:es)? not discriminate|without regard to|protected (?:veteran|status|characteristic)|reasonable accommodation|e-?verify|employment eligibility|artificial intelligence \(ai\) tools|parts of the hiring process|privacy (?:notice|policy)|background (?:check|screen)|drug (?:screen|test)|401\(?k\)?|(?:health|dental|vision|medical) (?:insurance|benefits|coverage)|paid time off|\bpto\b|salary range|pay range|base (?:pay|salary)|compensation (?:package|range|is)|\bequity\b|sign-?on bonus|annual bonus/i;
+const JOB_PREF_CUE = /\b(preferred|prefer|preferably|a plus|is a plus|nice to have|bonus|desired|desirable|ideally|advantageous|an asset|would be great|strong add|strong plus|added advantage|big plus)\b/i;
 function jobJdLines(text){
   const out = []; let sec = "other";
-  for (const raw of String(text || "").split(/\r?\n/)){
+  /* v1.80.5：从网页复制的 JD 常把几条挤在一行（“…·       Solid grounding…”）：按项目符号拆开，每条单独算 */
+  const rawLines = String(text || "").split(/\r?\n/).flatMap(x => x.split(/\s*[·•▪●]\s+(?=\S)|(?<=[a-z0-9.)])-\s+(?=[A-Z])|\s+[-–]\s+(?=[A-Z][a-z])/));   /* “…discipline- At least 3 years…”这种用“- ”连起来的也拆 */
+  for (const raw of rawLines){
     const l = raw.trim().replace(/^(?:[-–•*·●▪]+|\d{1,2}[.)])\s*/, ""); if (!l) continue;   /* 只去掉项目符号和“1.”这种编号，不吃掉“3+ years”开头的数字 */
     /* 小标题：短、不是句子（结尾不是句号；结尾的冒号可以有，比如“Requirements:”） */
-    const lh = l.replace(/[:：]\s*$/, ""), head = lh.length <= 70 && !/[.。;；]$/.test(lh) && !/\d/.test(lh.slice(0, 3));
-    if (head && JOB_SEC_PREF.test(lh)) sec = "pref"; else if (head && JOB_SEC_REQ.test(lh) && lh.split(/\s+/).length <= 7) sec = "req"; else if (head && JOB_SEC_RESP.test(lh)) sec = "resp";
+    const lh = l.replace(/[:：]\s*$/, "").replace(/^[^A-Za-z0-9]+/, ""), head = lh.length <= 70 && !/[.。;；]$/.test(lh) && !/\d/.test(lh.slice(0, 3));
+    if (head && JOB_SEC_PREF.test(lh)) sec = "pref"; else if (head && JOB_SEC_REQ.test(lh) && lh.split(/\s+/).length <= 7) sec = "req"; else if (head && JOB_SEC_RESP.test(lh)) sec = "resp"; else if (head && JOB_SEC_SKIP.test(lh)) sec = "skip";
+    if (sec === "skip" || JOB_SKIP_LINE.test(l)){ out.push({l, cls:"skip"}); continue; }   /* 不算要求，也不看年限 */
     /* 括号里写的“(X preferred)”只算括号里的那部分是加分，这一行别的还是按所在的段算 */
     const paren = [], main = l.replace(/\(([^)]*)\)/g, (all, inner) => { if (JOB_PREF_CUE.test(inner)){ paren.push(inner); return " "; } return all; });
-    out.push({l:main, cls: JOB_PREF_CUE.test(main) ? "pref" : sec});
+    /* v1.80.5：分号隔开的几句分开看：“At least 3 years …; SMT background preferred” 里只有后半句是加分 */
+    for (const cl of main.split(/;\s+/)) if (cl.trim()) out.push({l:cl, cls: JOB_PREF_CUE.test(cl) ? "pref" : sec});
     for (const p of paren) out.push({l:p, cls:"pref"});
   }
   return out;
@@ -19133,9 +19167,10 @@ function jobJdAnalyze(apps){
   const rows = {}; const years = []; const neg = [], pos = [];
   for (const a of apps){
     const lines = jobJdLines(a.jd), best = {};
-    for (const {l, cls} of lines) for (const [id, , , re] of JOB_SKILLS) if (re.test(l) && (best[id] == null || JOB_CLS_RANK[cls] > JOB_CLS_RANK[best[id]])) best[id] = cls;
+    for (const {l, cls} of lines) if (cls !== "skip") for (const [id, , , re] of JOB_SKILLS) if (re.test(l) && (best[id] == null || JOB_CLS_RANK[cls] > JOB_CLS_RANK[best[id]])) best[id] = cls;
     for (const [id, cls] of Object.entries(best)){ const r = rows[id] = rows[id] || {req:0, pref:0, resp:0, other:0, cos:[]}; r[cls]++; r.cos.push(a.co); }
-    let minY = null; for (const {l, cls} of lines){ if (cls === "pref" || !/experience|years/i.test(l)) continue; const m = l.match(/(\d{1,2})\s*\+?\s*(?:[-–]|to)?\s*(\d{1,2})?\s*\+?\s*years?/i); if (m){ const y = +m[1]; if (y <= 20 && (minY == null || y < minY)) minY = y; } }
+    /* v1.80.5：数字也可能写成英文（Minimum of five years）；“Prefer 3-5 years”是加分，不算硬性年限 */
+    let minY = null; for (const {l, cls} of lines){ if (cls === "pref" || cls === "skip" || !/experience|years/i.test(l)) continue; const l2 = l.replace(/\b(?:\d{1,2}|one|two|three|four|five)-years?\s+(?:technical\s+|associate(?:'?s)?\s+|college\s+)?(?:degrees?|programs?|diplomas?|colleges?|warranty|contracts?)\b/gi, " "), m = l2.match(/\b(\d{1,2}|zero|one|two|three|four|five|six|seven|eight|nine|ten)\s*\+?\s*(?:(?:[-–]|to)\s*(?:\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten))?\s*\+?\s*(?:\(\d+\)\s*)?years?\b/i); if (m){ const W = {zero:0, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10}, y = /\d/.test(m[1]) ? +m[1] : W[m[1].toLowerCase()]; if (y <= 20 && (minY == null || y < minY)) minY = y; } }
     years.push({co:a.co, y:minY});
     const all = String(a.jd || ""); if (JOB_NEG.test(all)) neg.push(a.co); else if (JOB_POS.test(all)) pos.push(a.co);
   }
@@ -22970,6 +23005,15 @@ Object.assign(I18N_EN, {
  "have / has / had 后面用过去分词 {0}（{1}）；{2} 是 -ing 形式，要跟在 am / is / are 后面。": "After have / has / had, use the past participle {0} ({1}); {2} is the -ing form, which goes after am / is / are.",
  "have / has / had 后面用过去分词 {0}；{1} 是 -ing 形式，要跟在 am / is / are 后面。": "After have / has / had, use the past participle {0}; {1} is the -ing form, which goes after am / is / are.",
  "{0} 是 -ing 形式；have 后面要用过去分词 {1}": "“{0}” is the -ing form; after have, use the past participle {1}"
+});
+
+/* v1.80.6：第一遍是识别错了、说明重写 */
+Object.assign(I18N_EN, {
+ "第一遍我说对了，是识别错了": "My first try was right; it was misheard",
+ "第一遍按识别错了算，这次可以选“秒出”。": "The first try counts as misheard; you can pick “Instant” this time.",
+ "第一遍按你说对算，这次可以选“秒出”。被识别错的词记下了": "Your first try counts as right; you can pick “Instant” this time. The misheard words were saved",
+ "“和某人通个电话”说 have a call with someone（a call 是一次通话）。make a call 是“打电话”这个动作，后面接打给谁：make a call to someone；make a call with 不这么说": "“A call with someone” is have a call with someone (a call is one conversation). make a call is the act of phoning, followed by who you call: make a call to someone; make a call with isn't used",
+ "逗号后面不能直接接 can：can 前面要有主语（…, so it can …），或者改成 to + 动词（… to keep up with …）": "can can't come right after a comma: it needs a subject (…, so it can …), or use to + verb (… to keep up with …)"
 });
 
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
