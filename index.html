@@ -1204,6 +1204,11 @@ i.lbl{font-style:normal}
 .fbx .fb-why{margin-left:1.1em}
 /* v1.80.6：游戏里练面试长回答时收起对战画面 */
 .g-top.g-long #gArena{display:none}
+/* v1.80.7：AI 练习 */
+.ai-chip{display:inline-block;margin-top:4px;cursor:pointer;font-size:12.5px}
+.runbar .ai-chip{margin:0 0 0 8px;white-space:nowrap}
+.db h2 + .ai-chip{margin:2px 0 6px}
+.ai-prompt{white-space:pre-wrap;font-size:12.5px;line-height:1.6;max-height:260px;overflow:auto;background:var(--soft, rgba(127,127,127,.08));padding:8px;border-radius:8px}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1225,7 +1230,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.80.6"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.80.7"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -5650,7 +5655,7 @@ VIEWS.callsetup = {
       <div class="panel"><h3>接之前</h3><ul class="issues"><li>戴上耳机，找个安静的地方</li><li>没听清就点 “Sorry, could you say that again?”，真实面试里这很正常</li><li>先说结论，再讲经历；讲经历用过去式</li></ul></div>
       ${!TTS.ok ? `<p class="note">这台设备没有英文朗读，问题会直接显示成文字。</p>` : ""}
       ${MIC.blocked ? `<p class="note">这个版本不能录音：照样接电话、开口答，只是挂断后没有回放。想听自己的回放，用离线版。</p>` : ""}
-      <button class="btn primary big block" style="margin-top:16px" data-act="cs-go">${ICON.phone}开始，等它打来</button></div>`;
+      <button class="btn primary big block" style="margin-top:16px" data-act="cs-go">${ICON.phone}开始，等它打来</button><button class="btn block" style="margin-top:10px" data-act="ai-prac" data-k="call">AI 练习</button></div>`;
   }
 };
 ACT["cs-n"] = el => { S.settings.callQs = +el.dataset.v; save(); $$(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === el.dataset.v)); };
@@ -7298,12 +7303,12 @@ VIEWS.dialogs = {
     const done = S.dlgDone || {};
     return `<div class="wrap">${backBtn()}<h2>情景对话</h2>
       <p class="muted small" style="margin:6px 0 14px">对方先说一句（先只听，不看文字），你开口回答，再看可以怎么回。不打分，练的是听懂、接得上话。</p>
-      <div class="list">${CONTENT.DIALOGS.map(d => `<button class="li" data-act="nav" data-v="dialog" data-id="${d.id}"><div class="grow"><b>${esc(d.title)}</b><span>${esc(d.zh)}</span></div><span class="end">${d.turns.length} 句${done[d.id] ? `<br>练过 ${done[d.id]} 次` : ""}</span></button>`).join("")}</div></div>`;
+      <div class="list">${CONTENT.DIALOGS.map(d => `<button class="li" data-act="nav" data-v="dialog" data-id="${d.id}"><div class="grow"><b>${esc(d.title)}</b><span>${esc(d.zh)}</span></div><span class="end">${d.turns.length} 句${done[d.id] ? `<br>练过 ${done[d.id]} 次` : ""}<br><span class="chip ai-chip" role="button" data-act="ai-prac" data-k="dlg" data-id="${d.id}">AI 练习</span></span></button>`).join("")}</div></div>`;
   }
 };
 VIEWS.dialog = {
   full:true, noRefresh:true,
-  render(){ return `<div class="wrap"><div class="runbar"><button class="back" data-act="back" aria-label="退出">✕</button><div class="track"><i id="dgTrack"></i></div><span class="num" id="dgCount"></span></div><div id="stage"></div></div>`; },
+  render(){ return `<div class="wrap"><div class="runbar"><button class="back" data-act="back" aria-label="退出">✕</button><div class="track"><i id="dgTrack"></i></div><span class="num" id="dgCount"></span><button class="chip ai-chip" data-act="ai-prac" data-k="dlg">AI 练习</button></div><div id="stage"></div></div>`; },
   mount(p){ const d = CONTENT.DIALOGS.find(x => x.id === p.id) || CONTENT.DIALOGS[0]; DG.st = {d, i:0, phase:"listen", show:false, plays:0, voice:TTS.mixVoice()}; Act.start(); dgRender(); setTimeout(() => dgPlay(false), 300); },
   leave(){ DG.st = null; }
 };
@@ -7884,6 +7889,77 @@ function dgJudge(t, said){
   if (fit.ok || cmp.score >= 0.5) return {cls:"close", msg: g.length ? "回答到了问题，但这里可能要改：" : "意思差不多，可以参考下面的说法", gram:g};
   return {cls:"", msg: fit.why || "好像没回答到对方的问题，看看下面的说法", gram:g};
 }
+
+/* ---------- v1.80.7：AI 练习：把这一处的对话做成提示词，复制到任何 AI（ChatGPT、Gemini、claude.ai……）里用语音模式练；
+   练完 AI 用中文分析，并按只因的格式给导入码。API 直连还在开发，先只弹“开发中”。
+   提示词只放模板；“关于我”、常错的类型、准备过的要点都是用的时候才从这台手机里取。提示词写给 AI 看，用中文，不翻译 ---------- */
+function aiTypes(){ try { return Object.values(K.TAGS).map(t => t && t.label).filter(Boolean).join("、"); } catch (e) { return "地道说法、时态、介词、提问、救急句、面试语块、闲聊"; } }
+function aiAboutMe(){ const out = []; const p = String((S.settings || {}).profile || "").trim(); if (p) out.push("关于我：" + p.slice(0, 400));
+  try { const agg = K.tagAgg(S.tags || {}, today(), 0, 30); const w = Object.entries(agg).filter(([t, v]) => t !== "other" && v && v[0] >= 3 && v[1] < v[0]).sort((a, b) => (1 - b[1][1] / b[1][0]) - (1 - a[1][1] / a[1][0])).slice(0, 3).map(([t]) => (K.TAGS[t] || {}).label || t); if (w.length) out.push("我最常犯的错：" + w.join("、") + "。"); } catch (e) {}
+  try { const h = (typeof pronState === "function" ? pronState().hard : []).slice(-6).map(x => x.w).filter(Boolean); if (h.length) out.push("我常读错的词：" + h.join("、") + "。"); } catch (e) {}
+  try { const m = Object.entries(S.mixStats || {}).sort((a, b) => b[1].n - a[1].n).slice(0, 3).map(([k]) => { const f = K.MIX_WHY.find(([fam]) => fam[0][0] === k); return f ? f[0].map(x => x[0]).join(" / ") : k; }); if (m.length) out.push("我常混的词：" + m.join("，") + "。"); } catch (e) {}
+  if (out.some(x => !x.startsWith("关于我"))) out.push("对话里请自然地给我机会用到这些，分析时也特别留意。");
+  return out.join("\n"); }
+function aiRules(deck){ return `规则：
+1. 只说英语，每次只说一到三句，一次只问一个问题，像真人一样自然。
+2. 对话中不要纠正我。听不懂我的意思就像真人一样追问，或者请我再说一遍；我说 slower，你就说慢一点。
+3. 8 到 10 轮以后，或者我说“结束”或 stop 时，停下来，用中文写分析：
+   - 总体：对方能不能听懂我，最大的问题是什么；
+   - 最影响理解的 3 处：我的原话 → 更自然的说法 → 为什么；
+   - 对方误会的地方，以及我应该怎么说；
+   - 我可能读错、被听错的词；
+   - 值得学的说法（5 个以内）。
+4. 最后在一个代码块里给我导入码，第一行写“题库 | ${deck}”。说错的每句一行：改 | 我的原句 | 正确说法 | 类型 | 提示；值得学的说法每个一行：卡 | 中文 | English | 类型 | 提示。类型只能从这些里选：${aiTypes()}。
+分析和导入码请用文字写出来（用语音模式练的话，结束时切回文字）。`; }
+function aiQText(q){ return String((q && ((q.v && q.v[0]) || q.q || q.en)) || "").trim(); }
+function aiKeysOf(q){ const a = (S.answers || {})[q && q.id] || {}; const k = (a.keys || []).filter(x => String(x).trim()); if (k.length) return k.join("；");
+  const t = String(a.text || "").trim(); if (!t) return ""; try { return K.splitSentences(t).slice(0, 2).join(" "); } catch (e) { return t.slice(0, 200); } }
+function aiQList(qs, withKeys){ return qs.map((q, i) => { const k = withKeys ? aiKeysOf(q) : ""; return `${i + 1}. ${aiQText(q)}${k ? `\n   我准备过的要点：${k}` : ""}`; }).join("\n"); }
+function aiPromptDlg(d){ const flow = (d.turns || []).map(t => t.say).filter(Boolean).slice(0, 8).join(" → ");
+  return [`你现在是我的英语口语陪练，请和我做一次角色扮演。`, `场景：${d.title}。你扮演 ${d.who || "对方"}，我是场景里和你对话的另一方。要涉及：${d.zh}。`,
+    `参考流程（只是方向，可以自由变化，也可以加一点意外）：${flow}`, aiAboutMe(), aiRules("AI 对话·" + d.title), "现在请你先开口。"].filter(Boolean).join("\n"); }
+function aiPromptDb(st, withKeys){ const qs = (st && st.qs) || [], cc = st && st.mode === "cc";
+  const who = cc ? (st.persona === "*" ? "各种人" : dbPersona(st.persona || (qs[0] || {}).deck)) : "面试官";
+  const meta = (S.deckMeta || {})[(qs[0] || {}).deck] || {}, co = meta.company || "";
+  const keysOn = withKeys && qs.some(q => aiKeysOf(q));
+  return [`你现在是我的英语口语陪练，请和我做一次角色扮演。`,
+    cc ? `场景：一次轻松的 coffee chat（networking 交流）。你扮演 ${who}，我是正在找工作的工程师。` : `场景：一次英文面试。你扮演面试官${co ? `（${co}）` : ""}，我是来面试的工程师。`,
+    `按这些问题一个一个问，每题可以根据我的回答追问一两句，顺序可以调整：`, aiQList(qs, withKeys),
+    keysOn ? `练完以后，请对照我准备过的要点分析：哪些说到了、哪些漏了、哪里可以说得更好。` : "",
+    aiAboutMe(), aiRules("AI 对话·" + (cc ? "Coffee chat：" + who : "面试")), "现在请你先开口。"].filter(Boolean).join("\n"); }
+function aiPromptCall(withKeys){ const sets = typeof callSets === "function" ? callSets() : [{id:"core"}]; const cd = sets.some(s => s.id === S.settings.callDeck) ? S.settings.callDeck : "core";
+  const n = S.settings.callQs || 3, deck = cd.startsWith("u:") ? cd.slice(2) : "", meta = (S.deckMeta || {})[deck] || {};
+  let qs = deck ? (S.customQ || []).filter(q => q.deck === deck) : (CONTENT.QUESTIONS || []).filter(q => /初筛|开场/.test(String(q.cat || q.kind || q.type || "")));
+  if (!qs.length) qs = (CONTENT.QUESTIONS || []).slice(0, n); qs = qs.slice(0, n);
+  const keysOn = withKeys && qs.some(q => aiKeysOf(q));
+  return [`你现在是我的英语口语陪练，请和我做一次角色扮演：电话初筛。`,
+    `你扮演打电话来的招聘专员${meta.name ? `（${meta.name}）` : ""}${meta.company ? `，来自 ${meta.company}` : ""}，我是投了简历的工程师。像真的打电话一样：先确认我现在方便吗，最后告诉我下一步。`,
+    `电话里大概问 ${n} 个问题，可以用这些，也可以换成电话初筛常问的：`, aiQList(qs, withKeys),
+    keysOn ? `练完以后，请对照我准备过的要点分析：哪些说到了、哪些漏了、哪里可以说得更好。` : "",
+    aiAboutMe(), aiRules("AI 对话·来电模拟"), "现在请你先开口，像电话刚接通一样。"].filter(Boolean).join("\n"); }
+async function aiCopy(t){ try { if (navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(t); return true; } } catch (e) {}
+  try { const ta = document.createElement("textarea"); ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); return !!ok; } catch (e) { return false; } }
+async function aiCopyFlow(prompt){
+  if (await aiCopy(prompt)){
+    const c = await choose("提示词复制好了", `<ol class="small" style="margin:0 0 8px 18px;line-height:1.9"><li>打开你常用的 AI，新建一个对话，粘贴后发送。</li><li>打开语音模式，开始练。</li><li>说“结束”，AI 会给你分析和导入码。</li><li>回到只因的导入页，粘贴导入码。</li></ol>
+      <details><summary class="small">看提示词</summary><pre class="ai-prompt" data-noi18n>${esc(prompt)}</pre></details>`, [["imp", "去导入页"], ["ok", "好"]]);
+    if (c === "imp") UI.nav("import");
+  } else await choose("复制不了：长按全选复制", `<textarea class="imp-text ai-prompt" readonly data-noi18n style="min-height:240px">${esc(prompt)}</textarea>`, [["ok", "好"]]);
+}
+ACT["ai-prac"] = async el => {
+  const k = el.dataset.k; let make = null, keys = false;
+  if (k === "dlg"){ const d = CONTENT.DIALOGS.find(x => x.id === el.dataset.id) || (typeof DG !== "undefined" && DG.st && DG.st.d); if (!d) return; make = () => aiPromptDlg(d); }
+  else if (k === "db"){ const st = typeof DB !== "undefined" ? DB.st : null; if (!st) return; keys = true; make = () => aiPromptDb(st, L.aiKeys !== false); }
+  else if (k === "call"){ keys = true; make = () => aiPromptCall(L.aiKeys !== false); }
+  if (!make) return;
+  const c = await choose("AI 练习", `<p class="small" style="margin:0 0 8px">复制提示词：粘贴到 ChatGPT、Gemini、claude.ai 等任何 AI，用语音模式练效果最好；练完它会给你分析和导入码。</p>
+    ${keys ? `<label class="switch"><span>带上我准备过的回答要点（AI 练完会对照着分析）</span><input type="checkbox" id="aiKeysOpt" ${L.aiKeys === false ? "" : "checked"}></label>` : ""}`,
+    [["copy", "复制提示词，去 AI 里练"], ["api", "在只因里直接和 AI 对话（开发中）"]]);
+  if (c === "copy") return aiCopyFlow(make());
+  if (c === "api"){ const c2 = await choose("在只因里直接和 AI 对话", `<p>正在开发中……</p><p class="small muted">做好以后：在设置里选一家 AI、填上 API key，就能在只因里直接语音对话，练完马上出分析。现在可以先用“复制提示词”。</p>`, [["copy", "用复制提示词"], ["ok", "知道了"]]);
+    if (c2 === "copy") return aiCopyFlow(make()); }
+};
+document.addEventListener("change", e => { const el = e.target; if (!el || el.id !== "aiKeysOpt") return; L.aiKeys = !!el.checked; saveLocal(); });   /* 带不带要点：记在本机 */
 
 /* 只因 Tuokou · 代码画的怪物（3 小怪 + 3 精英 + 8 首领），给 src/battle.js 用。
    全部是原创形象，可以进仓库。每只都有 light / heavy / skill 三招，外加 hit / win / lose。
@@ -15448,7 +15524,7 @@ VIEWS.dboss = {
   render(){
     const st = DB.st; if (!st) return `<div class="wrap">${backBtn()}<p>没有在进行的对话首领战。</p></div>`;
     const title = st.mode === "cc" ? "Coffee chat：" + (st.persona === "*" ? "各种人" : dbPersona(st.persona || (st.qs[0] || {}).deck)) : st.mode === "432" ? (st.game ? "三遍提速战" : "三遍提速练习") : "面试官";
-    return `<div class="wrap db">${backBtn()}<h2>${st.mode === "432" ? "" : st.game ? "对话首领战：" : "对话练习："}${title}</h2>
+    return `<div class="wrap db">${backBtn()}<h2>${st.mode === "432" ? "" : st.game ? "对话首领战：" : "对话练习："}${title}</h2>${st.mode === "432" ? "" : `<button class="chip ai-chip" data-act="ai-prac" data-k="db">AI 练习</button>`}
       ${st.game ? `<div class="bt-stage db-arena" id="dbArena"></div>` : ""}
       <p class="small muted" id="dbHud" style="margin:6px 0">${st.game ? `${youName()} <b id="dbYou">${st.you}</b> · ${dbWho(st)} <b id="dbBoss">100</b> · ` : ""}第 <span id="dbRound">1</span>/${st.qs.length} ${st.mode === "432" ? "遍" : "题"}<span id="dbRoundTag"></span></p>
       <div class="card db-q"><p class="small muted" id="dbWhoSay">${dbWho(st)}问：</p><p class="en" id="dbQ"></p>
@@ -23014,6 +23090,28 @@ Object.assign(I18N_EN, {
  "第一遍按你说对算，这次可以选“秒出”。被识别错的词记下了": "Your first try counts as right; you can pick “Instant” this time. The misheard words were saved",
  "“和某人通个电话”说 have a call with someone（a call 是一次通话）。make a call 是“打电话”这个动作，后面接打给谁：make a call to someone；make a call with 不这么说": "“A call with someone” is have a call with someone (a call is one conversation). make a call is the act of phoning, followed by who you call: make a call to someone; make a call with isn't used",
  "逗号后面不能直接接 can：can 前面要有主语（…, so it can …），或者改成 to + 动词（… to keep up with …）": "can can't come right after a comma: it needs a subject (…, so it can …), or use to + verb (… to keep up with …)"
+});
+
+/* v1.80.7：AI 练习（复制提示词；API 直连开发中） */
+Object.assign(I18N_EN, {
+ "AI 练习": "AI practice",
+ "复制提示词，去 AI 里练": "Copy a prompt and practise in any AI",
+ "在只因里直接和 AI 对话（开发中）": "Talk to an AI right here in Cluck (in development)",
+ "复制提示词：粘贴到 ChatGPT、Gemini、claude.ai 等任何 AI，用语音模式练效果最好；练完它会给你分析和导入码。": "Copy the prompt and paste it into any AI (ChatGPT, Gemini, claude.ai…); voice mode works best. When you finish, it gives you an analysis and import codes.",
+ "带上我准备过的回答要点（AI 练完会对照着分析）": "Include the answer points I prepared (the AI compares against them afterwards)",
+ "提示词复制好了": "Prompt copied",
+ "打开你常用的 AI，新建一个对话，粘贴后发送。": "Open the AI you use, start a new chat, paste and send.",
+ "打开语音模式，开始练。": "Turn on voice mode and start practising.",
+ "说“结束”，AI 会给你分析和导入码。": "Say “结束” (or stop), and the AI gives you an analysis and import codes.",
+ "回到只因的导入页，粘贴导入码。": "Come back to Cluck's import page and paste the import codes.",
+ "看提示词": "See the prompt",
+ "去导入页": "Go to import",
+ "复制不了：长按全选复制": "Couldn't copy: press and hold to select all, then copy",
+ "在只因里直接和 AI 对话": "Talk to an AI right here in Cluck",
+ "正在开发中……": "In development…",
+ "做好以后：在设置里选一家 AI、填上 API key，就能在只因里直接语音对话，练完马上出分析。现在可以先用“复制提示词”。": "When it's ready: choose an AI in Settings and paste your API key, then talk to it by voice right here and get an analysis as soon as you finish. For now, use “Copy prompt”.",
+ "用复制提示词": "Use copy prompt",
+ "好": "OK"
 });
 
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
