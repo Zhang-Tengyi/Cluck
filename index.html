@@ -1209,6 +1209,9 @@ i.lbl{font-style:normal}
 .runbar .ai-chip{margin:0 0 0 8px;white-space:nowrap}
 .db h2 + .ai-chip{margin:2px 0 6px}
 .ai-prompt{white-space:pre-wrap;font-size:12.5px;line-height:1.6;max-height:260px;overflow:auto;background:var(--soft, rgba(127,127,127,.08));padding:8px;border-radius:8px}
+/* v1.80.8：耳机模式听面试问答 */
+.hands-en .hf-lbl{display:block;font-size:13px;color:var(--muted, #667085);margin-bottom:4px;font-weight:600}
+.hands-zh.en{font-size:20px}
 
 .has-ai-only{display:none!important}
 .has-ai .has-ai-only{display:inline-flex!important}
@@ -1230,7 +1233,7 @@ details>summary{cursor:pointer;font-weight:600;color:var(--ink2)}
 <button data-act="tab" data-v="me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>我的</span></button>
 </nav>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<script>window.__BUILD__={"pwa": true, "version": "1.80.7"};</script>
+<script>window.__BUILD__={"pwa": true, "version": "1.80.8"};</script>
 <script>
 const SCENE_SRC = {"day": "scenes/day.webp", "night": "scenes/night.webp", "garage": "scenes/garage.webp", "factory": "scenes/factory.webp", "forest": "scenes/forest.webp", "forestN": "scenes/forestN.webp", "gday": "scenes/gday.webp", "gnight": "scenes/gnight.webp", "gforest": "scenes/gforest.webp", "gforestN": "scenes/gforestN.webp", "amuse": "scenes/amuse.webp", "amuseN": "scenes/amuseN.webp", "moon": "scenes/moon.webp", "gas": "scenes/gas.webp", "gasN": "scenes/gasN.webp"};
 const SCENE_FRONT = {"day": "", "night": "", "garage": "", "factory": "", "forest": "", "forestN": "", "gday": "scenes/gday_front.webp", "gnight": "scenes/gnight_front.webp", "gforest": "scenes/gforest_front.webp", "gforestN": "scenes/gforestN_front.webp", "amuse": "scenes/amuse_front.webp", "amuseN": "scenes/amuseN_front.webp", "moon": "scenes/moon_front.webp", "gas": "scenes/gas_front.webp", "gasN": "scenes/gasN_front.webp"};
@@ -6417,35 +6420,135 @@ function handsList(src){
 VIEWS.hands = {
   full:true, noRefresh:true,
   render(){
+    const kind = L.hfKind || "cards";
+    const hint = kind === "qa" ? "戴上耳机，点开始。先听问题，再听回答；累的时候用来磨耳朵。" : kind === "paste" ? "把想听的英文贴在下面，点开始。" : "戴上耳机，点开始。听到中文先自己说，灯全灭后听标准说法，再跟着说一遍。";
     return `<div class="wrap"><div class="runbar"><button class="back" data-act="back" aria-label="退出">✕</button><div class="track"><i id="hfTrack"></i></div><span class="num" id="hfCount"></span></div>
       <div class="center"><div class="gantry big" id="hfLamps">${lamps()}</div></div>
       <div class="hands-zh" id="hfZh"></div><div class="hands-en" id="hfEn"></div>
-      <div class="hands-phase small muted" id="hfPhase">戴上耳机，点开始。听到中文先自己说，灯全灭后听标准说法，再跟着说一遍。</div>
+      <div class="hands-phase small muted" id="hfPhase">${hint}</div>
       <div class="row-gap" style="justify-content:center;margin-top:22px">
         <button class="icon-btn" data-act="hf-prev" aria-label="上一句">${ICON.chev}</button>
         <button class="play" data-act="hf-toggle" id="hfToggle" aria-label="开始">${ICON.play}</button>
         <button class="icon-btn" data-act="hf-next" aria-label="下一句">${ICON.next}</button></div>
-      <div class="panel" style="margin-top:22px"><label class="fld" style="margin-top:0"><span>听哪些</span><select data-chg="hfsrc">${hfSources().map(([v, l]) => `<option value="${esc(v)}" ${(L.hfSrc || "deck") === v ? "selected" : ""}>${esc(l)}（${handsList(v).length} 句）</option>`).join("")}</select></label>
-        <div class="small muted" style="margin-top:10px">每句的思考时间</div>
-        <div class="seg">${[3,4,5,7].map(s => `<button data-act="hf-think" data-v="${s}" aria-pressed="${L.thinkSec===s}">${s} 秒</button>`).join("")}</div>
-        <p class="small muted">${TTS.ok ? (TTS.hasZh() ? "" : "这台设备没有中文朗读：中文只显示在屏幕上，开始时会响一声。") : "这台设备不能朗读，耳机模式用不了，可以用反射训练。"}屏幕会保持常亮，锁屏后会停下。这里的练习不改变复习安排，但计入练习时间。</p></div></div>`;
+      <div class="panel" style="margin-top:22px">
+        <div class="small muted">听什么</div><div class="seg" style="margin-bottom:10px">${[["cards","句子"],["qa","面试问答"],["paste","自己贴的"]].map(([k, l]) => `<button data-act="hf-kind" data-v="${k}" aria-pressed="${kind === k}">${l}</button>`).join("")}</div>
+        ${kind === "qa" ? hfQAPanel() : kind === "paste" ? hfPastePanel() : hfCardsPanel()}
+        <p class="small muted">${TTS.ok ? (kind === "cards" && !TTS.hasZh() ? "这台设备没有中文朗读：中文只显示在屏幕上，开始时会响一声。" : "") : "这台设备不能朗读，耳机模式用不了，可以用反射训练。"}屏幕会保持常亮，锁屏后会停下。这里的练习不改变复习安排，但计入练习时间。</p></div></div>`;
   },
   mount(){
-    HF.st = {list:handsList(), i:0, playing:false, token:0, n:0}; hfShow();
+    HF.st = {list:hfList(), i:0, playing:false, token:hfTok(), n:0, heard:0, t0:0}; hfShow();
     HF.vis = () => { if (document.visibilityState === "hidden" && HF.st && HF.st.playing){ hfPlay(false); hfPhase("锁屏或切到后台时停下了，点开始继续"); } };
     document.addEventListener("visibilitychange", HF.vis);
   },
-  leave(){ if (HF.vis) document.removeEventListener("visibilitychange", HF.vis); if (HF.st){ HF.st.playing = false; HF.st.token++; } TTS.cancel(); Wake.off(); Act.stop(); HF.st = null; }
+  leave(){ if (HF.vis) document.removeEventListener("visibilitychange", HF.vis); if (HF.st){ HF.st.playing = false; HF.st.token = hfTok(); } TTS.cancel(); Wake.off(); Act.stop(); HF.st = null; }
 };
+/* v1.80.8：播放的编号全局递增、不重复：以前每次打开都从 0 开始，没停干净的上一轮碰巧编号一样，会接着读（用新的内容、旧的读法） */
+function hfTok(){ return (HF.gen = (HF.gen || 0) + 1); }
+/* v1.80.8：耳机模式除了句子，还能听面试问答、听自己贴进来的英文（用户：累的时候反复听面试问答）。
+   听法按研究来：先想再听（回想比光听记得牢）、交替着放（A B C 再 A B C，比一题连放几遍好）、第二遍稍快、问题和回答换声音；好久没听的先放（隔开听） */
+function hfList(){ const k = L.hfKind || "cards"; return k === "qa" ? hfQAList() : k === "paste" ? hfPasteList() : handsList(); }
+function hfCardsPanel(){ return `<label class="fld" style="margin-top:0"><span>听哪些</span><select data-chg="hfsrc">${hfSources().map(([v, l]) => `<option value="${esc(v)}" ${(L.hfSrc || "deck") === v ? "selected" : ""}>${esc(l)}（${handsList(v).length} 句）</option>`).join("")}</select></label>
+        <div class="small muted" style="margin-top:10px">每句的思考时间</div>
+        <div class="seg">${[3,4,5,7].map(s => `<button data-act="hf-think" data-v="${s}" aria-pressed="${L.thinkSec===s}">${s} 秒</button>`).join("")}</div>`; }
+function hfQAAll(){ try { return allQuestions().filter(q => q && q.id && (String(ans(q.id).text || "").trim() || String(refFor(q) || "").trim())); } catch (e) { return []; } }
+function hfQAList(){
+  const mode = L.hfAns || "mine", src = L.hfQSrc || "today", seen = L.hfQSeen || {};
+  let qs = hfQAAll().filter(q => mode === "mine" ? String(ans(q.id).text || "").trim() : mode === "ref" ? String(refFor(q) || "").trim() : true);
+  if (src.startsWith("deck:")) qs = qs.filter(q => q.deck === src.slice(5));
+  else if (src === "pick") qs = qs.filter(q => (L.hfPick || []).includes(q.id));
+  else qs = qs.slice().sort((x, y) => (seen[x.id] || 0) - (seen[y.id] || 0)).slice(0, 12);   /* 今天该听的：好久没听的先放 */
+  const items = qs.map(q => { const mine = String(ans(q.id).text || "").trim(), ref = String(refFor(q) || "").trim();
+    const parts = (mode === "mine" ? [["我的回答", mine]] : mode === "ref" ? [["参考回答", ref]] : [["我的回答", mine], ["参考回答", ref]]).filter(x => x[1]);
+    const keys = (ans(q.id).keys || []).map(String).filter(k => /[A-Za-z]/.test(k) && !/[\u4e00-\u9fff]/.test(k)).slice(0, 2);   /* 只念英文的要点 */
+    return {kind:"qa", id:q.id, q:String((q.v || [])[0] || q.en || "").trim(), zh:q.zh || "", parts, keys}; }).filter(x => x.q && x.parts.length);
+  return L.hfTwice === false ? items : items.concat(items.map(x => Object.assign({}, x, {fast:true})));   /* 每题两遍：A B C 放完再 A B C，第二遍稍快 */
+}
+function hfPasteList(){ const t = String(L.hfPaste || "").trim(); if (!t) return [];
+  let ss; try { ss = K.splitSentences(t.replace(/\s*\n+\s*/g, " ")); } catch (e) { ss = t.split(/(?<=[.!?])\s+/); }
+  const items = ss.map((x, i) => ({kind:"line", id:"p" + i, en:String(x).trim()})).filter(x => x.en && /[A-Za-z]/.test(x.en));
+  return L.hfTwice === false ? items : items.concat(items.map(x => Object.assign({}, x, {fast:true}))); }
+function hfMinSeg(){ const min = L.hfMin == null ? 20 : L.hfMin; return `<div class="small muted" style="margin-top:10px">放多久</div><div class="seg">${[[10,"10 分钟"],[20,"20 分钟"],[30,"30 分钟"],[0,"一直放"]].map(([v, l]) => `<button data-act="hf-min" data-v="${v}" aria-pressed="${min === v}">${l}</button>`).join("")}</div>`; }
+function hfQAPanel(){
+  const all = hfQAAll(), src = L.hfQSrc || "today", mode = L.hfAns || "mine", style = L.hfStyle || "think", decks = {};
+  for (const q of all) if (q.deck) decks[q.deck] = (decks[q.deck] || 0) + 1;
+  const opts = [["today", "今天该听的（好久没听的先放）"], ...Object.entries(decks).map(([d, n]) => ["deck:" + d, `${d}（${n} 题）`]), ["pick", `自己挑（${(L.hfPick || []).length} 题）`]];
+  return `<label class="fld" style="margin-top:0"><span>听哪些题</span><select id="hfQSrc">${opts.map(([v, l]) => `<option value="${esc(v)}" ${src === v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select></label>
+    ${src === "pick" ? `<button class="btn sm" data-act="hf-pick" style="margin-top:6px">挑题</button>` : ""}
+    <div class="small muted" style="margin-top:10px">回答放哪个</div><div class="seg">${[["mine","我的回答"],["ref","参考回答"],["both","两个都放"]].map(([k, l]) => `<button data-act="hf-ans" data-v="${k}" aria-pressed="${mode === k}">${l}</button>`).join("")}</div>
+    <div class="small muted" style="margin-top:10px">怎么听</div><div class="seg">${[["listen","纯听"],["think","先想再听"],["shadow","小声跟读"]].map(([k, l]) => `<button data-act="hf-style" data-v="${k}" aria-pressed="${style === k}">${l}</button>`).join("")}</div>
+    <p class="small muted" style="margin:4px 0 0">${style === "listen" ? "最省力：问题、回答连着放。" : style === "think" ? "推荐：问题念完先停一下，你在脑子里答一遍，再放回答。比光听记得牢。" : "回答一句一句放，每句后面留时间让你小声跟着说。"}</p>
+    ${style === "think" ? `<div class="small muted" style="margin-top:10px">想多久</div><div class="seg">${[5,10,15].map(x => `<button data-act="hf-qthink" data-v="${x}" aria-pressed="${(L.hfQThink || 10) === x}">${x} 秒</button>`).join("")}</div>` : ""}
+    <label class="switch" style="margin-top:10px"><span>每题两遍（交替着放，第二遍稍快）</span><input type="checkbox" id="hfTwice" ${L.hfTwice === false ? "" : "checked"}></label>
+    <label class="switch"><span>要点里的英文说法再慢慢念一遍</span><input type="checkbox" id="hfKeys" ${L.hfKeys === false ? "" : "checked"}></label>
+    ${hfMinSeg()}
+    <p class="small muted" style="margin:6px 0 0">${all.length ? `有回答的题一共 ${all.length} 道。` : "还没有写好回答的题：先在面试题里写回答，或者导入参考回答。"}</p>`; }
+function hfPastePanel(){ const style = L.hfPStyle || "listen";
+  return `<label class="fld" style="margin-top:0"><span>贴英文进来（一段或几段都行）</span><textarea id="hfPaste" class="imp-text" data-noi18n placeholder="比如：一段面试回答、一篇短文" style="min-height:120px">${esc(L.hfPaste || "")}</textarea></label>
+    <div class="small muted" style="margin-top:10px">怎么听</div><div class="seg">${[["listen","纯听"],["shadow","小声跟读"]].map(([k, l]) => `<button data-act="hf-pstyle" data-v="${k}" aria-pressed="${style === k}">${l}</button>`).join("")}</div>
+    <label class="switch" style="margin-top:10px"><span>每段两遍（第二遍稍快）</span><input type="checkbox" id="hfTwice" ${L.hfTwice === false ? "" : "checked"}></label>
+    ${hfMinSeg()}`; }
 function hfShow(){
   const st = HF.st; if (!st) return; const c = st.list[st.i];
   const zh = $("#hfZh"), en = $("#hfEn"), tr = $("#hfTrack"), cn = $("#hfCount");
-  if (zh) zh.textContent = c ? c.zh : "没有可以练的句子";
-  if (c){ L.hfSeen = L.hfSeen || {}; L.hfSeen[c.id] = Date.now(); const ks = Object.keys(L.hfSeen); if (ks.length > 500) ks.sort((a, b) => L.hfSeen[a] - L.hfSeen[b]).slice(0, ks.length - 500).forEach(k => delete L.hfSeen[k]); saveLocal(); }
+  if (zh) zh.textContent = !c ? (L.hfKind === "paste" ? "先把想听的英文贴在下面" : L.hfKind === "qa" ? "没有可以听的题" : "没有可以练的句子") : c.kind === "qa" ? c.q : c.kind === "line" ? "" : c.zh;
+  if (zh) zh.classList.toggle("en", !!(c && c.kind === "qa"));
+  if (c && !c.kind){ L.hfSeen = L.hfSeen || {}; L.hfSeen[c.id] = Date.now(); const ks = Object.keys(L.hfSeen); if (ks.length > 500) ks.sort((a, b) => L.hfSeen[a] - L.hfSeen[b]).slice(0, ks.length - 500).forEach(k => delete L.hfSeen[k]); saveLocal(); }
   if (en) en.textContent = "";
   if (tr) tr.style.width = Math.round(st.i / Math.max(1, st.list.length) * 100) + "%";
   if (cn) cn.textContent = c ? `${st.i+1}/${st.list.length}` : "";
 }
+function hfSents(t){ try { return K.splitSentences(t); } catch (e) { return [t]; } }
+function hfAnsShow(label, text){ const en = $("#hfEn"); if (en) en.innerHTML = `<b class="hf-lbl">${esc(label)}</b> <span class="en" data-noi18n>${esc(text)}</span>`; }
+async function hfLoop2(tok){
+  const st = HF.st; if (!st) return; if (!HF.qv) try { HF.qv = TTS.mixVoice ? TTS.mixVoice() : null; } catch (e) {}
+  while (hfAlive(tok)){
+    const c = st.list[st.i]; if (!c){ st.playing = false; break; }
+    const rate = c.fast ? 1.1 : 1; hfShow();
+    if (c.kind === "qa"){
+      const style = L.hfStyle || "think";
+      hfPhase(c.fast ? "第二遍：听问题" : "听问题"); await TTS.speak(c.q, Object.assign({rate}, HF.qv ? {voice:HF.qv} : {})); if (!hfAlive(tok)) return;   /* 问题换一个声音，像面试官 */
+      if (style === "think"){ hfPhase("在脑子里答一遍"); await hfCountdown((L.hfQThink || 10) * 1000, tok); } else await sleep(900);
+      if (!hfAlive(tok)) return;
+      for (const [label, text] of c.parts){
+        hfAnsShow(label, text); hfPhase("听" + label);
+        if (style === "shadow"){ for (const x of hfSents(text)){ if (!hfAlive(tok)) return; await TTS.speak(x, {rate}); if (!hfAlive(tok)) return; hfPhase("跟着小声说"); await sleep(Math.max(1500, x.length * 60)); if (!hfAlive(tok)) return; hfPhase("听" + label); } }
+        else await TTS.speak(text, {rate});
+        if (!hfAlive(tok)) return; await sleep(700);
+      }
+      if (L.hfKeys !== false && c.keys.length){ hfPhase("重点再慢慢念一遍"); await TTS.speak(c.keys.join(". "), {rate:0.8}); if (!hfAlive(tok)) return; }
+      L.hfQSeen = L.hfQSeen || {}; L.hfQSeen[c.id] = Date.now(); saveLocal();
+    } else {
+      const en = $("#hfEn"); if (en){ en.textContent = c.en; en.setAttribute("data-noi18n", ""); } hfPhase(c.fast ? "第二遍" : "听");
+      await TTS.speak(c.en, {rate}); if (!hfAlive(tok)) return;
+      if ((L.hfPStyle || "listen") === "shadow"){ hfPhase("跟着小声说"); await sleep(Math.max(1500, c.en.length * 60)); } else await sleep(500);
+    }
+    if (!hfAlive(tok)) return;
+    st.n++; st.heard++; st.i = (st.i + 1) % st.list.length;
+    const lim = L.hfMin == null ? 20 : L.hfMin; if (lim && Date.now() - st.t0 >= lim * 60000){ hfPlay(false); hfEnd(); return; }
+  }
+}
+async function hfEnd(){
+  const st = HF.st; if (!st) return; const mins = Math.max(1, Math.round((Date.now() - (st.t0 || Date.now())) / 60000)), qa = L.hfKind === "qa";
+  const nq = qa ? new Set(st.list.slice(0, Math.min(st.heard, st.list.length)).map(x => x.id)).size : 0, pick = qa && st.list.length ? st.list[Math.floor(Math.random() * st.list.length)] : null;
+  const c = await choose("听完了", `<p>${qa ? `听了 ${mins} 分钟、${nq} 道题。` : `听了 ${mins} 分钟。`}</p>${pick ? `<p class="small muted">最后来一题：不看文字，开口答一遍，把听到的变成自己的。</p><p class="en" data-noi18n>${esc(pick.q)}</p>` : ""}`, pick ? [["solo", "开口答这一题"], ["ok", "好"]] : [["ok", "好"]]);
+  if (c === "solo" && pick) ACT["iv-solo"]({dataset:{q:pick.id}});
+}
+const hfRe = () => { if (HF.st && HF.st.playing) hfPlay(false); UI.replace("hands"); };
+ACT["hf-kind"] = el => { L.hfKind = el.dataset.v; saveLocal(); hfRe(); };
+ACT["hf-ans"] = el => { L.hfAns = el.dataset.v; saveLocal(); hfRe(); };
+ACT["hf-style"] = el => { L.hfStyle = el.dataset.v; saveLocal(); hfRe(); };
+ACT["hf-pstyle"] = el => { L.hfPStyle = el.dataset.v; saveLocal(); hfRe(); };
+ACT["hf-qthink"] = el => { L.hfQThink = +el.dataset.v; saveLocal(); hfRe(); };
+ACT["hf-min"] = el => { L.hfMin = +el.dataset.v; saveLocal(); hfRe(); };
+ACT["hf-pick"] = async () => { const all = hfQAAll(); const sel = new Set(L.hfPick || []);
+  await choose("挑要听的题", all.length ? `<div class="list">${all.map(q => `<label class="li"><input type="checkbox" class="hfPickBox" data-q="${esc(q.id)}" ${sel.has(q.id) ? "checked" : ""}><div class="grow"><b class="en" data-noi18n>${esc((q.v || [])[0] || "")}</b><span data-noi18n>${esc(q.zh || "")}</span></div></label>`).join("")}</div>` : `<p class="small muted">还没有写好回答的题。</p>`, [["ok", "好"]]);
+  hfRe(); };
+document.addEventListener("change", e => { const el = e.target; if (!el || !el.id && !(el.classList && el.classList.contains("hfPickBox"))) return;
+  if (el.id === "hfQSrc"){ L.hfQSrc = el.value; saveLocal(); hfRe(); }
+  else if (el.id === "hfTwice"){ L.hfTwice = !!el.checked; saveLocal(); if (HF.st && !HF.st.playing){ HF.st.list = hfList(); HF.st.i = 0; hfShow(); } }
+  else if (el.id === "hfKeys"){ L.hfKeys = !!el.checked; saveLocal(); }
+  else if (el.classList && el.classList.contains("hfPickBox")){ const set = new Set(L.hfPick || []); if (el.checked) set.add(el.dataset.q); else set.delete(el.dataset.q); L.hfPick = [...set]; saveLocal(); } });
+document.addEventListener("input", e => { const el = e.target; if (!el || el.id !== "hfPaste") return; L.hfPaste = el.value; saveLocal(); if (HF.st && !HF.st.playing){ HF.st.list = hfList(); HF.st.i = 0; hfShow(); } });
 function hfPhase(t){ const p = $("#hfPhase"); if (p) p.textContent = t; }
 const hfAlive = tok => HF.st && HF.st.playing && HF.st.token === tok;
 function hfCountdown(ms, tok){
@@ -6472,9 +6575,9 @@ async function hfLoop(tok){
 }
 function hfPlay(on){
   const st = HF.st; if (!st) return;
-  st.playing = on; st.token++; TTS.cancel();
+  st.playing = on; st.token = hfTok(); TTS.cancel();
   const b = $("#hfToggle"); if (b){ b.innerHTML = on ? ICON.pause : ICON.play; b.setAttribute("aria-label", on ? "暂停" : "开始"); }
-  if (on){ if (!TTS.ok){ toast("这台设备不能朗读"); st.playing = false; return; } Wake.on(); Act.start(true); hfLoop(st.token); }
+  if (on){ if (!TTS.ok){ toast("这台设备不能朗读"); st.playing = false; return; } Wake.on(); Act.start(true); if (!st.t0) st.t0 = Date.now(); ((L.hfKind === "qa" || L.hfKind === "paste") ? hfLoop2 : hfLoop)(st.token); }
   else { Wake.off(); Act.stop(); $$("#hfLamps i").forEach(i => i.classList.remove("on")); hfPhase("暂停了"); }
 }
 ACT["hf-toggle"] = () => HF.st && hfPlay(!HF.st.playing);
@@ -19210,7 +19313,7 @@ const JOB_SKILLS = [
 ];
 function jobSkillByName(n){ const t = jobNorm(n); return JOB_SKILLS.find(([id, label]) => jobNorm(id) === t || jobNorm(label) === t || jobNorm(label.split("/")[0]) === t) || null; }
 function jobSkillEv(){ const j = JB(); if (!j.skillEv || typeof j.skillEv !== "object") j.skillEv = {}; return j.skillEv; }
-/* v1.80.5：拿用户 24 份真实 JD 核对后补的小标题：What You Have、What Will Set You Apart、What we're looking for、Key Requirements…（以前 FieldAI 两份 JD 每一行都算“其他”） */
+/* v1.80.5：拿用户 24 份真实 JD 核对后补的小标题：What You Have、What Will Set You Apart、What we're looking for、Key Requirements…（以前有两份 JD 每一行都算“其他”） */
 const JOB_SEC_REQ = /^(minimum|basic|required|requirements?|must[- ]haves?|qualifications?|what (?:you|we)(?:'|’)?(?:ll|re| will| are)? ?(?:need|bring|have|look(?:ing)? for)|what you have|(?:who|what) we(?:'|’)?re looking for|we(?:'|’)?re looking for|you (?:have|bring|are|should have)|who you are|about you|skills|experience|education|your (?:background|qualifications|skills|experience|profile)|key (?:requirements|qualifications|skills)|(?:job|position|minimum|basic) (?:requirements|qualifications)|technical skills|what it takes|to be successful|you(?:'|’)?ll (?:need|thrive|succeed))/i;
 const JOB_SEC_PREF = /^(preferred|nice[- ]to[- ]haves?|bonus|desired|additional (?:skills|qualifications|experience)|plus\b|pluses|ideal|it would be great|extra (?:credit|points)|good to have|we'?d love|what (?:will|would) set you apart|(?:what )?(?:will |would )?(?:make|set) you (?:stand out|apart)|stand out|even better)/i;
 const JOB_SEC_RESP = /^(responsibilit|what you(?:'|’)?ll (?:do|work on)|what you will (?:get to )?do|what you(?:'|’)?ll get to do|what you (?:may|will) work on|the role|about the (?:role|job|position|opportunity)|role overview|job (?:summary|description|duties|responsibilities)|position (?:summary|overview)|your (?:impact|role)|duties|essential (?:duties|functions)|primary responsibilities|day[- ]to[- ]day|in this role|key responsibilities)/i;
@@ -19422,7 +19525,7 @@ function jobPendingInfo(){
   const todo = JB().apps.filter(a => /详情待补/.test(a.note || "") && !String(a.role || "").trim() && jobGroup(a) !== "ended");
   return {days, n:days.reduce((s, x) => s + x[1], 0), todo};
 }
-const JOB_WHERE = "想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、NUworks 的 Applications；浏览器的历史记录。";
+const JOB_WHERE = "想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、学校就业网站的 Applications；浏览器的历史记录。";
 function jobPendingHTML(){
   const p = jobPendingInfo(); if (!p.n && !p.todo.length) return "";
   return `<section class="panel job-pend"><div class="job-row"><b>${p.n ? `${p.n} 份只记了数` : `${p.todo.length} 份还没补职位`}</b><span class="small muted">趁还记得补上</span></div>
@@ -21975,8 +22078,8 @@ Object.assign(I18N_EN, {
  "{n} 份只记了数": "{n} logged without details",
  "趁还记得补上": "Fill them in while you remember",
  "这几天在成长页只记了数，还没写是哪家。": "You logged these on the Grow page without saying which companies.",
- "想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、NUworks 的 Applications；浏览器的历史记录。": "Can't remember where you applied? Search your email for 'application' or 'thank you for applying' (most portals send a confirmation); LinkedIn → My jobs → Applied; Handshake or NUworks → Applications; your browser history.",
- "还有 {n} 份只记了数。想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、NUworks 的 Applications；浏览器的历史记录。": "{n} still logged without details. Can't remember where you applied? Search your email for 'application' or 'thank you for applying' (most portals send a confirmation); LinkedIn → My jobs → Applied; Handshake or NUworks → Applications; your browser history.",
+ "想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、学校就业网站的 Applications；浏览器的历史记录。": "Can't remember where you applied? Search your email for 'application' or 'thank you for applying' (most portals send a confirmation); LinkedIn → My jobs → Applied; Handshake or your school's career site → Applications; your browser history.",
+ "还有 {n} 份只记了数。想不起来投了哪家：邮箱里搜 application、thank you for applying（大多数网申会发确认信）；LinkedIn → My jobs → Applied；Handshake、学校就业网站的 Applications；浏览器的历史记录。": "{n} still logged without details. Can't remember where you applied? Search your email for 'application' or 'thank you for applying' (most portals send a confirmation); LinkedIn → My jobs → Applied; Handshake or your school's career site → Applications; your browser history.",
  "补上 {n} 份": "Fill in {n}",
  "{n} 份还没补职位": "{n} still missing a role",
  "只写了公司：": "Company only: ",
@@ -23112,6 +23215,56 @@ Object.assign(I18N_EN, {
  "做好以后：在设置里选一家 AI、填上 API key，就能在只因里直接语音对话，练完马上出分析。现在可以先用“复制提示词”。": "When it's ready: choose an AI in Settings and paste your API key, then talk to it by voice right here and get an analysis as soon as you finish. For now, use “Copy prompt”.",
  "用复制提示词": "Use copy prompt",
  "好": "OK"
+});
+
+/* v1.80.8：耳机模式听面试问答、听自己贴的英文 */
+Object.assign(I18N_EN, {
+ "句子": "Sentences",
+ "面试问答": "Interview Q&A",
+ "自己贴的": "My own text",
+ "听什么": "What to hear",
+ "戴上耳机，点开始。先听问题，再听回答；累的时候用来磨耳朵。": "Put on headphones and tap start. Hear the question, then the answer: an easy way to train your ear when you're tired.",
+ "把想听的英文贴在下面，点开始。": "Paste the English you want to hear below, then tap start.",
+ "听哪些题": "Which questions",
+ "今天该听的（好久没听的先放）": "For today (longest-unheard first)",
+ "{0}（{n} 题）": "{0} ({n} questions)",
+ "自己挑（{n} 题）": "Pick my own ({n})",
+ "挑题": "Pick questions",
+ "回答放哪个": "Which answer",
+ "两个都放": "Both",
+ "怎么听": "How to listen",
+ "纯听": "Just listen",
+ "先想再听": "Think first",
+ "小声跟读": "Murmur along",
+ "最省力：问题、回答连着放。": "Least effort: question and answer play back to back.",
+ "推荐：问题念完先停一下，你在脑子里答一遍，再放回答。比光听记得牢。": "Recommended: after the question there's a pause to answer in your head, then the answer plays. It sticks better than just listening.",
+ "回答一句一句放，每句后面留时间让你小声跟着说。": "The answer plays sentence by sentence, with time after each to murmur along.",
+ "想多久": "Thinking time",
+ "每题两遍（交替着放，第二遍稍快）": "Twice each (alternating; a bit faster the second time)",
+ "要点里的英文说法再慢慢念一遍": "Read the English key phrases from my points again, slowly",
+ "放多久": "How long",
+ "一直放": "Keep playing",
+ "有回答的题一共 {n} 道。": "{n} questions have answers.",
+ "还没有写好回答的题：先在面试题里写回答，或者导入参考回答。": "No questions with answers yet: write answers in Interview questions, or import model answers.",
+ "贴英文进来（一段或几段都行）": "Paste English (one or more paragraphs)",
+ "比如：一段面试回答、一篇短文": "For example: an interview answer or a short article",
+ "每段两遍（第二遍稍快）": "Twice each (a bit faster the second time)",
+ "第二遍：听问题": "Second time: listen to the question",
+ "在脑子里答一遍": "Answer it in your head",
+ "听我的回答": "Listen to my answer",
+ "听参考回答": "Listen to the model answer",
+ "跟着小声说": "Murmur along",
+ "重点再慢慢念一遍": "The key phrases again, slowly",
+ "听": "Listen",
+ "先把想听的英文贴在下面": "Paste the English you want to hear below first",
+ "没有可以听的题": "No questions to listen to",
+ "听完了": "Done listening",
+ "听了 {n} 分钟、{n} 道题。": "Listened for {n} min, {n} questions.",
+ "听了 {n} 分钟。": "Listened for {n} min.",
+ "最后来一题：不看文字，开口答一遍，把听到的变成自己的。": "One last one: answer it out loud without looking, to make what you heard your own.",
+ "开口答这一题": "Answer this one",
+ "挑要听的题": "Pick the questions to hear",
+ "还没有写好回答的题。": "No questions with answers yet."
 });
 
 /* 语言登记表：设置里的“界面语言”选项从这里来 */
